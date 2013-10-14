@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/', function()
-{
-	return View::make('hello');
-});
+Route::get('/', "HomeController@index");
+Route::get('/discovery', "DiscoveryController@idp");
+Route::post('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
+Route::get('/accounts/openid/v2','OpenIdProviderController@op_endpoint');

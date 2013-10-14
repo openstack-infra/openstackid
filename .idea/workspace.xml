@@ -4,6 +4,39 @@
     <list default="true" id="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" name="Default" comment="" />
     <ignored path="openidIdp.iws" />
     <ignored path=".idea/workspace.xml" />
+    <file path="/DiscoveryController.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381780458797" ignored="false" />
+    <file path="/DiscoveryControllerTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381770482258" ignored="false" />
+    <file path="/2013_10_14_155702_create_extension_table.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381766606263" ignored="false" />
+    <file path="/ServerExtension.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381766727808" ignored="false" />
+    <file path="/ServerExtensionTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381768563012" ignored="false" />
+    <file path="/tmp/ide-phpunit.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381787642400" ignored="false" />
+    <file path="/fragment.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381787792984" ignored="false" />
+    <file path="/HomeController.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381768818138" ignored="false" />
+    <file path="/XrdsDocumentBuilder.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381773998567" ignored="false" />
+    <file path="/a.dummy" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381783802820" ignored="false" />
+    <file path="/Dummy.txt" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381777738465" ignored="false" />
+    <file path="/IXRDSService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381773588280" ignored="false" />
+    <file path="/XRDSService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381772341971" ignored="false" />
+    <file path="/XRDSDocumentTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381774070136" ignored="false" />
+    <file path="/OpenIdProtocol.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381784562638" ignored="false" />
+    <file path="/IServerExtensionsRepository.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381777956130" ignored="false" />
+    <file path="/IServerConfigurationRepository.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381778188675" ignored="false" />
+    <file path="/OpenIdProtocolTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381781851602" ignored="false" />
+    <file path="/app.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381780572613" ignored="false" />
+    <file path="/RepositoriesServiceProvider.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381780638618" ignored="false" />
+    <file path="/ServerConfigurationRepositoryEloquent.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381781085301" ignored="false" />
+    <file path="/ServerExtensionsRepositoryEloquent.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381781161806" ignored="false" />
+    <file path="/IOpenIdProtocol.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381783163549" ignored="false" />
+    <file path="/*.regexp" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381781743384" ignored="false" />
+    <file path="/IOpenIdMessageHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381784676935" ignored="false" />
+    <file path="/OpenIdAuthenticationRequestHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381783827702" ignored="false" />
+    <file path="/OpenIdSessionAssociationRequestHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381784308892" ignored="false" />
+    <file path="/OpenIdCheckAuthenticationRequestHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381783903261" ignored="false" />
+    <file path="/OpenIdMessage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381787153443" ignored="false" />
+    <file path="/OpenIdMessageHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381784626399" ignored="false" />
+    <file path="/OpenIdProviderController.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381787496595" ignored="false" />
+    <file path="/OpenIdProviderControllerTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381786052450" ignored="false" />
+    <file path="/routes.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381787719854" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,35 +59,7 @@
     <favorites_list name="openidIdp" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="composer.json" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/composer.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="8" column="42" selection-start="254" selection-end="254" vertical-scroll-proportion="-5.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="autoload.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vendor/autoload.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="autoload_classmap.php" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/vendor/composer/autoload_classmap.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.088757396">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -64,16 +69,52 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
+        <option value="$PROJECT_DIR$/app/tests/mocks/ServerExtensionsRepositoryMock.php" />
         <option value="$PROJECT_DIR$/composer.json" />
+        <option value="$PROJECT_DIR$/app/controllers/DiscoveryController.php" />
+        <option value="$PROJECT_DIR$/app/tests/OpenIdProtocolTest.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/OpenIdServiceProvider.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/IOpenIdProtocol.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/handlers/IOpenIdMessageHandler.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdSessionAssociationRequestHandler.php" />
+        <option value="$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdCheckAuthenticationRequestHandler.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdMessageHandler.php" />
+        <option value="$PROJECT_DIR$/app/controllers/OpenIdProviderController.php" />
+        <option value="$PROJECT_DIR$/app/routes.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/OpenIdMessage.php" />
       </list>
     </option>
   </component>
-  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="PhpServers">
+    <option name="servers">
+      <server host="dev.openstackid.com" name="dev.openstackid.com" />
+    </option>
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" interpreter_name="PHP 5.4.13" />
   <component name="ProjectFrameBounds">
     <option name="x" value="65" />
     <option name="y" value="32" />
     <option name="width" value="1301" />
     <option name="height" value="728" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>CoffeeScript</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -120,16 +161,261 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vendor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vendor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="composer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tests" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openid" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openid" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="repositories" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openid" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="handlers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="controllers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="config" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="options.splitter.main.proportions" value="0.3" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="options.lastSelected" value="Configurable.PHP.PHPUnit" />
+    <property name="recentsLimit" value="5" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../php-openid" />
+    <property name="GoToClass.includeJavaFiles" value="false" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
-  <component name="RunManager">
-    <list size="0" />
+  <component name="RunManager" selected="PHPUnit.OpenIdProviderControllerTest">
+    <configuration default="false" name="DiscoveryControllerTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="DiscoveryControllerTest" file="$PROJECT_DIR$/app/tests/DiscoveryControllerTest.php" scope="Class" />
+      <RunnerSettings RunnerId="PhpUnitDebugRunner" />
+      <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="XRDSDocumentTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="XRDSDocumentTest" file="$PROJECT_DIR$/app/tests/XRDSDocumentTest.php" scope="Class" />
+      <RunnerSettings RunnerId="PhpRunner" />
+      <RunnerSettings RunnerId="PhpUnitDebugRunner" />
+      <ConfigurationWrapper RunnerId="PhpRunner" />
+      <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="DiscoveryControllerTest.testIdpDiscovery" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="DiscoveryControllerTest" file="$PROJECT_DIR$/app/tests/DiscoveryControllerTest.php" method="testIdpDiscovery" scope="Method" />
+      <RunnerSettings RunnerId="PhpRunner" />
+      <RunnerSettings RunnerId="PhpUnitDebugRunner" />
+      <ConfigurationWrapper RunnerId="PhpRunner" />
+      <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="OpenIdProviderController.php" type="PhpLocalRunConfigurationType" factoryName="PHP Console" temporary="true" path="$PROJECT_DIR$/app/controllers/OpenIdProviderController.php">
+      <RunnerSettings RunnerId="PhpScriptDebugRunner" />
+      <ConfigurationWrapper RunnerId="PhpScriptDebugRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="OpenIdProviderControllerTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="OpenIdProviderControllerTest" file="$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php" scope="Class" />
+      <RunnerSettings RunnerId="PhpUnitDebugRunner" />
+      <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
+      <method />
+    </configuration>
+    <configuration default="true" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner />
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
+      <method />
+    </configuration>
+    <configuration default="false" name="dev.openstackid.com" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application" browser="FIREFOX" server_name="dev.openstackid.com">
+      <RunnerSettings RunnerId="PhpWebAppDebugRunner" />
+      <ConfigurationWrapper RunnerId="PhpWebAppDebugRunner" />
+      <method />
+    </configuration>
+    <list size="6">
+      <item index="0" class="java.lang.String" itemvalue="PHPUnit.DiscoveryControllerTest" />
+      <item index="1" class="java.lang.String" itemvalue="PHP Web Application.dev.openstackid.com" />
+      <item index="2" class="java.lang.String" itemvalue="PHPUnit.XRDSDocumentTest" />
+      <item index="3" class="java.lang.String" itemvalue="PHPUnit.DiscoveryControllerTest.testIdpDiscovery" />
+      <item index="4" class="java.lang.String" itemvalue="PHP Script.OpenIdProviderController.php" />
+      <item index="5" class="java.lang.String" itemvalue="PHPUnit.OpenIdProviderControllerTest" />
+    </list>
+    <recent_temporary>
+      <list size="5">
+        <item index="0" class="java.lang.String" itemvalue="PHPUnit.OpenIdProviderControllerTest" />
+        <item index="1" class="java.lang.String" itemvalue="PHP Script.OpenIdProviderController.php" />
+        <item index="2" class="java.lang.String" itemvalue="PHPUnit.DiscoveryControllerTest.testIdpDiscovery" />
+        <item index="3" class="java.lang.String" itemvalue="PHPUnit.XRDSDocumentTest" />
+        <item index="4" class="java.lang.String" itemvalue="PHPUnit.DiscoveryControllerTest" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
   <component name="TaskManager">
@@ -148,11 +434,11 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24979983" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4115292" sideWeight="0.6080139" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39198607" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3292683" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -221,26 +507,164 @@
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager />
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/tests/DiscoveryControllerTest.php</url>
+          <line>12</line>
+          <option name="timeStamp" value="33" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/controllers/DiscoveryController.php</url>
+          <line>24</line>
+          <option name="timeStamp" value="34" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/controllers/DiscoveryController.php</url>
+          <line>16</line>
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php</url>
+          <line>12</line>
+          <option name="timeStamp" value="36" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/controllers/OpenIdProviderController.php</url>
+          <line>22</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="php">
+          <url>file://$PROJECT_DIR$/app/libs/openid/OpenIdMessage.php</url>
+          <line>20</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+      </breakpoints>
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
+      <option name="time" value="40" />
+    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/composer.json">
+    <entry file="file://$PROJECT_DIR$/app/tests/DiscoveryControllerTest.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="42" selection-start="254" selection-end="254" vertical-scroll-proportion="-5.0">
+        <state line="9" column="47" selection-start="197" selection-end="214" vertical-scroll-proportion="-2.375">
+          <folding>
+            <element signature="e#6#165#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/OpenIdServiceProvider.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="62" selection-start="322" selection-end="322" vertical-scroll-proportion="-2.9166667">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vendor/autoload.php">
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdVoidRequestHandler.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="12" column="30" selection-start="201" selection-end="225" vertical-scroll-proportion="0.30508474">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vendor/composer/autoload_classmap.php">
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdCheckAuthenticationRequestHandler.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.088757396">
+        <state line="14" column="66" selection-start="288" selection-end="288" vertical-scroll-proportion="-4.0833335">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/DiscoveryController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="84" selection-start="557" selection-end="633" vertical-scroll-proportion="0.45762712">
+          <folding>
+            <element signature="e#6#165#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Controllers/Controller.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="125" column="0" selection-start="3086" selection-end="3086" vertical-scroll-proportion="-3.5416667">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="70" selection-start="733" selection-end="752" vertical-scroll-proportion="-4.5416665">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Route.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="62" column="0" selection-start="1606" selection-end="1606" vertical-scroll-proportion="3.5019455">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/routes.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="10" selection-start="573" selection-end="573" vertical-scroll-proportion="-4.375">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/composer/ClassLoader.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="186" column="0" selection-start="5045" selection-end="5045" vertical-scroll-proportion="0.30141845">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/OpenIdMessage.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="49" column="0" selection-start="1419" selection-end="1419" vertical-scroll-proportion="-4.4583335">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/OpenIdProviderController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="0" selection-start="582" selection-end="582" vertical-scroll-proportion="-3.75">
+          <folding>
+            <element signature="e#166#193#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="63" column="0" selection-start="2142" selection-end="2142" vertical-scroll-proportion="-6.7083335">
+          <folding>
+            <element signature="e#187#242#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdMessageHandler.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="0" selection-start="467" selection-end="467" vertical-scroll-proportion="-3.7083333">
+          <folding>
+            <element signature="e#195#220#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="0" selection-start="475" selection-end="475" vertical-scroll-proportion="-10.625">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Foundation/AliasLoader.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="65" column="0" selection-start="1247" selection-end="1247" vertical-scroll-proportion="3.3050847">
           <folding />
         </state>
       </provider>
