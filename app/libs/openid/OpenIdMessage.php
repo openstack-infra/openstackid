@@ -12,13 +12,14 @@ namespace openid;
 
 class OpenIdMessage implements \ArrayAccess {
 
-    protected $valid_modes;
+
     protected $container = array();
 
     const OpenID2MessageType="http://specs.openid.net/auth/2.0";
+    const ModeType = "openid_mode";
+    const NSType   = "openid_ns";
 
     public function __construct(array $values) {
-        $this->valid_modes = array("checkid_setup","checkid_immediate","check_authentication","associate");
         $this->container = $values;
     }
 
@@ -42,11 +43,15 @@ class OpenIdMessage implements \ArrayAccess {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
     }
 
+
+    public function getMode(){
+        return $this->container[self::ModeType];
+    }
+
     public function IsValid(){
-        if (isset($this->container["openid.ns"])
-            && $this->container["openid.ns"] == self::OpenID2MessageType
-            && isset($this->container["openid.mode"])
-            && in_array($this->container["openid.mode"],$this->valid_modes)){
+        if (isset($this->container[self::NSType])
+            && $this->container[self::NSType] == self::OpenID2MessageType
+            && isset($this->container[self::ModeType])){
             return true;
         }
         return false;

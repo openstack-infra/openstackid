@@ -78,3 +78,27 @@ Route::filter('csrf', function()
 		throw new Illuminate\Session\TokenMismatchException;
 	}
 });
+
+use openid\services\IMementoOpenIdRequestService;
+use openid\OpenIdMessage;
+use openid\requests\OpenIdAuthenticationRequest;
+use openid\exceptions\InvalidOpenIdMessageException;
+
+Route::filter("openid.needs.auth.request",function(){
+
+    $memento_service = App::make("openid\\services\\IMementoOpenIdRequestService");
+
+    $openid_message = $memento_service->getCurrentRequest();
+    if($openid_message==null || !$openid_message->IsValid())
+        throw new InvalidOpenIdMessageException();
+    $auth_request = new OpenIdAuthenticationRequest($openid_message);
+    if(!$auth_request->IsValid())
+        throw new InvalidOpenIdMessageException();
+});
+
+Route::filter("openid.save.request",function(){
+
+    $memento_service = App::make("openid\\services\\IMementoOpenIdRequestService");
+    $memento_service->saveCurrentRequest();
+
+});

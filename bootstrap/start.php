@@ -60,6 +60,19 @@ $framework = $app['path.base'].'/vendor/laravel/framework/src';
 
 require $framework.'/Illuminate/Foundation/start.php';
 
+
+//custom authentication
+use Illuminate\Auth\Guard;
+use auth\CustomAuthProvider;
+
+Auth::extend('custom', function($app) {
+    return new Guard(
+        new CustomAuthProvider(),
+        App::make('session.store')
+    );
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | Return The Application

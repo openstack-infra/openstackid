@@ -24,10 +24,11 @@ abstract class OpenIdMessageHandler {
     public function HandleMessage(OpenIdMessage $message){
         if($this->CanHandle($message)){
             //handle request
+            return $this->InternalHandle($message);
         }
         else if(isset($this->successor) && !null($this->successor))
         {
-            $this->successor->HandleMessage($message);
+            return $this->successor->HandleMessage($message);
         }
         throw new Exception("WTF?");
     }

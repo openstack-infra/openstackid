@@ -35,10 +35,12 @@ class OpenIdProtocol implements IOpenIdProtocol {
         $this->server_configuration        = $server_configuration;
 
         //create chain of responsibility
+        $authService           = \App::make("openid\\services\\IAuthService");
+        $mementoRequestService = \App::make("openid\\services\\IMementoOpenIdRequestService");
+        $auth_strategy         = \App::make("openid\\handlers\\IOpenIdAuthenticationStrategy");
 
-        $this->request_handlers = new OpenIdAuthenticationRequestHandler(
-                                    new OpenIdSessionAssociationRequestHandler(
-                                            new OpenIdCheckAuthenticationRequestHandler(null)));
+        $successor              = new OpenIdSessionAssociationRequestHandler(new OpenIdCheckAuthenticationRequestHandler(null));
+        $this->request_handlers = new OpenIdAuthenticationRequestHandler($authService,$mementoRequestService,$auth_strategy,$successor);
     }
 
     public function getXRDSDiscovery(){
@@ -61,6 +63,6 @@ class OpenIdProtocol implements IOpenIdProtocol {
     }
 
     public function HandleOpenIdMessage(OpenIdMessage $openIdMessage){
-        $this->request_handlers->HandleMessage($openIdMessage);
+        return $this->request_handlers->HandleMessage($openIdMessage);
     }
 }

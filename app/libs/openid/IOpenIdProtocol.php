@@ -8,7 +8,7 @@
  */
 
 namespace openid;
-
+use openid\responses\OpenIdResponse;
 
 interface IOpenIdProtocol {
     /**
@@ -30,7 +30,7 @@ interface IOpenIdProtocol {
 
     /**
     * @param OpenIdMessage $openIdMessage
-    * @return mixed
+    * @return responses\OpenIdResponse response
     */
     public function HandleOpenIdMessage(OpenIdMessage $openIdMessage);
 }

@@ -1,5 +1,6 @@
 <?php
 
+use openid\exceptions\InvalidOpenIdMessageException;
 /*
 |--------------------------------------------------------------------------
 | Register The Laravel Class Loader
@@ -48,9 +49,18 @@ Log::useDailyFiles(storage_path().'/logs/'.$logFile);
 |
 */
 
+
 App::error(function(Exception $exception, $code)
 {
 	Log::error($exception);
+});
+
+
+
+App::error(function(openid\exceptions\InvalidOpenIdMessageException $exception, $code)
+{
+    Log::error($exception);
+    return View::make('error')->with('error', $exception->getMessage());
 });
 
 /*

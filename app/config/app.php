@@ -115,6 +115,8 @@ return array(
 		'Illuminate\Workbench\WorkbenchServiceProvider',
         'openid\OpenIdServiceProvider',
         'repositories\RepositoriesServiceProvider',
+        'auth\AuthenticationServiceProvider',
+        'services\ServicesProvider'
 	),
 
 	/*

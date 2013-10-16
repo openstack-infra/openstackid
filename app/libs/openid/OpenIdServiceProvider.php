@@ -15,7 +15,7 @@ use Illuminate\Support\ServiceProvider;
  * Register dependencies with IOC container for package openid
  * @package openid
  */
-class OpenIdServiceProvider  extends ServiceProvider {
+class OpenIdServiceProvider extends ServiceProvider {
 
     public function register()
     {

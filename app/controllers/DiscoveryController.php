@@ -8,6 +8,7 @@
  */
 
 use openid\IOpenIdProtocol;
+use openid\XRDS\XRDSDocumentBuilder;
 
 class DiscoveryController extends BaseController {
 
@@ -22,8 +23,14 @@ class DiscoveryController extends BaseController {
      * @return xrds document on response
      */
     public function idp(){
-        $response = Response::make($this->openid_protocol->getXRDSDiscovery(), 200);
-        $response->header('Content-Type', "application/xrds+xml");
+        $value = Request::header('Content-Type');
+        if($value == XRDSDocumentBuilder::ContentType){
+            $response = Response::make($this->openid_protocol->getXRDSDiscovery(), 200);
+            $response->header('Content-Type', "application/xrds+xml");
+        }
+        else{
+            $response = View::make("home");
+        }
         return $response;
     }
 
