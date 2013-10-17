@@ -116,7 +116,8 @@ return array(
         'openid\OpenIdServiceProvider',
         'repositories\RepositoriesServiceProvider',
         'auth\AuthenticationServiceProvider',
-        'services\ServicesProvider'
+        'services\ServicesProvider',
+        'strategies\OpenIdResponseStrategyProvider'
 	),
 
 	/*

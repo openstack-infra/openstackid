@@ -26,5 +26,9 @@
             <div id="flash_notice">{{ Session::get('flash_notice')  }}</div>
         @endif
     {{ Form::close() }}
+    @foreach ($views as $view)
+         {{ $view}}
+    @endforeach
+
 </div>
 @stop

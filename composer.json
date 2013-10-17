@@ -19,7 +19,8 @@
             "app/libs",
             "app/repositories",
             "app/tests/mocks",
-            "app/services"
+            "app/services",
+            "app/strategies"
 		]
 	},
 	"scripts": {

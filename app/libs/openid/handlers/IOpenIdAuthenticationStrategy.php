@@ -9,9 +9,10 @@
 
 namespace openid\handlers;
 use openid\requests\OpenIdAuthenticationRequest;
-
+use openid\requests\contexts\RequestContext;
 interface IOpenIdAuthenticationStrategy {
 
-    public function doLogin(OpenIdAuthenticationRequest $request);
-    public function doConsent(OpenIdAuthenticationRequest $request);
+    public function doLogin(OpenIdAuthenticationRequest $request,RequestContext $context);
+
+    public function doConsent(OpenIdAuthenticationRequest $request,RequestContext $context);
 }

@@ -8,44 +8,53 @@
  */
 
 namespace openid\requests;
+
 use openid\requests\OpenIdRequest;
 use openid\OpenIdMessage;
+use openid\OpenIdProtocol;
+use openid\helpers\OpenIdUriHelper;
 
 class OpenIdAuthenticationRequest extends OpenIdRequest{
-    const IdentifierSelectType = "http://specs.openid.net/auth/2.0/identifier_select";
-    const ImmediateMode        = "checkid_immediate";
-    const SetupMode            = "checkid_setup";
-
-    const ClaimedIdType   = "openid_claimed_id";
-    const IdentityType    = "openid_identity";
-    const AssocHandleType = "openid_assoc_handle";
-    const ReturnToType    = "openid_return_to";
-    const RealmType       = "openid_realm";
 
     public static function IsOpenIdAuthenticationRequest(OpenIdMessage $message){
         $mode = $message->getMode();
-        if($mode==self::ImmediateMode || $mode==self::SetupMode) return true;
+        if($mode==OpenIdProtocol::ImmediateMode || $mode==OpenIdProtocol::SetupMode) return true;
         return false;
     }
 
     public function getClaimedId(){
-        return isset($this->message[self::ClaimedIdType])?$this->message[self::ClaimedIdType]:null;
+        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId,"_")]:null;
     }
 
     public function getIdentity(){
-        return isset($this->message[self::IdentityType])?$this->message[self::IdentityType]:null;
+        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity,"_")]:null;
     }
 
     public function getAssocHandle(){
-        return isset($this->message[self::AssocHandleType])?$this->message[self::AssocHandleType]:null;
+        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_AssocHandle,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_AssocHandle,"_")]:null;
     }
 
     public function getReturnTo(){
-        return isset($this->message[self::ReturnToType])?$this->message[self::ReturnToType]:null;
+        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")]:null;
     }
 
     public function getRealm(){
-        return isset($this->message[self::RealmType])?$this->message[self::RealmType]:null;
+        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")]:null;
+    }
+
+
+    public function getTrustedRoot()    {
+        if (isset($this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")])) {
+            $root = $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")];
+        } else if (isset($this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")])) {
+            $root = $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")];
+        } else {
+            return null;
+        }
+        if (OpenIdUriHelper::normalizeUrl($root) && !empty($root)) {
+            return $root;
+        }
+        return null;
     }
 
     public function IsValid(){
@@ -55,9 +64,9 @@ class OpenIdAuthenticationRequest extends OpenIdRequest{
         $mode = $this->getMode();
         //todo: validate url(format-regex) - white list /black list?
         return !empty($return_to)
-               && !empty($claimed_id) && $claimed_id==self::IdentifierSelectType
-               && !empty($identity) && $identity==self::IdentifierSelectType
-               && !empty($mode) && ($mode == self::ImmediateMode || $mode == self::SetupMode);
+               && !empty($claimed_id) && $claimed_id == OpenIdProtocol::IdentifierSelectType
+               && !empty($identity)   && $identity   == OpenIdProtocol::IdentifierSelectType
+               && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
     }
 
 }

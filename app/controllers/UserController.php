@@ -9,7 +9,7 @@
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\IAuthService;
 use openid\requests\OpenIdAuthenticationRequest;
-
+use openid\exceptions\InvalidRequestContextException;
 
 class UserController extends BaseController{
 
@@ -25,13 +25,26 @@ class UserController extends BaseController{
         $this->beforeFilter('openid.needs.auth.request',array('only' => array('getLogin', 'getConsent')));
     }
 
-    public function getLogin(){
+    private function getViewData(){
+        $context = Session::get('context');
+        if(is_null($context))
+            throw new InvalidRequestContextException();
+        $partial_views = $context->getPartials();
+        $data  = array();
+        $views = array();
+        foreach($partial_views as $partial){
+            $views[$partial->getName()] = View::make($partial->getName(),$partial->getData());
+        }
+        $data["views"]=$views;
+        return $data;
+    }
 
-        return View::make("login");
+    public function getLogin(){
+        $data = $this->getViewData();
+        return View::make("login",$data);
     }
 
     public function postLogin(){
-
         $data = Input::all();
         // Build the validation constraint set.
         $rules = array(
@@ -44,7 +57,8 @@ class UserController extends BaseController{
             $username = Input::get("username");
             $password = Input::get("password");
             if($this->auth_service->Login($username,$password)){
-                return Redirect::to('/accounts/user/consent');
+                //go to authentication flow again
+                return Redirect::action("OpenIdProviderController@op_endpoint");
             }
             return Redirect::action('UserController@getLogin')->with('flash_notice', 'Authentication Failed!');
         }
@@ -52,11 +66,12 @@ class UserController extends BaseController{
     }
 
     public function getConsent(){
-        return View::make("consent")->with("realm","test");
+        $data = $this->getViewData();
+        $data["realm"] ="test";
+        return View::make("consent",$data);
     }
 
     public function postConsent(){
-
         return Redirect::to('/accounts/openid/v2');
     }
 }

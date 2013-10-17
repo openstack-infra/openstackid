@@ -9,7 +9,7 @@
 
 namespace openid\responses;
 use openid\responses\OpenIdDirectResponse;
-
+use openid\OpenIdProtocol;
 /**
  * Class OpenIdDirectGenericErrorResponse
  * implements 5.1.2.2.  Error Responses
@@ -27,11 +27,11 @@ class OpenIdDirectGenericErrorResponse extends OpenIdDirectResponse {
     public function __construct($error, $contact=null, $reference=null){
         parent::__construct();
         $this->setHttpCode(self::HttpErrorResponse);
-        $this["error"] = $error;
+        $this[OpenIdProtocol::OpenIDProtocol_Error] = $error;
         //opt values
         if(!is_null($contact))
-            $this["contact"] = $contact;
+            $this[OpenIdProtocol::OpenIDProtocol_Contact] = $contact;
         if(!is_null($reference))
-            $this["reference"] = $reference;
+            $this[OpenIdProtocol::OpenIDProtocol_Reference] = $reference;
     }
 }

@@ -8,6 +8,7 @@
  */
 
 namespace auth;
+use openid\services\AuthorizationResponse_;
 use openid\services\IAuthService;
 use \Auth;
 use \Session;
@@ -40,15 +41,15 @@ class AuthService implements  IAuthService {
         return Auth::attempt(array('username' => $username, 'password' => $password), true);
     }
 
-    /**
-     * @return mixed
-     */
-    public function isUserAuthorized()
-    {
-        return Session::get("authorized_state");
-    }
-
     public function logout(){
         Auth::logout();
+    }
+
+    /**
+     * @return AuthorizationResponse_*
+     */
+    public function getUserAuthorizationResponse()
+    {
+        return Session::get("openid.authorization.response");
     }
 }

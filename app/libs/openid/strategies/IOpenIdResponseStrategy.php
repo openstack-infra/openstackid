@@ -9,8 +9,6 @@
 
 namespace openid\strategies;
 
-use openid\responses\OpenIdResponse;
-
 interface IOpenIdResponseStrategy {
-    public function handle(OpenIdResponse $response);
+    public function handle($response);
 }

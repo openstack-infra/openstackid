@@ -1,0 +1,124 @@
+<?php
+/**
+ * Created by JetBrains PhpStorm.
+ * User: smarcet
+ * Date: 10/17/13
+ * Time: 5:01 PM
+ * To change this template use File | Settings | File Templates.
+ */
+
+namespace openid\helpers;
+use openid\OpenIdProtocol;
+use Zend\Math\Rand;
+
+class OpenIdCryptoHelper
+{
+
+    public static function generateSecret($func)
+    {
+        if ($func == OpenIdProtocol::SignatureAlgorithmHMAC_SHA1) {
+            $macLen = 20; /* 160 bit */
+        } else if ($func == OpenIdProtocol::SignatureAlgorithmHMAC_SHA256) {
+            $macLen = 32; /* 256 bit */
+        } else {
+            return false;
+        }
+        return self::randomBytes($macLen);
+    }
+
+    /**
+     * Produces string of random byte of given length.
+     *
+     * @param integer $len length of requested string
+     * @return string RAW random binary string
+     */
+    static public function randomBytes($len)
+    {
+        Rand::getBytes($len,true);
+    }
+
+    static public function computeHMAC($macFunc, $data, $secret)
+    {
+        if (function_exists('hash_hmac')) {
+            return hash_hmac($macFunc, $data, $secret, 1);
+        } else {
+            if (self::strlen($secret) > 64) {
+                $secret = self::digest($macFunc, $secret);
+            }
+            $secret = str_pad($secret, 64, chr(0x00));
+            $ipad = str_repeat(chr(0x36), 64);
+            $opad = str_repeat(chr(0x5c), 64);
+            $hash1 = self::digest($macFunc, ($secret ^ $ipad) . $data);
+            return self::digest($macFunc, ($secret ^ $opad) . $hash1);
+        }
+    }
+
+    /**
+     * Returns lenght of binary string in bytes
+     *
+     * @param string $str
+     * @return int the string lenght
+     */
+    static public function strlen($str)
+    {
+        if (extension_loaded('mbstring') &&
+            (((int)ini_get('mbstring.func_overload')) & 2)
+        ) {
+            return mb_strlen($str, 'latin1');
+        } else {
+            return strlen($str);
+        }
+    }
+
+    /**
+     * Generates a hash value (message digest) according to given algorithm.
+     * It returns RAW binary string.
+     *
+     * This is a wrapper function that uses one of available internal function
+     * dependent on given PHP configuration. It may use various functions from
+     *  ext/openssl, ext/hash, ext/mhash or ext/standard.
+     *
+     * @param string $func digest algorithm
+     * @param string $data data to sign
+     * @return string RAW digital signature
+     * @throws \Exception
+     */
+    static public function digest($func, $data)
+    {
+        if (function_exists('openssl_digest')) {
+            return openssl_digest($data, $func, true);
+        } else if (function_exists('hash')) {
+            return hash($func, $data, true);
+        } else if ($func === 'sha1') {
+            return sha1($data, true);
+        } else if ($func === 'sha256') {
+            if (function_exists('mhash')) {
+                return mhash(MHASH_SHA256, $data);
+            }
+        }
+        throw new \Exception('Unsupported digest algorithm "' . $func . '".');
+    }
+
+    /**
+     * Takes an arbitrary precision integer and returns its shortest big-endian
+     * two's complement representation.
+     *
+     * Arbitrary precision integers MUST be encoded as big-endian signed two's
+     * complement binary strings. Henceforth, "btwoc" is a function that takes
+     * an arbitrary precision integer and returns its shortest big-endian two's
+     * complement representation. All integers that are used with
+     * Diffie-Hellman Key Exchange are positive. This means that the left-most
+     * bit of the two's complement representation MUST be zero. If it is not,
+     * implementations MUST add a zero byte at the front of the string.
+     *
+     * @param string $str binary representation of arbitrary precision integer
+     * @return string big-endian signed representation
+     */
+    static public function btwoc($str)
+    {
+        if (ord($str[0]) > 127) {
+            return "\0" . $str;
+        }
+        return $str;
+    }
+}

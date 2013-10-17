@@ -12,15 +12,17 @@ namespace services;
 use openid\handlers\IOpenIdAuthenticationStrategy;
 use openid\requests\OpenIdAuthenticationRequest;
 use \Redirect;
+use openid\requests\contexts\RequestContext;
+
 class AuthenticationStrategy implements IOpenIdAuthenticationStrategy{
 
-    public function doLogin(OpenIdAuthenticationRequest $request)
+    public function doLogin(OpenIdAuthenticationRequest $request,RequestContext $context)
     {
-         return Redirect::action('UserController@getLogin');
+         return Redirect::action('UserController@getLogin')->with('context', $context);
     }
 
-    public function doConsent(OpenIdAuthenticationRequest $request)
+    public function doConsent(OpenIdAuthenticationRequest $request,RequestContext $context)
     {
-        return Redirect::action('UserController@getConsent');
+        return Redirect::action('UserController@getConsent')->with('context', $context);;
     }
 }

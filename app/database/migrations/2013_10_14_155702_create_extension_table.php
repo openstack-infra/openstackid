@@ -13,7 +13,7 @@ class CreateExtensionTable extends Migration {
 	{
         Schema::create('server_extensions', function($table)
         {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('name',100);
             $table->string('namespace',255);
             $table->boolean('active');

@@ -14,7 +14,7 @@ abstract class OpenIdResponse extends OpenIdMessage {
 
     const HttpOkResponse      = 200;
     const HttpErrorResponse   = 400;
-    const OpenId2ResponseType = "http://specs.openid.net/auth/2.0";
+
 
     protected $http_code;
     protected $content_type;
@@ -39,4 +39,9 @@ abstract class OpenIdResponse extends OpenIdMessage {
     }
 
     abstract public function getType();
+
+    public function addParam($name,$value){
+        //todo: validate if $name is a valid openid 2.0 param name?
+        $this[$name] = $value;
+    }
 }

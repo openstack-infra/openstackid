@@ -12,7 +12,7 @@ namespace openid\repositories;
 
 interface IServerExtensionsRepository {
     /**
-     * @return all active server extensions
+     * @return array of IOpenIdExtension
      */
-    public function  GetAllExtensions();
+    public function  getAllActiveExtensions();
 }

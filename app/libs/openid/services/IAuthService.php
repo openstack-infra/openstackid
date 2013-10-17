@@ -8,16 +8,16 @@
  */
 
 namespace openid\services;
-
+use openid\model\IOpenIdUser;
 
 interface IAuthService {
     /**
-     * @return mixed
+     * @return bool
      */
     public function isUserLogged();
 
     /**
-     * @return mixed
+     * @return IOpenIdUser
      */
     public function getCurrentUser();
 
@@ -28,10 +28,15 @@ interface IAuthService {
      */
     public function Login($username,$password);
 
+    const AuthorizationResponse_None            = "None";
+    const AuthorizationResponse_AllowOnce       = "AllowOnce";
+    const AuthorizationResponse_AllowForever    = "AllowForever";
+    const AuthorizationResponse_DenyForever     = "DenyForever";
+    const AuthorizationResponse_DenyOnce        = "DenyOnce";
     /**
-     * @return mixed
+     * @return AuthorizationResponse_*
      */
-    public function isUserAuthorized();
+    public function getUserAuthorizationResponse();
 
     public function logout();
 }

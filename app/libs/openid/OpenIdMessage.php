@@ -9,15 +9,12 @@
 
 namespace openid;
 
+use openid\exceptions\InvalidOpenIdMessageMode;
 
 class OpenIdMessage implements \ArrayAccess {
 
 
     protected $container = array();
-
-    const OpenID2MessageType="http://specs.openid.net/auth/2.0";
-    const ModeType = "openid_mode";
-    const NSType   = "openid_ns";
 
     public function __construct(array $values) {
         $this->container = $values;
@@ -45,13 +42,19 @@ class OpenIdMessage implements \ArrayAccess {
 
 
     public function getMode(){
-        return $this->container[self::ModeType];
+        return $this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode,"_")];
+    }
+
+    protected function setMode($mode){
+        if(!OpenIdProtocol::isValidMode($mode))
+            throw new InvalidOpenIdMessageMode($mode);
+        $this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)]=$mode;;
     }
 
     public function IsValid(){
-        if (isset($this->container[self::NSType])
-            && $this->container[self::NSType] == self::OpenID2MessageType
-            && isset($this->container[self::ModeType])){
+        if (isset($this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS,"_")])
+            && $this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS,"_")] == OpenIdProtocol::OpenID2MessageType
+            && isset($this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode,"_")])){
             return true;
         }
         return false;

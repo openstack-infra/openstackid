@@ -17,7 +17,7 @@ class ServerExtensionsRepositoryEloquent implements  IServerExtensionsRepository
     /**
      * @return all active server extensions
      */
-    public function  GetAllExtensions()
+    public function  getAllActiveExtensions()
     {
         $extensions =  array();
 

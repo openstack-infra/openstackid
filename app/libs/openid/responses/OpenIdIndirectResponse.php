@@ -8,9 +8,10 @@
  */
 
 namespace openid\responses;
+use openid\OpenIdProtocol;
 use openid\responses\OpenIdResponse;
 
-class OpenIdIndirectResponse extends OpenIdResponse{
+class OpenIdIndirectResponse extends OpenIdResponse {
 
     const IndirectResponseContentType ="application/x-www-form-urlencoded";
 
@@ -23,7 +24,7 @@ class OpenIdIndirectResponse extends OpenIdResponse{
          * response. Future versions of the specification may define different values in order
          * to allow message recipients to properly interpret the request.
          */
-        $this["openid.ns"] = self::OpenId2ResponseType;
+        $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)] = OpenIdProtocol::OpenID2MessageType;
     }
 
 
@@ -47,5 +48,13 @@ class OpenIdIndirectResponse extends OpenIdResponse{
     public function getType()
     {
         return "indirect";
+    }
+
+    public function setReturnTo($return_to){
+        $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)] = $return_to;
+    }
+
+    public function getReturnTo(){
+        return $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)];
     }
 }
