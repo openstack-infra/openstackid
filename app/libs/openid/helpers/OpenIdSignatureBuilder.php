@@ -13,14 +13,21 @@ use openid\responses\OpenIdPositiveAssertionResponse;
 
 class OpenIdSignatureBuilder {
 
+    /**
+     * @param ResponseContext $context
+     * @param $macAlg
+     * @param $secret
+     * @param OpenIdPositiveAssertionResponse $response
+     */
     public static function build(ResponseContext $context,$macAlg,$secret,OpenIdPositiveAssertionResponse &$response){
         //do signing ...
         $signed = '';
         $data = '';
         $params = $context->getSignParams();
 
-        foreach($params as $key => $val){
+        foreach($params as $key){
             if (strpos($key, 'openid.') === 0) {
+                $val = $response[$key];
                 $key = substr($key, strlen('openid.'));
                 if (!empty($signed)) {
                     $signed .= ',';

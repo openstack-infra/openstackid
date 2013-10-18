@@ -114,7 +114,6 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
         'openid\OpenIdServiceProvider',
-        'repositories\RepositoriesServiceProvider',
         'auth\AuthenticationServiceProvider',
         'services\ServicesProvider',
         'strategies\OpenIdResponseStrategyProvider'

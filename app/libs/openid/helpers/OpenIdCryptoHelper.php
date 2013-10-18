@@ -10,9 +10,15 @@
 namespace openid\helpers;
 use openid\OpenIdProtocol;
 use Zend\Math\Rand;
+use openid\exceptions\OpenIdCrytoException;
 
 class OpenIdCryptoHelper
 {
+
+    private static $signature_algorithms= array(
+        OpenIdProtocol::SignatureAlgorithmHMAC_SHA1     => "sha1",
+        OpenIdProtocol::SignatureAlgorithmHMAC_SHA256   => "sha256",
+    );
 
     public static function generateSecret($func)
     {
@@ -23,7 +29,8 @@ class OpenIdCryptoHelper
         } else {
             return false;
         }
-        return self::randomBytes($macLen);
+        $bytes = self::randomBytes($macLen);
+        return base64_encode($bytes);
     }
 
     /**
@@ -34,11 +41,22 @@ class OpenIdCryptoHelper
      */
     static public function randomBytes($len)
     {
-        Rand::getBytes($len,true);
+        return Rand::getBytes($len,true);
     }
 
+    /**
+     * @param $macFunc
+     * @param $data
+     * @param $secret
+     * @return string
+     * @throws \openid\exceptions\OpenIdCrytoException
+     */
     static public function computeHMAC($macFunc, $data, $secret)
     {
+        if(!isset(self::$signature_algorithms[$macFunc]))
+            throw new OpenIdCrytoException(sprintf("Invalid mac function %s",$macFunc));
+        $macFunc = self::$signature_algorithms[$macFunc];
+
         if (function_exists('hash_hmac')) {
             return hash_hmac($macFunc, $data, $secret, 1);
         } else {

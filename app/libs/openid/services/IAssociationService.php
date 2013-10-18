@@ -21,7 +21,7 @@ interface IAssociationService {
      * @param IAssociation $association
      * @return bool
      */
-    public function addAssociation($handle,$secret,$type,$lifetime,$issued);
+    public function addAssociation($handle,$secret,$mac_function,$lifetime,$issued,$type);
 
     /**
      * @param $handle

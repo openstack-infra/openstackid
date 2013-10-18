@@ -10,8 +10,6 @@
 class DiscoveryControllerTest extends TestCase {
 
     public function testIdpDiscovery(){
-        App::bind("openid\\repositories\\IServerConfigurationRepository","ServerConfigurationRepositoryMock");
-        App::bind("openid\\repositories\\IServerExtensionsRepository","ServerExtensionsRepositoryMock");
         $response = $this->call('GET', '/discovery');
         //"application/xrds+xml"
         $this->assertTrue($response->getStatusCode()===200 );

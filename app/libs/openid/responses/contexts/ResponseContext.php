@@ -10,6 +10,8 @@
 namespace openid\responses\contexts;
 
 
+use openid\OpenIdProtocol;
+
 class ResponseContext
 {
 
@@ -20,7 +22,7 @@ class ResponseContext
         $this->sign_params = array();
     }
 
-    public function addSignParam(string $param)
+    public function addSignParam($param)
     {
         array_push($this->sign_params, $param);
     }

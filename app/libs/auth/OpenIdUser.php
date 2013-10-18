@@ -12,8 +12,15 @@ namespace auth;
 use Illuminate\Auth\UserInterface;
 use openid\model\IOpenIdUser;
 
-class OpenIdUser extends Eloquent implements UserInterface , IOpenIdUser{
 
+class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
+
+    protected $table = 'openid_users';
+    private $member;
+
+    public function setMember($member){
+        $this->member=$member;
+    }
     /**
      * Get the unique identifier for the user.
      *
@@ -21,7 +28,10 @@ class OpenIdUser extends Eloquent implements UserInterface , IOpenIdUser{
      */
     public function getAuthIdentifier()
     {
-        // TODO: Implement getAuthIdentifier() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->external_id;
     }
 
     /**
@@ -31,61 +41,88 @@ class OpenIdUser extends Eloquent implements UserInterface , IOpenIdUser{
      */
     public function getAuthPassword()
     {
-        // TODO: Implement getAuthPassword() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->member->Password;
     }
 
     public function getIdentifier()
     {
-        // TODO: Implement getIdentifier() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->identifier;
     }
 
     public function getEmail()
     {
-        // TODO: Implement getEmail() method.
+        $this->external_id;
     }
 
     public function getFirstName()
     {
-        // TODO: Implement getFirstName() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->member->FirstName;
     }
 
     public function getLastName()
     {
-        // TODO: Implement getLastName() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->member->Surname;
     }
 
     public function getFullName()
     {
-        // TODO: Implement getFullName() method.
+        return $this->getFirstName()." ". $this->getLastName();
     }
 
     public function getNickName()
     {
-        // TODO: Implement getNickName() method.
+        return $this->getFullName;
     }
 
     public function getGender()
     {
-        // TODO: Implement getGender() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return "";
     }
 
     public function getCountry()
     {
-        // TODO: Implement getCountry() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->member->Country;
     }
 
     public function getLanguage()
     {
-        // TODO: Implement getLanguage() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->member->Locale;
     }
 
     public function getTimeZone()
     {
-        // TODO: Implement getTimeZone() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return "";
     }
 
     public function getDateOfBirth()
     {
-        // TODO: Implement getDateOfBirth() method.
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return "";
     }
 }

@@ -17,8 +17,6 @@
 			"app/database/seeds",
 			"app/tests/TestCase.php",
             "app/libs",
-            "app/repositories",
-            "app/tests/mocks",
             "app/services",
             "app/strategies"
 		]

@@ -15,7 +15,6 @@ use openid\services\IMementoOpenIdRequestService;
 
 class OpenIdProviderController extends BaseController
 {
-
     private $openid_protocol;
     private $memento_service;
 
@@ -24,7 +23,6 @@ class OpenIdProviderController extends BaseController
         $this->openid_protocol = $openid_protocol;
         $this->memento_service = $memento_service;
     }
-
 
     public function op_endpoint()
     {

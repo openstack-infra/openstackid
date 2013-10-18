@@ -8,21 +8,27 @@
  */
 
 namespace openid\extensions\implementations;
-use openid\extensions\IOpenIdExtension;
+use openid\extensions\OpenIdExtension;
 use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
 
-class OpenIdPAPEExtension  implements IOpenIdExtension {
+class OpenIdPAPEExtension  extends OpenIdExtension {
 
-    public function apply(OpenIdRequest $request, RequestContext $context)
+
+    protected function populateProperties()
     {
-        // TODO: Implement apply() method.
+        // TODO: Implement populateProperties() method.
     }
 
-    public function transform(OpenIdRequest $request, OpenIdResponse $response, ResponseContext $context)
+    public function parseRequest(OpenIdRequest $request, RequestContext $context)
     {
-        // TODO: Implement transform() method.
+        // TODO: Implement parseRequest() method.
+    }
+
+    public function prepareResponse(OpenIdRequest $request, OpenIdResponse $response, ResponseContext $context)
+    {
+        // TODO: Implement prepareResponse() method.
     }
 }

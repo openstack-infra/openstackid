@@ -37,6 +37,7 @@ interface IAuthService {
      * @return AuthorizationResponse_*
      */
     public function getUserAuthorizationResponse();
+    public function setUserAuthorizationResponse($auth_response);
 
     public function logout();
 }

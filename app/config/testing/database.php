@@ -26,7 +26,7 @@ return array(
     |
     */
 
-    'default' => 'sqlite',
+    'default' => 'mysql',
 
     /*
     |--------------------------------------------------------------------------
@@ -45,10 +45,28 @@ return array(
     */
 
     'connections' => array(
-        'sqlite' => array(
-            'driver'   => 'sqlite',
-            'database' => ':memory:',
-            'prefix'   => '',
+
+        'mysql' => array(
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => 'openstackid_openid',
+            'username'  => 'root',
+            'password'  => 'Koguryo@1981',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+        ),
+
+
+        'mysql_external' => array(
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => '506635_oslive',
+            'username'  => 'root',
+            'password'  => 'Koguryo@1981',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
         ),
     ),
 

@@ -54,7 +54,17 @@ return array(
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
-        )
+        ),
+        'mysql_external' => array(
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => '506635_oslive',
+            'username'  => 'root',
+            'password'  => 'Koguryo@1981',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+        ),
     ),
 
     /*

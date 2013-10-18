@@ -17,6 +17,8 @@ class ServicesProvider extends ServiceProvider {
         $this->app->singleton('openid\\services\\IMementoOpenIdRequestService','services\\MementoRequestService');
         $this->app->singleton('openid\\handlers\\IOpenIdAuthenticationStrategy','services\\AuthenticationStrategy');
         $this->app->singleton('openid\\services\\IServerExtensionsService','services\\ServerExtensionsService');
-
+        $this->app->singleton('openid\\services\\IAssociationService','services\\AssociationService');
+        $this->app->singleton('openid\\services\\ITrustedSitesService','services\\TrustedSitesService');
+        $this->app->singleton('openid\\services\\IServerConfigurationService','services\\ServerConfigurationService');
     }
 }

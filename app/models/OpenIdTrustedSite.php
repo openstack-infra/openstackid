@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Created by JetBrains PhpStorm.
@@ -9,6 +10,8 @@
 use openid\model\ITrustedSite;
 
 class OpenIdTrustedSite extends Eloquent implements  ITrustedSite{
+
+    protected $table = 'openid_trusted_sites';
 
     public function setRealm($realm)
     {

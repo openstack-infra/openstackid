@@ -18,6 +18,10 @@ abstract class OpenIdRequest {
        $this->message = $message;
    }
 
+   public function getMessage(){
+       return $this->message;
+   }
+
    public function getMode(){
         return $this->message->getMode();
    }

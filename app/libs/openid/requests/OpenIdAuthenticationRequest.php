@@ -44,10 +44,10 @@ class OpenIdAuthenticationRequest extends OpenIdRequest{
 
 
     public function getTrustedRoot()    {
-        if (isset($this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")])) {
-            $root = $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")];
+        if (isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")])) {
+            $root = $this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")];
         } else if (isset($this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")])) {
-            $root = $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")];
+            $root = $this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")];
         } else {
             return null;
         }

@@ -50,6 +50,13 @@ class AuthService implements  IAuthService {
      */
     public function getUserAuthorizationResponse()
     {
-        return Session::get("openid.authorization.response");
+        if(Session::has("openid.authorization.response"))
+            return Session::get("openid.authorization.response");
+        return IAuthService::AuthorizationResponse_None;
+    }
+
+    public function setUserAuthorizationResponse($auth_response){
+        //todo : check valid response
+        Session::set("openid.authorization.response",$auth_response);
     }
 }

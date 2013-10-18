@@ -12,4 +12,6 @@ namespace openid\services;
 
 interface IServerConfigurationService {
     public function getOPEndpointURL();
+    public function getPrivateAssociationLifetime();
+    public function getSessionAssociationLifetime();
 }

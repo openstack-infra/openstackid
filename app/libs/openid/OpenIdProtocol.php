@@ -15,8 +15,6 @@ use openid\handlers\OpenIdAuthenticationRequestHandler;
 use openid\handlers\OpenIdSessionAssociationRequestHandler;
 use openid\handlers\OpenIdCheckAuthenticationRequestHandler;
 
-use openid\repositories\IServerExtensionsRepository;
-use openid\repositories\IServerConfigurationRepository;
 use openid\XRDS\XRDSService;
 use openid\XRDS\XRDSDocumentBuilder;
 use openid\IOpenIdProtocol;
@@ -99,16 +97,12 @@ class OpenIdProtocol implements IOpenIdProtocol {
     }
 
     public static function param($param, $separator='.'){
-        return Self::OpenIdPrefix.$separator.self::$protocol_definition[$param];
+        return self::OpenIdPrefix.$separator.self::$protocol_definition[$param];
     }
 
-    private $server_extension_repository;
-    private $server_configuration;
     private $request_handlers;
 
-    public function __construct(IServerConfigurationRepository $server_configuration,IServerExtensionsRepository $server_extension_repository){
-        $this->server_extension_repository = $server_extension_repository;
-        $this->server_configuration        = $server_configuration;
+    public function __construct(){
         //create chain of responsibility
         $auth_service                   = \App::make("openid\\services\\IAuthService");
         $memento_request_service        = \App::make("openid\\services\\IMementoOpenIdRequestService");
@@ -116,9 +110,10 @@ class OpenIdProtocol implements IOpenIdProtocol {
         $server_extension_service       = \App::make("openid\\services\\IServerExtensionsService");
         $association_service            = \App::make("openid\\services\\IAssociationService");
         $trusted_sites_service          = \App::make("openid\\services\\ITrustedSitesService");
+        $server_config_service          = \App::make("openid\\services\\IServerConfigurationService");
 
         $successor                      = new OpenIdSessionAssociationRequestHandler(new OpenIdCheckAuthenticationRequestHandler(null));
-        $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service,$memento_request_service,$auth_strategy,$server_extension_service,$association_service,$trusted_sites_service,$successor);
+        $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service,$memento_request_service,$auth_strategy,$server_extension_service,$association_service,$trusted_sites_service,$server_config_service,$successor);
     }
 
     public function getXRDSDiscovery(){

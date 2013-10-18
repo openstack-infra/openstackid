@@ -10,9 +10,12 @@ use openid\model\IAssociation;
 
 class OpenIdAssociation extends Eloquent implements  IAssociation{
 
+    protected $table = 'openid_associations';
+    public $timestamps = false;
+
     public function getMacFunction()
     {
-        // TODO: Implement getMacFunction() method.
+        return $this->mac_function;
     }
 
     public function setMacFunction($mac_function)
@@ -22,7 +25,7 @@ class OpenIdAssociation extends Eloquent implements  IAssociation{
 
     public function getSecret()
     {
-        // TODO: Implement getSecret() method.
+        return $this->secret;
     }
 
     public function setSecret($secret)
@@ -32,7 +35,7 @@ class OpenIdAssociation extends Eloquent implements  IAssociation{
 
     public function getLifetime()
     {
-        // TODO: Implement getLifetime() method.
+        return $this->lifetime;
     }
 
     public function setLifetime($lifetime)
@@ -42,7 +45,7 @@ class OpenIdAssociation extends Eloquent implements  IAssociation{
 
     public function getIssued()
     {
-        // TODO: Implement getIssued() method.
+        return $this->issued;
     }
 
     public function setIssued($issued)
@@ -52,7 +55,7 @@ class OpenIdAssociation extends Eloquent implements  IAssociation{
 
     public function getType()
     {
-        // TODO: Implement getType() method.
+        return $this->type;
     }
 
     public function setType($type)
