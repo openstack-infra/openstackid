@@ -18,6 +18,7 @@ use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
 use openid\services\Registry;
 use openid\OpenIdMessage;
+use openid\exceptions\InvalidOpenIdMessageException;
 
 class OpenIdAXRequest extends OpenIdRequest
 {
@@ -50,7 +51,7 @@ class OpenIdAXRequest extends OpenIdRequest
             )
                 throw new InvalidOpenIdMessageException("AX: not set or invalid mode mode");
 
-            if (isset($this->message[OpenIdProtocol::OpenIdPrefix . "_" . OpenIdAXExtension::Prefix . "_" . OpenIdAXExtension::RequiredAttributes]))
+            if (!isset($this->message[OpenIdProtocol::OpenIdPrefix . "_" . OpenIdAXExtension::Prefix . "_" . OpenIdAXExtension::RequiredAttributes]))
                 throw new InvalidOpenIdMessageException("AX: not set required attributes!");
 
             $attributes = $this->message[OpenIdProtocol::OpenIdPrefix . "_" . OpenIdAXExtension::Prefix . "_" . OpenIdAXExtension::RequiredAttributes];
@@ -58,13 +59,14 @@ class OpenIdAXRequest extends OpenIdRequest
             foreach ($attributes as $attr) {
                 $attr = trim($attr);
                 if (!isset(OpenIdAXExtension::$available_properties[$attr]))
-                    throw new InvalidOpenIdMessageException(sprintf("AX: invalid attribute requested %s", $attr));
-                if (!isset($this->message[OpenIdProtocol::OpenIdPrefix . "_" . self::Prefix . "_" . self::Type . "_" . $attr]))
+                    //throw new InvalidOpenIdMessageException(sprintf("AX: invalid attribute requested %s", $attr));
+                    continue;
+                if (!isset($this->message[OpenIdProtocol::OpenIdPrefix . "_" . OpenIdAXExtension::Prefix . "_" . OpenIdAXExtension::Type . "_" . $attr]))
                     throw new InvalidOpenIdMessageException(sprintf("AX: invalid ns for attribute %s", $attr));
-                $ns = $this->message[OpenIdProtocol::OpenIdPrefix . "_" . self::Prefix . "_" . self::Type . "_" . $attr];
+                $ns = $this->message[OpenIdProtocol::OpenIdPrefix . "_" . OpenIdAXExtension::Prefix . "_" . OpenIdAXExtension::Type . "_" . $attr];
                 if ($ns != OpenIdAXExtension::$available_properties[$attr])
                     throw new InvalidOpenIdMessageException(sprintf("AX: invalid ns for attribute %s", $attr));
-                array_push($this->$attributes, $attr);
+                array_push($this->attributes, $attr);
             }
             return true;
         }
@@ -101,7 +103,7 @@ class OpenIdAXExtension extends OpenIdExtension
         self::$available_properties[OpenIdAXExtension::Country] = "http://axschema.org/contact/country/home";
         self::$available_properties[OpenIdAXExtension::Email] = "http://axschema.org/contact/email";
         self::$available_properties[OpenIdAXExtension::FirstMame] = "http://axschema.org/namePerson/first";
-        self::$available_properties[OpenIdAXExtension::LastName] = "http://axschema.org/pref/language";
+        self::$available_properties[OpenIdAXExtension::LastName] = "http://axschema.org/namePerson/last";
         self::$available_properties[OpenIdAXExtension::Language] = "http://axschema.org/pref/language";
     }
 

@@ -23,17 +23,8 @@ class XRDSDocumentBuilder {
     public function render(){
         $XRDNamespace = self::XRDNamespace;
         $XRDSNamespace = self::XRDSNamespace;
-        $header = <<< XRDS
-        <?xml version="1.0" encoding="UTF-8"?>
-        <xrds:XRDS
-             xmlns:xrds="{$XRDSNamespace}"
-             xmlns="{$XRDNamespace}">
-        <XRD>
-XRDS;
-        $footer = <<< XRDS
-         </XRD>
-        </xrds:XRDS>
-XRDS;
+        $header = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<xrds:XRDS xmlns:xrds=\"{$XRDSNamespace}\" xmlns=\"{$XRDNamespace}\">\n<XRD>\n";
+        $footer = "</XRD>\n</xrds:XRDS>";
         $xrds = $header;
         foreach($this->elements as $service){
             $xrds .= $service->render();

@@ -117,14 +117,16 @@ class OpenIdProtocol implements IOpenIdProtocol {
     }
 
     public function getXRDSDiscovery(){
-        $active_extensions = $this->server_extension_repository->GetAllExtensions();
+        $server_extension_service       = \App::make("openid\\services\\IServerExtensionsService");
+        $server_config_service          = \App::make("openid\\services\\IServerConfigurationService");
+        $active_extensions = $server_extension_service->getAllActiveExtensions();
         $extensions = array();
         foreach($active_extensions as $ext){
-            array_push($extensions,$ext->namespace);
+            array_push($extensions,$ext->getNamespace());
         }
 
         $services = array();
-        array_push($services, new XRDSService(0,self::OPIdentifierType,$this->server_configuration->getOPEndpointURL(),$extensions));
+        array_push($services, new XRDSService(0,self::OPIdentifierType,$server_config_service->getOPEndpointURL(),$extensions));
         $builder = new XRDSDocumentBuilder($services);
         $xrds = $builder->render();
         return $xrds;

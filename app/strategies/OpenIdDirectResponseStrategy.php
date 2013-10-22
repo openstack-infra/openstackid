@@ -7,7 +7,6 @@
  * To change this template use File | Settings | File Templates.
  */
 namespace strategies;
-use openid\responses\OpenIdResponse;
 use openid\strategies\IOpenIdResponseStrategy;
 use \Response;
 

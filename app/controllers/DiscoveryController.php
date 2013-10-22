@@ -23,10 +23,14 @@ class DiscoveryController extends BaseController {
      * @return xrds document on response
      */
     public function idp(){
-        $value = Request::header('Content-Type');
-        if($value == XRDSDocumentBuilder::ContentType){
+        //This field contains a semicolon-separated list of representation schemes
+        //which will be accepted in the response to this request.
+        $accept = Request::header('Accept');
+        $accept_values = explode(",",$accept);
+        if(in_array(XRDSDocumentBuilder::ContentType,$accept_values))
+        {
             $response = Response::make($this->openid_protocol->getXRDSDiscovery(), 200);
-            $response->header('Content-Type', "application/xrds+xml");
+            $response->header('Content-Type', "application/xrds+xml; charset=UTF-8");
         }
         else{
             $response = View::make("home");

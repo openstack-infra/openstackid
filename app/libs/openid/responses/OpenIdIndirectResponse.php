@@ -14,6 +14,7 @@ use openid\responses\OpenIdResponse;
 class OpenIdIndirectResponse extends OpenIdResponse {
 
     const IndirectResponseContentType ="application/x-www-form-urlencoded";
+    const OpenIdIndirectResponse="OpenIdIndirectResponse";
 
     public function __construct(){
         // Successful Responses: A server receiving a valid request MUST send a
@@ -47,7 +48,7 @@ class OpenIdIndirectResponse extends OpenIdResponse {
 
     public function getType()
     {
-        return "indirect";
+        return self::OpenIdIndirectResponse;
     }
 
     public function setReturnTo($return_to){

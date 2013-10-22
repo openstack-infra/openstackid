@@ -17,6 +17,8 @@ use openid\exceptions\InvalidKVFormat;
  */
 class OpenIdDirectResponse  extends OpenIdResponse {
 
+   const OpenIdDirectResponse="OpenIdDirectResponse";
+
    const DirectResponseContentType ="text/plain";
 
    public function __construct(){
@@ -64,6 +66,6 @@ class OpenIdDirectResponse  extends OpenIdResponse {
 
     public function getType()
     {
-        return "direct";
+        return self::OpenIdDirectResponse;
     }
 }

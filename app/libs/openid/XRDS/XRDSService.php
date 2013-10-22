@@ -29,21 +29,14 @@ class XRDSService {
     }
 
     public function render(){
-      $local_id =empty($this->local_id)?"":"<LocalID>{$this->local_id}</LocalID>";
+      $local_id =empty($this->local_id)?"":"<LocalID>{$this->local_id}</LocalID>\n";
 
       $extensions ="";
       foreach($this->extensions as $extension){
-          $extensions.="<Type>{$extension}</Type>";
+          $extensions.="<Type>{$extension}</Type>\n";
       }
 
-      $element = <<< SERVICE
-      <Service priority="{$this->priority}">
-          <Type>{$this->type}</Type>
-          {$extensions}
-          <URI>{$this->uri}</URI>
-          {$local_id}
-      </Service>
-SERVICE;
+      $element ="<Service priority=\"{$this->priority}\">\n<Type>{$this->type}</Type>\n{$extensions}<URI>{$this->uri}</URI>\n{$local_id}</Service>\n";
         return $element;
     }
 

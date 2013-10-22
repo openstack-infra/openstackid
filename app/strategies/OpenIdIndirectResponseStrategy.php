@@ -9,6 +9,7 @@
 namespace strategies;
 use openid\strategies\IOpenIdResponseStrategy;
 use \Response;
+use \Redirect;
 
 class OpenIdIndirectResponseStrategy implements IOpenIdResponseStrategy {
 

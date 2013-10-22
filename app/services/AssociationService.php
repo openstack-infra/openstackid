@@ -11,7 +11,8 @@ namespace services;
 use openid\model\IAssociation;
 use openid\services\IAssociationService;
 use \OpenIdAssociation;
-
+use \DateTime;
+use \DateInterval;
 class AssociationService implements  IAssociationService{
 
     /**
@@ -20,8 +21,18 @@ class AssociationService implements  IAssociationService{
      */
     public function getAssociation($handle)
     {
-        //todo: need to add expiration logic
-        return OpenIdAssociation::where('identifier','=',$handle)->first();
+        $assoc =  OpenIdAssociation::where('identifier','=',$handle)->first();
+        if(!is_null($assoc)){
+            $issued_date = new DateTime($assoc->issued);
+            $life_time   = $assoc->lifetime;
+            $issued_date->add(new DateInterval('PT'.$life_time.'S'));
+            $now         = new DateTime(gmdate("Y-m-d H:i:s", time()));
+            if($now>$issued_date){
+                $this->deleteAssociation($handle);
+                $assoc = null;
+            }
+        }
+        return $assoc;
     }
 
     /**

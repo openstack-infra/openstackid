@@ -23,7 +23,7 @@ use openid\responses\OpenIdNonImmediateNegativeAssertion;
 use openid\responses\OpenIdImmediateNegativeAssertion;
 use openid\services\ITrustedSitesService;
 use openid\responses\OpenIdIndirectResponse;
-use openid\exceptions\OpenIdIndirectGenericErrorResponse;
+use openid\responses\OpenIdIndirectGenericErrorResponse;
 use openid\helpers\OpenIdErrorMessages;
 use openid\helpers\OpenIdCryptoHelper;
 use openid\model\IAssociation;
@@ -111,9 +111,12 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
 
     protected function InternalHandle(OpenIdMessage $message)
     {
+        $request = null;
         try
         {
             $request = new OpenIdAuthenticationRequest($message);
+            if(!$request->IsValid())
+                throw new InvalidOpenIdMessageException("OpenIdAuthenticationRequest is Invalid!");
             $extensions = $this->server_extensions_service->getAllActiveExtensions();
             $context = new RequestContext;
             $mode = $request->getMode();
@@ -168,15 +171,22 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                                     return $this->doAssertion($request, $extensions);
                                     break;
                                 case IAuthService::AuthorizationResponse_DenyOnce:
-                                    return new OpenIdNonImmediateNegativeAssertion;
-                                    break;
-                                case IAuthService::AuthorizationResponse_DenyForever:
+                                {
+                                    $response = new OpenIdNonImmediateNegativeAssertion;
+                                    $response->setReturnTo($request->getReturnTo());
+                                    return $response;
+                                }
+                                break;
+                                case IAuthService::AuthorizationResponse_DenyForever:{
                                     $this->trusted_sites_service->addTrustedSite($currentUser, $request->getTrustedRoot(), IAuthService::AuthorizationResponse_DenyForever);
-                                    return new OpenIdNonImmediateNegativeAssertion;
-                                    break;
+                                    $response = new OpenIdNonImmediateNegativeAssertion;
+                                    $response->setReturnTo($request->getReturnTo());
+                                    return $response;
+                                }
+                                break;
                                 default:
-                                    throw new \Exception("Invalid Authorization response!");
-                                    break;
+                                   throw new \Exception("Invalid Authorization response!");
+                                break;
                             }
                         }
                     }
@@ -206,7 +216,15 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             }
         }
         catch (InvalidOpenIdMessageException $ex) {
-            return new OpenIdIndirectGenericErrorResponse($ex->getMessage());
+            $response  = new OpenIdIndirectGenericErrorResponse($ex->getMessage());
+
+            if(!is_null($request)){
+                $return_to = $request->getReturnTo();
+                if(!empty($return_to))
+                    $response->setReturnTo($return_to);
+            }
+
+            return $response ;
         }
     }
 

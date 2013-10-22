@@ -35,7 +35,8 @@ class OpenIdAuthenticationRequest extends OpenIdRequest{
     }
 
     public function getReturnTo(){
-        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")]:null;
+        $return_to = isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")]:null;
+        return (OpenIdUriHelper::checkReturnTo($return_to))?$return_to:"";
     }
 
     public function getRealm(){
@@ -58,12 +59,14 @@ class OpenIdAuthenticationRequest extends OpenIdRequest{
     }
 
     public function IsValid(){
-        $return_to = $this->getReturnTo();
+        $return_to  = $this->getReturnTo();
         $claimed_id = $this->getClaimedId();
-        $identity = $this->getIdentity();
-        $mode = $this->getMode();
-        //todo: validate url(format-regex) - white list /black list?
+        $identity   = $this->getIdentity();
+        $mode       = $this->getMode();
+        $realm      = $this->getRealm();
         return !empty($return_to)
+               && !empty($realm)
+               && OpenIdUriHelper::checkRealm($realm,$return_to)
                && !empty($claimed_id) && $claimed_id == OpenIdProtocol::IdentifierSelectType
                && !empty($identity)   && $identity   == OpenIdProtocol::IdentifierSelectType
                && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);

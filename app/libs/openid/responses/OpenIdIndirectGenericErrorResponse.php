@@ -14,7 +14,7 @@ use openid\OpenIdProtocol;
 
 class OpenIdIndirectGenericErrorResponse extends OpenIdIndirectResponse {
 
-    public function __construct($error,$contact,$reference){
+    public function __construct($error,$contact=null,$reference=null){
         parent::__construct();
         $this->setHttpCode(self::HttpErrorResponse);
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Error)] = $error;

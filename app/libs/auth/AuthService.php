@@ -38,7 +38,7 @@ class AuthService implements  IAuthService {
      */
     public function Login($username, $password)
     {
-        return Auth::attempt(array('username' => $username, 'password' => $password), true);
+        return Auth::attempt(array('username' => $username, 'password' => $password), false);
     }
 
     public function logout(){
@@ -50,8 +50,11 @@ class AuthService implements  IAuthService {
      */
     public function getUserAuthorizationResponse()
     {
-        if(Session::has("openid.authorization.response"))
-            return Session::get("openid.authorization.response");
+        if(Session::has("openid.authorization.response")){
+            $value= Session::get("openid.authorization.response");
+            Session::remove('openid.authorization.response');
+            return $value;
+        }
         return IAuthService::AuthorizationResponse_None;
     }
 

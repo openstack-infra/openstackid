@@ -20,9 +20,13 @@ abstract class OpenIdExtension {
     protected $description;
 
     public function __construct($name,$namespace,$description){
-        $this->namespace=$namespace;
-        $this->name=$name;
-        $this->description = $description;
+        $this->namespace    = $namespace;
+        $this->name         = $name;
+        $this->description  = $description;
+    }
+
+    public function getNamespace(){
+        return $this->namespace;
     }
 
     /**
