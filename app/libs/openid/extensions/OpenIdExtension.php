@@ -36,5 +36,6 @@ abstract class OpenIdExtension {
      * @throws InvalidOpenIdMessageException
      */
     abstract public function parseRequest(OpenIdRequest $request,RequestContext $context);
+    abstract public function getTrustedData(OpenIdRequest $request);
     abstract public function prepareResponse(OpenIdRequest $request,OpenIdResponse $response ,ResponseContext $context);
 }

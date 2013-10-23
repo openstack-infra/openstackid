@@ -13,7 +13,7 @@ use Illuminate\Auth\UserProviderInterface;
 use auth\exceptions\AuthenticationException;
 use \Member;
 use \Zend\Crypt\Hash;
-
+use openid\services\Registry;
 class CustomAuthProvider implements UserProviderInterface{
 
     /**
@@ -33,7 +33,7 @@ class CustomAuthProvider implements UserProviderInterface{
      */
     public function retrieveById($identifier)
     {
-        $user = OpenIdUser::where('external_id', '=', $identifier)->first();
+        $user   = OpenIdUser::where('external_id', '=', $identifier)->first();
         $member = Member::where('Email', '=', $identifier)->first();
         if(!is_null($member) && !is_null($user)){
             $user->setMember($member);
@@ -52,23 +52,52 @@ class CustomAuthProvider implements UserProviderInterface{
     {
         if(!isset($credentials['username']) ||  !isset($credentials['password']))
             throw new AuthenticationException("invalid crendentials");
-        $identifier = $credentials['username'];
-        $password = $credentials['password'];
-        $user = OpenIdUser::where('external_id', '=', $identifier)->first();
+
+        $identifier   = $credentials['username'];
+        $password     = $credentials['password'];
+        $user         = OpenIdUser::where('external_id', '=', $identifier)->first();
+
+        //check user status...
+        if(!is_null($user) && ($user->lock || !$user->active))
+            return null;
+
+        $user_service = Registry::getInstance()->get("openid\\services\\IUserService");
         $member = Member::where('Email', '=', $identifier)->first();
-        if(!is_null($member) && $member->checkPassword($password)){
+        if(!is_null($member)){
+            $res = $member->checkPassword($password);
+            //if user does not exists, then create it
             if(is_null($user)){
                 //create user
                 $user = new OpenIdUser();
-                $user->external_id = $member->Email;
+                $user->external_id          = $member->Email;
+                $user->last_login_date      = gmdate("Y-m-d H:i:s", time());
+                $user->login_failed_attempt = 0;
                 $user->active = true;
-                $user->identifier = Hash::compute("sha1",$user->external_id);
+                $user->lock = false;
                 $user->Save();
             }
+
             $user->setMember($member);
-            return $user;
+            $user_name = $member->FirstName.".".$member->Surname;
+            $user_service->associateUser($user->id,strtolower($user_name));
+            $server_configuration = Registry::getInstance()->get("openid\\services\\IServerConfigurationService");
+            if(!$res){
+                if($user->login_failed_attempt<$server_configuration->getMaxFailedLoginAttempts())
+                    $user_service->updateFailedLoginAttempts($user->id);
+                else{
+                    $user_service->lockUser($user->id);
+                }
+                $user = null;
+            }
+            else{
+                $user->last_login_date      = gmdate("Y-m-d H:i:s", time());
+                $user->login_failed_attempt = 0;
+                $user->active = true;
+                $user->lock = false;
+                $user->Save();
+            }
         }
-        return null;
+        return $user;
     }
 
     /**
@@ -83,8 +112,11 @@ class CustomAuthProvider implements UserProviderInterface{
         if(!isset($credentials['username']) ||  !isset($credentials['password']))
             throw new AuthenticationException("invalid crendentials");
         $identifier = $credentials['username'];
-        $password = $credentials['password'];
-        $member = Member::where('Email', '=', $identifier)->first();
-        return  $member->checkPassword($password);
-    }
+        $password   = $credentials['password'];
+        $user       = OpenIdUser::where('external_id', '=', $identifier)->first();
+        if(is_null($user) || $user->lock || !$user->active)
+            return false;
+        $member     = Member::where('Email', '=', $identifier)->first();
+        return is_null($member)?false:$member->checkPassword($password);
+     }
 }

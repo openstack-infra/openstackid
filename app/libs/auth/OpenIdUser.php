@@ -57,7 +57,10 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getEmail()
     {
-        $this->external_id;
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->external_id;
     }
 
     public function getFirstName()
@@ -124,5 +127,9 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return "";
+    }
+
+    public function getId(){
+        return $this->id;
     }
 }

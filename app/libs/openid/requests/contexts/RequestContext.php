@@ -12,18 +12,14 @@ namespace openid\requests\contexts;
 
 class RequestContext
 {
-
+    private $trusted_data;
     private $partial_views;
-    const StageNull = -1;
-    const StageLogin = 0;
-    const StageConsent = 1;
 
-    private $stage;
 
     public function __construct()
     {
         $this->partial_views = array();
-        $this->stage = self::StageNull;
+        $this->trusted_data = array();
     }
 
     public function addPartialView(PartialView $partial_view)
@@ -36,13 +32,16 @@ class RequestContext
         return $this->partial_views;
     }
 
-    public function setStage($stage)
-    {
-        $this->stage = $stage;
+
+    /**
+     * Gets an associative array of current request trusted data
+     * @return array
+     */
+    public function getTrustedData(){
+        return $this->trusted_data;
     }
 
-    public function getStage()
-    {
-        return $this->stage;
+    public function setTrustedData($trusted_data){
+        $this->trusted_data = array_merge($this->trusted_data,$trusted_data);
     }
 }

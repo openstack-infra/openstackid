@@ -2,250 +2,44 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" name="Default" comment="[smarcet] - Refs #4576, #4578 : XRDS discovery and  Authentication Workflow  main classes">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/AssociationService.php" afterPath="$PROJECT_DIR$/app/services/AssociationService.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/404.blade.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/openid/services/IUserService.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/services/UserService.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/views/identity.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/database/migrations/2013_10_17_210518_create_users_table.php" afterPath="$PROJECT_DIR$/app/database/migrations/2013_10_17_210518_create_users_table.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/AuthService.php" afterPath="$PROJECT_DIR$/app/libs/auth/AuthService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php" afterPath="$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/DiscoveryController.php" afterPath="$PROJECT_DIR$/app/controllers/DiscoveryController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/HomeController.php" afterPath="$PROJECT_DIR$/app/controllers/HomeController.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IAuthService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IAuthService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/IOpenIdProtocol.php" afterPath="$PROJECT_DIR$/app/libs/openid/IOpenIdProtocol.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/model/IOpenIdUser.php" afterPath="$PROJECT_DIR$/app/libs/openid/model/IOpenIdUser.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IServerConfigurationService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IServerConfigurationService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/model/ITrustedSite.php" afterPath="$PROJECT_DIR$/app/libs/openid/model/ITrustedSite.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdDirectResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdDirectResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/strategies/OpenIdDirectResponseStrategy.php" afterPath="$PROJECT_DIR$/app/strategies/OpenIdDirectResponseStrategy.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/OpenIdExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/OpenIdExtension.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectGenericErrorResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectGenericErrorResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php" afterPath="$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdImmediateNegativeAssertion.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdImmediateNegativeAssertion.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdNonImmediateNegativeAssertion.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdNonImmediateNegativeAssertion.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdOAuthExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdOAuthExtension.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdPAPEExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdPAPEExtension.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdPositiveAssertionResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdPositiveAssertionResponse.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" afterPath="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/strategies/OpenIdResponseStrategyFactoryMethod.php" afterPath="$PROJECT_DIR$/app/libs/openid/strategies/OpenIdResponseStrategyFactoryMethod.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/strategies/OpenIdResponseStrategyProvider.php" afterPath="$PROJECT_DIR$/app/strategies/OpenIdResponseStrategyProvider.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdUriHelper.php" afterPath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdUriHelper.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/Registry.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/Registry.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdSREGExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdSREGExtension.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/OpenIdTrustedSite.php" afterPath="$PROJECT_DIR$/app/models/OpenIdTrustedSite.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/OpenIdUser.php" afterPath="$PROJECT_DIR$/app/libs/auth/OpenIdUser.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/ServerConfigurationService.php" afterPath="$PROJECT_DIR$/app/services/ServerConfigurationService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/ServicesProvider.php" afterPath="$PROJECT_DIR$/app/services/ServicesProvider.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/TrustedSitesService.php" afterPath="$PROJECT_DIR$/app/services/TrustedSitesService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/UserController.php" afterPath="$PROJECT_DIR$/app/controllers/UserController.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSDocumentBuilder.php" afterPath="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSDocumentBuilder.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSService.php" afterPath="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/filters.php" afterPath="$PROJECT_DIR$/app/filters.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/openidIdp.iml" afterPath="$PROJECT_DIR$/.idea/openidIdp.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/routes.php" afterPath="$PROJECT_DIR$/app/routes.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="openidIdp.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/DiscoveryController.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381940543859" ignored="false" />
-    <file path="/DiscoveryControllerTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381770482258" ignored="false" />
-    <file path="/2013_10_14_155702_create_extension_table.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382044897650" ignored="false" />
-    <file path="/ServerExtension.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381766727808" ignored="false" />
-    <file path="/ServerExtensionTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381768563012" ignored="false" />
-    <file path="/tmp/ide-phpunit.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382105884970" ignored="false" />
-    <file path="/fragment.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382414523829" ignored="false" />
-    <file path="/HomeController.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382412067248" ignored="false" />
-    <file path="/XrdsDocumentBuilder.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381773998567" ignored="false" />
-    <file path="/a.dummy" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382123110073" ignored="false" />
-    <file path="/Dummy.txt" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382410799468" ignored="false" />
-    <file path="/IXRDSService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381773588280" ignored="false" />
-    <file path="/XRDSService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382413513308" ignored="false" />
-    <file path="/XRDSDocumentTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381774070136" ignored="false" />
-    <file path="/OpenIdProtocol.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382412432743" ignored="false" />
-    <file path="/IServerExtensionsRepository.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381944367232" ignored="false" />
-    <file path="/IServerConfigurationRepository.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381778188675" ignored="false" />
-    <file path="/OpenIdProtocolTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381781851602" ignored="false" />
-    <file path="/app.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381929077974" ignored="false" />
-    <file path="/RepositoriesServiceProvider.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381780638618" ignored="false" />
-    <file path="/ServerConfigurationRepositoryEloquent.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381781085301" ignored="false" />
-    <file path="/ServerExtensionsRepositoryEloquent.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381946012463" ignored="false" />
-    <file path="/IOpenIdProtocol.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381858939899" ignored="false" />
-    <file path="/*.regexp" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382130199566" ignored="false" />
-    <file path="/IOpenIdMessageHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381784676935" ignored="false" />
-    <file path="/OpenIdAuthenticationRequestHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382395882447" ignored="false" />
-    <file path="/OpenIdSessionAssociationRequestHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381784308892" ignored="false" />
-    <file path="/OpenIdCheckAuthenticationRequestHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381783903261" ignored="false" />
-    <file path="/OpenIdMessage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382033984714" ignored="false" />
-    <file path="/OpenIdMessageHandler.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381861117166" ignored="false" />
-    <file path="/OpenIdProviderController.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381953184255" ignored="false" />
-    <file path="/OpenIdProviderControllerTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381786052450" ignored="false" />
-    <file path="/routes.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381938649068" ignored="false" />
-    <file path="/OpenIdResponse.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382035157533" ignored="false" />
-    <file path="/OpenIdDirectResponse.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382389070767" ignored="false" />
-    <file path="/InvalidKVFormat.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381844314772" ignored="false" />
-    <file path="/OpenIdDirectGenericErrorResponse.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382038608960" ignored="false" />
-    <file path="/OpenIdIndirectResponse.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382389092247" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/training/Training.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370381" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/registration/code/EditProfileForm.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/registration/code/EditProfilePage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Project.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/SpeakerVotingPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/training/Frontend/TrainingDirectoryPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/registration/code/MemberDecorator.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/_config.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/registration/code/RegistrationPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/_ss_environment.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381848972509" ignored="false" />
-    <file path="/_config.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381848980103" ignored="false" />
-    <file path="/OpenIdRequest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382125344411" ignored="false" />
-    <file path="/OpenIdAuthenticationRequest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382395581458" ignored="false" />
-    <file path="$PROJECT_DIR$/../../LaravelTest/test/bootstrap/start.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381851672863" ignored="false" />
-    <file path="/CustomUser.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382043218430" ignored="false" />
-    <file path="/IAuthService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382113720266" ignored="false" />
-    <file path="/AuthService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382391761423" ignored="false" />
-    <file path="/IMementoRequestService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381852639908" ignored="false" />
-    <file path="/layout.blade.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381853928575" ignored="false" />
-    <file path="/error.blade.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381854085102" ignored="false" />
-    <file path="/global.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381857547950" ignored="false" />
-    <file path="/IOpenIdResponseStrategy.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381858495548" ignored="false" />
-    <file path="/OpenIdResponseStrategyFactoryMethod.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382389777793" ignored="false" />
-    <file path="/IAuthenticationStrategy.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381861012975" ignored="false" />
-    <file path="/UserController.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382113746587" ignored="false" />
-    <file path="/login.blade.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381950573256" ignored="false" />
-    <file path="/consent.blade.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382113544100" ignored="false" />
-    <file path="/MementoRequestService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381934837267" ignored="false" />
-    <file path="/AuthenticationStrategy.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381945904565" ignored="false" />
-    <file path="/ServicesProvider.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381865901188" ignored="false" />
-    <file path="/AuthenticationServiceProvider.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382127065838" ignored="false" />
-    <file path="/IMementoOpenIdRequestService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381930275650" ignored="false" />
-    <file path="/filters.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382390681240" ignored="false" />
-    <file path="/home.blade.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381939705628" ignored="false" />
-    <file path="/IOpenIdExtension.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382123060746" ignored="false" />
-    <file path="/RequestContext.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381951760812" ignored="false" />
-    <file path="/PartialView.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381944893338" ignored="false" />
-    <file path="/ResponseContext.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382122134407" ignored="false" />
-    <file path="/OpenIdAXExtension.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382414883747" ignored="false" />
-    <file path="/OpenIdSREGExtension.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382123115344" ignored="false" />
-    <file path="/IOpenIdAuthenticationStrategy.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381945734462" ignored="false" />
-    <file path="/IServerExtensionsService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381949170421" ignored="false" />
-    <file path="/ServerExtensionsService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382130368730" ignored="false" />
-    <file path="/pape.blade.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381951022347" ignored="false" />
-    <file path="/OpenIdDirectResponseStrategy.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1381952729742" ignored="false" />
-    <file path="/OpenIdIndirectResponseStrategy.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382389937860" ignored="false" />
-    <file path="/IAssociationService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382040567532" ignored="false" />
-    <file path="/IAssociation.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382017552899" ignored="false" />
-    <file path="$PROJECT_DIR$/../../ZendFramework-1.12.3/demos/Zend/OpenId/test_server.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382020503104" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/_ss_environment.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382021988019" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/sample._live-config.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382022713443" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/input_html_purifier_validator/_config.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382023130737" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/input_html_purifier_validator/code/input_html_purifier_validator.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382023249388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/form_html_purifier/code/input_html_purifier_validator.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382023612389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/form_html_purifier/code/form_html_purifier.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382023668653" ignored="false" />
-    <file path="/form_html_purifier.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382025598743" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/form_html_purifier/code/SafeXSSForm.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382026977713" ignored="false" />
-    <file path="/tmp/silverstripe-cache-home-smarcet-git-www.openstack.org/.cache.registration.templates.Layout.EditProfilePage.ss" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382024476892" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/form_html_purifier/_config.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382026977713" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/dataobject_manager/code/HasManyFileDataObjectManager.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370381" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/dataobject_manager/code/simple_html_editor_field/SimpleHTMLEditorField.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370381" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/training/TrainingProgram.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370382" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/dataobject_manager/code/ManyManyFileDataObjectManager.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370382" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/themes/openstack-old/javascript/jquery.raty-2.1.0/js/jquery.min.js" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370382" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/dataobject_manager/code/HasManyDataObjectManager.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370382" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/event-signin/SigninPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370382" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/SpeakerSubmission.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370382" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/event-signin/EventSignIn.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370382" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/SpeakerListPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370382" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/BoardOfDirectorsPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370382" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/deployment-survey/Deployment.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370384" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/dataobject_manager/code/FileDataObjectManager.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370384" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/PresentationCategoryPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370384" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/dataobject_manager/code/DataObjectManager.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370384" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/ConferenceNewsPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/deployment-survey/DeploymentSurveyPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/SpeakerVote.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/SecureFiles/code/SecureFileAccessToken.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/UserStoriesHolder.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/LogoDownloadPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/JobHolder.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/LegalDocumentPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/CompaniesPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/BrandingPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/OpenstackUser.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/JSONMember.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/IVotedPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/LegalAgreement.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370385" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/SpeakerVoteTotals.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/CompanyListPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/UserStoryPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/LogoRightsSubmission.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Voter.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/CandidatePage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/TechnicalCommitteePage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/FeedbackSubmission.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/CandidateNomination.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Page.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/RestrictedDownloadPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/OpenStackUserRequest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/ProductPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/AffiliationUpdate.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/ElectionVoterPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370386" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/ArticlePage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Feature.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/EventPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/CallForSpeakersPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/NewCompanyListPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/CallForSpeakersForm.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/PdfPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/PrimaryLogoPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/AttachmentFile.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/CommMember.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370387" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/ElectionSystem.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/ArticleHolder.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/ElectionPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/JobPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/uploadify/code/s3/S3File.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/WebBadgeDownloadPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/SangriaPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/LegalDocumentsHolder.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/MemberListPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/LogoRightsPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/MemberVerifyPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Link.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/InvolvementType.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370388" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/CommunityPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/CommPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/HomePage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Bio.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Org.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Presentation.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/OneColumn.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/themes/openstack/javascript/jquery.raty-2.1.0/js/jquery.min.js" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Candidate.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/EventHolder.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/LogoGuidelinesPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/AttachmentImage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/BioPage.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/openstack/code/Company.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/dataobject_manager/code/ImageDataObjectManager.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/themes/openstack-new/javascript/jquery.raty-2.1.0/js/jquery.min.js" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370389" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/dataobject_manager/code/ManyManyDataObjectManager.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028370390" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/registration/javascript/registration.page.js" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382027810599" ignored="false" />
-    <file path="/registration.page.js" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382027595478" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/registration/javascript/edit.profile.page.js" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382028395150" ignored="false" />
-    <file path="/OpenIdPositiveAssertionResponse.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382040841463" ignored="false" />
-    <file path="/OpenIdImmediateNegativeAssertion.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382038406853" ignored="false" />
-    <file path="/OpenIdNonImmediateNegativeAssertion.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382035302961" ignored="false" />
-    <file path="/ITrustedSitesService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382039793081" ignored="false" />
-    <file path="/IOpenIdUser.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382036261557" ignored="false" />
-    <file path="/ITrustedSite.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382036504552" ignored="false" />
-    <file path="/OpenIdUriHelper.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382395555526" ignored="false" />
-    <file path="/OpenIdIndirectGenericErrorResponse.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382395264655" ignored="false" />
-    <file path="/OpenIdErrorMessages.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382038761070" ignored="false" />
-    <file path="/OpenIdCryptoHelper.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382115073089" ignored="false" />
-    <file path="/OpenIdSignatureBuilder.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382042943494" ignored="false" />
-    <file path="/2013_10_17_210518_create_users_table.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382043971133" ignored="false" />
-    <file path="/OpenIdAssociation.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382131190978" ignored="false" />
-    <file path="/OpenIdTrustedSite.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382044287141" ignored="false" />
-    <file path="/2013_10_17_211051_create_trusted_sites_table.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382045588474" ignored="false" />
-    <file path="/UserTest.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382107688032" ignored="false" />
-    <file path="/Member.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382107213536" ignored="false" />
-    <file path="/AuthHelper.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382107564917" ignored="false" />
-    <file path="/CustomAuthProvider.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382111326308" ignored="false" />
-    <file path="/OpenIdUser.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382110559418" ignored="false" />
-    <file path="/AssociationService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382388577205" ignored="false" />
-    <file path="/TrustedSitesService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382110176023" ignored="false" />
-    <file path="/ServerConfigurationService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382115613393" ignored="false" />
-    <file path="/IServerConfigurationService.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382115464737" ignored="false" />
-    <file path="/OpenIdPAPEExtension.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382123148277" ignored="false" />
-    <file path="/OpenIdOAuthExtension.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382123162598" ignored="false" />
-    <file path="/OpenIdExtension.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382412523443" ignored="false" />
-    <file path="/Registry.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382126967425" ignored="false" />
-    <file path="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382130298408" ignored="false" />
-    <file path="/.gitignore" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382133150606" ignored="false" />
-    <file path="/OpenIdResponseStrategyProvider.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382389817462" ignored="false" />
-    <file path="$PROJECT_DIR$/../../php-openid/Auth/OpenID/TrustRoot.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382393554180" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/auth_openid/_config.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382410846743" ignored="false" />
-    <file path="$PROJECT_DIR$/../../www.openstack.org/auth_openid/code/Auth/Yadis/Manager.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382411305415" ignored="false" />
-    <file path="/XRDSDocumentBuilder.php" changelist="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" time="1382413461314" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -272,93 +66,88 @@
       <file leaf-file-name="OpenIdAuthenticationRequestHandler.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="108" column="0" selection-start="5058" selection-end="5058" vertical-scroll-proportion="-2.2083333">
-              <folding>
-                <element signature="e#6#164#0" expanded="true" />
-                <element signature="e#194#219#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="OpenIdProviderController.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/controllers/OpenIdProviderController.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="0" selection-start="1358" selection-end="1358" vertical-scroll-proportion="-2.5833333">
+            <state line="326" column="25" selection-start="14477" selection-end="14482" vertical-scroll-proportion="-5.625" vertical-offset="4335" max-vertical-offset="4725">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OpenIdIndirectResponseStrategy.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php">
+      <file leaf-file-name="OpenIdIndirectGenericErrorResponse.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectGenericErrorResponse.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="0" selection-start="599" selection-end="599" vertical-scroll-proportion="-2.75">
+            <state line="16" column="20" selection-start="319" selection-end="319" vertical-scroll-proportion="-1.7083334" vertical-offset="109" max-vertical-offset="405">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Controller.php" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Controllers/Controller.php">
+      <file leaf-file-name="OpenIdNonImmediateNegativeAssertion.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdNonImmediateNegativeAssertion.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="120" column="0" selection-start="2992" selection-end="2992" vertical-scroll-proportion="0.37185928">
+            <state line="18" column="57" selection-start="441" selection-end="490" vertical-scroll-proportion="-7.0" vertical-offset="12" max-vertical-offset="330">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AliasLoader.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Foundation/AliasLoader.php">
+      <file leaf-file-name="OpenIdAuthenticationRequest.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="65" column="0" selection-start="1247" selection-end="1247" vertical-scroll-proportion="-2.4166667">
+            <state line="41" column="28" selection-start="1681" selection-end="1689" vertical-scroll-proportion="-7.5416665" vertical-offset="299" max-vertical-offset="1065">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ClassLoader.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vendor/composer/ClassLoader.php">
+      <file leaf-file-name="OpenIdRequest.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdRequest.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="184" column="0" selection-start="5017" selection-end="5017" vertical-scroll-proportion="-2.4166667">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="6.2916665" vertical-offset="151" max-vertical-offset="435">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AssociationService.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/services/AssociationService.php">
+      <file leaf-file-name="OpenIdImmediateNegativeAssertion.php" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdImmediateNegativeAssertion.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="0" selection-start="986" selection-end="986" vertical-scroll-proportion="-2.75">
+            <state line="19" column="57" selection-start="492" selection-end="492" vertical-scroll-proportion="0.8333333" vertical-offset="0" max-vertical-offset="345">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AuthHelper.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/libs/auth/AuthHelper.php">
+      <file leaf-file-name="OpenIdIndirectResponse.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectResponse.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="0" selection-start="1159" selection-end="1159" vertical-scroll-proportion="-3.2916667">
+            <state line="53" column="31" selection-start="1781" selection-end="1792" vertical-scroll-proportion="-3.7083333" vertical-offset="601" max-vertical-offset="885">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OpenIdAXExtension.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php">
+      <file leaf-file-name="RequestContext.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="147" column="0" selection-start="6949" selection-end="6949" vertical-scroll-proportion="-1.0">
-              <folding>
-                <element signature="e#213#251#0" expanded="true" />
-              </folding>
+            <state line="16" column="0" selection-start="282" selection-end="282" vertical-scroll-proportion="9.625" vertical-offset="381" max-vertical-offset="690">
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UserController.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
+      <file leaf-file-name="OpenIdProtocol.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="74" column="0" selection-start="2593" selection-end="2593" vertical-scroll-proportion="-3.0833333">
+            <state line="130" column="33" selection-start="6238" selection-end="6238" vertical-scroll-proportion="-10.041667" vertical-offset="1529" max-vertical-offset="2040">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ITrustedSite.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/model/ITrustedSite.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="12" column="22" selection-start="202" selection-end="214" vertical-scroll-proportion="-3.75" vertical-offset="0" max-vertical-offset="285">
               <folding />
             </state>
           </provider>
@@ -382,22 +171,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php" />
-        <option value="$PROJECT_DIR$/app/strategies/OpenIdResponseStrategyProvider.php" />
-        <option value="$PROJECT_DIR$/app/filters.php" />
-        <option value="$PROJECT_DIR$/app/controllers/UserController.php" />
-        <option value="$PROJECT_DIR$/app/libs/auth/AuthService.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectGenericErrorResponse.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdUriHelper.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
-        <option value="$PROJECT_DIR$/app/controllers/HomeController.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/extensions/OpenIdExtension.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" />
+        <option value="$PROJECT_DIR$/app/services/TrustedSitesService.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/model/ITrustedSite.php" />
+        <option value="$PROJECT_DIR$/app/routes.php" />
+        <option value="$PROJECT_DIR$/app/services/ServerConfigurationService.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/services/IServerConfigurationService.php" />
         <option value="$PROJECT_DIR$/app/controllers/DiscoveryController.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSDocumentBuilder.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/IOpenIdProtocol.php" />
+        <option value="$PROJECT_DIR$/app/models/OpenIdTrustedSite.php" />
         <option value="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSService.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSDocumentBuilder.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/responses/OpenIdNonImmediateNegativeAssertion.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/responses/OpenIdImmediateNegativeAssertion.php" />
       </list>
     </option>
   </component>
@@ -407,7 +196,55 @@
       <server host="dev.openstack.org" name="dev.openstack.org" use_path_mappings="true" />
     </option>
   </component>
-  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" interpreter_name="PHP 5.4.13" />
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" interpreter_name="PHP 5.4.13">
+    <include_path>
+      <path value="$PROJECT_DIR$/vendor/symfony/console" />
+      <path value="$PROJECT_DIR$/vendor/symfony/browser-kit" />
+      <path value="$PROJECT_DIR$/vendor/swiftmailer/swiftmailer" />
+      <path value="$PROJECT_DIR$/vendor/psr/log" />
+      <path value="$PROJECT_DIR$/vendor/predis/predis" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-kernel" />
+      <path value="$PROJECT_DIR$/vendor/symfony/http-foundation" />
+      <path value="$PROJECT_DIR$/vendor/symfony/finder" />
+      <path value="$PROJECT_DIR$/vendor/symfony/filesystem" />
+      <path value="$PROJECT_DIR$/vendor/symfony/event-dispatcher" />
+      <path value="$PROJECT_DIR$/vendor/composer" />
+      <path value="$PROJECT_DIR$/vendor/symfony/dom-crawler" />
+      <path value="$PROJECT_DIR$/vendor/symfony/debug" />
+      <path value="$PROJECT_DIR$/vendor/symfony/css-selector" />
+      <path value="$PROJECT_DIR$/vendor/patchwork/utf8" />
+      <path value="$PROJECT_DIR$/vendor/nikic/php-parser" />
+      <path value="$PROJECT_DIR$/vendor/nesbot/carbon" />
+      <path value="$PROJECT_DIR$/vendor/monolog/monolog" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit-mock-objects" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-token-stream" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/phpunit" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-text-template" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-timer" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-code-coverage" />
+      <path value="$PROJECT_DIR$/vendor/phpunit/php-file-iterator" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/cache" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/annotations" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/common" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/collections" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/inflector" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/dbal" />
+      <path value="$PROJECT_DIR$/vendor/doctrine/lexer" />
+      <path value="$PROJECT_DIR$/vendor/filp/whoops" />
+      <path value="$PROJECT_DIR$/vendor/ircmaxell/password-compat" />
+      <path value="$PROJECT_DIR$/vendor/jeremeamia/SuperClosure" />
+      <path value="$PROJECT_DIR$/vendor/laravel/framework" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-crypt" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-math" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-servicemanager" />
+      <path value="$PROJECT_DIR$/vendor/symfony/process" />
+      <path value="$PROJECT_DIR$/vendor/symfony/routing" />
+      <path value="$PROJECT_DIR$/vendor/symfony/translation" />
+      <path value="$PROJECT_DIR$/vendor/symfony/yaml" />
+      <path value="$PROJECT_DIR$/vendor/zendframework/zend-stdlib" />
+      <path value="$PROJECT_DIR$/vendor/classpreloader/classpreloader" />
+    </include_path>
+  </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="65" />
     <option name="y" value="38" />
@@ -456,6 +293,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -484,106 +322,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="vendor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vendor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="laravel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="framework" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vendor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="laravel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="framework" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Illuminate" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="vendor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="laravel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="framework" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Illuminate" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Auth" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="app" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -632,33 +370,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="XRDS" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openid" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="services" />
+              <option name="myItemId" value="requests" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -705,136 +417,9 @@
               <option name="myItemId" value="libs" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openid" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="handlers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openid" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="extensions" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openid" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="extensions" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="implementations" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openid" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="exceptions" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="controllers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -897,14 +482,20 @@
     <configuration default="true" type="PhpLocalRunConfigurationType" factoryName="PHP Console">
       <method />
     </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
+      <method />
+    </configuration>
+    <configuration default="true" type="PhpUnitRemoteRunConfigurationType" factoryName="PHPUnit on Server">
+      <method />
+    </configuration>
     <configuration default="false" name="dev.openstackid.com" type="PhpWebAppRunConfigurationType" factoryName="PHP Web Application" browser="FIREFOX" server_name="dev.openstackid.com">
       <RunnerSettings RunnerId="PhpWebAppDebugRunner" />
       <ConfigurationWrapper RunnerId="PhpWebAppDebugRunner" />
       <method />
     </configuration>
     <list size="6">
-      <item index="0" class="java.lang.String" itemvalue="PHP Script.OpenIdProviderController.php" />
-      <item index="1" class="java.lang.String" itemvalue="PHP Web Application.dev.openstackid.com" />
+      <item index="0" class="java.lang.String" itemvalue="PHP Web Application.dev.openstackid.com" />
+      <item index="1" class="java.lang.String" itemvalue="PHP Script.OpenIdProviderController.php" />
       <item index="2" class="java.lang.String" itemvalue="PHPUnit.DiscoveryControllerTest.testIdpDiscovery" />
       <item index="3" class="java.lang.String" itemvalue="PHPUnit.OpenIdProviderControllerTest" />
       <item index="4" class="java.lang.String" itemvalue="PHPUnit.ServerExtensionTest" />
@@ -953,23 +544,24 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="38" width="1301" height="728" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32871974" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3042434" sideWeight="0.5278746" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.47212544" sideWeight="0.6180945" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32612312" sideWeight="0.6180945" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3544093" sideWeight="0.38190553" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3554007" sideWeight="0.38190553" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3292683" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.30504403" sideWeight="0.67128026" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3292683" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.0" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -979,274 +571,140 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
-    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="true" />
-    <option name="CHECK_NEW_TODO" value="true" />
     <option name="myTodoPanelSettings">
-      <value>
-        <are-packages-shown value="false" />
-        <are-modules-shown value="false" />
-        <flatten-packages value="false" />
-        <is-autoscroll-to-source value="false" />
-      </value>
+      <TodoPanelSettings />
     </option>
-    <option name="PERFORM_UPDATE_IN_BACKGROUND" value="true" />
-    <option name="PERFORM_COMMIT_IN_BACKGROUND" value="true" />
-    <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
-    <option name="PERFORM_CHECKOUT_IN_BACKGROUND" value="true" />
-    <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
-    <option name="PERFORM_ROLLBACK_IN_BACKGROUND" value="false" />
-    <option name="CHECK_LOCALLY_CHANGED_CONFLICTS_IN_BACKGROUND" value="false" />
-    <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
-    <option name="SHOW_ONLY_CHANGED_IN_SELECTION_DIFF" value="true" />
-    <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
-    <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
-    <option name="SHORT_DIFF_HORIZONTALLY" value="true" />
-    <option name="SHORT_DIFF_EXTRA_LINES" value="2" />
-    <option name="SOFT_WRAPS_IN_SHORT_DIFF" value="true" />
-    <option name="INCLUDE_TEXT_INTO_PATCH" value="false" />
-    <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
-    <option name="SHOW_FILE_HISTORY_DETAILS" value="true" />
-    <option name="SHOW_VCS_ERROR_NOTIFICATIONS" value="true" />
-    <option name="SHOW_DIRTY_RECURSIVELY" value="false" />
-    <option name="LIMIT_HISTORY" value="true" />
-    <option name="MAXIMUM_HISTORY_ROWS" value="1000" />
-    <option name="UPDATE_FILTER_SCOPE_NAME" />
-    <option name="USE_COMMIT_MESSAGE_MARGIN" value="false" />
-    <option name="COMMIT_MESSAGE_MARGIN_SIZE" value="72" />
-    <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
-    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="[smarcet] - Refs #4576, #4578 : XRDS discovery and  Authentication Workflow  main classes" />
-    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
-    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
-    <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
-    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
-    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
-    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
-    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
-    <option name="ACTIVE_VCS_NAME" />
-    <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
-    <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
-    <option name="UPDATE_FILTER_BY_SCOPE" value="false" />
-    <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
-    <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
     <MESSAGE value="[smarcet] - Refs #4576, #4578 : XRDS discovery and  Authentication Workflow  main classes" />
+    <option name="LAST_COMMIT_MESSAGE" value="[smarcet] - Refs #4576, #4578 : XRDS discovery and  Authentication Workflow  main classes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Auth/Guard.php</url>
-          <line>271</line>
-          <option name="timeStamp" value="89" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Foundation/Testing/TestCase.php</url>
-          <line>57</line>
-          <option name="timeStamp" value="95" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/vendor/symfony/browser-kit/Symfony/Component/BrowserKit/Client.php</url>
-          <line>297</line>
-          <option name="timeStamp" value="96" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/tests/ServerExtensionTest.php</url>
-          <line>12</line>
-          <option name="timeStamp" value="109" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/tests/UserTest.php</url>
-          <line>18</line>
-          <option name="timeStamp" value="112" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/auth/AuthHelper.php</url>
-          <line>37</line>
-          <option name="timeStamp" value="113" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/auth/AuthHelper.php</url>
-          <line>27</line>
-          <option name="timeStamp" value="114" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php</url>
-          <line>52</line>
-          <option name="timeStamp" value="116" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php</url>
-          <line>82</line>
-          <option name="timeStamp" value="117" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/auth/AuthService.php</url>
-          <line>44</line>
-          <option name="timeStamp" value="121" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php</url>
-          <line>57</line>
-          <option name="timeStamp" value="125" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/services/AssociationService.php</url>
-          <line>23</line>
-          <option name="timeStamp" value="155" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdDirectResponse.php</url>
-          <line>68</line>
-          <option name="timeStamp" value="159" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php</url>
-          <line>113</line>
-          <option name="timeStamp" value="179" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php</url>
-          <line>41</line>
-          <option name="timeStamp" value="181" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php</url>
-          <line>119</line>
-          <option name="timeStamp" value="183" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php</url>
-          <line>112</line>
-          <option name="timeStamp" value="184" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php</url>
-          <line>70</line>
-          <option name="timeStamp" value="185" />
+          <url>file://$PROJECT_DIR$/app/services/TrustedSitesService.php</url>
+          <line>19</line>
+          <option name="timeStamp" value="208" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
-        <breakpoints-dialog />
+        <breakpoints-dialog>
+          <selected-grouping-rules>
+            <grouping-rule id="by-file" />
+          </selected-grouping-rules>
+        </breakpoints-dialog>
       </breakpoints-dialog>
-      <option name="time" value="186" />
+      <option name="time" value="211" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/XRDS/XRDSService.php">
+    <entry file="file://$PROJECT_DIR$/app/services/TrustedSitesService.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="106" selection-start="970" selection-end="970" vertical-scroll-proportion="0.23364486">
+        <state line="26" column="0" selection-start="760" selection-end="760" vertical-scroll-proportion="0.3418647" vertical-offset="68" max-vertical-offset="615">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/exceptions/InvalidOpenIdMessageException.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="10" selection-start="176" selection-end="193" vertical-scroll-proportion="-1.875">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdRequest.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="0" selection-start="406" selection-end="406" vertical-scroll-proportion="-3.375">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Exception/Handler.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="149" column="0" selection-start="3487" selection-end="3487" vertical-scroll-proportion="-3.0833333">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Auth/Guard.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="271" column="0" selection-start="6244" selection-end="6244" vertical-scroll-proportion="-3.4166667">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="82" column="0" selection-start="2402" selection-end="2402" vertical-scroll-proportion="-2.75">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/auth/AuthHelper.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="0" selection-start="1159" selection-end="1159" vertical-scroll-proportion="-3.2916667">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="0" selection-start="2593" selection-end="2593" vertical-scroll-proportion="-3.0833333">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="147" column="0" selection-start="6949" selection-end="6949" vertical-scroll-proportion="-1.0">
-          <folding>
-            <element signature="e#213#251#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/services/AssociationService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="0" selection-start="986" selection-end="986" vertical-scroll-proportion="-2.75">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Foundation/AliasLoader.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="65" column="0" selection-start="1247" selection-end="1247" vertical-scroll-proportion="-2.4166667">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vendor/composer/ClassLoader.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="184" column="0" selection-start="5017" selection-end="5017" vertical-scroll-proportion="-2.4166667">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="108" column="0" selection-start="5058" selection-end="5058" vertical-scroll-proportion="-2.2083333">
-          <folding>
-            <element signature="e#6#164#0" expanded="true" />
-            <element signature="e#194#219#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/OpenIdProviderController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="0" selection-start="1358" selection-end="1358" vertical-scroll-proportion="-2.5833333">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="0" selection-start="599" selection-end="599" vertical-scroll-proportion="-2.75">
+        <state line="36" column="0" selection-start="1358" selection-end="1358" vertical-scroll-proportion="0.7129799" vertical-offset="0" max-vertical-offset="547">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Controllers/Controller.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="120" column="0" selection-start="2992" selection-end="2992" vertical-scroll-proportion="0.37185928">
+        <state line="125" column="0" selection-start="3086" selection-end="3086" vertical-scroll-proportion="0.15173675" vertical-offset="1732" max-vertical-offset="4590">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Route.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="0" selection-start="1316" selection-end="1316" vertical-scroll-proportion="0.15539305" vertical-offset="725" max-vertical-offset="7275">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/XRDS/XRDSService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="84" selection-start="728" selection-end="728" vertical-scroll-proportion="-5.6666665" vertical-offset="239" max-vertical-offset="810">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/XRDS/XRDSDocumentBuilder.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="55" selection-start="996" selection-end="996" vertical-scroll-proportion="-19.375" vertical-offset="0" max-vertical-offset="675">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="0" selection-start="282" selection-end="282" vertical-scroll-proportion="9.625" vertical-offset="381" max-vertical-offset="690">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/model/ITrustedSite.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="22" selection-start="202" selection-end="214" vertical-scroll-proportion="-3.75" vertical-offset="0" max-vertical-offset="285">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="130" column="33" selection-start="6238" selection-end="6238" vertical-scroll-proportion="-10.041667" vertical-offset="1529" max-vertical-offset="2040">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdRequest.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="6.2916665" vertical-offset="151" max-vertical-offset="435">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="28" selection-start="1681" selection-end="1689" vertical-scroll-proportion="-7.5416665" vertical-offset="299" max-vertical-offset="1065">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectResponse.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="53" column="31" selection-start="1781" selection-end="1792" vertical-scroll-proportion="-3.7083333" vertical-offset="601" max-vertical-offset="885">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectGenericErrorResponse.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="20" selection-start="319" selection-end="319" vertical-scroll-proportion="-1.7083334" vertical-offset="109" max-vertical-offset="405">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="326" column="25" selection-start="14477" selection-end="14482" vertical-scroll-proportion="-5.625" vertical-offset="4335" max-vertical-offset="4725">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdNonImmediateNegativeAssertion.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="57" selection-start="441" selection-end="490" vertical-scroll-proportion="-7.0" vertical-offset="12" max-vertical-offset="330">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdImmediateNegativeAssertion.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="57" selection-start="492" selection-end="492" vertical-scroll-proportion="0.8333333" vertical-offset="0" max-vertical-offset="345">
           <folding />
         </state>
       </provider>

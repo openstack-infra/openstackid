@@ -12,25 +12,17 @@ use openid\model\ITrustedSite;
 class OpenIdTrustedSite extends Eloquent implements  ITrustedSite{
 
     protected $table = 'openid_trusted_sites';
-
-    public function setRealm($realm)
-    {
-        // TODO: Implement setRealm() method.
-    }
+    public $timestamps = false;
 
     public function getRealm()
     {
-        // TODO: Implement getRealm() method.
-    }
-
-    public function setData($data)
-    {
-        // TODO: Implement setData() method.
+        return $this->realm;
     }
 
     public function getData()
     {
-        // TODO: Implement getData() method.
+        $res =  $this->data;
+        return json_decode($res);
     }
 
     public function getUser()
@@ -40,11 +32,7 @@ class OpenIdTrustedSite extends Eloquent implements  ITrustedSite{
 
     public function getAuthorizationPolicy()
     {
-        // TODO: Implement getAuthorizationPolicy() method.
+       return $this->policy;
     }
 
-    public function setAuthorizationPolicy($policy)
-    {
-        // TODO: Implement setAuthorizationPolicy() method.
-    }
 }

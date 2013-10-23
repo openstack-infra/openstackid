@@ -12,6 +12,12 @@ use openid\services\IServerConfigurationService;
 
 class ServerConfigurationService implements IServerConfigurationService{
 
+
+    public function getUserIdentityEndpointURL($identifier){
+        $url = action("DiscoveryController@user",array("identifier"=>$identifier));
+        return $url;
+    }
+
     public function getOPEndpointURL()
     {
         $url = action("OpenIdProviderController@op_endpoint");
@@ -26,5 +32,9 @@ class ServerConfigurationService implements IServerConfigurationService{
     public function getSessionAssociationLifetime()
     {
         return 360;
+    }
+
+    public function getMaxFailedLoginAttempts(){
+        return 3;
     }
 }

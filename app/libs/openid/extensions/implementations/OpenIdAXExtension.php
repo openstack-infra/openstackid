@@ -147,5 +147,18 @@ class OpenIdAXExtension extends OpenIdExtension
         }
     }
 
+    public function getTrustedData(OpenIdRequest $request){
+
+        $data = array();
+        $ax_request = new OpenIdAXRequest($request->getMessage());
+        if ($ax_request->IsValid()){
+            $attributes = $ax_request->getRequiredAttributes();
+            foreach($attributes as $attr){
+                array_push($data,$attr);
+            }
+        }
+        return $data;
+    }
+
 
 }

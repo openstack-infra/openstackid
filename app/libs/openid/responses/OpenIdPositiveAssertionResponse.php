@@ -15,6 +15,7 @@ use openid\OpenIdProtocol;
 class OpenIdPositiveAssertionResponse extends OpenIdIndirectResponse  {
 
     public function __construct($op_endpoint,$claimed_id,$identity,$return_to){
+        parent::__construct();
         $this->setMode(OpenIdProtocol::IdMode);
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_OpEndpoint)]  = $op_endpoint;
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]   = $claimed_id;

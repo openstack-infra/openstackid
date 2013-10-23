@@ -62,4 +62,9 @@ class AuthService implements  IAuthService {
         //todo : check valid response
         Session::set("openid.authorization.response",$auth_response);
     }
+
+    public function getUserByOpenId($openid){
+        $user = OpenIdUser::where('identifier','=',$openid)->first();
+        return $user;
+    }
 }

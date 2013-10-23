@@ -12,14 +12,9 @@ namespace openid\model;
 
 interface ITrustedSite {
 
-    public function setRealm($realm);
     public function getRealm();
-
-    public function setData($data);
     public function getData();
-
     public function getUser();
-
     public function getAuthorizationPolicy();
-    public function setAuthorizationPolicy($policy);
+
 }

@@ -13,7 +13,11 @@ use openid\OpenIdProtocol;
 
 class OpenIdNonImmediateNegativeAssertion extends OpenIdIndirectResponse {
 
-    public function __construct(){
+    public function __construct($return_url=null){
+        parent::__construct();
         $this->setMode(OpenIdProtocol::CancelMode);
+        if(!is_null($return_url) && !empty($return_url)){
+            $this->setReturnTo($return_url);
+        }
     }
 }

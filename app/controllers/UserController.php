@@ -10,7 +10,7 @@ use openid\services\IMementoOpenIdRequestService;
 use openid\services\IAuthService;
 use openid\requests\OpenIdAuthenticationRequest;
 use openid\exceptions\InvalidRequestContextException;
-
+use openid\XRDS\XRDSDocumentBuilder;
 class UserController extends BaseController{
 
     private $memento_service;

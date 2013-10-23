@@ -30,4 +30,8 @@ class OpenIdSREGExtension extends OpenIdExtension
     {
         // TODO: Implement prepareResponse() method.
     }
+
+    public function getTrustedData(OpenIdRequest $request){
+
+    }
 }

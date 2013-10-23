@@ -13,6 +13,7 @@
 
 Route::get('/', "HomeController@index");
 Route::get('/discovery', "DiscoveryController@idp");
+
 //op endpoint url
 Route::post('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
 Route::get('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
@@ -21,7 +22,7 @@ Route::get('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
 Route::get('/accounts/user/login',"UserController@getLogin");
 
 Route::post('/accounts/user/login',"UserController@postLogin");
-
+Route::get("/accounts/user/ud/{identifier}","DiscoveryController@user");
 
 Route::get('/accounts/user/consent',"UserController@getConsent");
 

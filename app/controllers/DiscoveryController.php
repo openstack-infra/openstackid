@@ -9,13 +9,16 @@
 
 use openid\IOpenIdProtocol;
 use openid\XRDS\XRDSDocumentBuilder;
+use \openid\services\IAuthService;
 
 class DiscoveryController extends BaseController {
 
     private $openid_protocol;
+    private $auth_service;
 
-    public function __construct(IOpenIdProtocol $openid_protocol){
-        $this->openid_protocol=$openid_protocol;
+    public function __construct(IOpenIdProtocol $openid_protocol,IAuthService $auth_service ){
+        $this->openid_protocol  = $openid_protocol;
+        $this->auth_service     = $auth_service;
     }
 
     /**
@@ -29,7 +32,7 @@ class DiscoveryController extends BaseController {
         $accept_values = explode(",",$accept);
         if(in_array(XRDSDocumentBuilder::ContentType,$accept_values))
         {
-            $response = Response::make($this->openid_protocol->getXRDSDiscovery(), 200);
+            $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeIdp), 200);
             $response->header('Content-Type', "application/xrds+xml; charset=UTF-8");
         }
         else{
@@ -38,8 +41,23 @@ class DiscoveryController extends BaseController {
         return $response;
     }
 
-    public function user(){
-
+    public function user($identifier){
+        $user = $this->auth_service->getUserByOpenId($identifier);
+        if(is_null($user))
+           return View::make("404");
+        //This field contains a semicolon-separated list of representation schemes
+        //which will be accepted in the response to this request.
+        $accept = Request::header('Accept');
+        $accept_values = explode(",",$accept);
+        if(in_array(XRDSDocumentBuilder::ContentType,$accept_values))
+        {
+            $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeUser), 200);
+            $response->header('Content-Type', "application/xrds+xml; charset=UTF-8");
+        }
+        else{
+            $response = View::make("identity");
+        }
+        return $response;
     }
 
 }

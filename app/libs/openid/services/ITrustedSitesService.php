@@ -19,5 +19,5 @@ interface ITrustedSitesService {
      * @param $return_to
      * @return ITrustedSite
      */
-    public function getTrustedSite(IOpenIdUser $user,$return_to);
+    public function getTrustedSite(IOpenIdUser $user,$realm);
 }

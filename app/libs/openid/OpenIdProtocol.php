@@ -116,7 +116,8 @@ class OpenIdProtocol implements IOpenIdProtocol {
         $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service,$memento_request_service,$auth_strategy,$server_extension_service,$association_service,$trusted_sites_service,$server_config_service,$successor);
     }
 
-    public function getXRDSDiscovery(){
+    public function getXRDSDiscovery($mode, $canonical_id=null){
+        //todo: check valid mode
         $server_extension_service       = \App::make("openid\\services\\IServerExtensionsService");
         $server_config_service          = \App::make("openid\\services\\IServerConfigurationService");
         $active_extensions = $server_extension_service->getAllActiveExtensions();
@@ -126,8 +127,8 @@ class OpenIdProtocol implements IOpenIdProtocol {
         }
 
         $services = array();
-        array_push($services, new XRDSService(0,self::OPIdentifierType,$server_config_service->getOPEndpointURL(),$extensions));
-        $builder = new XRDSDocumentBuilder($services);
+        array_push($services, new XRDSService(0, $mode == IOpenIdProtocol::OpenIdXRDSModeUser ? self::ClaimedIdentifierType: self::OPIdentifierType,$server_config_service->getOPEndpointURL(),$extensions,$canonical_id));
+        $builder = new XRDSDocumentBuilder($services,$canonical_id);
         $xrds = $builder->render();
         return $xrds;
     }

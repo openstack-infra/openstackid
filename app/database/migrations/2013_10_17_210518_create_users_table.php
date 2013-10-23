@@ -17,7 +17,9 @@ class CreateUsersTable extends Migration {
             $table->string('identifier',255);
             $table->string('external_id',100);
             $table->boolean('active');
+            $table->boolean('lock');
             $table->dateTime('last_login_date');
+            $table->integer('login_failed_attempt');
             $table->timestamps();
         });
   	}

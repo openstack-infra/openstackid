@@ -12,6 +12,7 @@ namespace openid\model;
 
 interface IOpenIdUser {
 
+    public function getId();
     public function getIdentifier();
     public function getEmail();
     public function getFirstName();
