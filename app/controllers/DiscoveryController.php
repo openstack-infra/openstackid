@@ -10,15 +10,18 @@
 use openid\IOpenIdProtocol;
 use openid\XRDS\XRDSDocumentBuilder;
 use \openid\services\IAuthService;
+use openid\services\IServerConfigurationService;
 
 class DiscoveryController extends BaseController {
 
     private $openid_protocol;
     private $auth_service;
+    private $server_config_service;
 
-    public function __construct(IOpenIdProtocol $openid_protocol,IAuthService $auth_service ){
-        $this->openid_protocol  = $openid_protocol;
-        $this->auth_service     = $auth_service;
+    public function __construct(IOpenIdProtocol $openid_protocol,IAuthService $auth_service, IServerConfigurationService $server_config_service){
+        $this->openid_protocol       = $openid_protocol;
+        $this->auth_service          = $auth_service;
+        $this->server_config_service = $server_config_service;
     }
 
     /**
@@ -48,10 +51,11 @@ class DiscoveryController extends BaseController {
         //This field contains a semicolon-separated list of representation schemes
         //which will be accepted in the response to this request.
         $accept = Request::header('Accept');
+        $claimed_identifier = $this->server_config_service->getUserIdentityEndpointURL($identifier);
         $accept_values = explode(",",$accept);
         if(in_array(XRDSDocumentBuilder::ContentType,$accept_values))
         {
-            $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeUser), 200);
+            $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeUser,$claimed_identifier), 200);
             $response->header('Content-Type', "application/xrds+xml; charset=UTF-8");
         }
         else{

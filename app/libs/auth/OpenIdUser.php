@@ -11,7 +11,7 @@
 namespace auth;
 use Illuminate\Auth\UserInterface;
 use openid\model\IOpenIdUser;
-
+use \Member;
 
 class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 

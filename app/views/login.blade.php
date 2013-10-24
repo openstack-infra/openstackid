@@ -2,7 +2,7 @@
 @section('content')
 <h1>Login</h1>
 <div class="container">
-    {{ Form::open(array('url' => '/accounts/user/login', 'method' => 'post')) }}
+    {{ Form::open(array('url' => '/accounts/user/login', 'method' => 'post',  "autocomplete" => "off")) }}
         <ul class="errors">
             @foreach($errors->all() as $message)
                 <li>{{ $message }}</li>
@@ -26,9 +26,5 @@
             <div id="flash_notice">{{ Session::get('flash_notice')  }}</div>
         @endif
     {{ Form::close() }}
-    @foreach ($views as $view)
-         {{ $view}}
-    @endforeach
-
 </div>
 @stop

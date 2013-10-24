@@ -1,7 +1,7 @@
 @extends('layout')
 @section('content')
 <div class="container">
-    {{ Form::open(array('url' => '/accounts/user/consent', 'method' => 'post')) }}
+    {{ Form::open(array('url' => '/accounts/user/consent', 'method' => 'post',  "autocomplete" => "off")) }}
     <label>
         This Site {{ $realm }} is requesting permissions
     </label>
@@ -19,5 +19,8 @@
     {{ Form::submit('Ok') }}
     {{ Form::submit('Cancel') }}
     {{ Form::close() }}
+    @foreach ($views as $view)
+    {{ $view}}
+    @endforeach
 </div>
 @stop

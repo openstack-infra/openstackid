@@ -12,9 +12,8 @@ use openid\services\IServerConfigurationService;
 
 class ServerConfigurationService implements IServerConfigurationService{
 
-
     public function getUserIdentityEndpointURL($identifier){
-        $url = action("DiscoveryController@user",array("identifier"=>$identifier));
+        $url = action("UserController@getIdentity",array("identifier"=>$identifier));
         return $url;
     }
 

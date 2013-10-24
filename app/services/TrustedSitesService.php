@@ -42,4 +42,9 @@ class TrustedSitesService implements ITrustedSitesService {
         $site = OpenIdTrustedSite::where("realm","=",$realm)->where("user_id","=",$user->getId())->first();
         return $site;
     }
+
+    public function getAllTrustedSitesByUser(IOpenIdUser $user){
+        $sites = OpenIdTrustedSite::where("user_id","=",$user->getId())->get();
+        return $sites;
+    }
 }

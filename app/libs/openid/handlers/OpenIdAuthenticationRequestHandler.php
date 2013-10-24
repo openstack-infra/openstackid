@@ -76,7 +76,6 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     /**
      * Create Positive Identity Assertion
      * implements http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
-     * @param OpenIdAuthenticationRequest $request
      * @return OpenIdPositiveAssertionResponse
      */
     private function doAssertion()
@@ -100,7 +99,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             $ext->prepareResponse($this->current_request, $response, $context);
         }
         //check former assoc handle...
-        $assoc_handle = $request->getAssocHandle();
+        $assoc_handle = $this->current_request->getAssocHandle();
         $association = $this->association_service->getAssociation($assoc_handle);
         if (empty($assoc_handle) || is_null($association)) {
             // if not present or if it already void then enter on dumb mode
@@ -122,8 +121,6 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     }
 
     /**
-     * @param OpenIdAuthenticationRequest $request
-     * @param RequestContext $context
      * @return mixed
      */
     private function doConsentProcess(){
@@ -213,8 +210,6 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         }
     }
     /**
-     * @param OpenIdAuthenticationRequest $request
-     * @param RequestContext $context
      * @return OpenIdIndirectGenericErrorResponse|OpenIdNonImmediateNegativeAssertion|OpenIdPositiveAssertionResponse
      * @throws \Exception
      */
@@ -240,7 +235,6 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     }
 
     /**
-     * @param OpenIdAuthenticationRequest $request
      * @return OpenIdImmediateNegativeAssertion|OpenIdIndirectGenericErrorResponse|OpenIdPositiveAssertionResponse
      */
     protected function doImmediateMode(){
@@ -293,7 +287,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
      */
     protected function InternalHandle(OpenIdMessage $message)
     {
-        $request = null;
+        $this->current_request = null;
         try
         {
             $this->current_request = new OpenIdAuthenticationRequest($message);
@@ -302,7 +296,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                 throw new InvalidOpenIdMessageException("OpenIdAuthenticationRequest is Invalid!");
 
             $this->current_request_context  = new RequestContext;
-            $mode                           = $request->getMode();
+            $mode                           = $this->current_request->getMode();
 
             switch ($mode) {
                 case OpenIdProtocol::SetupMode:
@@ -322,8 +316,8 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         }
         catch (InvalidOpenIdMessageException $ex) {
             $response  = new OpenIdIndirectGenericErrorResponse($ex->getMessage());
-            if(!is_null($request)){
-                $return_to = $request->getReturnTo();
+            if(!is_null($this->current_request)){
+                $return_to = $this->current_request->getReturnTo();
                 if(!empty($return_to))
                     $response->setReturnTo($return_to);
             }

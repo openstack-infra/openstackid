@@ -20,4 +20,6 @@ interface ITrustedSitesService {
      * @return ITrustedSite
      */
     public function getTrustedSite(IOpenIdUser $user,$realm);
+
+    public function getAllTrustedSitesByUser(IOpenIdUser $user);
 }

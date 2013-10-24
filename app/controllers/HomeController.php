@@ -9,6 +9,10 @@ class HomeController extends BaseController {
         $accept_values = explode(",",$accept);
         if(in_array(XRDSDocumentBuilder::ContentType,$accept_values))
             return Redirect::action('DiscoveryController@idp');
-        return View::make("home");
+        if(Auth::guest())
+            return View::make("home");
+        else{
+            return Redirect::action("UserController@getProfile");
+        }
     }
 }

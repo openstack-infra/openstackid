@@ -13,17 +13,22 @@
 
 Route::get('/', "HomeController@index");
 Route::get('/discovery', "DiscoveryController@idp");
-
+Route::get("/{identifier}","UserController@getIdentity");
+Route::get("/accounts/user/ud/{identifier}","DiscoveryController@user");
 //op endpoint url
 Route::post('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
 Route::get('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
 
 //user interaction
 Route::get('/accounts/user/login',"UserController@getLogin");
-
 Route::post('/accounts/user/login',"UserController@postLogin");
-Route::get("/accounts/user/ud/{identifier}","DiscoveryController@user");
 
-Route::get('/accounts/user/consent',"UserController@getConsent");
 
-Route::post('/accounts/user/consent',"UserController@postConsent");
+
+Route::group(["before" => "auth"], function()
+{
+    Route::get('/accounts/user/consent',"UserController@getConsent");
+    Route::post('/accounts/user/consent',"UserController@postConsent");
+    Route::any("/accounts/user/logout","UserController@logout");
+    Route::any("/accounts/user/profile","UserController@getProfile");
+});
