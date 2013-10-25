@@ -1,7 +1,7 @@
 @extends('layout')
 @section('content')
 <div class="container">
-    {{ Form::open(array('url' => '/accounts/user/consent', 'method' => 'post',  "autocomplete" => "off")) }}
+    {{ Form::open(array('url' => '/accounts/user/consent','id'=>'authorization_form', 'method' => 'post',  "autocomplete" => "off")) }}
     <label>
         This Site {{ $realm }} is requesting permissions
     </label>
@@ -16,11 +16,23 @@
         {{ Form::label("deny_forever","Deny Forever")}}
         {{ Form::radio('trust[]', 'DenyForever','',array('id'=>'deny_forever')) }}
     </div>
-    {{ Form::submit('Ok') }}
-    {{ Form::submit('Cancel') }}
+    {{ Form::submit('Ok',array("id"=>"send_authorization",'class'=>'btn')) }}
+    {{ Form::button('Cancel',array('id'=>'cancel_authorization','class'=>'btn cancel_authorization')) }}
     {{ Form::close() }}
     @foreach ($views as $view)
     {{ $view}}
     @endforeach
 </div>
+@section('scripts')
+<script type="application/javascript">
+    $(document).ready(function() {
+        $("body").on('click',"#cancel_authorization",function(event){
+            $form = $('#authorization_form');
+            $("#deny_once").prop("checked", true)
+            $form.submit();
+            event.preventDefault();
+            return false;
+        });
+    });
+</script>
 @stop

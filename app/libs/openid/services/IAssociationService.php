@@ -13,15 +13,24 @@ use openid\model\IAssociation;
 interface IAssociationService {
     /**
      * @param $handle
-     * @return IAssociation
+     * @param null $realm
+     * @return null|IAssociation
+     * @throws \openid\exceptions\ReplayAttackException
+     * @throws \openid\exceptions\OpenIdInvalidRealmException
      */
-    public function getAssociation($handle);
+    public function getAssociation($handle, $realm=null);
 
     /**
-     * @param IAssociation $association
-     * @return bool
+     * @param $handle
+     * @param $secret
+     * @param $mac_function
+     * @param $lifetime
+     * @param $issued
+     * @param $type
+     * @param $realm
+     * @return mixed
      */
-    public function addAssociation($handle,$secret,$mac_function,$lifetime,$issued,$type);
+    public function addAssociation($handle,$secret,$mac_function,$lifetime,$issued,$type, $realm);
 
     /**
      * @param $handle

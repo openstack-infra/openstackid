@@ -112,11 +112,11 @@ return array(
 		'Illuminate\Validation\ValidationServiceProvider',
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
+        'Illuminate\Redis\RedisServiceProvider',
         'openid\OpenIdServiceProvider',
         'auth\AuthenticationServiceProvider',
         'services\ServicesProvider',
         'strategies\OpenIdResponseStrategyProvider',
-        'Illuminate\Redis\RedisServiceProvider',
 	),
 
 	/*

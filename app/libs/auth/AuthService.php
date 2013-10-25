@@ -34,11 +34,12 @@ class AuthService implements  IAuthService {
     /**
      * @param $username
      * @param $password
+     * @param $remember_me
      * @return mixed
      */
-    public function Login($username, $password)
+    public function Login($username, $password,$remember_me)
     {
-        return Auth::attempt(array('username' => $username, 'password' => $password), false);
+        return Auth::attempt(array('username' => $username, 'password' => $password), $remember_me);
     }
 
     public function logout(){

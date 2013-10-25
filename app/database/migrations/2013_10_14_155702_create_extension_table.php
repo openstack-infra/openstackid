@@ -16,9 +16,10 @@ class CreateExtensionTable extends Migration {
             $table->bigIncrements('id');
             $table->string('name',100);
             $table->string('namespace',255);
-            $table->boolean('active');
+            $table->boolean('active')->default(false);
             $table->string('extension_class',255);
-            $table->string('description',255);
+            $table->string('description',255)->nullable();
+            $table->string('view_name',255);
             $table->timestamps();
         });
 	}

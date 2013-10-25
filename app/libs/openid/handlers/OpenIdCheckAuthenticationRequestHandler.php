@@ -10,6 +10,8 @@
 namespace openid\handlers;
 
 
+use openid\exceptions\InvalidNonce;
+use openid\model\OpenIdNonce;
 use openid\OpenIdMessage;
 use openid\requests\OpenIdCheckAuthenticationRequest;
 use openid\exceptions\InvalidOpenIdMessageException;
@@ -18,9 +20,7 @@ use openid\services\IAssociationService;
 use openid\services\INonceService;
 use openid\model\IAssociation;
 use openid\exceptions\ReplayAttackException;
-use openid\responses\contexts\ResponseContext;
 use openid\helpers\OpenIdSignatureBuilder;
-use openid\responses\OpenIdPositiveAssertionResponse;
 use openid\responses\OpenIdCheckAuthenticationResponse;
 
 class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
@@ -48,7 +48,10 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
 
             if(!$this->current_request->IsValid())
                 throw new InvalidOpenIdMessageException("OpenIdCheckAuthenticationRequest is Invalid!");
+            $claimed_nonce             = new OpenIdNonce($this->current_request->getNonce());
 
+            if(!$this->nonce_service->lockNonce($claimed_nonce))
+                throw new ReplayAttackException(sprintf("nonce %s already used on a formed request!",$claimed_nonce->getRawFormat()));
             /**
              *  For verifying signatures an OP MUST only use private associations and MUST NOT
              *  use associations that have shared keys. If the verification request contains a handle
@@ -66,10 +69,9 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
             if(is_null($stored_assoc) || $stored_assoc->getType()!=IAssociation::TypePrivate)
                 throw new InvalidOpenIdMessageException("OpenIdCheckAuthenticationRequest is Invalid!");
 
-            $claimed_nonce             = $this->current_request->getNonce();
+
+            $claimed_realm             = $this->current_request->getRealm();
             $claimed_sig               = $this->current_request->getSig();
-            $claimed_op_endpoint       = $this->current_request->getOPEndpoint();
-            $claimed_identity          = $this->current_request->getClaimedId();
             $claimed_invalidate_handle = $this->current_request->getInvalidateHandle();
 
             if(!is_null($claimed_invalidate_handle) && !empty($claimed_invalidate_handle)){
@@ -79,10 +81,7 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
                 }
             }
 
-            $this->nonce_service->markNonceAsInvalid($claimed_nonce,$claimed_sig);
-
-
-
+            $this->nonce_service->markNonceAsInvalid($claimed_nonce,$claimed_sig,$claimed_realm);
 
             $res = OpenIdSignatureBuilder::verify($this->current_request, $stored_assoc->getMacFunction(), $stored_assoc->getSecret(),$claimed_sig);
             //delete association
@@ -96,6 +95,10 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
         }
         catch(ReplayAttackException $rEx){
             $response  = new OpenIdDirectGenericErrorResponse($rEx->getMessage());
+            return $response;
+        }
+        catch(InvalidNonce $rInvNonce){
+            $response  = new OpenIdDirectGenericErrorResponse($rInvNonce->getMessage());
             return $response;
         }
         catch (InvalidOpenIdMessageException $ex) {

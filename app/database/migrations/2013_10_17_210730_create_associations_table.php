@@ -8,12 +8,13 @@ class CreateAssociationsTable extends Migration {
     {
         Schema::create('openid_associations', function($table)
         {
-            $table->bigIncrements('id');
+            $table->bigIncrements('id')->unsigned();
             $table->string('identifier',255);
-            $table->string('mac_function',100);
+            $table->string('mac_function',255);
             $table->string('secret',1024);
+            $table->string('realm',1024)->nullable();
             $table->smallInteger('type');
-            $table->integer('lifetime');
+            $table->integer('lifetime')->unsigned();
             $table->dateTime('issued');
         });
     }

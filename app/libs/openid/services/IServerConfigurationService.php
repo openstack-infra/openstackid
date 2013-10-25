@@ -16,4 +16,5 @@ interface IServerConfigurationService {
     public function getPrivateAssociationLifetime();
     public function getSessionAssociationLifetime();
     public function getMaxFailedLoginAttempts();
+    public function getNonceLifetime();
 }

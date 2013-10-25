@@ -29,7 +29,7 @@ class OpenIdSignatureBuilder {
         $data = '';
         foreach($claimed_signed as $key){
             $key_php = str_ireplace('.','_',$key);
-            $val = $request->getParam('openid_'.$key_php);
+            $val = $request->getParam($key_php);
             $data .= $key . ':' . $val . "\n";
         }
         $computed_sig   = base64_encode(OpenIdCryptoHelper::computeHMAC($macAlg, $data, $secret));

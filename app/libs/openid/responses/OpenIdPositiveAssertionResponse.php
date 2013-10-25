@@ -14,7 +14,7 @@ use openid\OpenIdProtocol;
 
 class OpenIdPositiveAssertionResponse extends OpenIdIndirectResponse  {
 
-    public function __construct($op_endpoint,$claimed_id,$identity,$return_to,$nonce){
+    public function __construct($op_endpoint,$claimed_id,$identity,$return_to,$nonce,$realm){
         parent::__construct();
         $this->setMode(OpenIdProtocol::IdMode);
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_OpEndpoint)]  = $op_endpoint;
@@ -22,6 +22,7 @@ class OpenIdPositiveAssertionResponse extends OpenIdIndirectResponse  {
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)]    = $identity;
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]    = $return_to;
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Nonce)]       = $nonce;
+        $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)]       = $realm;
     }
 
 

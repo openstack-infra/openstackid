@@ -60,7 +60,7 @@ App::error(function(Exception $exception, $code)
 App::error(function(openid\exceptions\InvalidOpenIdMessageException $exception, $code)
 {
     Log::error($exception);
-    return View::make('error')->with('error', $exception->getMessage());
+    return View::make('404');
 });
 
 /*

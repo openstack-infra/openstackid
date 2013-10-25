@@ -59,4 +59,13 @@ class OpenIdMessage implements \ArrayAccess {
         }
         return false;
     }
+
+
+    /**
+     * @param OpenIDProtocol_* $param
+     * @return string
+     */
+    public function getParam($param){
+        return isset($this->container[OpenIdProtocol::param($param,"_")])?$this->container[OpenIdProtocol::param($param,"_")]:null;
+    }
 }

@@ -11,7 +11,7 @@ namespace openid\handlers;
 
 
 use openid\OpenIdMessage;
-use Whoops\Example\Exception;
+use \Exception;
 
 abstract class OpenIdMessageHandler {
 

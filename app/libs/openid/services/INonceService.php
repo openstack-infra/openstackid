@@ -8,12 +8,19 @@
 
 namespace openid\services;
 use \openid\exceptions\ReplayAttackException;
+use openid\model\OpenIdNonce;
 
 interface INonceService {
 
+    /**
+     * @return OpenIdNonce
+     */
     public function generateNonce();
 
-    public function associateNonce($nonce,$signature);
+    public function lockNonce(OpenIdNonce $nonce);
+    public function unlockNonce(OpenIdNonce $nonce);
+
+    public function associateNonce(OpenIdNonce $nonce,$signature, $realm);
 
     /**
      * To prevent replay attacks, the OP MUST NOT issue more than one verification response
@@ -24,5 +31,5 @@ interface INonceService {
      * @throws ReplayAttackException
      * @return mixed
      */
-    public function markNonceAsInvalid($nonce,$signature);
+    public function markNonceAsInvalid(OpenIdNonce $nonce, $signature, $realm);
 } 

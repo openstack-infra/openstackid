@@ -535,7 +535,7 @@ class OpenIdUriHelper
      * @param string $trust_root The trust root to check
      * @return bool $sanity Whether the trust root looks OK
      */
-    private static function isSane($trust_root)
+    private static function _isSane($trust_root)
     {
         $parts = self::_parse($trust_root);
         if ($parts === false) {
@@ -608,7 +608,7 @@ class OpenIdUriHelper
     public static function checkRealm($trust_root, $url)
     {
         if (!filter_var($url, FILTER_VALIDATE_URL)) return false;
-        if (!self::isSane($trust_root)) return false;
+        if (!self::_isSane($trust_root)) return false;
 
         $trust_root_parsed = self::_parse($trust_root);
         $url_parsed = self::_parse($url);
@@ -673,5 +673,9 @@ class OpenIdUriHelper
             return false;
         }
         return true;
+    }
+
+    public static function isValidUrl($url){
+        return filter_var($url, FILTER_VALIDATE_URL);
     }
 }

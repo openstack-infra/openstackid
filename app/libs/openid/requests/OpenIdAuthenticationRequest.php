@@ -27,40 +27,29 @@ class OpenIdAuthenticationRequest extends OpenIdRequest {
     }
 
     public function getClaimedId(){
-        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId,"_")]:null;
+        return $this->getParam(OpenIdProtocol::OpenIDProtocol_ClaimedId);
     }
 
     public function getIdentity(){
-        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity,"_")]:null;
+        return $this->getParam(OpenIdProtocol::OpenIDProtocol_Identity);
     }
 
     public function getAssocHandle(){
-        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_AssocHandle,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_AssocHandle,"_")]:null;
+        return $this->getParam(OpenIdProtocol::OpenIDProtocol_AssocHandle);
     }
 
     public function getReturnTo(){
-        $return_to = isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")]:null;
+        $return_to = $this->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo);
         return (OpenIdUriHelper::checkReturnTo($return_to))?$return_to:"";
     }
 
     public function getRealm(){
-        return isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")])?$this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")]:null;
+        $realm = $this->getParam(OpenIdProtocol::OpenIDProtocol_Realm);
+        return $realm;
     }
 
 
-    public function getTrustedRoot()    {
-        if (isset($this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")])) {
-            $root = $this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm,"_")];
-        } else if (isset($this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")])) {
-            $root = $this->message[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo,"_")];
-        } else {
-            return null;
-        }
-        if (OpenIdUriHelper::normalizeUrl($root) && !empty($root)) {
-            return $root;
-        }
-        return null;
-    }
+
 
     /**
      * @param $claimed_id
@@ -70,7 +59,7 @@ class OpenIdAuthenticationRequest extends OpenIdRequest {
     private function isValidIdentifier($claimed_id,$identity){
         if($claimed_id==$identity && $identity==OpenIdProtocol::IdentifierSelectType && $claimed_id==OpenIdProtocol::IdentifierSelectType)
             return true;
-        if($claimed_id==$identity){
+        if($claimed_id==$identity && OpenIdUriHelper::isValidUrl($identity)){
             //todo: check valid user?
             return true;
         }

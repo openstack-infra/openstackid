@@ -67,4 +67,14 @@ class OpenIdAssociation extends Eloquent implements  IAssociation{
     {
         // TODO: Implement IsExpired() method.
     }
+
+    public function getRealm()
+    {
+        return $this->realm;
+    }
+
+    public function setRealm($realm)
+    {
+        // TODO: Implement setRealm() method.
+    }
 }

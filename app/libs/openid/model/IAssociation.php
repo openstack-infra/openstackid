@@ -30,6 +30,9 @@ interface IAssociation {
     public function getType();
     public function setType($type);
 
+    public function getRealm();
+    public function setRealm($realm);
+
     public function IsExpired();
 
 }

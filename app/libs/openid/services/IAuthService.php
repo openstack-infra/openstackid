@@ -24,9 +24,10 @@ interface IAuthService {
     /**
      * @param $username
      * @param $password
+     * @param $remember_me
      * @return mixed
      */
-    public function Login($username,$password);
+    public function Login($username,$password,$remember_me);
 
     const AuthorizationResponse_None            = "None";
     const AuthorizationResponse_AllowOnce       = "AllowOnce";

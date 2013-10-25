@@ -37,8 +37,12 @@ class OpenIdProtocol implements IOpenIdProtocol {
     const ErrorMode               = "error";
     const AssociateMode           = "associate";
 
-    const SignatureAlgorithmHMAC_SHA1       = "HMAC-SHA1";
-    const SignatureAlgorithmHMAC_SHA256     = "HMAC-SHA256";
+    const SignatureAlgorithmHMAC_SHA1        = "HMAC-SHA1";
+    const SignatureAlgorithmHMAC_SHA256      = "HMAC-SHA256";
+
+    const AssociationSessionTypeNoEncryption = "no-encryption";
+    const AssociationSessionTypeDHSHA1       = "DH-SHA1";
+    const AssociationSessionTypeDHSHA256     = "DH-SHA256";
 
     const OpenIDProtocol_Mode               = "mode";
     const OpenIDProtocol_NS                 = "ns";
@@ -56,7 +60,12 @@ class OpenIdProtocol implements IOpenIdProtocol {
     const OpenIDProtocol_Contact            = "contact";
     const OpenIDProtocol_Reference          = "reference";
     const OpenIDProtocol_IsValid            = "is_valid";
-
+    const OpenIDProtocol_AssocType          = "assoc_type";
+    const OpenIDProtocol_SessionType        = "session_type";
+    const OpenIdProtocol_DHModulus          = "dh_modulus";
+    const OpenIdProtocol_DHGen              = "dh_gen";
+    const OpenIdProtocol_DHConsumerPublic   = "dh_consumer_public";
+    const OpenIdProtocol_ExpiresIn          = "expires_in";
 
 
     private static $OpenIDProtocol_ValidModes = array(
@@ -87,6 +96,12 @@ class OpenIdProtocol implements IOpenIdProtocol {
         self::OpenIDProtocol_Contact          => self::OpenIDProtocol_Contact,
         self::OpenIDProtocol_Reference        => self::OpenIDProtocol_Reference,
         self::OpenIDProtocol_IsValid          => self::OpenIDProtocol_IsValid,
+        self::OpenIDProtocol_AssocType        => self::OpenIDProtocol_AssocType,
+        self::OpenIDProtocol_SessionType      => self::OpenIDProtocol_SessionType,
+        self::OpenIdProtocol_DHModulus        => self::OpenIdProtocol_DHModulus,
+        self::OpenIdProtocol_DHGen            => self::OpenIdProtocol_DHGen,
+        self::OpenIdProtocol_DHConsumerPublic => self::OpenIdProtocol_DHConsumerPublic,
+        self::OpenIdProtocol_ExpiresIn        => self::OpenIdProtocol_ExpiresIn,
     );
 
     /**
@@ -106,6 +121,7 @@ class OpenIdProtocol implements IOpenIdProtocol {
 
     public function __construct(){
         //create chain of responsibility
+        //todo use registry here
         $auth_service                   = \App::make("openid\\services\\IAuthService");
         $memento_request_service        = \App::make("openid\\services\\IMementoOpenIdRequestService");
         $auth_strategy                  = \App::make("openid\\handlers\\IOpenIdAuthenticationStrategy");
@@ -115,7 +131,7 @@ class OpenIdProtocol implements IOpenIdProtocol {
         $server_config_service          = \App::make("openid\\services\\IServerConfigurationService");
         $nonce_service                  = \App::make("openid\\services\\INonceService");
         $check_auth                     = new OpenIdCheckAuthenticationRequestHandler($association_service,$nonce_service,null);
-        $session_assoc                  = new OpenIdSessionAssociationRequestHandler($check_auth);
+        $session_assoc                  = new OpenIdSessionAssociationRequestHandler($association_service,$check_auth);
         $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service,$memento_request_service,$auth_strategy,$server_extension_service,$association_service,$trusted_sites_service,$server_config_service,$nonce_service,$session_assoc);
     }
 

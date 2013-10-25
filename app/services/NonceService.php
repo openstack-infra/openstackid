@@ -7,7 +7,8 @@
  */
 
 namespace services;
-//use Illuminate\Redis\Database as Redis;
+
+use openid\model\OpenIdNonce;
 use openid\services\INonceService;
 use openid\exceptions\ReplayAttackException;
 
@@ -19,33 +20,67 @@ class NonceService implements INonceService {
         $this->redis = \RedisLV4::connection();
     }
 
-    public function generateNonce()
-    {
-        $nonce = gmdate('Y-m-d\TH:i:s\Z') . uniqid();
-        //sets the $nonce to live 60 secs
-        $this->redis->setex($nonce,3600 ,'');
-        return $nonce;
+    /**
+     * @param OpenIdNonce $nonce
+     * @return bool
+     */
+    public function lockNonce(OpenIdNonce $nonce){
+        $raw_nonce     = $nonce->getRawFormat();
+        $cur_time      = time();
+        $lock_lifetime = \ServerConfigurationService::getNonceLifetime();;
+        return $this->redis->setnx('lock.'.$raw_nonce,$cur_time+$lock_lifetime+1);
+    }
+
+    public function unlockNonce(OpenIdNonce $nonce){
+        $raw_nonce     = $nonce->getRawFormat();
+        $this->redis->del('lock.'.$raw_nonce);
     }
 
     /**
-     * @param $nonce
-     * @param $signature
-     * @throws \openid\exceptions\ReplayAttackException
+     * @return OpenIdNonce
      */
-    public function markNonceAsInvalid($nonce, $signature)
+    public function generateNonce()
     {
-        $old_signature =   $this->redis->get($nonce);
-        if(!$old_signature){
-            throw new ReplayAttackException(sprintf("nonce %s was already used!.",$nonce));
-        }
-        if($old_signature!=$signature){
-            throw new ReplayAttackException(sprintf("nonce %s was associated with sig %s, but sig %s was provided.",$nonce,$old_signature,$signature));
-        }
-        $this->redis->del($nonce);
+        $raw_nonce = gmdate('Y-m-d\TH:i:s\Z') . uniqid();
+        return new OpenIdNonce($raw_nonce);
     }
 
-    public function associateNonce($nonce, $signature)
+    /**
+     * @param OpenIdNonce $nonce
+     * @param string $signature
+     * @param string $realm
+     * @return mixed|void
+     * @throws \openid\exceptions\ReplayAttackException
+     */
+    public function markNonceAsInvalid(OpenIdNonce $nonce, $signature, $realm)
     {
-          $this->redis->setex($nonce,3600,$signature);
+        $raw_nonce     =   $nonce->getRawFormat();
+        $key           =   $raw_nonce.$signature;
+
+        try{
+            if($this->redis->exists($key)==0)
+                throw new ReplayAttackException(sprintf("nonce %s was already used!.",$nonce));
+            $old_realm     =   $this->redis->get($key);
+            if($realm!=$old_realm){
+                throw new ReplayAttackException(sprintf("nonce %s was not emit for realm !.",$realm));
+            }
+            $this->redis->del($key);
+        }
+        catch(ReplayAttackException $ex){
+            $this->redis->del($key);
+            throw $ex;
+        }
+    }
+
+    /**
+     * @param OpenIdNonce $nonce
+     * @param string $signature
+     * @param string $realm
+     */
+    public function associateNonce(OpenIdNonce $nonce, $signature,$realm)
+    {
+        $raw_nonce     = $nonce->getRawFormat();
+        $lifetime      = \ServerConfigurationService::getNonceLifetime();
+        $this->redis->setex($raw_nonce.$signature,$lifetime,$realm);
     }
 }

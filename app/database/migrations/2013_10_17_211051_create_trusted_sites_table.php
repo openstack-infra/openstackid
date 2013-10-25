@@ -8,10 +8,10 @@ class CreateTrustedSitesTable extends Migration {
     {
         Schema::create('openid_trusted_sites', function($table)
         {
-            $table->bigIncrements('id');
-            $table->string('realm',255);
-            $table->string('data',1024);
-            $table->string('policy',100);
+            $table->bigIncrements('id')->unsigned();
+            $table->string('realm',1024);
+            $table->string('data',5000)->nullable();
+            $table->string('policy',255);
             $table->bigInteger("user_id")->unsigned();
         });
     }

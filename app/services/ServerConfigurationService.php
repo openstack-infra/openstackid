@@ -36,4 +36,8 @@ class ServerConfigurationService implements IServerConfigurationService{
     public function getMaxFailedLoginAttempts(){
         return 3;
     }
+
+    public function getNonceLifetime(){
+        return 360;
+    }
 }

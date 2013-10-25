@@ -64,15 +64,24 @@ class UserController extends BaseController{
         $data = Input::all();
         // Build the validation constraint set.
         $rules = array(
-            'username' => 'required',
+            'username' => 'required|email',
             'password' => 'required'
         );
         // Create a new validator instance.
         $validator = Validator::make($data, $rules);
+
         if ($validator->passes()) {
+
             $username = Input::get("username");
             $password = Input::get("password");
-            if($this->auth_service->Login($username,$password)){
+            $remember = Input::get("remember");
+
+            if(is_null($remember))
+                $remember=false;
+            else
+                $remember=true;
+
+            if($this->auth_service->Login($username,$password,$remember)){
                 $msg = $this->memento_service->getCurrentRequest();
                 if (!is_null($msg) && $msg->IsValid()){
                     //go to authentication flow again

@@ -8,22 +8,45 @@
  */
 
 namespace services;
+use openid\exceptions\ReplayAttackException;
 use openid\model\IAssociation;
 use openid\services\IAssociationService;
 use \OpenIdAssociation;
 use \DateTime;
 use \DateInterval;
+use openid\exceptions\OpenIdInvalidRealmException;
+
 class AssociationService implements  IAssociationService{
+
+    private $redis;
+
+    public function __construct(){
+        $this->redis = \RedisLV4::connection();
+    }
 
     /**
      * @param $handle
-     * @return IAssociation
+     * @param null $realm
+     * @return null|IAssociation
+     * @throws \openid\exceptions\ReplayAttackException
+     * @throws \openid\exceptions\OpenIdInvalidRealmException
      */
-    public function getAssociation($handle)
+    public function getAssociation($handle, $realm=null)
     {
         $assoc =  OpenIdAssociation::where('identifier','=',$handle)->first();
         if(!is_null($assoc)){
             $issued_date = new DateTime($assoc->issued);
+            if($assoc->type == IAssociation::TypePrivate && !is_null($realm) && !empty($realm)){
+                if($assoc->realm!=$realm){
+                    throw new OpenIdInvalidRealmException(sprintf("Private Association %s was not emit for requested realm %s",$handle,$realm));
+                }
+                $cur_time      = time();
+                $lock_lifetime = 180;
+                $success       = $this->redis->setnx('lock.'.$handle,$cur_time+$lock_lifetime+1);
+                if(!$success){
+                    throw new ReplayAttackException(sprintf("Private Association %s already used",$handle));
+                }
+            }
             $life_time   = $assoc->lifetime;
             $issued_date->add(new DateInterval('PT'.$life_time.'S'));
             $now         = new DateTime(gmdate("Y-m-d H:i:s", time()));
@@ -39,15 +62,17 @@ class AssociationService implements  IAssociationService{
      * @param IAssociation $association
      * @return bool
      */
-    public function addAssociation($handle, $secret,$mac_function, $lifetime, $issued,$type)
+    public function addAssociation($handle, $secret,$mac_function, $lifetime, $issued,$type,$realm=null)
     {
         $assoc = new OpenIdAssociation();
-        $assoc->identifier = $handle;
-        $assoc->secret = $secret;
-        $assoc->type = $type;
+        $assoc->identifier   = $handle;
+        $assoc->secret       = $secret;
+        $assoc->type         = $type;
         $assoc->mac_function = $mac_function;
-        $assoc->lifetime = $lifetime;
-        $assoc->issued = $issued;
+        $assoc->lifetime     = $lifetime;
+        $assoc->issued       = $issued;
+        if(!is_null($realm))
+            $assoc->realm        = $realm;
         $assoc->Save();
     }
 

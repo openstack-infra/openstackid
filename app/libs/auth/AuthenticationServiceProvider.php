@@ -13,9 +13,13 @@ use openid\services\Registry;
 
 class AuthenticationServiceProvider extends ServiceProvider {
 
-    public function register()
-    {
+    public function boot(){
         $this->app->singleton('openid\\services\\IAuthService','auth\\AuthService');
         Registry::getInstance()->set("openid\\services\\IAuthService",$this->app->make("openid\\services\\IAuthService"));
+    }
+
+    public function register()
+    {
+
     }
 }

@@ -14,13 +14,10 @@ use Illuminate\Redis\Database;
 
 class ServicesProvider extends ServiceProvider {
 
-    public function register()
-    {
 
-        $this->app['redis'] = $this->app->share(function($app)
-        {
-            return new Database($app['config']['database.redis']);
-        });
+    public function boot(){
+
+        //register on boot bc we rely on Illuminate\Redis\ServiceProvider\RedisServiceProvider
 
         $this->app->singleton('openid\\services\\IMementoOpenIdRequestService','services\\MementoRequestService');
         $this->app->singleton('openid\\handlers\\IOpenIdAuthenticationStrategy','services\\AuthenticationStrategy');
@@ -41,8 +38,19 @@ class ServicesProvider extends ServiceProvider {
         Registry::getInstance()->set("openid\\services\\INonceService",\App::make("openid\\services\\INonceService"));
     }
 
-    public function provides()
+    public function register()
     {
-        return array('redis');
+        $this->app['serverconfigurationservice'] = $this->app->share(function($app)
+        {
+            return new ServerConfigurationService();
+        });
+
+        // Shortcut so developers don't need to add an Alias in app/config/app.php
+        $this->app->booting(function()
+        {
+            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
+            $loader->alias('ServerConfigurationService', 'services\\Facades\\ServerConfigurationService');
+        });
     }
+
 }

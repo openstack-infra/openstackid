@@ -89,6 +89,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
 
         //initial signature params
         $context->addSignParam(OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_OpEndpoint));
+        $context->addSignParam(OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm));
         $context->addSignParam(OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo));
         $context->addSignParam(OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Nonce));
         $context->addSignParam(OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_AssocHandle));
@@ -97,8 +98,10 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
 
         $op_endpoint    = $this->server_configuration_service->getOPEndpointURL();
         $identity       = $this->server_configuration_service->getUserIdentityEndpointURL($currentUser->getIdentifier());
-        $current_nonce  = $this->nonce_service->generateNonce();
-        $response       = new OpenIdPositiveAssertionResponse($op_endpoint, $identity, $identity, $this->current_request->getReturnTo(),$current_nonce);
+        $nonce          = $this->nonce_service->generateNonce();
+        $realm          = $this->current_request->getRealm();
+        $response       = new OpenIdPositiveAssertionResponse($op_endpoint, $identity, $identity, $this->current_request->getReturnTo(),$nonce->getRawFormat(),$realm);
+
 
         foreach ($this->extensions as $ext) {
             $ext->prepareResponse($this->current_request, $response, $context);
@@ -114,7 +117,8 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             $new_handle = uniqid();
             $lifetime = $this->server_configuration_service->getPrivateAssociationLifetime();
             $issued = gmdate("Y-m-d H:i:s", time());
-            $this->association_service->addAssociation($new_handle, $new_secret,OpenIdProtocol::SignatureAlgorithmHMAC_SHA256,$lifetime, $issued,IAssociation::TypePrivate);
+            //create private association ...
+            $this->association_service->addAssociation($new_handle, $new_secret,OpenIdProtocol::SignatureAlgorithmHMAC_SHA256,$lifetime, $issued,IAssociation::TypePrivate, $realm);
             $response->setAssocHandle($new_handle);
             if (!empty($assoc_handle)) {
                 $response->setInvalidateHandle($assoc_handle);
@@ -123,13 +127,16 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         } else {
             $response->setAssocHandle($assoc_handle);
         }
+
+        //create signature ...
         OpenIdSignatureBuilder::build($context, $association->getMacFunction(), $association->getSecret(), $response);
         /*
          * To prevent replay attacks, the OP MUST NOT issue more than one verification response for each
          * authentication response it had previously issued. An authentication response and its matching
          * verification request may be identified by their "openid.response_nonce" values.
+         * so associate $nonce with signature and realm
          */
-        $this->nonce_service->associateNonce($current_nonce, $response->getSig());
+        $this->nonce_service->associateNonce($nonce, $response->getSig(),$realm);
         return $response;
     }
 

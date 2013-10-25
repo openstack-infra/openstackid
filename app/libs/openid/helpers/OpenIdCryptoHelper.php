@@ -17,7 +17,9 @@ class OpenIdCryptoHelper
 
     private static $signature_algorithms= array(
         OpenIdProtocol::SignatureAlgorithmHMAC_SHA1     => "sha1",
+        OpenIdProtocol::AssociationSessionTypeDHSHA1    => "sha1",
         OpenIdProtocol::SignatureAlgorithmHMAC_SHA256   => "sha256",
+        OpenIdProtocol::AssociationSessionTypeDHSHA256  => "sha256",
     );
 
     public static function generateSecret($func)
@@ -103,6 +105,10 @@ class OpenIdCryptoHelper
      */
     static public function digest($func, $data)
     {
+        if(!isset(self::$signature_algorithms[$func]))
+            throw new OpenIdCrytoException(sprintf("Invalid mac function %s",$func));
+        $func = self::$signature_algorithms[$func];
+
         if (function_exists('openssl_digest')) {
             return openssl_digest($data, $func, true);
         } else if (function_exists('hash')) {
