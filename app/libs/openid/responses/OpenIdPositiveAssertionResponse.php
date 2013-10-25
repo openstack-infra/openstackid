@@ -14,15 +14,17 @@ use openid\OpenIdProtocol;
 
 class OpenIdPositiveAssertionResponse extends OpenIdIndirectResponse  {
 
-    public function __construct($op_endpoint,$claimed_id,$identity,$return_to){
+    public function __construct($op_endpoint,$claimed_id,$identity,$return_to,$nonce){
         parent::__construct();
         $this->setMode(OpenIdProtocol::IdMode);
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_OpEndpoint)]  = $op_endpoint;
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]   = $claimed_id;
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)]    = $identity;
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]    = $return_to;
-        $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Nonce)]       = $this->generateNonce();
+        $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Nonce)]       = $nonce;
     }
+
+
 
     public function setAssocHandle($assoc_handle){
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_AssocHandle)] = $assoc_handle;
@@ -30,6 +32,10 @@ class OpenIdPositiveAssertionResponse extends OpenIdIndirectResponse  {
 
     public function setSigned($signed){
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Signed)] = $signed;
+    }
+
+    public function getSig(){
+        return $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Sig)];
     }
 
     public function setSig($sig){
@@ -40,7 +46,4 @@ class OpenIdPositiveAssertionResponse extends OpenIdIndirectResponse  {
         $this[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_InvalidateHandle)] = $invalidate_handle;
     }
 
-    private function generateNonce(){
-        return gmdate('Y-m-d\TH:i:s\Z') . uniqid();
-    }
 }

@@ -11,24 +11,37 @@
 |
 */
 
-Route::get('/', "HomeController@index");
-Route::get('/discovery', "DiscoveryController@idp");
-Route::get("/{identifier}","UserController@getIdentity");
-Route::get("/accounts/user/ud/{identifier}","DiscoveryController@user");
-//op endpoint url
-Route::post('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
-Route::get('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
-
-//user interaction
-Route::get('/accounts/user/login',"UserController@getLogin");
-Route::post('/accounts/user/login',"UserController@postLogin");
 
 
 
-Route::group(["before" => "auth"], function()
+Route::group(["before"=>"ssl"],function(){
+
+    Route::get('/', "HomeController@index");
+    Route::get('/discovery', "DiscoveryController@idp");
+    /*
+    * If the Claimed Identifier was not previously discovered by the Relying Party
+    * (the "openid.identity" in the request was "http://specs.openid.net/auth/2.0/identifier_select"
+    * or a different Identifier, or if the OP is sending an unsolicited positive assertion),
+    * the Relying Party MUST perform discovery on the Claimed Identifier in
+    * the response to make sure that the OP is authorized to make assertions about the Claimed Identifier.
+    */
+    Route::get("/{identifier}","UserController@getIdentity");
+    Route::get("/accounts/user/ud/{identifier}","DiscoveryController@user");
+
+    //op endpoint url
+    Route::post('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
+    Route::get('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
+
+    //user interaction
+    Route::get('/accounts/user/login',"UserController@getLogin");
+    Route::post('/accounts/user/login',"UserController@postLogin");
+});
+
+Route::group(["before" => array("ssl","auth")], function()
 {
     Route::get('/accounts/user/consent',"UserController@getConsent");
     Route::post('/accounts/user/consent',"UserController@postConsent");
     Route::any("/accounts/user/logout","UserController@logout");
     Route::any("/accounts/user/profile","UserController@getProfile");
+    Route::any("/accounts/user/profile/trusted_site/delete/{id}","UserController@get_deleteTrustedSite");
 });

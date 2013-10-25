@@ -55,6 +55,7 @@ class OpenIdProtocol implements IOpenIdProtocol {
     const OpenIDProtocol_Error              = "error";
     const OpenIDProtocol_Contact            = "contact";
     const OpenIDProtocol_Reference          = "reference";
+    const OpenIDProtocol_IsValid            = "is_valid";
 
 
 
@@ -85,6 +86,7 @@ class OpenIdProtocol implements IOpenIdProtocol {
         self::OpenIDProtocol_Error            => self::OpenIDProtocol_Error,
         self::OpenIDProtocol_Contact          => self::OpenIDProtocol_Contact,
         self::OpenIDProtocol_Reference        => self::OpenIDProtocol_Reference,
+        self::OpenIDProtocol_IsValid          => self::OpenIDProtocol_IsValid,
     );
 
     /**
@@ -111,9 +113,10 @@ class OpenIdProtocol implements IOpenIdProtocol {
         $association_service            = \App::make("openid\\services\\IAssociationService");
         $trusted_sites_service          = \App::make("openid\\services\\ITrustedSitesService");
         $server_config_service          = \App::make("openid\\services\\IServerConfigurationService");
-
-        $successor                      = new OpenIdSessionAssociationRequestHandler(new OpenIdCheckAuthenticationRequestHandler(null));
-        $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service,$memento_request_service,$auth_strategy,$server_extension_service,$association_service,$trusted_sites_service,$server_config_service,$successor);
+        $nonce_service                  = \App::make("openid\\services\\INonceService");
+        $check_auth                     = new OpenIdCheckAuthenticationRequestHandler($association_service,$nonce_service,null);
+        $session_assoc                  = new OpenIdSessionAssociationRequestHandler($check_auth);
+        $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service,$memento_request_service,$auth_strategy,$server_extension_service,$association_service,$trusted_sites_service,$server_config_service,$nonce_service,$session_assoc);
     }
 
     public function getXRDSDiscovery($mode, $canonical_id=null){

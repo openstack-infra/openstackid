@@ -29,7 +29,7 @@ class OpenIdResponseStrategyFactoryMethod {
             break;
             case OpenIdDirectResponse::OpenIdDirectResponse:
             {
-                return Registry::getInstance()->get(OpenIdIndirectResponse::OpenIdDirectResponse);
+                return Registry::getInstance()->get(OpenIdDirectResponse::OpenIdDirectResponse);
             }
             break;
             default:

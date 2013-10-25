@@ -10,8 +10,6 @@
 namespace openid\responses\contexts;
 
 
-use openid\OpenIdProtocol;
-
 class ResponseContext
 {
 

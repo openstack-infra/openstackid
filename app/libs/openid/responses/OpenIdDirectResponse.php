@@ -9,6 +9,7 @@
 
 namespace openid\responses;
 use openid\exceptions\InvalidKVFormat;
+use openid\OpenIdProtocol;
 
 /**
  * Class OpenIdDirectResponse
@@ -30,7 +31,7 @@ class OpenIdDirectResponse  extends OpenIdResponse {
          * response. Future versions of the specification may define different values in order
          * to allow message recipients to properly interpret the request.
          */
-        $this["ns"]=self::OpenId2ResponseType;
+        $this["ns"]=OpenIdProtocol::OpenID2MessageType;
     }
     /**
      * Implementation of 4.1.1.  Key-Value Form Encoding

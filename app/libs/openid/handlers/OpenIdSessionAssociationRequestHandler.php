@@ -20,6 +20,7 @@ class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler{
 
     protected function CanHandle(OpenIdMessage $message)
     {
-        // TODO: Implement CanHandle() method.
+        $res = false;
+        return $res;
     }
 }

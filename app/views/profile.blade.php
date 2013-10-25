@@ -10,10 +10,31 @@
         <h3>Trusted Sites</h3>
         <ul>
         @foreach ($sites as $site)
-            <li><div><span>Realm {{ $site->getRealm() }} - Policy {{ $site->getAuthorizationPolicy() }}</span>&nbsp;<a href="#">Edit</a>&nbsp;<a href="#">Delete</a></div></li>
+            <li><div><span>Realm {{ $site->getRealm() }} - Policy {{ $site->getAuthorizationPolicy() }}</span>&nbsp;{{ HTML::link('','Edit',array('class'=>'btn edit-realm')) }}&nbsp;{{ HTML::link(URL::action("UserController@get_deleteTrustedSite",array("id"=>$site->id)),'Delete',array('class'=>'btn del-realm')) }}</div></li>
         @endforeach
         </ul>
     </div>
     @endif
 </div>
+@section('scripts')
+<script type="application/javascript">
+    $(document).ready(function() {
+
+        $("#trusted_sites").on('click',".del-realm",function(event){
+           var url = $(this).attr("href") ;
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType : "json",
+                success: function( json ) {
+                },
+                error: function( xhr, status ) {
+                    alert( "Sorry, there was a problem!" );
+                }
+            });
+           event.preventDefault();
+           return false;
+        });
+    });
+</script>
 @stop

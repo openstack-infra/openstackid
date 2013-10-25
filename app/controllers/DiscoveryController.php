@@ -44,6 +44,16 @@ class DiscoveryController extends BaseController {
         return $response;
     }
 
+    /**
+
+     * If the Claimed Identifier was not previously discovered by the Relying Party
+     * (the "openid.identity" in the request was "http://specs.openid.net/auth/2.0/identifier_select"
+     * or a different Identifier, or if the OP is sending an unsolicited positive assertion),
+     * the Relying Party MUST perform discovery on the Claimed Identifier in
+     * the response to make sure that the OP is authorized to make assertions about the Claimed Identifier.
+     * @param $identifier
+     * @return mixed
+     */
     public function user($identifier){
         $user = $this->auth_service->getUserByOpenId($identifier);
         if(is_null($user))

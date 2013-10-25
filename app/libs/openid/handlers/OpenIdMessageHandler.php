@@ -26,7 +26,7 @@ abstract class OpenIdMessageHandler {
             //handle request
             return $this->InternalHandle($message);
         }
-        else if(isset($this->successor) && !null($this->successor))
+        else if(isset($this->successor) && !is_null($this->successor))
         {
             return $this->successor->HandleMessage($message);
         }

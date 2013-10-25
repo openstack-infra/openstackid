@@ -13,7 +13,7 @@
 
 App::before(function($request)
 {
-	//
+
 });
 
 
@@ -104,3 +104,14 @@ Route::filter("openid.save.request",function(){
     $memento_service->saveCurrentRequest();
 
 });
+
+use openid\services\Registry;
+
+Route::filter("ssl",function(){
+    if (!Request::secure()){
+        $memento_service = Registry::getInstance()->get("openid\\services\\IMementoOpenIdRequestService");
+        $memento_service->saveCurrentRequest();
+        return Redirect::secure(Request::getRequestUri());
+    }
+});
+

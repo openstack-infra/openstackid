@@ -14,7 +14,11 @@ use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
 use openid\helpers\OpenIdUriHelper;
 
-class OpenIdAuthenticationRequest extends OpenIdRequest{
+class OpenIdAuthenticationRequest extends OpenIdRequest {
+
+    public function __construct(OpenIdMessage $message){
+        parent::__construct($message);
+    }
 
     public static function IsOpenIdAuthenticationRequest(OpenIdMessage $message){
         $mode = $message->getMode();
@@ -58,6 +62,21 @@ class OpenIdAuthenticationRequest extends OpenIdRequest{
         return null;
     }
 
+    /**
+     * @param $claimed_id
+     * @param $identity
+     * @return bool
+     */
+    private function isValidIdentifier($claimed_id,$identity){
+        if($claimed_id==$identity && $identity==OpenIdProtocol::IdentifierSelectType && $claimed_id==OpenIdProtocol::IdentifierSelectType)
+            return true;
+        if($claimed_id==$identity){
+            //todo: check valid user?
+            return true;
+        }
+        return false;
+    }
+
     public function IsValid(){
         $return_to  = $this->getReturnTo();
         $claimed_id = $this->getClaimedId();
@@ -67,8 +86,9 @@ class OpenIdAuthenticationRequest extends OpenIdRequest{
         return !empty($return_to)
                && !empty($realm)
                && OpenIdUriHelper::checkRealm($realm,$return_to)
-               && !empty($claimed_id) && $claimed_id == OpenIdProtocol::IdentifierSelectType
-               && !empty($identity)   && $identity   == OpenIdProtocol::IdentifierSelectType
+               && !empty($claimed_id)
+               && !empty($identity)
+               && $this->isValidIdentifier($claimed_id,$identity)
                && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
     }
 

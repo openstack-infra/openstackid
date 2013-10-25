@@ -58,6 +58,27 @@ class AssociationService implements  IAssociationService{
     public function deleteAssociation($handle)
     {
         $assoc = OpenIdAssociation::where('identifier','=',$handle)->first();
-        $assoc->delete();
+        if(!is_null($assoc)){
+            $assoc->delete();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * For verifying signatures an OP MUST only use private associations and MUST NOT
+     * use associations that have shared keys. If the verification request contains a handle
+     * for a shared association, it means the Relying Party no longer knows the shared secret,
+     * or an entity other than the RP (e.g. an attacker) has established this association with the OP.
+     * @param $handle
+     * @return mixed
+     */
+    public function getAssociationType($handle)
+    {
+        $assoc = OpenIdAssociation::where('identifier','=',$handle)->first();
+        if(!is_null($assoc)){
+            return $assoc->type;
+        }
+        return false;
     }
 }

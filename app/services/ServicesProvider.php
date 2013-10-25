@@ -10,11 +10,18 @@
 namespace services;
 use Illuminate\Support\ServiceProvider;
 use openid\services\Registry;
+use Illuminate\Redis\Database;
 
 class ServicesProvider extends ServiceProvider {
 
     public function register()
     {
+
+        $this->app['redis'] = $this->app->share(function($app)
+        {
+            return new Database($app['config']['database.redis']);
+        });
+
         $this->app->singleton('openid\\services\\IMementoOpenIdRequestService','services\\MementoRequestService');
         $this->app->singleton('openid\\handlers\\IOpenIdAuthenticationStrategy','services\\AuthenticationStrategy');
         $this->app->singleton('openid\\services\\IServerExtensionsService','services\\ServerExtensionsService');
@@ -22,6 +29,7 @@ class ServicesProvider extends ServiceProvider {
         $this->app->singleton('openid\\services\\ITrustedSitesService','services\\TrustedSitesService');
         $this->app->singleton('openid\\services\\IServerConfigurationService','services\\ServerConfigurationService');
         $this->app->singleton('openid\\services\\IUserService','services\\UserService');
+        $this->app->singleton('openid\\services\\INonceService','services\\NonceService');
 
         Registry::getInstance()->set("openid\\services\\IMementoOpenIdRequestService",\App::make("openid\\services\\IMementoOpenIdRequestService"));
         Registry::getInstance()->set("openid\\handlers\\IOpenIdAuthenticationStrategy",\App::make("openid\\handlers\\IOpenIdAuthenticationStrategy"));
@@ -30,6 +38,11 @@ class ServicesProvider extends ServiceProvider {
         Registry::getInstance()->set("openid\\services\\ITrustedSitesService",\App::make("openid\\services\\ITrustedSitesService"));
         Registry::getInstance()->set("openid\\services\\IServerConfigurationService",\App::make("openid\\services\\IServerConfigurationService"));
         Registry::getInstance()->set("openid\\services\\IUserService",\App::make("openid\\services\\IUserService"));
+        Registry::getInstance()->set("openid\\services\\INonceService",\App::make("openid\\services\\INonceService"));
+    }
 
+    public function provides()
+    {
+        return array('redis');
     }
 }

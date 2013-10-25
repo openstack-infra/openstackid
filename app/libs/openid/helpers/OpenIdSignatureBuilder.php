@@ -10,9 +10,33 @@
 namespace openid\helpers;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdPositiveAssertionResponse;
+use openid\requests\OpenIdCheckAuthenticationRequest;
 
 class OpenIdSignatureBuilder {
 
+
+    /**
+     * @param OpenIdCheckAuthenticationRequest $request
+     * @param $macAlg
+     * @param $secret
+     * @param $claimed_sig
+     * @return bool
+     */
+    public static function verify(OpenIdCheckAuthenticationRequest $request,$macAlg,$secret,$claimed_sig){
+        $res = false;
+        $signed = $request->getSigned();
+        $claimed_signed = explode(',',$signed);
+        $data = '';
+        foreach($claimed_signed as $key){
+            $key_php = str_ireplace('.','_',$key);
+            $val = $request->getParam('openid_'.$key_php);
+            $data .= $key . ':' . $val . "\n";
+        }
+        $computed_sig   = base64_encode(OpenIdCryptoHelper::computeHMAC($macAlg, $data, $secret));
+        if($claimed_sig==$computed_sig)
+            $res = true;
+        return $res;
+    }
     /**
      * @param ResponseContext $context
      * @param $macAlg

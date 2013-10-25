@@ -18,6 +18,10 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
     protected $table = 'openid_users';
     private $member;
 
+    public function trusted_sites(){
+        return $this->has_many("OpenIdTrustedSite");
+    }
+
     public function setMember($member){
         $this->member=$member;
     }

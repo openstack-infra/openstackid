@@ -19,15 +19,19 @@ class UserController extends BaseController{
     private $memento_service;
     private $auth_service;
     private $server_configuration_service;
+    private $discovery;
+
 
     public function __construct(IMementoOpenIdRequestService $memento_service,
                                 IAuthService $auth_service,
                                 IServerConfigurationService $server_configuration_service,
-                                ITrustedSitesService $trusted_sites_service){
+                                ITrustedSitesService $trusted_sites_service,
+                                DiscoveryController $discovery){
         $this->memento_service = $memento_service;
         $this->auth_service = $auth_service;
         $this->server_configuration_service = $server_configuration_service;
         $this->trusted_sites_service=$trusted_sites_service;
+        $this->discovery = $discovery;
         //filters
         $this->beforeFilter('csrf',array('only' => array('postLogin', 'postConsent')));
         $this->beforeFilter('openid.save.request');
@@ -108,8 +112,16 @@ class UserController extends BaseController{
         //which will be accepted in the response to this request.
         $accept = Request::header('Accept');
         $accept_values = explode(",",$accept);
-        if(in_array(XRDSDocumentBuilder::ContentType,$accept_values))
-            return Redirect::action('DiscoveryController@user',array("identifier"=>$identifier));
+        if(in_array(XRDSDocumentBuilder::ContentType,$accept_values)){
+            /*
+            * If the Claimed Identifier was not previously discovered by the Relying Party
+            * (the "openid.identity" in the request was "http://specs.openid.net/auth/2.0/identifier_select"
+            * or a different Identifier, or if the OP is sending an unsolicited positive assertion),
+            * the Relying Party MUST perform discovery on the Claimed Identifier in
+            * the response to make sure that the OP is authorized to make assertions about the Claimed Identifier.
+            */
+            return $this->discovery->user($identifier);
+        }
 
         if(Auth::check()){
             return View::make("identity")->with('username',$user->getFullName())->with( "identifier",$user->getIdentifier());
@@ -125,7 +137,6 @@ class UserController extends BaseController{
 
     public function getProfile(){
         $user = $this->auth_service->getCurrentUser();
-
         $sites = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
         return View::make("profile",array(
             "username"=> $user->getFullName(),
@@ -133,5 +144,9 @@ class UserController extends BaseController{
             "identifier"=>$user->getIdentifier(),
             "sites"=>$sites
         ));
+    }
+
+    public function get_deleteTrustedSite($id){
+        return Response::json(array('success' => true));
     }
 }

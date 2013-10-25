@@ -19,6 +19,7 @@ use openid\responses\OpenIdResponse;
 use openid\services\Registry;
 use openid\OpenIdMessage;
 use openid\exceptions\InvalidOpenIdMessageException;
+use openid\requests\contexts\PartialView;
 
 class OpenIdAXRequest extends OpenIdRequest
 {
@@ -112,7 +113,13 @@ class OpenIdAXExtension extends OpenIdExtension
     {
         $ax_request = new OpenIdAXRequest($request->getMessage());
         if (!$ax_request->IsValid()) return;
-        //todo : build sub view ....
+        $attributes = $ax_request->getRequiredAttributes();
+        $data = array();
+        foreach($attributes as $attr){
+            array_push($data,$attr);
+        }
+        $partial_view = new PartialView("extensions.ax",array("attributes"=>$data));
+        $context->addPartialView($partial_view);
     }
 
     public function prepareResponse(OpenIdRequest $request, OpenIdResponse $response, ResponseContext $context)
@@ -145,6 +152,11 @@ class OpenIdAXExtension extends OpenIdExtension
                 $response->addParam(OpenIdProtocol::OpenIdPrefix . "." . self::Prefix . "." . self::Value . "." . $attr, $user->getLanguage());
             }
         }
+    }
+
+    public function verifyRequest(OpenIdRequest $request,ResponseContext $context){
+        $ax_request = new OpenIdAXRequest($request->getMessage());
+        if (!$ax_request->IsValid()) return;
     }
 
     public function getTrustedData(OpenIdRequest $request){

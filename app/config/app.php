@@ -102,7 +102,6 @@ return array(
 		'Illuminate\Pagination\PaginationServiceProvider',
 		'Illuminate\Foundation\Providers\PublisherServiceProvider',
 		'Illuminate\Queue\QueueServiceProvider',
-		'Illuminate\Redis\RedisServiceProvider',
 		'Illuminate\Auth\Reminders\ReminderServiceProvider',
 		'Illuminate\Foundation\Providers\RouteListServiceProvider',
 		'Illuminate\Database\SeedServiceProvider',
@@ -116,7 +115,8 @@ return array(
         'openid\OpenIdServiceProvider',
         'auth\AuthenticationServiceProvider',
         'services\ServicesProvider',
-        'strategies\OpenIdResponseStrategyProvider'
+        'strategies\OpenIdResponseStrategyProvider',
+        'Illuminate\Redis\RedisServiceProvider',
 	),
 
 	/*
@@ -170,7 +170,7 @@ return array(
 		'Password'        => 'Illuminate\Support\Facades\Password',
 		'Queue'           => 'Illuminate\Support\Facades\Queue',
 		'Redirect'        => 'Illuminate\Support\Facades\Redirect',
-		'Redis'           => 'Illuminate\Support\Facades\Redis',
+		'RedisLV4'        => 'Illuminate\Support\Facades\Redis',
 		'Request'         => 'Illuminate\Support\Facades\Request',
 		'Response'        => 'Illuminate\Support\Facades\Response',
 		'Route'           => 'Illuminate\Support\Facades\Route',

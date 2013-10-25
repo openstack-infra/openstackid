@@ -22,7 +22,6 @@ use openid\exceptions\InvalidOpenIdAuthenticationRequestMode;
 use openid\responses\OpenIdNonImmediateNegativeAssertion;
 use openid\responses\OpenIdImmediateNegativeAssertion;
 use openid\services\ITrustedSitesService;
-use openid\responses\OpenIdIndirectResponse;
 use openid\responses\OpenIdIndirectGenericErrorResponse;
 use openid\helpers\OpenIdErrorMessages;
 use openid\helpers\OpenIdCryptoHelper;
@@ -32,6 +31,7 @@ use openid\services\IServerConfigurationService;
 use openid\helpers\OpenIdSignatureBuilder;
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\model\ITrustedSite;
+use openid\services\INonceService;
 /**
  * Class OpenIdAuthenticationRequestHandler
  * Implements
@@ -51,6 +51,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     private $extensions;
     private $current_request;
     private $current_request_context;
+    private $nonce_service;
 
     public function __construct(IAuthService $authService,
                                 IMementoOpenIdRequestService $mementoRequestService,
@@ -59,6 +60,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                                 IAssociationService $association_service,
                                 ITrustedSitesService $trusted_sites_service,
                                 IServerConfigurationService $server_configuration_service,
+                                INonceService $nonce_service,
                                 $successor)
     {
         parent::__construct($successor);
@@ -70,6 +72,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         $this->trusted_sites_service = $trusted_sites_service;
         $this->server_configuration_service = $server_configuration_service;
         $this->extensions = $this->server_extensions_service->getAllActiveExtensions();
+        $this->nonce_service = $nonce_service;
     }
 
 
@@ -92,15 +95,19 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         $context->addSignParam(OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId));
         $context->addSignParam(OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity));
 
-        $op_endpoint = $this->server_configuration_service->getOPEndpointURL();
-        $identity = $this->server_configuration_service->getUserIdentityEndpointURL($currentUser->getIdentifier());
-        $response = new OpenIdPositiveAssertionResponse($op_endpoint, $identity, $identity, $this->current_request->getReturnTo());
+        $op_endpoint    = $this->server_configuration_service->getOPEndpointURL();
+        $identity       = $this->server_configuration_service->getUserIdentityEndpointURL($currentUser->getIdentifier());
+        $current_nonce  = $this->nonce_service->generateNonce();
+        $response       = new OpenIdPositiveAssertionResponse($op_endpoint, $identity, $identity, $this->current_request->getReturnTo(),$current_nonce);
+
         foreach ($this->extensions as $ext) {
             $ext->prepareResponse($this->current_request, $response, $context);
         }
+
         //check former assoc handle...
-        $assoc_handle = $this->current_request->getAssocHandle();
-        $association = $this->association_service->getAssociation($assoc_handle);
+        $assoc_handle   = $this->current_request->getAssocHandle();
+        $association    = $this->association_service->getAssociation($assoc_handle);
+
         if (empty($assoc_handle) || is_null($association)) {
             // if not present or if it already void then enter on dumb mode
             $new_secret = OpenIdCryptoHelper::generateSecret(OpenIdProtocol::SignatureAlgorithmHMAC_SHA256);
@@ -117,6 +124,12 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             $response->setAssocHandle($assoc_handle);
         }
         OpenIdSignatureBuilder::build($context, $association->getMacFunction(), $association->getSecret(), $response);
+        /*
+         * To prevent replay attacks, the OP MUST NOT issue more than one verification response for each
+         * authentication response it had previously issued. An authentication response and its matching
+         * verification request may be identified by their "openid.response_nonce" values.
+         */
+        $this->nonce_service->associateNonce($current_nonce, $response->getSig());
         return $response;
     }
 
@@ -126,7 +139,6 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     private function doConsentProcess(){
         //do consent process
         $this->mementoRequestService->saveCurrentRequest();
-        $this->current_request_context->setStage(RequestContext::StageConsent);
         foreach ($this->extensions  as $ext) {
             $ext->parseRequest($this->current_request, $this->current_request_context);
         }
@@ -327,6 +339,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
 
     protected function CanHandle(OpenIdMessage $message)
     {
-        return OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($message);
+        $res =  OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($message);
+        return $res;
     }
 }

@@ -14,8 +14,8 @@ class OpenIdDirectResponseStrategy implements IOpenIdResponseStrategy {
 
     public function handle($response)
     {
-        $response = Response::make($response->getContent(), $response->getHttpCode());
-        $response->header('Content-Type', $response->getContentType());
-        return $response;
+        $http_response = Response::make($response->getContent(), $response->getHttpCode());
+        $http_response->header('Content-Type', $response->getContentType());
+        return $http_response;
     }
 }

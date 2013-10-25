@@ -27,4 +27,8 @@ abstract class OpenIdRequest {
    }
 
    abstract public function IsValid();
+
+   public function getParam($param){
+       return $this->message[$param];
+   }
 }

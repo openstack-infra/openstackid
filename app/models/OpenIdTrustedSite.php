@@ -14,6 +14,10 @@ class OpenIdTrustedSite extends Eloquent implements  ITrustedSite{
     protected $table = 'openid_trusted_sites';
     public $timestamps = false;
 
+    public function user(){
+        return $this->belongs_to("OpenIdUser");
+    }
+
     public function getRealm()
     {
         return $this->realm;
@@ -27,7 +31,7 @@ class OpenIdTrustedSite extends Eloquent implements  ITrustedSite{
 
     public function getUser()
     {
-        // TODO: Implement getUser() method.
+        return $this->user();
     }
 
     public function getAuthorizationPolicy()
