@@ -10,15 +10,21 @@
 namespace openid\handlers;
 
 
+use openid\exceptions\InvalidOpenIdMessageException;
 use openid\OpenIdMessage;
 use \Exception;
+use openid\services\ILogService;
 
 abstract class OpenIdMessageHandler {
 
     protected  $successor;
+    protected  $current_request;
+    protected  $log;
 
-    public function __construct($successor){
-        $this->successor=$successor;
+
+    public function __construct($successor, ILogService $log){
+        $this->successor = $successor;
+        $this->log       = $log;
     }
 
     public function HandleMessage(OpenIdMessage $message){
@@ -30,7 +36,8 @@ abstract class OpenIdMessageHandler {
         {
             return $this->successor->HandleMessage($message);
         }
-        throw new Exception("WTF?");
+        $this->log->warning_msg( sprintf("unhandled message %s", $message->toString()));
+        throw new InvalidOpenIdMessageException( sprintf("unhandled message %s", $message->toString()));
     }
 
     abstract protected function InternalHandle(OpenIdMessage $message);

@@ -9,6 +9,7 @@
 
 namespace openid\handlers;
 
+use openid\helpers\AssocHandleGenerator;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
 use openid\requests\OpenIdAuthenticationRequest;
@@ -32,6 +33,7 @@ use openid\helpers\OpenIdSignatureBuilder;
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\model\ITrustedSite;
 use openid\services\INonceService;
+use openid\services\ILogService;
 /**
  * Class OpenIdAuthenticationRequestHandler
  * Implements
@@ -49,7 +51,6 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     private $trusted_sites_service;
     private $server_configuration_service;
     private $extensions;
-    private $current_request;
     private $current_request_context;
     private $nonce_service;
 
@@ -61,9 +62,10 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                                 ITrustedSitesService $trusted_sites_service,
                                 IServerConfigurationService $server_configuration_service,
                                 INonceService $nonce_service,
+                                ILogService $log,
                                 $successor)
     {
-        parent::__construct($successor);
+        parent::__construct($successor,$log);
         $this->authService = $authService;
         $this->mementoRequestService = $mementoRequestService;
         $this->auth_strategy = $auth_strategy;
@@ -114,9 +116,9 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         if (empty($assoc_handle) || is_null($association)) {
             // if not present or if it already void then enter on dumb mode
             $new_secret = OpenIdCryptoHelper::generateSecret(OpenIdProtocol::SignatureAlgorithmHMAC_SHA256);
-            $new_handle = uniqid();
-            $lifetime = $this->server_configuration_service->getPrivateAssociationLifetime();
-            $issued = gmdate("Y-m-d H:i:s", time());
+            $new_handle = AssocHandleGenerator::generate();
+            $lifetime   = $this->server_configuration_service->getPrivateAssociationLifetime();
+            $issued     = gmdate("Y-m-d H:i:s", time());
             //create private association ...
             $this->association_service->addAssociation($new_handle, $new_secret,OpenIdProtocol::SignatureAlgorithmHMAC_SHA256,$lifetime, $issued,IAssociation::TypePrivate, $realm);
             $response->setAssocHandle($new_handle);
@@ -334,6 +336,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             }
         }
         catch (InvalidOpenIdMessageException $ex) {
+            $this->log->error($ex);
             $response  = new OpenIdIndirectGenericErrorResponse($ex->getMessage());
             if(!is_null($this->current_request)){
                 $return_to = $this->current_request->getReturnTo();

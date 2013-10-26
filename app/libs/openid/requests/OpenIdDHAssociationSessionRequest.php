@@ -10,20 +10,33 @@ namespace openid\requests;
 
 use openid\OpenIdProtocol;
 use openid\OpenIdMessage;
+use openid\helpers\OpenIdCryptoHelper;
+use Zend\Crypt\PublicKey\DiffieHellman;
+use openid\exceptions\InvalidDHParam;
 
 class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest {
 
 
      // Default Diffie-Hellman key generator (1024 bit)
-    const DH_P   = 'dcf93a0b883972ec0e19989ac5a2ce310e1d37717e8d9571bb7623731866e61ef75a2e27898b057f9891c2e27a639c3f29b60814581cd3b2ca3986d2683705577d45c2e7e52dc81c7a171876e5cea74b1448bfdfaf18828efd2519f14e45e3826634af1949e5b535cc829a483b8a76223e5d490a257f05bdff16f2fb22c583ab';
-
+    const DH_P   = 'DCF93A0B883972EC0E19989AC5A2CE310E1D37717E8D9571BB7623731866E61EF75A2E27898B057F9891C2E27A639C3F29B60814581CD3B2CA3986D2683705577D45C2E7E52DC81C7A171876E5CEA74B1448BFDFAF18828EFD2519F14E45E3826634AF1949E5B535CC829A483B8A76223E5D490A257F05BDFF16F2FB22C583AB';
     // Default Diffie-Hellman prime number (should be 2 or 5)
     const DH_G   = '02';
 
+    private $p_number;
+    private $g_number;
+    private $rp_pub_key;
+
     public function __construct(OpenIdMessage $message){
         parent::__construct($message);
+        $this->g_number   = null;
+        $this->p_number   = null;
+        $this->rp_pub_key = null;
     }
 
+    /**
+     * @return bool
+     * @throws InvalidDHParam
+     */
     public function IsValid()
     {
         $dh_modulus              = $this->getDHModulus();
@@ -35,18 +48,38 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest 
     }
 
     public function getDHModulus(){
-        $p =  $this->getParam(OpenIdProtocol::OpenIdProtocol_DHModulus);
-        return empty($p)?pack('H*', OpenIdDHAssociationSessionRequest::DH_P): base64_decode($p);
+        if(is_null($this->p_number)){
+            $p_param        =  $this->getParam(OpenIdProtocol::OpenIdProtocol_DHModulus);
+            $p_bin          = empty($p_param)?pack('H*', OpenIdDHAssociationSessionRequest::DH_P): base64_decode($p_param);
+            if(!$p_bin)
+                throw new InvalidDHParam(sprintf("invalid %s param.",OpenIdProtocol::OpenIdProtocol_DHModulus));
+            $this->p_number = OpenIdCryptoHelper::convert($p_bin,DiffieHellman::FORMAT_BINARY,DiffieHellman::FORMAT_NUMBER);
+        }
+        return $this->p_number;
     }
 
     public function getDHGen(){
-        $g =  $this->getParam(OpenIdProtocol::OpenIdProtocol_DHGen);
-        return empty($g)?pack('H*', OpenIdDHAssociationSessionRequest::DH_G): base64_decode($g);
+        if(is_null( $this->g_number)){
+            $g_param =  $this->getParam(OpenIdProtocol::OpenIdProtocol_DHGen);
+            $g_bin = empty($g_param)?pack('H*', OpenIdDHAssociationSessionRequest::DH_G): base64_decode($g_param);
+            if(!$g_bin)
+                throw new InvalidDHParam(sprintf("invalid %s param.",OpenIdProtocol::OpenIdProtocol_DHGen));
+            $this->g_number = OpenIdCryptoHelper::convert($g_bin,DiffieHellman::FORMAT_BINARY,DiffieHellman::FORMAT_NUMBER);
+        }
+        return  $this->g_number;
     }
 
     public function getDHConsumerPublic(){
-        $pk = $this->getParam(OpenIdProtocol::OpenIdProtocol_DHConsumerPublic);
-        return empty($pk)?"": base64_decode($pk);
+        if(is_null($this->rp_pub_key)){
+            $rp_pub_key_param = $this->getParam(OpenIdProtocol::OpenIdProtocol_DHConsumerPublic);
+            if(empty($rp_pub_key_param))
+                throw new InvalidDHParam(sprintf("invalid %s param.",OpenIdProtocol::OpenIdProtocol_DHConsumerPublic));
+            $rp_pub_key_bin   = base64_decode($rp_pub_key_param);
+            if(!$rp_pub_key_bin)
+                throw new InvalidDHParam(sprintf("invalid %s param.",OpenIdProtocol::OpenIdProtocol_DHConsumerPublic));
+            $this->rp_pub_key = OpenIdCryptoHelper::convert($rp_pub_key_bin,DiffieHellman::FORMAT_BINARY,DiffieHellman::FORMAT_NUMBER);
+        }
+        return $this->rp_pub_key;
     }
 
     public static function IsOpenIdDHAssociationSessionRequest(OpenIdMessage $message){

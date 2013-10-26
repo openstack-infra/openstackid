@@ -17,6 +17,7 @@ use openid\requests\OpenIdCheckAuthenticationRequest;
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\responses\OpenIdDirectGenericErrorResponse;
 use openid\services\IAssociationService;
+use openid\services\ILogService;
 use openid\services\INonceService;
 use openid\model\IAssociation;
 use openid\exceptions\ReplayAttackException;
@@ -28,13 +29,13 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
 
     private $association_service;
     private $nonce_service;
-    private $current_request;
 
     public function __construct(IAssociationService $association_service,
                                 INonceService $nonce_service,
+                                ILogService $log,
                                 $successor)
     {
-        parent::__construct($successor);
+        parent::__construct($successor,$log);
         $this->association_service = $association_service;
         $this->nonce_service = $nonce_service;
     }
@@ -94,14 +95,17 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
             return new OpenIdCheckAuthenticationResponse($is_valid,$claimed_invalidate_handle);
         }
         catch(ReplayAttackException $rEx){
+            $this->log->error($rEx);
             $response  = new OpenIdDirectGenericErrorResponse($rEx->getMessage());
             return $response;
         }
         catch(InvalidNonce $rInvNonce){
+            $this->log->error($rInvNonce);
             $response  = new OpenIdDirectGenericErrorResponse($rInvNonce->getMessage());
             return $response;
         }
         catch (InvalidOpenIdMessageException $ex) {
+            $this->log->error($ex);
             $response  = new OpenIdDirectGenericErrorResponse($ex->getMessage());
             return $response;
         }

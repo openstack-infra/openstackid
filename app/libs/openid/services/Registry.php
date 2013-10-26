@@ -26,11 +26,9 @@ class Registry {
     private function __clone() {}
 
     public function set($key, $value) {
-        if (isset($this->registry[$key])) {
-            throw new \Exception("There is already an entry for key " . $key);
+        if (!isset($this->registry[$key])) {
+            $this->registry[$key] = $value;
         }
-
-        $this->registry[$key] = $value;
     }
 
     public function get($key) {

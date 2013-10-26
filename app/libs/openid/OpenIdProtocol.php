@@ -15,6 +15,8 @@ use openid\handlers\OpenIdAuthenticationRequestHandler;
 use openid\handlers\OpenIdSessionAssociationRequestHandler;
 use openid\handlers\OpenIdCheckAuthenticationRequestHandler;
 
+use openid\services\Registry;
+use openid\services\ServiceCatalog;
 use openid\XRDS\XRDSService;
 use openid\XRDS\XRDSDocumentBuilder;
 use openid\IOpenIdProtocol;
@@ -67,6 +69,25 @@ class OpenIdProtocol implements IOpenIdProtocol {
     const OpenIdProtocol_DHConsumerPublic   = "dh_consumer_public";
     const OpenIdProtocol_ExpiresIn          = "expires_in";
 
+
+    private static $OpenIDProtocol_SupportedAssocType = array(
+        self::SignatureAlgorithmHMAC_SHA1,
+        self::SignatureAlgorithmHMAC_SHA256
+    );
+
+    public static function isAssocTypeSupported($assoc_type){
+        return in_array($assoc_type,self::$OpenIDProtocol_SupportedAssocType);
+    }
+
+    private static $OpenIDProtocol_SupportedSessionType = array(
+        self::AssociationSessionTypeNoEncryption,
+        self::AssociationSessionTypeDHSHA1,
+        self::AssociationSessionTypeDHSHA256
+    );
+
+    public static function isSessionTypeSupported($session_type){
+        return in_array($session_type,self::$OpenIDProtocol_SupportedSessionType);
+    }
 
     private static $OpenIDProtocol_ValidModes = array(
         self::ImmediateMode,
@@ -121,18 +142,20 @@ class OpenIdProtocol implements IOpenIdProtocol {
 
     public function __construct(){
         //create chain of responsibility
-        //todo use registry here
-        $auth_service                   = \App::make("openid\\services\\IAuthService");
-        $memento_request_service        = \App::make("openid\\services\\IMementoOpenIdRequestService");
-        $auth_strategy                  = \App::make("openid\\handlers\\IOpenIdAuthenticationStrategy");
-        $server_extension_service       = \App::make("openid\\services\\IServerExtensionsService");
-        $association_service            = \App::make("openid\\services\\IAssociationService");
-        $trusted_sites_service          = \App::make("openid\\services\\ITrustedSitesService");
-        $server_config_service          = \App::make("openid\\services\\IServerConfigurationService");
-        $nonce_service                  = \App::make("openid\\services\\INonceService");
-        $check_auth                     = new OpenIdCheckAuthenticationRequestHandler($association_service,$nonce_service,null);
-        $session_assoc                  = new OpenIdSessionAssociationRequestHandler($association_service,$check_auth);
-        $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service,$memento_request_service,$auth_strategy,$server_extension_service,$association_service,$trusted_sites_service,$server_config_service,$nonce_service,$session_assoc);
+
+        $auth_service                   = Registry::getInstance()->get(ServiceCatalog::AuthenticationService);
+        $memento_request_service        = Registry::getInstance()->get(ServiceCatalog::MementoService);
+        $auth_strategy                  = Registry::getInstance()->get(ServiceCatalog::AuthenticationStrategy);
+        $server_extension_service       = Registry::getInstance()->get(ServiceCatalog::ServerExtensionsService);
+        $association_service            = Registry::getInstance()->get(ServiceCatalog::AssociationService);
+        $trusted_sites_service          = Registry::getInstance()->get(ServiceCatalog::TrustedSitesService);
+        $server_config_service          = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
+        $nonce_service                  = Registry::getInstance()->get(ServiceCatalog::NonceService);
+        $log                            = Registry::getInstance()->get(ServiceCatalog::LogService);
+
+        $check_auth                     = new OpenIdCheckAuthenticationRequestHandler($association_service,$nonce_service,$log,null);
+        $session_assoc                  = new OpenIdSessionAssociationRequestHandler($association_service,$log,$check_auth);
+        $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service,$memento_request_service,$auth_strategy,$server_extension_service,$association_service,$trusted_sites_service,$server_config_service,$nonce_service,$log,$session_assoc);
     }
 
     public function getXRDSDiscovery($mode, $canonical_id=null){

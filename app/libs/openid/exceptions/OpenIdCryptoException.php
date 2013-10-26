@@ -10,10 +10,10 @@
 namespace openid\exceptions;
 use \Exception;
 
-class OpenIdCrytoException extends Exception{
+class OpenIdCryptoException extends Exception{
 
     public function __construct($message = "") {
-        $message = "OpenIdCrytoException : ".$message;
+        $message = "OpenIdCryptoException : ".$message;
         parent::__construct($message, 0 , null);
     }
 
