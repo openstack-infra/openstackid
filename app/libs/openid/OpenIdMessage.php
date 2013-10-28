@@ -14,7 +14,7 @@ use openid\exceptions\InvalidOpenIdMessageMode;
 class OpenIdMessage implements \ArrayAccess {
 
 
-    protected $container = array();
+    protected  $container = array();
 
     public function __construct(array $values) {
         $this->container = $values;
@@ -42,7 +42,7 @@ class OpenIdMessage implements \ArrayAccess {
 
 
     public function getMode(){
-        return $this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode,"_")];
+        return $this->getParam(OpenIdProtocol::OpenIDProtocol_Mode);
     }
 
     protected function setMode($mode){
@@ -52,9 +52,11 @@ class OpenIdMessage implements \ArrayAccess {
     }
 
     public function IsValid(){
-        if (isset($this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS,"_")])
-            && $this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS,"_")] == OpenIdProtocol::OpenID2MessageType
-            && isset($this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode,"_")])){
+        $ns = $this->getParam(OpenIdProtocol::OpenIDProtocol_NS);
+        $mode = $this->getParam(OpenIdProtocol::OpenIDProtocol_Mode);
+        if (!is_null($ns)
+            && $ns == OpenIdProtocol::OpenID2MessageType
+            && !is_null($mode)){
             return true;
         }
         return false;
@@ -66,7 +68,12 @@ class OpenIdMessage implements \ArrayAccess {
      * @return string
      */
     public function getParam($param){
-        return isset($this->container[OpenIdProtocol::param($param,"_")])?$this->container[OpenIdProtocol::param($param,"_")]:null;
+        if(isset($this->container[OpenIdProtocol::param($param,"_")]))
+            return $this->container[OpenIdProtocol::param($param,"_")];
+        if(isset($this->container[OpenIdProtocol::param($param,".")])){
+            return $this->container[OpenIdProtocol::param($param,".")];
+        }
+        return null;
     }
 
     public function toString(){

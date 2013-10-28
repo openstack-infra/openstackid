@@ -47,6 +47,10 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest 
         return true;
     }
 
+    /**
+     * @return null|string
+     * @throws \openid\exceptions\InvalidDHParam
+     */
     public function getDHModulus(){
         if(is_null($this->p_number)){
             $p_param        =  $this->getParam(OpenIdProtocol::OpenIdProtocol_DHModulus);
@@ -58,6 +62,10 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest 
         return $this->p_number;
     }
 
+    /**
+     * @return null|string
+     * @throws \openid\exceptions\InvalidDHParam
+     */
     public function getDHGen(){
         if(is_null( $this->g_number)){
             $g_param =  $this->getParam(OpenIdProtocol::OpenIdProtocol_DHGen);
@@ -69,6 +77,10 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest 
         return  $this->g_number;
     }
 
+    /**
+     * @return null|string
+     * @throws \openid\exceptions\InvalidDHParam
+     */
     public function getDHConsumerPublic(){
         if(is_null($this->rp_pub_key)){
             $rp_pub_key_param = $this->getParam(OpenIdProtocol::OpenIdProtocol_DHConsumerPublic);
@@ -82,6 +94,10 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest 
         return $this->rp_pub_key;
     }
 
+    /**
+     * @param OpenIdMessage $message
+     * @return bool
+     */
     public static function IsOpenIdDHAssociationSessionRequest(OpenIdMessage $message){
         if(OpenIdAssociationSessionRequest::IsOpenIdAssociationSessionRequest($message)){
             $session_type = $message->getParam(OpenIdProtocol::OpenIDProtocol_AssocType);

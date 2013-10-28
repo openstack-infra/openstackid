@@ -67,7 +67,7 @@ class OpenIdCryptoHelper
             return false;
         }
         $bytes = self::randomBytes($macLen);
-        return base64_encode($bytes);
+        return $bytes;
     }
 
     /**

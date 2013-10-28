@@ -68,6 +68,10 @@ class OpenIdProtocol implements IOpenIdProtocol {
     const OpenIdProtocol_DHGen              = "dh_gen";
     const OpenIdProtocol_DHConsumerPublic   = "dh_consumer_public";
     const OpenIdProtocol_ExpiresIn          = "expires_in";
+    const OpenIdProtocol_DHServerPublic     = "dh_server_public";
+    const OpenIdProtocol_DHEncMacKey        = "enc_mac_key ";
+    const OpenIdProtocol_MacKey             = "mac_key ";
+
 
 
     private static $OpenIDProtocol_SupportedAssocType = array(
@@ -123,7 +127,10 @@ class OpenIdProtocol implements IOpenIdProtocol {
         self::OpenIdProtocol_DHGen            => self::OpenIdProtocol_DHGen,
         self::OpenIdProtocol_DHConsumerPublic => self::OpenIdProtocol_DHConsumerPublic,
         self::OpenIdProtocol_ExpiresIn        => self::OpenIdProtocol_ExpiresIn,
-    );
+        self::OpenIdProtocol_DHServerPublic   => self::OpenIdProtocol_DHServerPublic,
+        self::OpenIdProtocol_DHEncMacKey      => self::OpenIdProtocol_DHEncMacKey,
+        self::OpenIdProtocol_MacKey           => self::OpenIdProtocol_MacKey,
+     );
 
     /**
      * check if a provide message mode is valid or not in openid 2.0 protocol
@@ -154,7 +161,7 @@ class OpenIdProtocol implements IOpenIdProtocol {
         $log                            = Registry::getInstance()->get(ServiceCatalog::LogService);
 
         $check_auth                     = new OpenIdCheckAuthenticationRequestHandler($association_service,$nonce_service,$log,null);
-        $session_assoc                  = new OpenIdSessionAssociationRequestHandler($association_service,$log,$check_auth);
+        $session_assoc                  = new OpenIdSessionAssociationRequestHandler($log,$check_auth);
         $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service,$memento_request_service,$auth_strategy,$server_extension_service,$association_service,$trusted_sites_service,$server_config_service,$nonce_service,$log,$session_assoc);
     }
 

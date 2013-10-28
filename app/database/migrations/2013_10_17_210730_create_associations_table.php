@@ -11,7 +11,7 @@ class CreateAssociationsTable extends Migration {
             $table->bigIncrements('id')->unsigned();
             $table->string('identifier',255);
             $table->string('mac_function',255);
-            $table->string('secret',1024);
+            $table->binary('secret');
             $table->string('realm',1024)->nullable();
             $table->smallInteger('type');
             $table->integer('lifetime')->unsigned();

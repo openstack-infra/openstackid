@@ -12,8 +12,8 @@ namespace openid\model;
 
 interface IAssociation {
 
-    const TypePrivate = "Private";
-    const TypeSession = "Session";
+    const TypePrivate = 1;
+    const TypeSession = 2;
 
     public function getMacFunction();
     public function setMacFunction($mac_function);

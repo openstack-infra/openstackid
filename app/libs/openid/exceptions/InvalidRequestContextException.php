@@ -13,7 +13,7 @@ use \Exception;
 class InvalidRequestContextException  extends Exception{
 
     public function __construct($message = "") {
-        $message = "InvalidRequestContextException : ".$message;
+        $message = "Invalid Request Context : ".$message;
         parent::__construct($message, 0 , null);
     }
 

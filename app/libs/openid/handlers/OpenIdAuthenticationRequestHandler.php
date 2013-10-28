@@ -8,7 +8,6 @@
  */
 
 namespace openid\handlers;
-
 use openid\helpers\AssocHandleGenerator;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
@@ -34,6 +33,7 @@ use openid\exceptions\InvalidOpenIdMessageException;
 use openid\model\ITrustedSite;
 use openid\services\INonceService;
 use openid\services\ILogService;
+use openid\exceptions\InvalidAssociationTypeException;
 /**
  * Class OpenIdAuthenticationRequestHandler
  * Implements
@@ -82,6 +82,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
      * Create Positive Identity Assertion
      * implements http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
      * @return OpenIdPositiveAssertionResponse
+     * @throws InvalidAssociationTypeException
      */
     private function doAssertion()
     {
@@ -127,6 +128,8 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             }
             $association = $this->association_service->getAssociation($new_handle);
         } else {
+            if($association->getType()!=IAssociation::TypeSession)
+                throw new InvalidAssociationTypeException(sprintf("invalid association type requested."));
             $response->setAssocHandle($assoc_handle);
         }
 
@@ -164,6 +167,11 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         return $this->auth_strategy->doLogin($this->current_request, $this->current_request_context);
     }
 
+    /**
+     * @param ITrustedSite $site
+     * @return mixed|OpenIdIndirectGenericErrorResponse|OpenIdPositiveAssertionResponse
+     * @throws \Exception
+     */
     private function checkTrustedSite(ITrustedSite $site){
         $policy = $site->getAuthorizationPolicy();
 
@@ -198,6 +206,11 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     }
 
 
+    /**
+     * @param $authorization_response
+     * @return OpenIdNonImmediateNegativeAssertion|OpenIdPositiveAssertionResponse
+     * @throws \Exception
+     */
     private function checkAuthorizationResponse($authorization_response){
         // check response
         $currentUser            = $this->authService->getCurrentUser();
@@ -335,15 +348,13 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                 break;
             }
         }
+        catch(InvalidAssociationTypeException $exInvAssoc){
+            $this->log->warning($exInvAssoc);
+            return new OpenIdIndirectGenericErrorResponse($exInvAssoc->getMessage(),null,null,$this->current_request);
+        }
         catch (InvalidOpenIdMessageException $ex) {
             $this->log->error($ex);
-            $response  = new OpenIdIndirectGenericErrorResponse($ex->getMessage());
-            if(!is_null($this->current_request)){
-                $return_to = $this->current_request->getReturnTo();
-                if(!empty($return_to))
-                    $response->setReturnTo($return_to);
-            }
-            return $response;
+            return new OpenIdIndirectGenericErrorResponse($ex->getMessage(),null,null,$this->current_request);
         }
     }
 

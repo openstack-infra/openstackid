@@ -12,7 +12,7 @@ use \Exception;
 class InvalidNonce extends Exception{
 
     public function __construct($message = "") {
-        $message = "InvalidNonce : ".$message;
+        $message = "Invalid Nonce : ".$message;
         parent::__construct($message, 0 , null);
     }
 

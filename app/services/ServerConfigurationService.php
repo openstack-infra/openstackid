@@ -30,7 +30,7 @@ class ServerConfigurationService implements IServerConfigurationService{
 
     public function getSessionAssociationLifetime()
     {
-        return 360;
+        return 3600*6;
     }
 
     public function getMaxFailedLoginAttempts(){

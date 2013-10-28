@@ -12,7 +12,7 @@ use \Exception;
 class InvalidDHParam extends Exception{
 
     public function __construct($message = "") {
-        $message = "InvalidDHParam : ".$message;
+        $message = "Invalid Diffie Helman Parameter : ".$message;
         parent::__construct($message, 0 , null);
     }
 

@@ -2,17 +2,17 @@
 /**
  * Created by PhpStorm.
  * User: smarcet
- * Date: 10/25/13
- * Time: 1:23 PM
+ * Date: 10/28/13
+ * Time: 6:03 PM
  */
 
 namespace openid\exceptions;
 use \Exception;
 
-class OpenIdInvalidRealmException  extends Exception{
+class InvalidAssociationTypeException extends  Exception{
 
     public function __construct($message = "") {
-        $message = "OpenId Invalid Realm : ".$message;
+        $message = "Invalid Association Type: ".$message;
         parent::__construct($message, 0 , null);
     }
 

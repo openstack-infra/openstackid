@@ -23,6 +23,7 @@ use openid\model\IAssociation;
 use openid\exceptions\ReplayAttackException;
 use openid\helpers\OpenIdSignatureBuilder;
 use openid\responses\OpenIdCheckAuthenticationResponse;
+use openid\exceptions\InvalidAssociationTypeException;
 
 class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
 
@@ -49,7 +50,7 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
 
             if(!$this->current_request->IsValid())
                 throw new InvalidOpenIdMessageException("OpenIdCheckAuthenticationRequest is Invalid!");
-            $claimed_nonce             = new OpenIdNonce($this->current_request->getNonce());
+            $claimed_nonce           = new OpenIdNonce($this->current_request->getNonce());
 
             if(!$this->nonce_service->lockNonce($claimed_nonce))
                 throw new ReplayAttackException(sprintf("nonce %s already used on a formed request!",$claimed_nonce->getRawFormat()));
@@ -68,7 +69,7 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
             $stored_assoc  = $this->association_service->getAssociation($claimed_assoc);
 
             if(is_null($stored_assoc) || $stored_assoc->getType()!=IAssociation::TypePrivate)
-                throw new InvalidOpenIdMessageException("OpenIdCheckAuthenticationRequest is Invalid!");
+                throw new InvalidAssociationTypeException(sprintf("invalid association type requested"));
 
 
             $claimed_realm             = $this->current_request->getRealm();
@@ -94,8 +95,13 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
             }
             return new OpenIdCheckAuthenticationResponse($is_valid,$claimed_invalidate_handle);
         }
+        catch(InvalidAssociationTypeException $invAssocEx){
+            $this->log->warning($invAssocEx);
+            $response  = new OpenIdDirectGenericErrorResponse($invAssocEx->getMessage());
+            return $response;
+        }
         catch(ReplayAttackException $rEx){
-            $this->log->error($rEx);
+            $this->log->warning($rEx);
             $response  = new OpenIdDirectGenericErrorResponse($rEx->getMessage());
             return $response;
         }
