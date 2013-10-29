@@ -9,19 +9,22 @@
 
 namespace openid\handlers;
 
+use openid\exceptions\InvalidAssociationTypeException;
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\OpenIdMessage;
 use openid\requests\OpenIdAssociationSessionRequest;
 use openid\responses\OpenIdDirectGenericErrorResponse;
 use openid\services\ILogService;
 use openid\handlers\factories\SessionAssociationRequestFactory;
+use \Exception;
+use openid\exceptions\InvalidSessionTypeException;
+use openid\responses\OpenIdAssociationSessionUnsuccessfulResponse;
 /**
  * Class OpenIdSessionAssociationRequestHandler
  * Implements http://openid.net/specs/openid-authentication-2_0.html#associations
  * @package openid\handlers
  */
 class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler{
-
 
 
     public function __construct(ILogService $log ,$successor){
@@ -39,22 +42,33 @@ class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler{
 
             $strategy = SessionAssociationRequestFactory::buildSessionAssociationStrategy($message);
             return $strategy->handle();
-
         }
-        catch (InvalidOpenIdMessageException $ex) {
-            $response  = new OpenIdDirectGenericErrorResponse($ex->getMessage());
+        catch (InvalidSessionTypeException $inv_session_ex) {
+            $response  = new OpenIdAssociationSessionUnsuccessfulResponse($inv_session_ex->getMessage());
+            $this->log->error($inv_session_ex);
+            return $response;
+        }
+        catch (InvalidAssociationTypeException $inv_assoc_ex) {
+            $response  = new OpenIdAssociationSessionUnsuccessfulResponse($inv_assoc_ex->getMessage());
+            $this->log->error($inv_assoc_ex);
+            return $response;
+        }
+        catch (InvalidOpenIdMessageException $inv_msg_ex) {
+            $response  = new OpenIdDirectGenericErrorResponse($inv_msg_ex->getMessage());
+            $this->log->error($inv_msg_ex);
+            return $response;
+        }
+        catch (Exception $ex) {
+            $response  = new OpenIdDirectGenericErrorResponse('Server Error');
             $this->log->error($ex);
             return $response;
         }
     }
 
-
     /**
      * @param OpenIdMessage $message
-     * @return OpenIdAssociationSessionRequest
+     * @return bool
      */
-
-
     protected function CanHandle(OpenIdMessage $message)
     {
         $res = OpenIdAssociationSessionRequest::IsOpenIdAssociationSessionRequest($message);

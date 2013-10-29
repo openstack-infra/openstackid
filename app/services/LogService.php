@@ -9,6 +9,7 @@
 namespace services;
 use Exception;
 use openid\services\ILogService;
+use \Log;
 
 class LogService implements  ILogService {
 

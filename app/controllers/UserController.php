@@ -13,7 +13,7 @@ use openid\exceptions\InvalidRequestContextException;
 use openid\XRDS\XRDSDocumentBuilder;
 use openid\services\IServerConfigurationService;
 use openid\services\ITrustedSitesService;
-
+use \openid\OpenIdProtocol;
 class UserController extends BaseController{
 
     private $memento_service;
@@ -48,7 +48,11 @@ class UserController extends BaseController{
         foreach($partial_views as $partial){
             $views[$partial->getName()] = View::make($partial->getName(),$partial->getData());
         }
-        $data["views"]=$views;
+        $request         = $this->memento_service->getCurrentRequest();
+        $user            = $this->auth_service->getCurrentUser();
+        $data['realm']   = $request->getParam(OpenIdProtocol::OpenIDProtocol_Realm);
+        $data['openid']  = $user->getIdentifier();
+        $data['views']   = $views;
         return $data;
     }
 
@@ -99,7 +103,6 @@ class UserController extends BaseController{
 
     public function getConsent(){
         $data = $this->getViewData();
-        $data["realm"] ="test";
         return View::make("consent",$data);
     }
 
@@ -156,6 +159,7 @@ class UserController extends BaseController{
     }
 
     public function get_deleteTrustedSite($id){
+        $this->trusted_sites_service->delTrustedSite($id);
         return Response::json(array('success' => true));
     }
 }

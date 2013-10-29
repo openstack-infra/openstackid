@@ -59,6 +59,7 @@ class OpenIdProtocol implements IOpenIdProtocol {
     const OpenIDProtocol_Signed             = "signed";
     const OpenIDProtocol_Sig                = "sig";
     const OpenIDProtocol_Error              = "error";
+    const OpenIDProtocol_ErrorCode          = "error_code";
     const OpenIDProtocol_Contact            = "contact";
     const OpenIDProtocol_Reference          = "reference";
     const OpenIDProtocol_IsValid            = "is_valid";
@@ -118,6 +119,7 @@ class OpenIdProtocol implements IOpenIdProtocol {
         self::OpenIDProtocol_Signed           => self::OpenIDProtocol_Signed,
         self::OpenIDProtocol_Sig              => self::OpenIDProtocol_Sig,
         self::OpenIDProtocol_Error            => self::OpenIDProtocol_Error,
+        self::OpenIDProtocol_ErrorCode        => self::OpenIDProtocol_ErrorCode,
         self::OpenIDProtocol_Contact          => self::OpenIDProtocol_Contact,
         self::OpenIDProtocol_Reference        => self::OpenIDProtocol_Reference,
         self::OpenIDProtocol_IsValid          => self::OpenIDProtocol_IsValid,

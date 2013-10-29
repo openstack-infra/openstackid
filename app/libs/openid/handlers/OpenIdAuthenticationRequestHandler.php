@@ -8,6 +8,8 @@
  */
 
 namespace openid\handlers;
+use openid\exceptions\OpenIdInvalidRealmException;
+use openid\exceptions\ReplayAttackException;
 use openid\helpers\AssocHandleGenerator;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
@@ -197,7 +199,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                 break;
             case IAuthService::AuthorizationResponse_DenyForever:
                 // black listed site
-                return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $site->getRealm()));
+                return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $site->getRealm()),null,null,$this->current_request);
                 break;
             default:
                 throw new \Exception("Invalid Realm Policy");
@@ -348,13 +350,25 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                 break;
             }
         }
-        catch(InvalidAssociationTypeException $exInvAssoc){
-            $this->log->warning($exInvAssoc);
-            return new OpenIdIndirectGenericErrorResponse($exInvAssoc->getMessage(),null,null,$this->current_request);
+        catch(InvalidAssociationTypeException $inv_assoc_type){
+            $this->log->warning($inv_assoc_type);
+            return new OpenIdIndirectGenericErrorResponse($inv_assoc_type->getMessage(),null,null,$this->current_request);
         }
-        catch (InvalidOpenIdMessageException $ex) {
+        catch(OpenIdInvalidRealmException $inv_realm_ex){
+            $this->log->error($inv_realm_ex);
+            return new OpenIdIndirectGenericErrorResponse($inv_realm_ex->getMessage(),null,null,$this->current_request);
+        }
+        catch(ReplayAttackException $replay_ex){
+            $this->log->error($replay_ex);
+            return new OpenIdIndirectGenericErrorResponse($replay_ex->getMessage(),null,null,$this->current_request);
+        }
+        catch (InvalidOpenIdMessageException $inv_msg_ex) {
+            $this->log->error($inv_msg_ex);
+            return new OpenIdIndirectGenericErrorResponse($inv_msg_ex->getMessage(),null,null,$this->current_request);
+        }
+        catch(\Exception $ex){
             $this->log->error($ex);
-            return new OpenIdIndirectGenericErrorResponse($ex->getMessage(),null,null,$this->current_request);
+            return new OpenIdIndirectGenericErrorResponse("Server Error",null,null,$this->current_request);
         }
     }
 

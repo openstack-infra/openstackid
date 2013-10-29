@@ -36,9 +36,13 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest 
     /**
      * @return bool
      * @throws InvalidDHParam
+     * @throws \openid\exceptions\InvalidSessionTypeException
+     * @throws \openid\exceptions\InvalidAssociationTypeException
      */
     public function IsValid()
     {
+        $res = parent::IsValid();
+        if(!$res) return false;
         $dh_modulus              = $this->getDHModulus();
         $dh_gen                  = $this->getDHGen();
         $dh_consumer_public      = $this->getDHConsumerPublic();

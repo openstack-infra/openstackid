@@ -95,25 +95,29 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler{
             }
             return new OpenIdCheckAuthenticationResponse($is_valid,$claimed_invalidate_handle);
         }
-        catch(InvalidAssociationTypeException $invAssocEx){
-            $this->log->warning($invAssocEx);
-            $response  = new OpenIdDirectGenericErrorResponse($invAssocEx->getMessage());
+        catch(InvalidAssociationTypeException $inv_assoc_ex){
+            $this->log->warning($inv_assoc_ex);
+            $response  = new OpenIdDirectGenericErrorResponse($inv_assoc_ex->getMessage());
             return $response;
         }
-        catch(ReplayAttackException $rEx){
-            $this->log->warning($rEx);
-            $response  = new OpenIdDirectGenericErrorResponse($rEx->getMessage());
+        catch(ReplayAttackException $replay_ex){
+            $this->log->warning($replay_ex);
+            $response  = new OpenIdDirectGenericErrorResponse($replay_ex->getMessage());
             return $response;
         }
-        catch(InvalidNonce $rInvNonce){
-            $this->log->error($rInvNonce);
-            $response  = new OpenIdDirectGenericErrorResponse($rInvNonce->getMessage());
+        catch(InvalidNonce $inv_nonce_ex){
+            $this->log->error($inv_nonce_ex);
+            $response  = new OpenIdDirectGenericErrorResponse($inv_nonce_ex->getMessage());
             return $response;
         }
-        catch (InvalidOpenIdMessageException $ex) {
+        catch (InvalidOpenIdMessageException $inv_msg_ex) {
+            $this->log->error($inv_msg_ex);
+            $response  = new OpenIdDirectGenericErrorResponse($inv_msg_ex->getMessage());
+            return $response;
+        }
+        catch(\Exception $ex){
             $this->log->error($ex);
-            $response  = new OpenIdDirectGenericErrorResponse($ex->getMessage());
-            return $response;
+            return new OpenIdDirectGenericErrorResponse("Server Error");
         }
     }
 

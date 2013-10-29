@@ -33,11 +33,44 @@ class AssociationService implements  IAssociationService{
      */
     public function getAssociation($handle, $realm=null)
     {
+        // check if association is on redis cache
+        if($this->redis->exists($handle)){
+            $values = $this->redis->hmget($handle,array(
+                "type",
+                "mac_function" ,
+                "issued",
+                "lifetime",
+                "secret",
+                "realm"));
+            if($values[0]==IAssociation::TypePrivate){
+                if(is_null($realm) || empty($realm) || $values[5]!=$realm){
+                    throw new OpenIdInvalidRealmException(sprintf("Private Association %s was not emit for requested realm %s",$handle,$realm));
+                }
+                $cur_time      = time();
+                $lock_lifetime = 180;
+                $success       = $this->redis->setnx('lock.'.$handle,$cur_time+$lock_lifetime+1);
+                if(!$success){
+                    throw new ReplayAttackException(sprintf("Private Association %s already used",$handle));
+                }
+            }
+            $assoc = new OpenIdAssociation();
+            $assoc->type         = $values[0];
+            $assoc->mac_function = $values[1];
+            $assoc->issued       = $values[2];
+            $assoc->lifetime     = $values[3];
+            $assoc->secret       = hex2bin($values[4]);
+            $realm               = $values[5];
+            if(!empty($realm))
+                $assoc->realm        = $realm;
+            return $assoc;
+        }
+        // if not , check on db
         $assoc =  OpenIdAssociation::where('identifier','=',$handle)->first();
+
         if(!is_null($assoc)){
             $issued_date = new DateTime($assoc->issued);
-            if($assoc->type == IAssociation::TypePrivate && !is_null($realm) && !empty($realm)){
-                if($assoc->realm!=$realm){
+            if($assoc->type == IAssociation::TypePrivate){
+                if(is_null($realm) || empty($realm) || $assoc->realm!=$realm){
                     throw new OpenIdInvalidRealmException(sprintf("Private Association %s was not emit for requested realm %s",$handle,$realm));
                 }
                 $cur_time      = time();
@@ -65,15 +98,30 @@ class AssociationService implements  IAssociationService{
     public function addAssociation($handle, $secret,$mac_function, $lifetime, $issued,$type,$realm=null)
     {
         $assoc = new OpenIdAssociation();
-        $assoc->identifier   = $handle;
-        $assoc->secret       = $secret;
-        $assoc->type         = $type;
-        $assoc->mac_function = $mac_function;
-        $assoc->lifetime     = $lifetime;
-        $assoc->issued       = $issued;
-        if(!is_null($realm))
-            $assoc->realm        = $realm;
-        $assoc->Save();
+        if($type==IAssociation::TypeSession){
+            $assoc->identifier   = $handle;
+            $assoc->secret       = $secret;
+            $assoc->type         = $type;
+            $assoc->mac_function = $mac_function;
+            $assoc->lifetime     = $lifetime;
+            $assoc->issued       = $issued;
+            if(!is_null($realm))
+                $assoc->realm        = $realm;
+            $assoc->Save();
+        }
+
+        if(is_null($realm))
+            $realm= '';
+
+        $this->redis->hmset($handle,array(
+                "type"         => $type,
+                "mac_function" => $mac_function,
+                "issued"       => $issued,
+                "lifetime"     => $lifetime,
+                "secret"       => bin2hex($secret),
+                "realm"        => $realm));
+
+        $this->redis->expire($handle,$lifetime);
     }
 
     /**
@@ -82,6 +130,7 @@ class AssociationService implements  IAssociationService{
      */
     public function deleteAssociation($handle)
     {
+        $this->redis->del($handle);
         $assoc = OpenIdAssociation::where('identifier','=',$handle)->first();
         if(!is_null($assoc)){
             $assoc->delete();

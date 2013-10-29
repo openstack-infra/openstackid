@@ -13,7 +13,7 @@ use openid\model\ITrustedSite;
 
 interface ITrustedSitesService {
     public function addTrustedSite(IOpenIdUser $user,$realm,$policy,$data=array());
-    public function delTrustedSite($realm);
+    public function delTrustedSite($id);
     /**
      * @param IOpenIdUser $user
      * @param $return_to

@@ -26,9 +26,9 @@ class TrustedSitesService implements ITrustedSitesService {
          $site->Save();
     }
 
-    public function delTrustedSite($realm)
+    public function delTrustedSite($id)
     {
-        $site = OpenIdTrustedSite::where("realm","=",$realm)->first();
+        $site = OpenIdTrustedSite::where("id","=",$id)->first();
         if(!is_null($site)) $site->delete();
     }
 

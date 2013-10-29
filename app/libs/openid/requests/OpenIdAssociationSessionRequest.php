@@ -8,6 +8,8 @@
 
 namespace openid\requests;
 
+use openid\exceptions\InvalidAssociationTypeException;
+use openid\exceptions\InvalidSessionTypeException;
 use openid\OpenIdProtocol;
 use openid\OpenIdMessage;
 
@@ -19,9 +21,33 @@ class OpenIdAssociationSessionRequest extends OpenIdRequest{
         parent::__construct($message);
     }
 
-
+    /**
+     * @return bool
+     * @throws \openid\exceptions\InvalidSessionTypeException
+     * @throws \openid\exceptions\InvalidAssociationTypeException
+     */
     public function IsValid()
     {
+        $mode         = $this->getMode();
+        if( $mode != OpenIdProtocol::AssociateMode)
+            return false;
+
+        $assoc_type   = $this->getAssocType();
+
+        if(is_null($assoc_type) || empty($assoc_type))
+            return false;
+
+        $session_type = $this->getSessionType();
+
+        if(is_null($session_type) || empty($session_type))
+            return false;
+
+        if(!OpenIdProtocol::isSessionTypeSupported($session_type))
+            throw new InvalidSessionTypeException(sprintf("unsuported session type %s",$session_type));
+
+        if(!OpenIdProtocol::isAssocTypeSupported($assoc_type))
+            throw new InvalidAssociationTypeException(sprintf("unsuported assoc type %s",$assoc_type));
+
         return true;
     }
 

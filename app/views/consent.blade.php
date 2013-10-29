@@ -1,23 +1,37 @@
 @extends('layout')
 @section('content')
 <div class="container">
+    <h4>Welcome to OpenstackId</h4>
     {{ Form::open(array('url' => '/accounts/user/consent','id'=>'authorization_form', 'method' => 'post',  "autocomplete" => "off")) }}
+    <fieldset>
+    <legend>
+        This Site {{ $realm }} is requesting following information
+    </legend>
     <label>
-        This Site {{ $realm }} is requesting permissions
+        Sign in to <b>{{ $realm }}</b> using your openstackid ({{$openid}})
     </label>
 
     <div>
-        {{ Form::label("allow_forever","Allow Forever")}}
-        {{ Form::radio('trust[]', 'AllowForever','true',array('id'=>'allow_forever')) }}
-        {{ Form::label("allow_once","Allow Once")}}
-        {{ Form::radio('trust[]', 'AllowOnce','',array('id'=>'allow_once')) }}
-        {{ Form::label("deny_once","Deny Once")}}
-        {{ Form::radio('trust[]', 'DenyOnce','',array('id'=>'deny_once')) }}
-        {{ Form::label("deny_forever","Deny Forever")}}
-        {{ Form::radio('trust[]', 'DenyForever','',array('id'=>'deny_forever')) }}
+        <label class="radio">
+            {{ Form::radio('trust[]', 'AllowOnce','true',array('id'=>'allow_once','class'=>'input-block-level')) }}
+            Allow Once
+        </label>
+        <label class="radio">
+        {{ Form::radio('trust[]', 'AllowForever','',array('id'=>'allow_forever','class'=>'input-block-level')) }}
+        Allow Forever
+         </label>
+        <label class="radio">
+        {{ Form::radio('trust[]', 'DenyOnce','',array('id'=>'deny_once','class'=>'input-block-level')) }}
+        Deny Once
+        </label>
+        <label class="radio">
+        {{ Form::radio('trust[]', 'DenyForever','',array('id'=>'deny_forever','class'=>'input-block-level')) }}
+        Deny Forever
+        </label>
     </div>
     {{ Form::submit('Ok',array("id"=>"send_authorization",'class'=>'btn')) }}
     {{ Form::button('Cancel',array('id'=>'cancel_authorization','class'=>'btn cancel_authorization')) }}
+    </fieldset>
     {{ Form::close() }}
     @foreach ($views as $view)
     {{ $view}}

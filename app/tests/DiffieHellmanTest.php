@@ -9,6 +9,7 @@ use openid\requests\OpenIdDHAssociationSessionRequest;
 use openid\helpers\OpenIdCryptoHelper;
 use \Zend\Crypt\PublicKey\DiffieHellman;
 use \openid\helpers\AssocHandleGenerator;
+use \openid\OpenIdProtocol;
 class DiffieHellmanTest extends TestCase {
 
     /**
@@ -29,29 +30,46 @@ class DiffieHellmanTest extends TestCase {
     }
 
     public function testAssocHandlerGenerator(){
-        $list = '';
-        for($i=33;$i<=126;$i++){
-            $list.= chr($i);
-        }
         $handler = AssocHandleGenerator::generate(32);
         $this->assertTrue(strlen($handler)==32);
     }
 
+    public function testAssociationMessage(){
 
-    public function testAssociation(){
+        $g = pack('H*',OpenIdDHAssociationSessionRequest::DH_G);
+        $g = OpenIdCryptoHelper::convert($g,DiffieHellman::FORMAT_BINARY,DiffieHellman::FORMAT_NUMBER);
+        $p = pack('H*',OpenIdDHAssociationSessionRequest::DH_P);
+        $p = OpenIdCryptoHelper::convert($p,DiffieHellman::FORMAT_BINARY,DiffieHellman::FORMAT_NUMBER);
+        $dh = new DiffieHellman($p,$g);
+        $dh->generateKeys();
+
+        $rp_public_key  = $dh->getPublicKey(DiffieHellman::FORMAT_BTWOC);
+        $dh->computeSecretKey($rp_public_key,DiffieHellman::FORMAT_BTWOC);
+        $rp_public_key = base64_encode($rp_public_key);
+        $shared_secret = $dh->getSharedSecretKey();
+
         $params = array(
             "openid.ns"=>"http://specs.openid.net/auth/2.0",
-            "openid.assoc_type"=>'HMAC-SHA1',
-            "openid.dh_consumer_public"=>'AKxUIFDn9RsntYCLmRwc2jx+V7jJEB+EQK7Kgcyck7c3yEJzyrBrB/8DUA4Dsllne2tQX+t+7ivneZMyFsVOyfskw9yZRKQU6poovNbqudW9kVrBtrggwEsjLChIwkKm13xXKVomtGH5pU2V8PwIZtPluMr8uRR+0R9ogixwVSkB',
+            "openid.assoc_type"=>OpenIdProtocol::SignatureAlgorithmHMAC_SHA256,
+            "openid.dh_consumer_public"=>$rp_public_key,
             "openid.mode"=>'associate',
-            "openid.session_type"=>"DH-SHA1",
+            "openid.session_type"=>OpenIdProtocol::AssociationSessionTypeDHSHA256,
         );
 
-        $shared_secret = '63747905442891188011074543977271509700057281459936951909895661410344707875213381494657305044375401970833012559592307378035755377201544395671677989732074875047679599415079109546770345078156268045455589915055517469932823665407196575060345355634851325574327371573077018227834572392777937912458896556870551728909';
-        $rp_rp_public_key ='121013270978594747679028556064764237584422563894035983088053529062131301635207919054508681115003074784588424674441119914004706414602938326107484749287157686396853941560348587266623270903309845335216158216107235323624947881403052366432191590393486081418713651288957096504910069887492752423639936941679055284481';
 
-
-        $response = $this->client->request("POST","/accounts/openid/v2",$params);
+        $response = $this->action("POST","OpenIdProviderController@op_endpoint",$params);
+        $body     = $response->getContent();
+        $lines    = explode("\n",$body);
+        $params   = array();
+        foreach($lines as $line){
+            if(empty($line)) continue;
+            $param = explode(":",$line,2);
+            $params[$param[0]]=$param[1];
+        }
+        $this->assertResponseStatus(200);
+        $this->assertTrue(isset($params[OpenIdProtocol::OpenIDProtocol_NS]) && $params[OpenIdProtocol::OpenIDProtocol_NS]==OpenIdProtocol::OpenID2MessageType);
+        $this->assertTrue(isset($params[OpenIdProtocol::OpenIDProtocol_AssocType]) && $params[OpenIdProtocol::OpenIDProtocol_AssocType]==OpenIdProtocol::SignatureAlgorithmHMAC_SHA256);
+        $this->assertTrue(isset($params[OpenIdProtocol::OpenIDProtocol_SessionType]) && $params[OpenIdProtocol::OpenIDProtocol_SessionType]==OpenIdProtocol::AssociationSessionTypeDHSHA256);
     }
 
 

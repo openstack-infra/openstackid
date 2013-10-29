@@ -15,7 +15,6 @@ class RequestContext
     private $trusted_data;
     private $partial_views;
 
-
     public function __construct()
     {
         $this->partial_views = array();
