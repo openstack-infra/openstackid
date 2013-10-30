@@ -1,16 +1,14 @@
 @extends('layout')
 @section('content')
 <div class="container">
-    <h4>Welcome to OpenstackId</h4>
+    <h4>OpenstackId - Openid verification</h4>
     {{ Form::open(array('url' => '/accounts/user/consent','id'=>'authorization_form', 'method' => 'post',  "autocomplete" => "off")) }}
     <fieldset>
     <legend>
-        This Site {{ $realm }} is requesting following information
+        Sign in to <b>{{ $realm }}</b> using your openstackid
     </legend>
-    <label>
-        Sign in to <b>{{ $realm }}</b> using your openstackid ({{$openid}})
-    </label>
-
+    <p>A site identifying itself as <b>{{ $realm }}</b></p>
+    <p>has asked us for confirmation that <b>({{$openid}})</b> is your identity URL</p>
     <div>
         <label class="radio">
             {{ Form::radio('trust[]', 'AllowOnce','true',array('id'=>'allow_once','class'=>'input-block-level')) }}

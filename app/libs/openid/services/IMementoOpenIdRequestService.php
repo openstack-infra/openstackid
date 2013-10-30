@@ -25,4 +25,6 @@ interface IMementoOpenIdRequestService {
      *  @return OpenIdMessage;
      */
     public function getCurrentRequest();
+
+    public function clearCurrentRequest();
 }

@@ -29,8 +29,8 @@ Route::group(["before"=>"ssl"],function(){
     Route::get("/accounts/user/ud/{identifier}","DiscoveryController@user");
 
     //op endpoint url
-    Route::post('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
-    Route::get('/accounts/openid/v2','OpenIdProviderController@op_endpoint');
+    Route::post('/accounts/openid2','OpenIdProviderController@op_endpoint');
+    Route::get('/accounts/openid2','OpenIdProviderController@op_endpoint');
 
     //user interaction
     Route::get('/accounts/user/login',"UserController@getLogin");

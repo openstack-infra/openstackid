@@ -144,6 +144,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
          * so associate $nonce with signature and realm
          */
         $this->nonce_service->associateNonce($nonce, $response->getSig(),$realm);
+        $this->mementoRequestService->clearCurrentRequest();
         return $response;
     }
 
@@ -275,7 +276,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
      */
     protected function doImmediateMode(){
         if (!$this->authService->isUserLogged()) {
-            return new OpenIdImmediateNegativeAssertion;
+            return new OpenIdImmediateNegativeAssertion($this->current_request->getReturnTo());
         }
         $currentUser = $this->authService->getCurrentUser();
         $site        = $this->trusted_sites_service->getTrustedSite($currentUser, $this->current_request->getRealm());
@@ -289,7 +290,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             case IAuthService::AuthorizationResponse_DenyForever:
             {
                 // black listed site by user
-                return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $site->getRealm()));
+                return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $site->getRealm()),null,null,$this->current_request);
             }
             break;
             case IAuthService::AuthorizationResponse_AllowForever:
@@ -311,7 +312,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             }
             break;
             default:
-                return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $this->current_request->getRealm()));
+                return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $this->current_request->getRealm()),null,null,$this->current_request);
             break;
         }
     }

@@ -17,4 +17,5 @@ interface IServerConfigurationService {
     public function getSessionAssociationLifetime();
     public function getMaxFailedLoginAttempts();
     public function getNonceLifetime();
+    public function isValidIP($remote_address);
 }

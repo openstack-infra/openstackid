@@ -9,7 +9,7 @@
 
 namespace services;
 use openid\services\IServerConfigurationService;
-
+use \BannedIP;
 class ServerConfigurationService implements IServerConfigurationService{
 
     public function getUserIdentityEndpointURL($identifier){
@@ -39,5 +39,18 @@ class ServerConfigurationService implements IServerConfigurationService{
 
     public function getNonceLifetime(){
         return 360;
+    }
+
+
+    public function isValidIP($remote_address){
+        $res = true;
+        $banned_ip = BannedIP::where("ip","=",$remote_address)->first();
+        if($banned_ip){
+            $banned_ip->hits = $banned_ip->hits + 1;
+            $banned_ip->Save();
+            sleep(2 ^ $banned_ip->hits);
+            $res = false;
+        }
+        return $res;
     }
 }

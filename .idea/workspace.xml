@@ -2,25 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" name="Default" comment="[smarcet] - Refs #4576, #4578 : XRDS discovery and  Authentication Workflow  main classes">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidSessionTypeException.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdAssociationSessionUnsuccessfulResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/AssociationService.php" afterPath="$PROJECT_DIR$/app/services/AssociationService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/DiffieHellmanTest.php" afterPath="$PROJECT_DIR$/app/tests/DiffieHellmanTest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/LogService.php" afterPath="$PROJECT_DIR$/app/services/LogService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAssociationSessionRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAssociationSessionRequest.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/database/migrations/2013_10_30_203940_create_banned_ips.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/BannedIP.php" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/tests/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/DiscoveryController.php" afterPath="$PROJECT_DIR$/app/controllers/DiscoveryController.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IMementoOpenIdRequestService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IMementoOpenIdRequestService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IServerConfigurationService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IServerConfigurationService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/MementoRequestService.php" afterPath="$PROJECT_DIR$/app/services/MementoRequestService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdCheckAuthenticationRequestHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdCheckAuthenticationRequestHandler.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdDHAssociationSessionRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdDHAssociationSessionRequest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php" afterPath="$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" afterPath="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdSessionAssociationRequestHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdSessionAssociationRequestHandler.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/TrustedSitesService.php" afterPath="$PROJECT_DIR$/app/services/TrustedSitesService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/OpenIdProtocolTest.php" afterPath="$PROJECT_DIR$/app/tests/OpenIdProtocolTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php" afterPath="$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/ServerConfigurationService.php" afterPath="$PROJECT_DIR$/app/services/ServerConfigurationService.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/UserController.php" afterPath="$PROJECT_DIR$/app/controllers/UserController.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/extensions/ax.blade.php" afterPath="$PROJECT_DIR$/app/views/extensions/ax.blade.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/consent.blade.php" afterPath="$PROJECT_DIR$/app/views/consent.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/filters.php" afterPath="$PROJECT_DIR$/app/filters.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/profile.blade.php" afterPath="$PROJECT_DIR$/app/views/profile.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/routes.php" afterPath="$PROJECT_DIR$/app/routes.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/config/session.php" afterPath="$PROJECT_DIR$/app/config/session.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="openidIdp.iws" />
@@ -55,66 +56,96 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="consent.blade.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/views/consent.blade.php">
+      <file leaf-file-name="filters.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/filters.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="31" selection-start="281" selection-end="294" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="855">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ax.blade.php" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/app/views/extensions/ax.blade.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="6" selection-start="272" selection-end="272" vertical-scroll-proportion="0.27054107" vertical-offset="0" max-vertical-offset="499">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="bootstrap.min.css" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/public/css/bootstrap.min.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="148" column="14" selection-start="9593" selection-end="9593" vertical-scroll-proportion="0.0" vertical-offset="2050" max-vertical-offset="13200">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UserController.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="53" column="50" selection-start="2276" selection-end="2276" vertical-scroll-proportion="-11.875" vertical-offset="315" max-vertical-offset="2355">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="OpenIdAuthenticationRequestHandler.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="158" column="6" selection-start="7514" selection-end="7514" vertical-scroll-proportion="-2.76" vertical-offset="2142" max-vertical-offset="5685">
+            <state line="13" column="0" selection-start="478" selection-end="478" vertical-scroll-proportion="-1.8333334" vertical-offset="16" max-vertical-offset="1800">
               <folding>
-                <element signature="e#193#243#0" expanded="true" />
+                <element signature="e#6#41#0" expanded="true" />
+                <element signature="e#72#477#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RequestContext.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php">
+      <file leaf-file-name="2013_10_30_203940_create_banned_ips.php" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_30_203940_create_banned_ips.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="0" selection-start="282" selection-end="282" vertical-scroll-proportion="-6.25" vertical-offset="0" max-vertical-offset="675">
+            <state line="17" column="63" selection-start="396" selection-end="396" vertical-scroll-proportion="0.5194805" vertical-offset="135" max-vertical-offset="555">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="login.blade.php" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
+      <file leaf-file-name="2013_10_17_211839_alter_trusted_sites_table.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_17_211839_alter_trusted_sites_table.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="38" selection-start="77" selection-end="111" vertical-scroll-proportion="-2.5" vertical-offset="0" max-vertical-offset="690">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="5.625" vertical-offset="135" max-vertical-offset="570">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="2013_10_17_210730_create_associations_table.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_17_210730_create_associations_table.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="28" column="52" selection-start="716" selection-end="761" vertical-scroll-proportion="-15.625" vertical-offset="45" max-vertical-offset="555">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="2013_10_17_210518_create_users_table.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_17_210518_create_users_table.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="21" column="75" selection-start="618" selection-end="634" vertical-scroll-proportion="-5.625" vertical-offset="180" max-vertical-offset="675">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="2013_10_17_211051_create_trusted_sites_table.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_17_211051_create_trusted_sites_table.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="15" column="11" selection-start="143" selection-end="466" vertical-scroll-proportion="-9.375" vertical-offset="0" max-vertical-offset="495">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OpenIdAssociation.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/models/OpenIdAssociation.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="13" column="31" selection-start="269" selection-end="342" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="1185">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Member.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/models/Member.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="10" column="29" selection-start="201" selection-end="217" vertical-scroll-proportion="-2.5" vertical-offset="0" max-vertical-offset="300">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ServerConfigurationService.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/services/ServerConfigurationService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="41" column="5" selection-start="948" selection-end="948" vertical-scroll-proportion="-4.4166665" vertical-offset="419" max-vertical-offset="825">
+              <folding>
+                <element signature="e#187#235#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AssociationService.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/services/AssociationService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="109" column="24" selection-start="4123" selection-end="4127" vertical-scroll-proportion="-6.25" vertical-offset="1305" max-vertical-offset="2265">
               <folding />
             </state>
           </provider>
@@ -138,22 +169,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/app/tests/DiffieHellmanTest.php" />
-        <option value="$PROJECT_DIR$/app/services/LogService.php" />
-        <option value="$PROJECT_DIR$/app/services/AssociationService.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdCheckAuthenticationRequestHandler.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdSessionAssociationRequestHandler.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" />
         <option value="$PROJECT_DIR$/app/routes.php" />
-        <option value="$PROJECT_DIR$/app/views/profile.blade.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" />
-        <option value="$PROJECT_DIR$/app/services/TrustedSitesService.php" />
-        <option value="$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php" />
-        <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/services/IMementoOpenIdRequestService.php" />
+        <option value="$PROJECT_DIR$/app/services/MementoRequestService.php" />
         <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
         <option value="$PROJECT_DIR$/app/controllers/UserController.php" />
-        <option value="$PROJECT_DIR$/app/views/consent.blade.php" />
-        <option value="$PROJECT_DIR$/app/views/extensions/ax.blade.php" />
+        <option value="$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php" />
+        <option value="$PROJECT_DIR$/app/tests/index.html" />
+        <option value="$PROJECT_DIR$/app/config/session.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAssociationSessionRequest.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/services/IServerConfigurationService.php" />
+        <option value="$PROJECT_DIR$/app/filters.php" />
+        <option value="$PROJECT_DIR$/app/models/BannedIP.php" />
+        <option value="$PROJECT_DIR$/app/services/ServerConfigurationService.php" />
+        <option value="$PROJECT_DIR$/app/database/migrations/2013_10_30_203940_create_banned_ips.php" />
       </list>
     </option>
   </component>
@@ -262,6 +293,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -270,23 +302,164 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="vendor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="public" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="bootstrap" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="models" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="database" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="database" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="migrations" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="73" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="92" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="recentsLimit" value="5" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="72" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="recentsLimit" value="5" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../www.openstack.org" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="100" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="955" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="954" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="955" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="100" />
     <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="92" />
@@ -301,6 +474,7 @@
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
     <property name="options.lastSelected" value="Configurable.PHP.FrameworkIntegration" />
+    <property name="DefaultHtmlFileTemplate" value="Html5" />
     <property name="restartRequiresConfirmation" value="true" />
     <property name="options.searchVisible" value="true" />
   </component>
@@ -318,18 +492,6 @@
       <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
       <method />
     </configuration>
-    <configuration default="false" name="DiscoveryControllerTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
-      <TestRunner class="DiscoveryControllerTest" file="$PROJECT_DIR$/app/tests/DiscoveryControllerTest.php" scope="Class" />
-      <RunnerSettings RunnerId="PhpRunner" />
-      <ConfigurationWrapper RunnerId="PhpRunner" />
-      <method />
-    </configuration>
-    <configuration default="false" name="DiffieHellmanTest.testAssocHandlerGenerator" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
-      <TestRunner class="DiffieHellmanTest" file="$PROJECT_DIR$/app/tests/DiffieHellmanTest.php" method="testAssocHandlerGenerator" scope="Method" />
-      <RunnerSettings RunnerId="PhpUnitDebugRunner" />
-      <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
-      <method />
-    </configuration>
     <configuration default="false" name="AssocHandleGenerator.php" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true" temporary="true" uri="http://localhost:63342/openidIdp/app/libs/openid/helpers/AssocHandleGenerator.php">
       <RunnerSettings RunnerId="JavascriptDebugRunner" />
       <ConfigurationWrapper RunnerId="JavascriptDebugRunner" />
@@ -337,6 +499,18 @@
     </configuration>
     <configuration default="false" name="DiffieHellmanTest.testAssociation" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
       <TestRunner class="DiffieHellmanTest" file="$PROJECT_DIR$/app/tests/DiffieHellmanTest.php" method="testAssociation" scope="Method" />
+      <RunnerSettings RunnerId="PhpUnitDebugRunner" />
+      <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="OpenIdProtocolTest.testCheckId_immediate" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="OpenIdProtocolTest" file="$PROJECT_DIR$/app/tests/OpenIdProtocolTest.php" method="testCheckId_immediate" scope="Method" />
+      <RunnerSettings RunnerId="PhpUnitDebugRunner" />
+      <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="OpenIdProtocolTest" type="PHPUnitRunConfigurationType" factoryName="PHPUnit" temporary="true">
+      <TestRunner class="OpenIdProtocolTest" file="$PROJECT_DIR$/app/tests/OpenIdProtocolTest.php" scope="Class" />
       <RunnerSettings RunnerId="PhpUnitDebugRunner" />
       <ConfigurationWrapper RunnerId="PhpUnitDebugRunner" />
       <method />
@@ -367,18 +541,18 @@
     <list size="6">
       <item index="0" class="java.lang.String" itemvalue="PHP Web Application.dev.openstackid.com" />
       <item index="1" class="java.lang.String" itemvalue="PHPUnit.DiffieHellmanTest" />
-      <item index="2" class="java.lang.String" itemvalue="PHPUnit.DiscoveryControllerTest" />
-      <item index="3" class="java.lang.String" itemvalue="PHPUnit.DiffieHellmanTest.testAssocHandlerGenerator" />
-      <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.AssocHandleGenerator.php" />
-      <item index="5" class="java.lang.String" itemvalue="PHPUnit.DiffieHellmanTest.testAssociation" />
+      <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.AssocHandleGenerator.php" />
+      <item index="3" class="java.lang.String" itemvalue="PHPUnit.DiffieHellmanTest.testAssociation" />
+      <item index="4" class="java.lang.String" itemvalue="PHPUnit.OpenIdProtocolTest.testCheckId_immediate" />
+      <item index="5" class="java.lang.String" itemvalue="PHPUnit.OpenIdProtocolTest" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="PHPUnit.DiffieHellmanTest.testAssociation" />
-        <item index="1" class="java.lang.String" itemvalue="PHPUnit.DiffieHellmanTest" />
-        <item index="2" class="java.lang.String" itemvalue="JavaScript Debug.AssocHandleGenerator.php" />
-        <item index="3" class="java.lang.String" itemvalue="PHPUnit.DiffieHellmanTest.testAssocHandlerGenerator" />
-        <item index="4" class="java.lang.String" itemvalue="PHPUnit.DiscoveryControllerTest" />
+        <item index="0" class="java.lang.String" itemvalue="PHPUnit.OpenIdProtocolTest" />
+        <item index="1" class="java.lang.String" itemvalue="PHPUnit.OpenIdProtocolTest.testCheckId_immediate" />
+        <item index="2" class="java.lang.String" itemvalue="PHPUnit.DiffieHellmanTest.testAssociation" />
+        <item index="3" class="java.lang.String" itemvalue="PHPUnit.DiffieHellmanTest" />
+        <item index="4" class="java.lang.String" itemvalue="JavaScript Debug.AssocHandleGenerator.php" />
       </list>
     </recent_temporary>
   </component>
@@ -435,14 +609,15 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="38" width="1301" height="728" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24913494" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298639" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3098479" sideWeight="0.66608995" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31545237" sideWeight="0.66608995" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33391005" sideWeight="0.6180945" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3544093" sideWeight="0.38190553" order="7" side_tool="true" content_ui="tabs" />
@@ -451,7 +626,6 @@
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24913494" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="PHP-CGI Server" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -478,14 +652,14 @@
           <option name="timeStamp" value="351" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/controllers/UserController.php</url>
-          <line>161</line>
-          <option name="timeStamp" value="362" />
+          <url>file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php</url>
+          <line>146</line>
+          <option name="timeStamp" value="388" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/services/TrustedSitesService.php</url>
-          <line>30</line>
-          <option name="timeStamp" value="363" />
+          <url>file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php</url>
+          <line>91</line>
+          <option name="timeStamp" value="391" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -495,110 +669,123 @@
           </selected-grouping-rules>
         </breakpoints-dialog>
       </breakpoints-dialog>
-      <option name="time" value="370" />
+      <option name="time" value="397" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/controllers/DiscoveryController.php">
+    <entry file="file://$PROJECT_DIR$/app/start/global.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1095" />
+        <state line="62" column="29" selection-start="1853" selection-end="1881" vertical-scroll-proportion="-10.625" vertical-offset="675" max-vertical-offset="1470">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdAssociationSessionRequest.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="6" selection-start="285" selection-end="285" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="960">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Http/Request.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="289" column="26" selection-start="5410" selection-end="5416" vertical-scroll-proportion="-3.125" vertical-offset="4230" max-vertical-offset="7605">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/services/Registry.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="6" selection-start="201" selection-end="201" vertical-scroll-proportion="-3.75" vertical-offset="0" max-vertical-offset="600">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/services/IServerConfigurationService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="47" selection-start="578" selection-end="578" vertical-scroll-proportion="-8.125" vertical-offset="0" max-vertical-offset="300">
+          <folding />
+        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/filters.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1665" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/start/global.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="62" column="29" selection-start="1855" selection-end="1881" vertical-scroll-proportion="-6.875" vertical-offset="765" max-vertical-offset="1470" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectGenericErrorResponse.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="0" selection-start="483" selection-end="483" vertical-scroll-proportion="-3.5416667" vertical-offset="110" max-vertical-offset="525">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/OpenIdProviderController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="0" selection-start="1196" selection-end="1196" vertical-scroll-proportion="-3.375" vertical-offset="279" max-vertical-offset="540" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="20" selection-start="557" selection-end="557" vertical-scroll-proportion="-5.25" vertical-offset="54" max-vertical-offset="345" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="0" selection-start="105" selection-end="105" vertical-scroll-proportion="0.2189781" vertical-offset="0" max-vertical-offset="548">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/bootstrap/start.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1245">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/profile.blade.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="268" selection-start="633" selection-end="633" vertical-scroll-proportion="-7.5" vertical-offset="0" max-vertical-offset="675">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="38" selection-start="77" selection-end="111" vertical-scroll-proportion="-2.5" vertical-offset="0" max-vertical-offset="690">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="158" column="6" selection-start="7514" selection-end="7514" vertical-scroll-proportion="-2.76" vertical-offset="2142" max-vertical-offset="5685">
+        <state line="13" column="0" selection-start="478" selection-end="478" vertical-scroll-proportion="-1.8333334" vertical-offset="16" max-vertical-offset="1800">
           <folding>
-            <element signature="e#193#243#0" expanded="true" />
+            <element signature="e#6#41#0" expanded="true" />
+            <element signature="e#72#477#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php">
+    <entry file="file://$PROJECT_DIR$/app/models/Member.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="0" selection-start="282" selection-end="282" vertical-scroll-proportion="-6.25" vertical-offset="0" max-vertical-offset="675">
+        <state line="10" column="29" selection-start="201" selection-end="217" vertical-scroll-proportion="-2.5" vertical-offset="0" max-vertical-offset="300">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
+    <entry file="file://$PROJECT_DIR$/app/models/OpenIdAssociation.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="50" selection-start="2276" selection-end="2276" vertical-scroll-proportion="-11.875" vertical-offset="315" max-vertical-offset="2355">
+        <state line="13" column="31" selection-start="269" selection-end="342" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="1185">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/consent.blade.php">
+    <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_17_211051_create_trusted_sites_table.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="31" selection-start="281" selection-end="294" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="855">
+        <state line="15" column="11" selection-start="143" selection-end="466" vertical-scroll-proportion="-9.375" vertical-offset="0" max-vertical-offset="495">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/public/css/bootstrap.min.css">
+    <entry file="file://$PROJECT_DIR$/app/models/BannedIP.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="148" column="14" selection-start="9593" selection-end="9593" vertical-scroll-proportion="0.0" vertical-offset="2050" max-vertical-offset="13200">
+        <state line="8" column="14" selection-start="97" selection-end="105" vertical-scroll-proportion="-1.875" vertical-offset="0" max-vertical-offset="180">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/extensions/ax.blade.php">
+    <entry file="file://$PROJECT_DIR$/app/services/AssociationService.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="6" selection-start="272" selection-end="272" vertical-scroll-proportion="0.27054107" vertical-offset="0" max-vertical-offset="499">
+        <state line="109" column="24" selection-start="4123" selection-end="4127" vertical-scroll-proportion="-6.25" vertical-offset="1305" max-vertical-offset="2265">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/services/ServerConfigurationService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="5" selection-start="948" selection-end="948" vertical-scroll-proportion="-4.4166665" vertical-offset="419" max-vertical-offset="825">
+          <folding>
+            <element signature="e#187#235#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_17_211839_alter_trusted_sites_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="5.625" vertical-offset="135" max-vertical-offset="570">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_17_210730_create_associations_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="52" selection-start="716" selection-end="761" vertical-scroll-proportion="-15.625" vertical-offset="45" max-vertical-offset="555">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_17_210518_create_users_table.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="75" selection-start="618" selection-end="634" vertical-scroll-proportion="-5.625" vertical-offset="180" max-vertical-offset="675">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/database/migrations/2013_10_30_203940_create_banned_ips.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="63" selection-start="396" selection-end="396" vertical-scroll-proportion="0.5194805" vertical-offset="135" max-vertical-offset="555">
           <folding />
         </state>
       </provider>

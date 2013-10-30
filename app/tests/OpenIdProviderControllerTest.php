@@ -19,6 +19,6 @@ class OpenIdProviderControllerTest extends TestCase {
             "openid.mode"=>"checkid_setup"
         );
 
-        $response = $this->client->request("POST","/accounts/openid/v2",$params);
+        $response =$this->action("POST","OpenIdProviderController@op_endpoint",$params);
     }
 }

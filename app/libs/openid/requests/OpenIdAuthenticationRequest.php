@@ -13,6 +13,8 @@ use openid\requests\OpenIdRequest;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
 use openid\helpers\OpenIdUriHelper;
+use openid\services\Registry;
+use openid\services\ServiceCatalog;
 
 class OpenIdAuthenticationRequest extends OpenIdRequest {
 
@@ -52,32 +54,51 @@ class OpenIdAuthenticationRequest extends OpenIdRequest {
 
 
     /**
-     * @param $claimed_id
-     * @param $identity
+     * @param $claimed_id The Claimed Identifier.
+     * @param $identity The OP-Local Identifier.
      * @return bool
      */
     private function isValidIdentifier($claimed_id,$identity){
-        if($claimed_id==$identity && $identity==OpenIdProtocol::IdentifierSelectType && $claimed_id==OpenIdProtocol::IdentifierSelectType)
+        /*
+         * openid.claimed_id" and "openid.identity" SHALL be either both present or both absent.
+         * If neither value is present, the assertion is not about an identifier, and will contain
+         * other information in its payload, using extensions.
+         */
+
+        $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
+        if(is_null($claimed_id) && is_null($identity))
+            return false;
+        //http://specs.openid.net/auth/2.0/identifier_select
+        if($claimed_id==$identity && $identity==OpenIdProtocol::IdentifierSelectType)
             return true;
-        if($claimed_id==$identity && OpenIdUriHelper::isValidUrl($identity)){
-            //todo: check valid user?
-            return true;
+
+        if(OpenIdUriHelper::isValidUrl($claimed_id) && OpenIdUriHelper::isValidUrl($identity)){
+            $identity_url_pattern = $server_configuration_service->getUserIdentityEndpointURL("@identifier");
+            $url_parts            = explode("@",$identity_url_pattern,2);
+            $base_identity_url    = $url_parts[0];
+            if(strpos($identity,$base_identity_url)!==false)
+                return true;
+            if(strpos($claimed_id,$base_identity_url)!==false)
+                return true;
         }
         return false;
     }
 
     public function IsValid(){
-        $return_to  = $this->getReturnTo();
-        $claimed_id = $this->getClaimedId();
-        $identity   = $this->getIdentity();
-        $mode       = $this->getMode();
-        $realm      = $this->getRealm();
+        $return_to   = $this->getReturnTo();
+        $claimed_id  = $this->getClaimedId();
+        $identity    = $this->getIdentity();
+        $mode        = $this->getMode();
+        $realm       = $this->getRealm();
+        $valid_realm = OpenIdUriHelper::checkRealm($realm,$return_to);
+        $valid_id    = $this->isValidIdentifier($claimed_id,$identity);
+
         return !empty($return_to)
                && !empty($realm)
-               && OpenIdUriHelper::checkRealm($realm,$return_to)
+               && $valid_realm
                && !empty($claimed_id)
                && !empty($identity)
-               && $this->isValidIdentifier($claimed_id,$identity)
+               && $valid_id
                && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
     }
 

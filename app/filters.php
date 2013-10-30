@@ -1,5 +1,6 @@
 <?php
-
+use openid\services\ServiceCatalog;
+use openid\services\Registry;
 /*
 |--------------------------------------------------------------------------
 | Application & Route Filters
@@ -13,7 +14,16 @@
 
 App::before(function($request)
 {
+    $ip = $request->server('HTTP_CLIENT_IP');
 
+    if(empty($ip))
+        $ip = $request->server('HTTP_X_FORWARDED_FOR');
+    if(empty($ip))
+        $ip = $request->server('REMOTE_ADDR');
+
+    $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
+    if(!$server_configuration_service->isValidIP($ip))
+        return View::make('404');
 });
 
 
@@ -105,7 +115,6 @@ Route::filter("openid.save.request",function(){
 
 });
 
-use openid\services\Registry;
 
 Route::filter("ssl",function(){
     if (!Request::secure()){

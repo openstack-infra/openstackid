@@ -110,7 +110,7 @@ class UserController extends BaseController{
         $trust_action = input::get("trust");
         if(!is_null($trust_action) && is_array($trust_action)){
             $this->auth_service->setUserAuthorizationResponse($trust_action[0]);
-            return Redirect::to('/accounts/openid/v2');
+            return Redirect::action('OpenIdProviderController@op_endpoint');
         }
     }
 
@@ -160,6 +160,6 @@ class UserController extends BaseController{
 
     public function get_deleteTrustedSite($id){
         $this->trusted_sites_service->delTrustedSite($id);
-        return Response::json(array('success' => true));
+        return Redirect::action("UserController@getProfile");
     }
 }
