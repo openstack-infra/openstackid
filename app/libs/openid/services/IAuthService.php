@@ -29,6 +29,8 @@ interface IAuthService {
      */
     public function Login($username,$password,$remember_me);
 
+    public function getUserByUsername($username);
+
     const AuthorizationResponse_None            = "None";
     const AuthorizationResponse_AllowOnce       = "AllowOnce";
     const AuthorizationResponse_AllowForever    = "AllowForever";

@@ -34,6 +34,10 @@ class ServerConfigurationService implements IServerConfigurationService{
     }
 
     public function getMaxFailedLoginAttempts(){
+        return 20;
+    }
+
+    public function getMaxFailedLoginAttempts2ShowCaptcha(){
         return 3;
     }
 

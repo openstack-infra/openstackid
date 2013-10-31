@@ -117,6 +117,7 @@ return array(
         'auth\AuthenticationServiceProvider',
         'services\ServicesProvider',
         'strategies\OpenIdResponseStrategyProvider',
+        'Greggilbert\Recaptcha\RecaptchaServiceProvider',
 	),
 
 	/*

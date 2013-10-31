@@ -68,4 +68,9 @@ class AuthService implements  IAuthService {
         $user = OpenIdUser::where('identifier','=',$openid)->first();
         return $user;
     }
+
+    public function getUserByUsername($username){
+        $user = OpenIdUser::where('external_id','=',$username)->first();
+        return $user;
+    }
 }

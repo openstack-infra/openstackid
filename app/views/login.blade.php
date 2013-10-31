@@ -9,6 +9,12 @@
             <legend>Login</legend>
             {{ Form::text('username',null, array('placeholder' => 'Username','class'=>'input-block-level')) }}
             {{ Form::password('password', array('placeholder' => 'Password','class'=>'input-block-level')) }}
+            @if(Session::has('login_attempts') && Session::has('max_login_attempts_2_show_captcha') && Session::get('login_attempts') > Session::get('max_login_attempts_2_show_captcha'))
+                {{ Form::captcha(array('id'=>'captcha','class'=>'input-block-level')) }}
+                {{ Form::hidden('login_attempts', Session::get('login_attempts')) }}
+            @else
+                {{ Form::hidden('login_attempts', '0') }}
+            @endif
             <label class="checkbox">
                 {{ Form::checkbox('remember', '1', false) }}Remember me
             </label>

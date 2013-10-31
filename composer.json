@@ -6,7 +6,8 @@
 	"require": {
 		"laravel/framework": "4.0.*",
         "phpunit/phpunit": "3.7.*",
-        "zendframework/zend-crypt":"2.2.*"
+        "zendframework/zend-crypt":"2.2.*",
+        "greggilbert/recaptcha": "dev-master"
 	},
 	"autoload": {
 		"classmap": [

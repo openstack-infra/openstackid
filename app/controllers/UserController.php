@@ -65,14 +65,20 @@ class UserController extends BaseController{
     }
 
     public function postLogin(){
+        $max_login_attempts_2_show_captcha = $this->server_configuration_service->getMaxFailedLoginAttempts2ShowCaptcha();
         $data = Input::all();
+        $login_attempts =  intval(Input::get('login_attempts'));
         // Build the validation constraint set.
         $rules = array(
             'username' => 'required|email',
-            'password' => 'required'
+            'password' => 'required',
         );
+        if($login_attempts>=$max_login_attempts_2_show_captcha){
+            $rules['recaptcha_response_field'] = 'required|recaptcha';
+        }
         // Create a new validator instance.
         $validator = Validator::make($data, $rules);
+
 
         if ($validator->passes()) {
 
@@ -96,7 +102,11 @@ class UserController extends BaseController{
                     return Redirect::action("UserController@getIdentity",array("identifier"=> $user->getIdentifier()));
                 }
             }
-            return Redirect::action('UserController@getLogin')->with('flash_notice', 'Authentication Failed!');
+            $user = $this->auth_service->getUserByUsername($username);
+            if($user){
+                $login_attempts = $user->login_failed_attempt;
+            }
+            return Redirect::action('UserController@getLogin')->with('max_login_attempts_2_show_captcha',$max_login_attempts_2_show_captcha)->with('login_attempts',$login_attempts)->with('flash_notice', 'Authentication Failed!');
         }
         return Redirect::action('UserController@getLogin')->withErrors($validator);
     }
