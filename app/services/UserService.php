@@ -29,7 +29,7 @@ class UserService implements IUserService{
                         $done = true;
                     }
                     else{
-                        $proposed_username = $proposed_username."#".$fragment_nbr;
+                        $proposed_username = $proposed_username.".".$fragment_nbr;
                         $fragment_nbr++;
                     }
 
@@ -105,6 +105,17 @@ class UserService implements IUserService{
             {
                 \DB::table('openid_users')->where('id', '=', $identifier)->update(array('active' => 0));
             });
+        }
+    }
+
+    public function saveProfileInfo($identifier, $show_pic, $show_full_name, $show_email)
+    {
+        $user = OpenIdUser::where('id', '=', $identifier)->first();
+        if(!is_null($user)){
+            $user->public_profile_show_photo     = $show_pic;
+            $user->public_profile_show_fullname	 = $show_full_name;
+            $user->public_profile_show_email     = $show_email;
+            $user->Save();
         }
     }
 }

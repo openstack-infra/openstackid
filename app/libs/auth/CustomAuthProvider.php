@@ -14,7 +14,9 @@ use auth\exceptions\AuthenticationException;
 use \Member;
 use \Zend\Crypt\Hash;
 use openid\services\Registry;
-class CustomAuthProvider implements UserProviderInterface{
+
+class CustomAuthProvider implements UserProviderInterface
+{
 
     /**
      * @var UserService
@@ -25,6 +27,7 @@ class CustomAuthProvider implements UserProviderInterface{
     {
 
     }
+
     /**
      * Retrieve a user by their unique identifier.
      *
@@ -34,9 +37,9 @@ class CustomAuthProvider implements UserProviderInterface{
     public function retrieveById($identifier)
     {
         //here we do the manuel join between 2 DB, (openid and SS db)
-        $user   = OpenIdUser::where('external_id', '=', $identifier)->first();
+        $user = OpenIdUser::where('external_id', '=', $identifier)->first();
         $member = Member::where('Email', '=', $identifier)->first();
-        if(!is_null($member) && !is_null($user)){
+        if (!is_null($member) && !is_null($user)) {
             $user->setMember($member);
             return $user;
         }
@@ -51,57 +54,60 @@ class CustomAuthProvider implements UserProviderInterface{
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if(!isset($credentials['username']) ||  !isset($credentials['password']))
+        if (!isset($credentials['username']) || !isset($credentials['password']))
             throw new AuthenticationException("invalid crendentials");
 
-        $identifier   = $credentials['username'];
-        $password     = $credentials['password'];
-        $user         = OpenIdUser::where('external_id', '=', $identifier)->first();
+        $identifier = $credentials['username'];
+        $password = $credentials['password'];
+        $user = OpenIdUser::where('external_id', '=', $identifier)->first();
 
         //check user status...
-        if(!is_null($user) && ($user->lock || !$user->active))
+        if (!is_null($user) && ($user->lock || !$user->active))
+            return null;
+
+        //get SS member
+        $member = Member::where('Email', '=', $identifier)->first();
+        if (is_null($member))//member must exists
             return null;
 
         $user_service = Registry::getInstance()->get("openid\\services\\IUserService");
-        //get SS member
-        $member = Member::where('Email', '=', $identifier)->first();
-        if(!is_null($member)){
-            //member must exists
-            $valid_password = $member->checkPassword($password);
-            //if user does not exists, then create it
-            if(is_null($user)){
-                //create user
-                $user = new OpenIdUser();
-                $user->external_id          = $member->Email;
-                $user->last_login_date      = gmdate("Y-m-d H:i:s", time());
-                $user->Save();
-            }
 
-            $user->setMember($member);
-            $user_name = $member->FirstName.".".$member->Surname;
-            //do association between user and member
-            $user_service->associateUser($user->id,strtolower($user_name));
-
-            $server_configuration = Registry::getInstance()->get("openid\\services\\IServerConfigurationService");
-
-            if(!$valid_password){
-                //apply lock policy
-                if($user->login_failed_attempt < $server_configuration->getMaxFailedLoginAttempts())
-                    $user_service->updateFailedLoginAttempts($user->id);
-                else{
-                    $user_service->lockUser($user->id);
-                }
-                $user = null;
-            }
-            else{
-                //update user fields
-                $user->last_login_date      = gmdate("Y-m-d H:i:s", time());
-                $user->login_failed_attempt = 0;
-                $user->active               = true;
-                $user->lock                 = false;
-                $user->Save();
-            }
+        $valid_password = $member->checkPassword($password);
+        //if user does not exists, then create it
+        if (is_null($user)) {
+            //create user
+            $user = new OpenIdUser();
+            $user->external_id = $member->Email;
+            $user->last_login_date = gmdate("Y-m-d H:i:s", time());
+            $user->Save();
         }
+
+
+        $user_name = $member->FirstName . "." . $member->Surname;
+        //do association between user and member
+        $user_service->associateUser($user->id, strtolower($user_name));
+
+        $server_configuration = Registry::getInstance()->get("openid\\services\\IServerConfigurationService");
+
+        if (!$valid_password) {
+            //apply lock policy
+            if ($user->login_failed_attempt < $server_configuration->getMaxFailedLoginAttempts())
+                $user_service->updateFailedLoginAttempts($user->id);
+            else {
+                $user_service->lockUser($user->id);
+            }
+            $user = null;
+        } else {
+            //update user fields
+            $user->last_login_date = gmdate("Y-m-d H:i:s", time());
+            $user->login_failed_attempt = 0;
+            $user->active = true;
+            $user->lock = false;
+            $user->Save();
+        }
+        //reload user...
+        $user = OpenIdUser::where('external_id', '=', $identifier)->first();
+        $user->setMember($member);
         return $user;
     }
 
@@ -114,18 +120,18 @@ class CustomAuthProvider implements UserProviderInterface{
      */
     public function validateCredentials(UserInterface $user, array $credentials)
     {
-        if(!isset($credentials['username']) ||  !isset($credentials['password']))
+        if (!isset($credentials['username']) || !isset($credentials['password']))
             throw new AuthenticationException("invalid crendentials");
 
         $identifier = $credentials['username'];
-        $password   = $credentials['password'];
-        $user       = OpenIdUser::where('external_id', '=', $identifier)->first();
+        $password = $credentials['password'];
+        $user = OpenIdUser::where('external_id', '=', $identifier)->first();
 
-        if(is_null($user) || $user->lock || !$user->active)
+        if (is_null($user) || $user->lock || !$user->active)
             return false;
 
-        $member     = Member::where('Email', '=', $identifier)->first();
+        $member = Member::where('Email', '=', $identifier)->first();
 
-        return !is_null($member)?$member->checkPassword($password):false;
-     }
+        return !is_null($member) ? $member->checkPassword($password) : false;
+    }
 }

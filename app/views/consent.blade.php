@@ -8,7 +8,7 @@
         Sign in to <b>{{ $realm }}</b> using your openstackid
     </legend>
     <p>A site identifying itself as <b>{{ $realm }}</b></p>
-    <p>has asked us for confirmation that <b>({{$openid}})</b> is your identity URL</p>
+    <p>has asked us for confirmation that <a href="{{ str_replace("%23","#",$openid_url) }}">{{ str_replace("%23","#",$openid_url) }}</a> is your identity URL</p>
     <div>
         <label class="radio">
             {{ Form::radio('trust[]', 'AllowOnce','true',array('id'=>'allow_once','class'=>'input-block-level')) }}

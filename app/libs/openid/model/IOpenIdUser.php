@@ -24,4 +24,10 @@ interface IOpenIdUser {
     public function getLanguage();
     public function getTimeZone();
     public function getDateOfBirth();
+    public function getShowProfileFullName();
+    public function getShowProfilePic();
+    public function getShowProfileBio();
+    public function getShowProfileEmail();
+    public function getBio();
+    public function getPic();
 }

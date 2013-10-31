@@ -26,7 +26,7 @@ Route::group(["before"=>"ssl"],function(){
     * the response to make sure that the OP is authorized to make assertions about the Claimed Identifier.
     */
     Route::get("/{identifier}","UserController@getIdentity");
-    Route::get("/accounts/user/ud/{identifier}","DiscoveryController@user");
+    Route::get("/accounts/user/ud/{identifier}","DiscoveryController@user")->where(array('identifier' => '[\d\w\.\#]+'));
 
     //op endpoint url
     Route::post('/accounts/openid2','OpenIdProviderController@op_endpoint');
@@ -44,4 +44,5 @@ Route::group(["before" => array("ssl","auth")], function()
     Route::any("/accounts/user/logout","UserController@logout");
     Route::any("/accounts/user/profile","UserController@getProfile");
     Route::any("/accounts/user/profile/trusted_site/delete/{id}","UserController@get_deleteTrustedSite");
+    Route::post('/accounts/user/profile/update','UserController@postUserProfileOptions');
 });

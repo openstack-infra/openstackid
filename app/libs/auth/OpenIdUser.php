@@ -12,6 +12,7 @@ namespace auth;
 use Illuminate\Auth\UserInterface;
 use openid\model\IOpenIdUser;
 use \Member;
+use \MemberPhoto;
 
 class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
@@ -135,5 +136,47 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getId(){
         return $this->id;
+    }
+
+    public function getShowProfileFullName()
+    {
+        return $this->public_profile_show_fullname;
+    }
+
+    public function getShowProfilePic()
+    {
+        return $this->public_profile_show_photo;
+    }
+
+    public function getShowProfileBio()
+    {
+        return false;
+    }
+
+    public function getShowProfileEmail()
+    {
+        return $this->public_profile_show_email;
+    }
+
+    public function getBio()
+    {
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->member->Bio;
+    }
+
+    public function getPic()
+    {
+        if(is_null($this->member)){
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        $photoId = $this->member->PhotoID;
+        if(!is_null($photoId) && is_numeric($photoId) && $photoId>0){
+            $photo = MemberPhoto::where('ID','=',$photoId)->first();
+            $url = 'http://www.openstack.org/'.$photo->Filename;
+            return $url;
+        }
+        return '';
     }
 }

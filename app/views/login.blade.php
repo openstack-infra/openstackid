@@ -4,7 +4,7 @@
 <div class="span4" id="sidebar">
     <h4>Welcome to OpenstackId!!!</h4>
     <div class="well">
-        {{ Form::open(array('url' => '/accounts/user/login', 'method' => 'post',  "autocomplete" => "off")) }}
+        {{ Form::open(array('url' => URL::action('UserController@postLogin'), 'method' => 'post',  "autocomplete" => "off")) }}
         <fieldset>
             <legend>Login</legend>
             {{ Form::text('username',null, array('placeholder' => 'Username','class'=>'input-block-level')) }}

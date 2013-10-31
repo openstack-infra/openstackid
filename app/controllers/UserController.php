@@ -14,24 +14,28 @@ use openid\XRDS\XRDSDocumentBuilder;
 use openid\services\IServerConfigurationService;
 use openid\services\ITrustedSitesService;
 use \openid\OpenIdProtocol;
+use \openid\services\IUserService;
 class UserController extends BaseController{
 
     private $memento_service;
     private $auth_service;
     private $server_configuration_service;
     private $discovery;
+    private $user_service;
 
 
     public function __construct(IMementoOpenIdRequestService $memento_service,
                                 IAuthService $auth_service,
                                 IServerConfigurationService $server_configuration_service,
                                 ITrustedSitesService $trusted_sites_service,
-                                DiscoveryController $discovery){
-        $this->memento_service = $memento_service;
-        $this->auth_service = $auth_service;
+                                DiscoveryController $discovery,
+                                IUserService $user_service){
+        $this->memento_service              = $memento_service;
+        $this->auth_service                 = $auth_service;
         $this->server_configuration_service = $server_configuration_service;
-        $this->trusted_sites_service=$trusted_sites_service;
-        $this->discovery = $discovery;
+        $this->trusted_sites_service        = $trusted_sites_service;
+        $this->discovery                    = $discovery;
+        $this->user_service                 = $user_service;
         //filters
         $this->beforeFilter('csrf',array('only' => array('postLogin', 'postConsent')));
         $this->beforeFilter('openid.save.request');
@@ -48,11 +52,11 @@ class UserController extends BaseController{
         foreach($partial_views as $partial){
             $views[$partial->getName()] = View::make($partial->getName(),$partial->getData());
         }
-        $request         = $this->memento_service->getCurrentRequest();
-        $user            = $this->auth_service->getCurrentUser();
-        $data['realm']   = $request->getParam(OpenIdProtocol::OpenIDProtocol_Realm);
-        $data['openid']  = $user->getIdentifier();
-        $data['views']   = $views;
+        $request              = $this->memento_service->getCurrentRequest();
+        $user                 = $this->auth_service->getCurrentUser();
+        $data['realm']        = $request->getParam(OpenIdProtocol::OpenIDProtocol_Realm);
+        $data['openid_url']  = $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier());
+        $data['views']        = $views;
         return $data;
     }
 
@@ -85,12 +89,10 @@ class UserController extends BaseController{
             $username = Input::get("username");
             $password = Input::get("password");
             $remember = Input::get("remember");
-
             if(is_null($remember))
                 $remember=false;
             else
                 $remember=true;
-
             if($this->auth_service->Login($username,$password,$remember)){
                 $msg = $this->memento_service->getCurrentRequest();
                 if (!is_null($msg) && $msg->IsValid()){
@@ -99,7 +101,8 @@ class UserController extends BaseController{
                 }
                 else{
                     $user = $this->auth_service->getCurrentUser();
-                    return Redirect::action("UserController@getIdentity",array("identifier"=> $user->getIdentifier()));
+                    $identifier = $user->getIdentifier();
+                    return Redirect::action("UserController@getIdentity",array("identifier"=> $identifier));
                 }
             }
             $user = $this->auth_service->getUserByUsername($username);
@@ -126,6 +129,7 @@ class UserController extends BaseController{
 
     public function getIdentity($identifier){
 
+        $raw_url = Request::url();
         $user = $this->auth_service->getUserByOpenId($identifier);
         if(is_null($user))
             return View::make("404");
@@ -144,11 +148,16 @@ class UserController extends BaseController{
             */
             return $this->discovery->user($identifier);
         }
-
-        if(Auth::check()){
-            return View::make("identity")->with('username',$user->getFullName())->with( "identifier",$user->getIdentifier());
-        }
-        return View::make("identity");
+        $params = array(
+            'show_fullname'=> $user->getShowProfileFullName(),
+            'username'     => $user->getFullName(),
+            'show_email'   => $user->getShowProfileEmail(),
+            'email'        => $user->getEmail(),
+            'identifier'   => $user->getIdentifier(),
+            'show_pic'     => $user->getShowProfilePic(),
+            'pic'          => $user->getPic()
+        );
+        return View::make("identity",$params);
     }
 
     public function logout()
@@ -161,15 +170,28 @@ class UserController extends BaseController{
         $user = $this->auth_service->getCurrentUser();
         $sites = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
         return View::make("profile",array(
-            "username"=> $user->getFullName(),
-            "openid_url"=>$this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
-            "identifier"=>$user->getIdentifier(),
-            "sites"=>$sites
+            "username"       => $user->getFullName(),
+            "openid_url"     => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
+            "identifier "    => $user->getIdentifier(),
+            "sites"          => $sites,
+            "show_pic"       => $user->getShowProfilePic(),
+            "show_full_name" => $user->getShowProfileFullName(),
+            "show_email"     => $user->getShowProfileEmail(),
         ));
     }
 
     public function get_deleteTrustedSite($id){
         $this->trusted_sites_service->delTrustedSite($id);
+        return Redirect::action("UserController@getProfile");
+    }
+
+    public function postUserProfileOptions(){
+        $show_full_name = Input::get("show_full_name");
+        $show_email     = Input::get("show_email");
+        $show_pic       = Input::get("show_pic");
+        $user           = $this->auth_service->getCurrentUser();
+
+        $this->user_service->saveProfileInfo($user->getId(),$show_pic,$show_full_name,$show_email);
         return Redirect::action("UserController@getProfile");
     }
 }
