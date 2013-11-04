@@ -58,7 +58,7 @@ class AssociationService implements  IAssociationService{
             $assoc->mac_function = $values[1];
             $assoc->issued       = $values[2];
             $assoc->lifetime     = $values[3];
-            $assoc->secret       = hex2bin($values[4]);
+            $assoc->secret       = \hex2bin($values[4]);
             $realm               = $values[5];
             if(!empty($realm))
                 $assoc->realm        = $realm;
@@ -118,7 +118,7 @@ class AssociationService implements  IAssociationService{
                 "mac_function" => $mac_function,
                 "issued"       => $issued,
                 "lifetime"     => $lifetime,
-                "secret"       => bin2hex($secret),
+                "secret"       => \bin2hex($secret),
                 "realm"        => $realm));
 
         $this->redis->expire($handle,$lifetime);
