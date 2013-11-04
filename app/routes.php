@@ -14,7 +14,7 @@
 
 
 
-Route::group(["before"=>"ssl"],function(){
+Route::group(array("before"=>"ssl"),function(){
 
     Route::get('/', "HomeController@index");
     Route::get('/discovery', "DiscoveryController@idp");
@@ -38,7 +38,7 @@ Route::group(["before"=>"ssl"],function(){
     Route::get('/accounts/user/login/cancel',"UserController@cancelLogin");
 });
 
-Route::group(["before" => array("ssl","auth")], function()
+Route::group(array("before" => array("ssl","auth")), function()
 {
     Route::get('/accounts/user/consent',"UserController@getConsent");
     Route::post('/accounts/user/consent',"UserController@postConsent");
