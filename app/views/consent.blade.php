@@ -1,4 +1,7 @@
 @extends('layout')
+@section('title')
+<title>Welcome to openstackId - consent </title>
+@stop
 @section('content')
 <div class="container">
     <h4>OpenstackId - Openid verification</h4>
@@ -35,6 +38,8 @@
     {{ $view}}
     @endforeach
 </div>
+@stop
+
 @section('scripts')
 <script type="application/javascript">
     $(document).ready(function() {
