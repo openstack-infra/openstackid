@@ -12,8 +12,7 @@ class DatabaseSeeder extends Seeder {
 		Eloquent::unguard();
 
         $this->call('OpenIdExtensionsSeeder');
-
-        $this->command->info('ServerExtension table seeded!');
+        $this->call('ServerConfigurationSeeder');
 	}
 
 }

@@ -20,7 +20,7 @@ class ServerExtensionsService implements IServerExtensionsService{
         foreach($extensions as $extension){
             $class = $extension->extension_class;
             if(empty($class) /*|| !class_exists($class)*/) continue;
-            $implementation = new $class($extension->name,$extension->namespace,$extension->description);
+            $implementation = new $class($extension->name, $extension->namespace,$extension->view_name, $extension->description);
             array_push($res,$implementation);
         }
         return $res;

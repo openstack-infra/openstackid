@@ -6,6 +6,7 @@
  * Time: 3:21 PM
  * To change this template use File | Settings | File Templates.
  */
+
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\IAuthService;
 use openid\requests\OpenIdAuthenticationRequest;
@@ -15,6 +16,9 @@ use openid\services\IServerConfigurationService;
 use openid\services\ITrustedSitesService;
 use \openid\OpenIdProtocol;
 use \openid\services\IUserService;
+use openid\responses\OpenIdNonImmediateNegativeAssertion;
+use openid\strategies\OpenIdResponseStrategyFactoryMethod;
+
 class UserController extends BaseController{
 
     private $memento_service;
@@ -55,7 +59,7 @@ class UserController extends BaseController{
         $request              = $this->memento_service->getCurrentRequest();
         $user                 = $this->auth_service->getCurrentUser();
         $data['realm']        = $request->getParam(OpenIdProtocol::OpenIDProtocol_Realm);
-        $data['openid_url']  = $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier());
+        $data['openid_url']   = $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier());
         $data['views']        = $views;
         return $data;
     }
@@ -65,6 +69,20 @@ class UserController extends BaseController{
             return View::make("login");
         else{
             return Redirect::action("UserController@getProfile");
+        }
+    }
+
+
+    public function cancelLogin(){
+        $msg = $this->memento_service->getCurrentRequest();
+        if (!is_null($msg) && $msg->IsValid()){
+            $cancel_response = new OpenIdNonImmediateNegativeAssertion();
+            $cancel_response->setReturnTo($msg->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo));
+            $strategy = OpenIdResponseStrategyFactoryMethod::buildStrategy($cancel_response);
+            return $strategy->handle($cancel_response);
+        }
+        else{
+            return Redirect::action("HomeController@index");
         }
     }
 
@@ -129,11 +147,9 @@ class UserController extends BaseController{
 
     public function getIdentity($identifier){
 
-        $raw_url = Request::url();
-        $user = $this->auth_service->getUserByOpenId($identifier);
+        $user         = $this->auth_service->getUserByOpenId($identifier);
         if(is_null($user))
             return View::make("404");
-
         //This field contains a semicolon-separated list of representation schemes
         //which will be accepted in the response to this request.
         $accept = Request::header('Accept');
@@ -148,6 +164,11 @@ class UserController extends BaseController{
             */
             return $this->discovery->user($identifier);
         }
+        $current_user = $this->auth_service->getCurrentUser();
+        $another_user = false;
+        if($current_user && $current_user->getIdentifier()!=$user->getIdentifier()){
+            $another_user  = true;
+        }
         $params = array(
             'show_fullname'=> $user->getShowProfileFullName(),
             'username'     => $user->getFullName(),
@@ -155,7 +176,8 @@ class UserController extends BaseController{
             'email'        => $user->getEmail(),
             'identifier'   => $user->getIdentifier(),
             'show_pic'     => $user->getShowProfilePic(),
-            'pic'          => $user->getPic()
+            'pic'          => $user->getPic(),
+            'another_user' => $another_user,
         );
         return View::make("identity",$params);
     }
@@ -167,8 +189,9 @@ class UserController extends BaseController{
     }
 
     public function getProfile(){
-        $user = $this->auth_service->getCurrentUser();
+        $user  = $this->auth_service->getCurrentUser();
         $sites = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
+
         return View::make("profile",array(
             "username"       => $user->getFullName(),
             "openid_url"     => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),

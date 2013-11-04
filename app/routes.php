@@ -35,6 +35,7 @@ Route::group(["before"=>"ssl"],function(){
     //user interaction
     Route::get('/accounts/user/login',"UserController@getLogin");
     Route::post('/accounts/user/login',"UserController@postLogin");
+    Route::get('/accounts/user/login/cancel',"UserController@cancelLogin");
 });
 
 Route::group(["before" => array("ssl","auth")], function()

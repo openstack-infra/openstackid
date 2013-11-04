@@ -1,9 +1,11 @@
 @extends('layout')
+@section('title')
+<title>Welcome to openstackId</title>
+@stop
 @section('content')
-<h1>OpenstackId Idp</h1>
 <div class="container">
-    @if(Auth::guest())
-        @if( $show_fullname === false && $show_email===false && $show_pic == false)
+    @if(Auth::guest() || $another_user)
+        @if( $show_fullname === 0 && $show_email===0 && $show_pic === 0)
         <p>This is an OpenID Identity page. This user has chosen not to display any information on this page.</p>
         @else
                 @if( $show_fullname )
@@ -27,8 +29,9 @@
         @endif
     @else
         Welcome, {{{ $username }}}.
-        <a href="{{ URL::action("UserController@logout") }}"">logout</a>
-        @if( $show_fullname === false && $show_email ===false)
+        <a class="btn btn-small" href="{{ URL::action("UserController@getProfile") }}"">edit your profile</a>
+        <a class="btn btn-small" href="{{ URL::action("UserController@logout") }}"">logout</a>
+        @if( $show_fullname === 0 && $show_email===0 && $show_pic === 0)
         <p>
             This is your identity page. You are currently displaying no information on this page. You can display information such as your name, contact info and a photo.
         </p>
@@ -52,11 +55,6 @@
             </div>
             @endif
         @endif
-        <div class="row">
-            <div class="span6">
-                <a href="{{ URL::action("UserController@getProfile") }}"">edit your profile</a>
-            </div>
-        </div>
     @endif
 </div>
 @stop

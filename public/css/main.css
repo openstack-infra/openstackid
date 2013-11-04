@@ -1,0 +1,35 @@
+#logo a{
+    background: url("../img/open-stack-cloud-computing-logo.png") no-repeat scroll left center rgba(0, 0, 0, 0);
+    display: block;
+    height: 54px;
+    margin-left: -10px;
+    margin-top: 8px;
+    text-indent: -1000em;
+    width: 177px;
+}
+
+.panel-heading {
+    background-color: #F5F5F5;
+    border-bottom: 1px solid #DDDDDD;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    margin: -15px -15px 15px;
+    padding: 10px 15px;
+}
+
+.panel {
+    background-color: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+* {
+    -moz-box-sizing: border-box;
+}
+
+.margin-top-20{
+    margin-top: 20px;
+}

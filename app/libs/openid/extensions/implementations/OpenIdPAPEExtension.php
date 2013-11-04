@@ -13,9 +13,11 @@ use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
+use openid\OpenIdProtocol;
 
 class OpenIdPAPEExtension  extends OpenIdExtension {
 
+    const Prefix             = "pape";
 
     protected function populateProperties()
     {
@@ -34,5 +36,13 @@ class OpenIdPAPEExtension  extends OpenIdExtension {
 
     public function getTrustedData(OpenIdRequest $request){
 
+    }
+
+    public static function param($param, $separator='.'){
+        return OpenIdProtocol::OpenIdPrefix.$separator.self::Prefix.$separator.$param;
+    }
+
+    public static function paramNamespace($separator='.'){
+        return OpenIdProtocol::OpenIdPrefix . $separator . OpenIdProtocol::OpenIDProtocol_NS . $separator . self::Prefix;
     }
 }

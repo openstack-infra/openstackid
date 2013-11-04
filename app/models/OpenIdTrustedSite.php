@@ -29,6 +29,15 @@ class OpenIdTrustedSite extends Eloquent implements  ITrustedSite{
         return json_decode($res);
     }
 
+    public function getUITrustedData(){
+        $data = $this->getData();
+        $str = '';
+        foreach($data as $val){
+            $str .= $val. ', ';
+        }
+        return trim($str,', ');
+    }
+
     public function getUser()
     {
         return $this->user();

@@ -13,6 +13,8 @@ use Illuminate\Auth\UserInterface;
 use openid\model\IOpenIdUser;
 use \Member;
 use \MemberPhoto;
+use openid\services\Registry;
+use openid\services\ServiceCatalog;
 
 class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
@@ -171,10 +173,12 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
         if(is_null($this->member)){
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
+
         $photoId = $this->member->PhotoID;
         if(!is_null($photoId) && is_numeric($photoId) && $photoId>0){
-            $photo = MemberPhoto::where('ID','=',$photoId)->first();
-            $url = 'http://www.openstack.org/'.$photo->Filename;
+            $photo                        = MemberPhoto::where('ID','=',$photoId)->first();
+            $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
+            $url                          = $server_configuration_service->getAssetsUrl($photo->Filename);
             return $url;
         }
         return '';

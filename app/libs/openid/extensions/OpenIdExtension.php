@@ -15,13 +15,22 @@ use openid\responses\OpenIdResponse;
 use openid\responses\contexts\ResponseContext;
 
 abstract class OpenIdExtension {
+
     protected $namespace;
     protected $name;
     protected $description;
+    protected $view;
 
-    public function __construct($name,$namespace,$description){
+    /**
+     * @param $name
+     * @param $namespace
+     * @param $view
+     * @param $description
+     */
+    public function __construct($name, $namespace,$view, $description){
         $this->namespace    = $namespace;
         $this->name         = $name;
+        $this->view         = $view;
         $this->description  = $description;
     }
 
@@ -29,13 +38,25 @@ abstract class OpenIdExtension {
         return $this->namespace;
     }
 
-    /**
+    /** parse extension request
      * @param OpenIdRequest $request
      * @param RequestContext $context
      * @return mixed
      * @throws InvalidOpenIdMessageException
      */
     abstract public function parseRequest(OpenIdRequest $request,RequestContext $context);
+
+    /** Get a set of data that user allowed to be mark as trusted
+     * @param OpenIdRequest $request
+     * @return mixed
+     */
     abstract public function getTrustedData(OpenIdRequest $request);
+
+    /** build extension response
+     * @param OpenIdRequest $request
+     * @param OpenIdResponse $response
+     * @param ResponseContext $context
+     * @return mixed
+     */
     abstract public function prepareResponse(OpenIdRequest $request,OpenIdResponse $response ,ResponseContext $context);
 }

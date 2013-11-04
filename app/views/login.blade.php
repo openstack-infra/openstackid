@@ -1,6 +1,8 @@
 @extends('layout')
+@section('title')
+<title>Welcome to openstackId - Sign in </title>
+@stop
 @section('content')
-
 <div class="span4" id="sidebar">
     <h4>Welcome to OpenstackId!!!</h4>
     <div class="well">
@@ -19,7 +21,8 @@
                 {{ Form::checkbox('remember', '1', false) }}Remember me
             </label>
             <div class="pull-right">
-                {{ Form::submit('Login',array('id'=>'login','class'=>'btn btn-primary')) }}
+                {{ Form::submit('Sign In',array('id'=>'login','class'=>'btn btn-primary')) }}
+                <a class="btn btn-primary" href="{{ URL::action('UserController@cancelLogin') }}">Cancel</a>
             </div>
         </fieldset>
         {{ Form::close() }}

@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>OpenstackId Idp</title>
+    @yield('title')
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {{ HTML::style('css/bootstrap.css') }}
-
+    {{ HTML::style('css/bootstrap.min.css') }}
+    {{ HTML::style('css/main.css') }}
 </head>
 <body>
     <div class="container">
+        <header class="row">
+            <div class="span5">
+                <h1 id="logo"><a href="/">Open Stack</a></h1>
+            </div>
+            <div class="span7"></div>
+        </header>
         <div class="row" id="main-content">
             @yield('content')
         </div>
