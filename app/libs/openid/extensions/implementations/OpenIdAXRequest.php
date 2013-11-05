@@ -8,11 +8,17 @@
 
 namespace openid\extensions\implementations;
 
-use openid\requests\OpenIdRequest;
-use openid\OpenIdMessage;
 use openid\exceptions\InvalidOpenIdMessageException;
+use openid\helpers\OpenIdErrorMessages;
+use openid\OpenIdMessage;
+use openid\requests\OpenIdRequest;
 
 
+/**
+ * Class OpenIdAXRequest
+ * Implements http://openid.net/specs/openid-attribute-exchange-1_0.html
+ * @package openid\extensions\implementations
+ */
 class OpenIdAXRequest extends OpenIdRequest
 {
 
@@ -30,38 +36,41 @@ class OpenIdAXRequest extends OpenIdRequest
      */
     public function IsValid()
     {
+        try {
+            //check identifier
+            if (isset($this->message[OpenIdAXExtension::paramNamespace('_')])
+                && $this->message[OpenIdAXExtension::paramNamespace('_')] == OpenIdAXExtension::NamespaceUrl
+            ) {
 
-        //check identifier
-        if (isset($this->message[OpenIdAXExtension::paramNamespace('_')])
-               && $this->message[OpenIdAXExtension::paramNamespace('_')] == OpenIdAXExtension::NamespaceUrl
-        ) {
+                //check required fields
 
-            //check required fields
+                if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::Mode, '_')])
+                    || $this->message[OpenIdAXExtension::param(OpenIdAXExtension::Mode, '_')] != OpenIdAXExtension::FetchRequest
+                )
+                    throw new InvalidOpenIdMessageException(OpenIdErrorMessages::AXInvalidModeMessage);
 
-            if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::Mode,'_')])
-                ||     $this->message[OpenIdAXExtension::param(OpenIdAXExtension::Mode,'_')] != OpenIdAXExtension::FetchRequest
-            )
-                throw new InvalidOpenIdMessageException("AX: not set or invalid mode mode");
+                if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::RequiredAttributes, '_')]))
+                    throw new InvalidOpenIdMessageException(OpenIdErrorMessages::AXInvalidRequiredAttributesMessage);
 
-            if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::RequiredAttributes,'_')]))
-                throw new InvalidOpenIdMessageException("AX: not set required attributes!");
+                //get attributes
+                $attributes = $this->message[OpenIdAXExtension::param(OpenIdAXExtension::RequiredAttributes, '_')];
+                $attributes = explode(",", $attributes);
 
-            //get attributes
-            $attributes = $this->message[OpenIdAXExtension::param(OpenIdAXExtension::RequiredAttributes,'_')];
-            $attributes = explode(",", $attributes);
-
-            foreach ($attributes as $attr) {
-                $attr = trim($attr);
-                if (!isset(OpenIdAXExtension::$available_properties[$attr]))
-                    continue;
-                if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::Type,'_') . "_" . $attr]))
-                    throw new InvalidOpenIdMessageException(sprintf("AX: invalid ns for attribute %s", $attr));
-                $ns = $this->message[OpenIdAXExtension::param(OpenIdAXExtension::Type , "_") . "_" . $attr];
-                if ($ns != OpenIdAXExtension::$available_properties[$attr])
-                    throw new InvalidOpenIdMessageException(sprintf("AX: invalid ns for attribute %s", $attr));
-                array_push($this->attributes, $attr);
+                foreach ($attributes as $attr) {
+                    $attr = trim($attr);
+                    if (!isset(OpenIdAXExtension::$available_properties[$attr]))
+                        continue;
+                    if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::Type, '_') . "_" . $attr]))
+                        throw new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::AXInvalidNamespaceMessage, $attr));
+                    $ns = $this->message[OpenIdAXExtension::param(OpenIdAXExtension::Type, "_") . "_" . $attr];
+                    if ($ns != OpenIdAXExtension::$available_properties[$attr])
+                        throw new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::AXInvalidNamespaceMessage, $attr));
+                    array_push($this->attributes, $attr);
+                }
+                return true;
             }
-            return true;
+        } catch (\Exception $ex) {
+            $this->log->error($ex);
         }
         return false;
     }

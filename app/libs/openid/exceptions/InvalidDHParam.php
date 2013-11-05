@@ -7,13 +7,16 @@
  */
 
 namespace openid\exceptions;
-use \Exception;
 
-class InvalidDHParam extends Exception{
+use Exception;
 
-    public function __construct($message = "") {
-        $message = "Invalid Diffie Helman Parameter : ".$message;
-        parent::__construct($message, 0 , null);
+class InvalidDHParam extends Exception
+{
+
+    public function __construct($message = "")
+    {
+        $message = "Invalid Diffie Helman Parameter : " . $message;
+        parent::__construct($message, 0, null);
     }
 
 }

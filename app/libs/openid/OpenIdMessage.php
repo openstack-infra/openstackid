@@ -10,73 +10,91 @@
 namespace openid;
 
 use openid\exceptions\InvalidOpenIdMessageMode;
+use openid\helpers\OpenIdErrorMessages;
 
-class OpenIdMessage implements \ArrayAccess {
+/**
+ * Class OpenIdMessage
+ * Implements a base OpenId Message
+ * @package openid
+ */
+class OpenIdMessage implements \ArrayAccess
+{
 
+    protected $container = array();
 
-    protected  $container = array();
-
-    public function __construct(array $values) {
+    public function __construct(array $values)
+    {
         $this->container = $values;
     }
 
     /**
      * arrayaccess methods
      * */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
         if (is_null($offset)) {
             $this->container[] = $value;
         } else {
             $this->container[$offset] = $value;
         }
     }
-    public function offsetExists($offset) {
+
+    public function offsetExists($offset)
+    {
         return isset($this->container[$offset]);
     }
-    public function offsetUnset($offset) {
+
+    public function offsetUnset($offset)
+    {
         unset($this->container[$offset]);
     }
-    public function offsetGet($offset) {
+
+    public function offsetGet($offset)
+    {
         return isset($this->container[$offset]) ? $this->container[$offset] : null;
     }
 
-
-    public function getMode(){
+    public function getMode()
+    {
         return $this->getParam(OpenIdProtocol::OpenIDProtocol_Mode);
     }
 
-    protected function setMode($mode){
-        if(!OpenIdProtocol::isValidMode($mode))
-            throw new InvalidOpenIdMessageMode($mode);
-        $this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)]=$mode;;
+    /**
+     * @param OpenIDProtocol_ * $param
+     * @return string
+     */
+    public function getParam($param)
+    {
+        if (isset($this->container[OpenIdProtocol::param($param, "_")]))
+            return $this->container[OpenIdProtocol::param($param, "_")];
+        if (isset($this->container[OpenIdProtocol::param($param, ".")])) {
+            return $this->container[OpenIdProtocol::param($param, ".")];
+        }
+        return null;
     }
 
-    public function IsValid(){
+    public function IsValid()
+    {
         $ns = $this->getParam(OpenIdProtocol::OpenIDProtocol_NS);
         $mode = $this->getParam(OpenIdProtocol::OpenIDProtocol_Mode);
         if (!is_null($ns)
             && $ns == OpenIdProtocol::OpenID2MessageType
-            && !is_null($mode)){
+            && !is_null($mode)
+        ) {
             return true;
         }
         return false;
     }
 
-
-    /**
-     * @param OpenIDProtocol_* $param
-     * @return string
-     */
-    public function getParam($param){
-        if(isset($this->container[OpenIdProtocol::param($param,"_")]))
-            return $this->container[OpenIdProtocol::param($param,"_")];
-        if(isset($this->container[OpenIdProtocol::param($param,".")])){
-            return $this->container[OpenIdProtocol::param($param,".")];
-        }
-        return null;
+    public function toString()
+    {
+        return "";
     }
 
-    public function toString(){
-        return "";
+    protected function setMode($mode)
+    {
+        if (!OpenIdProtocol::isValidMode($mode))
+            throw new InvalidOpenIdMessageMode(sprintf(OpenIdErrorMessages::InvalidOpenIdMessageModeMessage, $mode));
+        $this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)] = $mode;;
     }
 }

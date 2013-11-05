@@ -33,6 +33,7 @@
             {{ Form::close() }}
         </div>
     </div>
+
     @if (count($sites)>0)
     <div class="row-fluid">
         <div id="trusted_sites" class="span12">
@@ -47,23 +48,50 @@
                     </tr>
                 </thead>
                 <tbody>
-            @foreach ($sites as $site)
-                @if($site->getAuthorizationPolicy()=='AllowForever')
-                    <tr class="success">
-                @else
-                    <tr class="error">
-                @endif
-                    <td>{{ $site->getRealm() }}</td>
-                    <td>{{ $site->getAuthorizationPolicy()}}</td>
-                    <td>{{ $site->getUITrustedData() }}</td>
-                    <td>{{ HTML::link(URL::action("UserController@get_deleteTrustedSite",array("id"=>$site->id)),'Delete',array('class'=>'btn del-realm','title'=>'Deletes a decision about a particular trusted site,')) }}</td>
-                </tr>
-            @endforeach
+                @foreach ($sites as $site)
+                    @if($site->getAuthorizationPolicy()=='AllowForever')
+                        <tr class="success">
+                    @else
+                        <tr class="error">
+                    @endif
+                        <td>{{ $site->getRealm() }}</td>
+                        <td>{{ $site->getAuthorizationPolicy()}}</td>
+                        <td>{{ $site->getUITrustedData() }}</td>
+                        <td>{{ HTML::link(URL::action("UserController@get_deleteTrustedSite",array("id"=>$site->id)),'Delete',array('class'=>'btn del-realm','title'=>'Deletes a decision about a particular trusted site,')) }}</td>
+                    </tr>
+                @endforeach
                 </tbody>
             </table>
         </div>
     </div>
     @endif
+
+    @if (count($actions)>0)
+    <div class="row-fluid">
+        <div id="actions" class="span12">
+            <legend><i class="icon-info-sign accordion-toggle" title="Users actions"></i>&nbsp;User Actions</legend>
+            <table class="table table-hover table-condensed">
+                <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>From IP</th>
+                    <th><i class="icon-info-sign accordion-toggle" title="Time is on UTC"></i>&nbsp;When</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($actions as $action)
+                <tr>
+                    <td>{{ $action->user_action }}</td>
+                    <td>{{ $action->from_ip }}</td>
+                    <td>{{ $action->created_at }}</td>
+                </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
 </div>
 <div class="span5">
 </div>

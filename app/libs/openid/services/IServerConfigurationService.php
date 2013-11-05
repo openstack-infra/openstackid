@@ -1,23 +1,26 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/17/13
- * Time: 5:16 PM
- * To change this template use File | Settings | File Templates.
- */
+
 
 namespace openid\services;
 
 
-interface IServerConfigurationService {
+interface IServerConfigurationService
+{
     public function getOPEndpointURL();
+
     public function getUserIdentityEndpointURL($identifier);
+
     public function getPrivateAssociationLifetime();
+
     public function getSessionAssociationLifetime();
+
     public function getMaxFailedLoginAttempts();
+
     public function getMaxFailedLoginAttempts2ShowCaptcha();
+
     public function getNonceLifetime();
+
     public function isValidIP($remote_address);
+
     public function getAssetsUrl($asset_path);
 }

@@ -1,16 +1,11 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/17/13
- * Time: 10:39 AM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\services;
+
 use openid\model\IAssociation;
 
-interface IAssociationService {
+interface IAssociationService
+{
     /**
      * @param $handle
      * @param null $realm
@@ -18,7 +13,7 @@ interface IAssociationService {
      * @throws \openid\exceptions\ReplayAttackException
      * @throws \openid\exceptions\OpenIdInvalidRealmException
      */
-    public function getAssociation($handle, $realm=null);
+    public function getAssociation($handle, $realm = null);
 
     /**
      * @param $handle
@@ -30,7 +25,7 @@ interface IAssociationService {
      * @param $realm
      * @return mixed
      */
-    public function addAssociation($handle,$secret,$mac_function,$lifetime,$issued,$type, $realm);
+    public function addAssociation($handle, $secret, $mac_function, $lifetime, $issued, $type, $realm);
 
     /**
      * @param $handle

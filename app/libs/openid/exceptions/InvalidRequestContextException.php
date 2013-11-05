@@ -8,13 +8,16 @@
  */
 
 namespace openid\exceptions;
-use \Exception;
 
-class InvalidRequestContextException  extends Exception{
+use Exception;
 
-    public function __construct($message = "") {
-        $message = "Invalid Request Context : ".$message;
-        parent::__construct($message, 0 , null);
+class InvalidRequestContextException extends Exception
+{
+
+    public function __construct($message = "")
+    {
+        $message = "Invalid Request Context : " . $message;
+        parent::__construct($message, 0, null);
     }
 
 }

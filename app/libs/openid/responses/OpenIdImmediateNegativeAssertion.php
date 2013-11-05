@@ -19,12 +19,14 @@ use openid\OpenIdProtocol;
  * In Response to Immediate Requests
  * @package openid\responses
  */
-class OpenIdImmediateNegativeAssertion extends OpenIdIndirectResponse{
+class OpenIdImmediateNegativeAssertion extends OpenIdIndirectResponse
+{
 
-    public function __construct($return_url=null){
+    public function __construct($return_url = null)
+    {
         parent::__construct();
         $this->setMode(OpenIdProtocol::SetupNeededMode);
-        if(!is_null($return_url) && !empty($return_url)){
+        if (!is_null($return_url) && !empty($return_url)) {
             $this->setReturnTo($return_url);
         }
     }

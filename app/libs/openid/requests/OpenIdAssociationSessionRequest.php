@@ -1,24 +1,27 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/25/13
- * Time: 5:54 PM
- */
 
 namespace openid\requests;
 
 use openid\exceptions\InvalidAssociationTypeException;
 use openid\exceptions\InvalidSessionTypeException;
-use openid\OpenIdProtocol;
+use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdMessage;
+use openid\OpenIdProtocol;
 
-class OpenIdAssociationSessionRequest extends OpenIdRequest{
+class OpenIdAssociationSessionRequest extends OpenIdRequest
+{
 
 
-
-    public function __construct(OpenIdMessage $message){
+    public function __construct(OpenIdMessage $message)
+    {
         parent::__construct($message);
+    }
+
+    public static function IsOpenIdAssociationSessionRequest(OpenIdMessage $message)
+    {
+        $mode = $message->getMode();
+        if ($mode == OpenIdProtocol::AssociateMode) return true;
+        return false;
     }
 
     /**
@@ -28,40 +31,36 @@ class OpenIdAssociationSessionRequest extends OpenIdRequest{
      */
     public function IsValid()
     {
-        $mode         = $this->getMode();
-        if( $mode != OpenIdProtocol::AssociateMode)
+        $mode = $this->getMode();
+        if ($mode != OpenIdProtocol::AssociateMode)
             return false;
 
-        $assoc_type   = $this->getAssocType();
+        $assoc_type = $this->getAssocType();
 
-        if(is_null($assoc_type) || empty($assoc_type))
+        if (is_null($assoc_type) || empty($assoc_type))
             return false;
 
         $session_type = $this->getSessionType();
 
-        if(is_null($session_type) || empty($session_type))
+        if (is_null($session_type) || empty($session_type))
             return false;
 
-        if(!OpenIdProtocol::isSessionTypeSupported($session_type))
-            throw new InvalidSessionTypeException(sprintf("unsuported session type %s",$session_type));
+        if (!OpenIdProtocol::isSessionTypeSupported($session_type))
+            throw new InvalidSessionTypeException(sprintf(OpenIdErrorMessages::UnsupportedSessionTypeMessage, $session_type));
 
-        if(!OpenIdProtocol::isAssocTypeSupported($assoc_type))
-            throw new InvalidAssociationTypeException(sprintf("unsuported assoc type %s",$assoc_type));
+        if (!OpenIdProtocol::isAssocTypeSupported($assoc_type))
+            throw new InvalidAssociationTypeException(sprintf(OpenIdErrorMessages::UnsupportedAssociationTypeMessage, $assoc_type));
 
         return true;
     }
 
-    public function getAssocType(){
+    public function getAssocType()
+    {
         return $this->getParam(OpenIdProtocol::OpenIDProtocol_AssocType);
     }
 
-    public function getSessionType(){
+    public function getSessionType()
+    {
         return $this->getParam(OpenIdProtocol::OpenIDProtocol_SessionType);
-    }
-
-    public static function IsOpenIdAssociationSessionRequest(OpenIdMessage $message){
-        $mode = $message->getMode();
-        if($mode==OpenIdProtocol::AssociateMode) return true;
-        return false;
     }
 }

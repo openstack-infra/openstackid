@@ -7,13 +7,16 @@
  */
 
 namespace openid\exceptions;
-use \Exception;
 
-class InvalidNonce extends Exception{
+use Exception;
 
-    public function __construct($message = "") {
-        $message = "Invalid Nonce : ".$message;
-        parent::__construct($message, 0 , null);
+class InvalidNonce extends Exception
+{
+
+    public function __construct($message = "")
+    {
+        $message = "Invalid Nonce : " . $message;
+        parent::__construct($message, 0, null);
     }
 
 }

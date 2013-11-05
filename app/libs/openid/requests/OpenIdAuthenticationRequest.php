@@ -1,64 +1,81 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/15/13
- * Time: 12:18 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\requests;
 
-use openid\requests\OpenIdRequest;
+use openid\helpers\OpenIdUriHelper;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
-use openid\helpers\OpenIdUriHelper;
 use openid\services\Registry;
 use openid\services\ServiceCatalog;
 
-class OpenIdAuthenticationRequest extends OpenIdRequest {
+class OpenIdAuthenticationRequest extends OpenIdRequest
+{
 
-    public function __construct(OpenIdMessage $message){
+    public function __construct(OpenIdMessage $message)
+    {
         parent::__construct($message);
     }
 
-    public static function IsOpenIdAuthenticationRequest(OpenIdMessage $message){
+    public static function IsOpenIdAuthenticationRequest(OpenIdMessage $message)
+    {
         $mode = $message->getMode();
-        if($mode==OpenIdProtocol::ImmediateMode || $mode==OpenIdProtocol::SetupMode) return true;
+        if ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode) return true;
         return false;
     }
 
-    public function getClaimedId(){
-        return $this->getParam(OpenIdProtocol::OpenIDProtocol_ClaimedId);
-    }
-
-    public function getIdentity(){
-        return $this->getParam(OpenIdProtocol::OpenIDProtocol_Identity);
-    }
-
-    public function getAssocHandle(){
+    public function getAssocHandle()
+    {
         return $this->getParam(OpenIdProtocol::OpenIDProtocol_AssocHandle);
     }
 
-    public function getReturnTo(){
-        $return_to = $this->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo);
-        return (OpenIdUriHelper::checkReturnTo($return_to))?$return_to:"";
+    public function IsValid()
+    {
+        $return_to = $this->getReturnTo();
+        $claimed_id = $this->getClaimedId();
+        $identity = $this->getIdentity();
+        $mode = $this->getMode();
+        $realm = $this->getRealm();
+        $valid_realm = OpenIdUriHelper::checkRealm($realm, $return_to);
+        $valid_id = $this->isValidIdentifier($claimed_id, $identity);
+
+        return !empty($return_to)
+        && !empty($realm)
+        && $valid_realm
+        && !empty($claimed_id)
+        && !empty($identity)
+        && $valid_id
+        && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
     }
 
-    public function getRealm(){
+    public function getReturnTo()
+    {
+        $return_to = $this->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo);
+        return (OpenIdUriHelper::checkReturnTo($return_to)) ? $return_to : "";
+    }
+
+    public function getClaimedId()
+    {
+        return $this->getParam(OpenIdProtocol::OpenIDProtocol_ClaimedId);
+    }
+
+    public function getIdentity()
+    {
+        return $this->getParam(OpenIdProtocol::OpenIDProtocol_Identity);
+    }
+
+    public function getRealm()
+    {
         $realm = $this->getParam(OpenIdProtocol::OpenIDProtocol_Realm);
         return $realm;
     }
-
-
-
 
     /**
      * @param $claimed_id The Claimed Identifier.
      * @param $identity The OP-Local Identifier.
      * @return bool
      */
-    private function isValidIdentifier($claimed_id,$identity){
+    private function isValidIdentifier($claimed_id, $identity)
+    {
         /*
          * openid.claimed_id" and "openid.identity" SHALL be either both present or both absent.
          * If neither value is present, the assertion is not about an identifier, and will contain
@@ -66,40 +83,22 @@ class OpenIdAuthenticationRequest extends OpenIdRequest {
          */
 
         $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
-        if(is_null($claimed_id) && is_null($identity))
+        if (is_null($claimed_id) && is_null($identity))
             return false;
         //http://specs.openid.net/auth/2.0/identifier_select
-        if($claimed_id==$identity && $identity==OpenIdProtocol::IdentifierSelectType)
+        if ($claimed_id == $identity && $identity == OpenIdProtocol::IdentifierSelectType)
             return true;
 
-        if(OpenIdUriHelper::isValidUrl($claimed_id) && OpenIdUriHelper::isValidUrl($identity)){
+        if (OpenIdUriHelper::isValidUrl($claimed_id) && OpenIdUriHelper::isValidUrl($identity)) {
             $identity_url_pattern = $server_configuration_service->getUserIdentityEndpointURL("@identifier");
-            $url_parts            = explode("@",$identity_url_pattern,2);
-            $base_identity_url    = $url_parts[0];
-            if(strpos($identity,$base_identity_url)!==false)
+            $url_parts = explode("@", $identity_url_pattern, 2);
+            $base_identity_url = $url_parts[0];
+            if (strpos($identity, $base_identity_url) !== false)
                 return true;
-            if(strpos($claimed_id,$base_identity_url)!==false)
+            if (strpos($claimed_id, $base_identity_url) !== false)
                 return true;
         }
         return false;
-    }
-
-    public function IsValid(){
-        $return_to   = $this->getReturnTo();
-        $claimed_id  = $this->getClaimedId();
-        $identity    = $this->getIdentity();
-        $mode        = $this->getMode();
-        $realm       = $this->getRealm();
-        $valid_realm = OpenIdUriHelper::checkRealm($realm,$return_to);
-        $valid_id    = $this->isValidIdentifier($claimed_id,$identity);
-
-        return !empty($return_to)
-               && !empty($realm)
-               && $valid_realm
-               && !empty($claimed_id)
-               && !empty($identity)
-               && $valid_id
-               && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
     }
 
 }

@@ -30,4 +30,5 @@ interface IOpenIdUser {
     public function getShowProfileEmail();
     public function getBio();
     public function getPic();
+    public function getActions();
 }

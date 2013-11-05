@@ -1,19 +1,14 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/15/13
- * Time: 12:46 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace auth;
+
+use Auth;
 use openid\services\AuthorizationResponse_;
 use openid\services\IAuthService;
-use \Auth;
-use \Session;
+use Session;
 
-class AuthService implements  IAuthService {
+class AuthService implements IAuthService
+{
 
     /**
      * @return mixed
@@ -37,12 +32,13 @@ class AuthService implements  IAuthService {
      * @param $remember_me
      * @return mixed
      */
-    public function Login($username, $password,$remember_me)
+    public function Login($username, $password, $remember_me)
     {
         return Auth::attempt(array('username' => $username, 'password' => $password), $remember_me);
     }
 
-    public function logout(){
+    public function logout()
+    {
         Auth::logout();
     }
 
@@ -51,26 +47,29 @@ class AuthService implements  IAuthService {
      */
     public function getUserAuthorizationResponse()
     {
-        if(Session::has("openid.authorization.response")){
-            $value= Session::get("openid.authorization.response");
+        if (Session::has("openid.authorization.response")) {
+            $value = Session::get("openid.authorization.response");
             Session::remove('openid.authorization.response');
             return $value;
         }
         return IAuthService::AuthorizationResponse_None;
     }
 
-    public function setUserAuthorizationResponse($auth_response){
+    public function setUserAuthorizationResponse($auth_response)
+    {
         //todo : check valid response
-        Session::set("openid.authorization.response",$auth_response);
+        Session::set("openid.authorization.response", $auth_response);
     }
 
-    public function getUserByOpenId($openid){
-        $user = OpenIdUser::where('identifier','=',$openid)->first();
+    public function getUserByOpenId($openid)
+    {
+        $user = OpenIdUser::where('identifier', '=', $openid)->first();
         return $user;
     }
 
-    public function getUserByUsername($username){
-        $user = OpenIdUser::where('external_id','=',$username)->first();
+    public function getUserByUsername($username)
+    {
+        $user = OpenIdUser::where('external_id', '=', $username)->first();
         return $user;
     }
 }

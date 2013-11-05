@@ -1,16 +1,13 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/14/13
- * Time: 4:52 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid;
-use openid\responses\OpenIdResponse;
 
-interface IOpenIdProtocol {
+/**
+ * Interface IOpenIdProtocol
+ * @package openid
+ */
+interface IOpenIdProtocol
+{
 
     const OpenIdXRDSModeUser = "OpenIdXRDSModeUser";
     const OpenIdXRDSModeIdp = "OpenIdXRDSModeIdp";
@@ -21,13 +18,11 @@ interface IOpenIdProtocol {
      * this document may be available at the target URL and is always available for a target XRI.
      * @return mixed
      */
-    public function getXRDSDiscovery($mode,$canonical_id=null);
-
-
+    public function getXRDSDiscovery($mode, $canonical_id = null);
 
     /**
-    * @param OpenIdMessage $openIdMessage
-    * @return responses\OpenIdResponse response
-    */
+     * @param OpenIdMessage $openIdMessage
+     * @return responses\OpenIdResponse response
+     */
     public function HandleOpenIdMessage(OpenIdMessage $openIdMessage);
 }

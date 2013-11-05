@@ -7,10 +7,11 @@
  */
 
 namespace openid\responses;
-use openid\OpenIdProtocol;
-use openid\responses\OpenIdDirectResponse;
 
-class OpenIdCheckAuthenticationResponse extends OpenIdDirectResponse {
+use openid\OpenIdProtocol;
+
+class OpenIdCheckAuthenticationResponse extends OpenIdDirectResponse
+{
     /**
      * 11.4.2.2. Response Parameters
      *  ns :As specified in Section 5.1.2.
@@ -27,10 +28,11 @@ class OpenIdCheckAuthenticationResponse extends OpenIdDirectResponse {
      * @param $is_valid
      * @param null $invalidate_handle
      */
-    public function __construct($is_valid,$invalidate_handle=null) {
+    public function __construct($is_valid, $invalidate_handle = null)
+    {
         parent::__construct();
         $this[OpenIdProtocol::OpenIDProtocol_IsValid] = $is_valid;
-        if(!is_null($invalidate_handle) && !empty($invalidate_handle))
+        if (!is_null($invalidate_handle) && !empty($invalidate_handle))
             $this[OpenIdProtocol::OpenIDProtocol_InvalidateHandle] = $invalidate_handle;
     }
 } 

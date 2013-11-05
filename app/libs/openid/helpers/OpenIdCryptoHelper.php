@@ -1,21 +1,23 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/17/13
- * Time: 5:01 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\helpers;
-use openid\OpenIdProtocol;
-use Zend\Math\Rand;
+
 use openid\exceptions\OpenIdCryptoException;
-use Zend\Math;
+use openid\OpenIdProtocol;
 use Zend\Crypt\PublicKey\DiffieHellman;
+use Zend\Math\Rand;
+use Zend\Math;
+
 class OpenIdCryptoHelper
 {
 
+
+    private static $signature_algorithms = array(
+        OpenIdProtocol::SignatureAlgorithmHMAC_SHA1 => "sha1",
+        OpenIdProtocol::AssociationSessionTypeDHSHA1 => "sha1",
+        OpenIdProtocol::SignatureAlgorithmHMAC_SHA256 => "sha256",
+        OpenIdProtocol::AssociationSessionTypeDHSHA256 => "sha256",
+    );
 
     public static function convert($number, $inputFormat = DiffieHellman::FORMAT_NUMBER, $outputFormat = DiffieHellman::FORMAT_BINARY)
     {
@@ -50,13 +52,6 @@ class OpenIdCryptoHelper
         }
     }
 
-    private static $signature_algorithms= array(
-        OpenIdProtocol::SignatureAlgorithmHMAC_SHA1     => "sha1",
-        OpenIdProtocol::AssociationSessionTypeDHSHA1    => "sha1",
-        OpenIdProtocol::SignatureAlgorithmHMAC_SHA256   => "sha256",
-        OpenIdProtocol::AssociationSessionTypeDHSHA256  => "sha256",
-    );
-
     public static function generateSecret($func)
     {
         if ($func == OpenIdProtocol::SignatureAlgorithmHMAC_SHA1) {
@@ -78,7 +73,7 @@ class OpenIdCryptoHelper
      */
     static public function randomBytes($len)
     {
-        return Rand::getBytes($len,true);
+        return Rand::getBytes($len, true);
     }
 
     /**
@@ -90,8 +85,8 @@ class OpenIdCryptoHelper
      */
     static public function computeHMAC($macFunc, $data, $secret)
     {
-        if(!isset(self::$signature_algorithms[$macFunc]))
-            throw new OpenIdCryptoException(sprintf("Invalid mac function %s",$macFunc));
+        if (!isset(self::$signature_algorithms[$macFunc]))
+            throw new OpenIdCryptoException(sprintf(OpenIdErrorMessages::InvalidMacFunctionMessage, $macFunc));
         $macFunc = self::$signature_algorithms[$macFunc];
 
         if (function_exists('hash_hmac')) {
@@ -140,8 +135,8 @@ class OpenIdCryptoHelper
      */
     static public function digest($func, $data)
     {
-        if(!isset(self::$signature_algorithms[$func]))
-            throw new OpenIdCryptoException(sprintf("Invalid mac function %s",$func));
+        if (!isset(self::$signature_algorithms[$func]))
+            throw new OpenIdCryptoException(sprintf(OpenIdErrorMessages::InvalidMacFunctionMessage, $func));
         $func = self::$signature_algorithms[$func];
 
         if (function_exists('openssl_digest')) {

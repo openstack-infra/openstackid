@@ -1,16 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/24/13
- * Time: 9:06 PM
- */
 
 namespace openid\services;
-use \openid\exceptions\ReplayAttackException;
+
+use openid\exceptions\ReplayAttackException;
 use openid\model\OpenIdNonce;
 
-interface INonceService {
+interface INonceService
+{
 
     /**
      * @return OpenIdNonce
@@ -18,9 +14,10 @@ interface INonceService {
     public function generateNonce();
 
     public function lockNonce(OpenIdNonce $nonce);
+
     public function unlockNonce(OpenIdNonce $nonce);
 
-    public function associateNonce(OpenIdNonce $nonce,$signature, $realm);
+    public function associateNonce(OpenIdNonce $nonce, $signature, $realm);
 
     /**
      * To prevent replay attacks, the OP MUST NOT issue more than one verification response

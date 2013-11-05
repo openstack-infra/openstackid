@@ -1,6 +1,9 @@
 <?php
-use openid\services\ServiceCatalog;
+use openid\exceptions\InvalidOpenIdMessageException;
+use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\Registry;
+use openid\services\ServiceCatalog;
+
 /*
 |--------------------------------------------------------------------------
 | Application & Route Filters
@@ -12,24 +15,28 @@ use openid\services\Registry;
 |
 */
 
-App::before(function($request)
-{
-    $ip = $request->server('HTTP_CLIENT_IP');
+App::before(function ($request) {
+    try {
+        $ip = $request->server('HTTP_CLIENT_IP');
+        if (empty($ip))
+            $ip = $request->server('HTTP_X_FORWARDED_FOR');
+        if (empty($ip))
+            $ip = $request->server('REMOTE_ADDR');
 
-    if(empty($ip))
-        $ip = $request->server('HTTP_X_FORWARDED_FOR');
-    if(empty($ip))
-        $ip = $request->server('REMOTE_ADDR');
-
-    $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
-    if(!$server_configuration_service->isValidIP($ip))
+        $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
+        if (!$server_configuration_service->isValidIP($ip)) {
+            Log::error(sprintf("blackisted IP access %s", $ip));
+            return View::make('404');
+        }
+    } catch (Exception $ex) {
+        Log::error($ex);
         return View::make('404');
+    }
 });
 
 
-App::after(function($request, $response)
-{
-	//
+App::after(function ($request, $response) {
+    //
 });
 
 /*
@@ -43,17 +50,14 @@ App::after(function($request, $response)
 |
 */
 
-Route::filter('auth', function()
-{
-	if (Auth::guest()) return Redirect::action('HomeController@index');
+Route::filter('auth', function () {
+    if (Auth::guest()) return Redirect::action('HomeController@index');
 });
 
 
-Route::filter('auth.basic', function()
-{
-	return Auth::basic();
+Route::filter('auth.basic', function () {
+    return Auth::basic();
 });
-
 
 
 /*
@@ -67,9 +71,8 @@ Route::filter('auth.basic', function()
 |
 */
 
-Route::filter('guest', function()
-{
-	if (Auth::check()) return Redirect::to('/');
+Route::filter('guest', function () {
+    if (Auth::check()) return Redirect::to('/');
 });
 
 /*
@@ -83,32 +86,26 @@ Route::filter('guest', function()
 |
 */
 
-Route::filter('csrf', function()
-{
-	if (Session::token() != Input::get('_token'))
-	{
-		throw new Illuminate\Session\TokenMismatchException;
-	}
+Route::filter('csrf', function () {
+    if (Session::token() != Input::get('_token')) {
+        throw new Illuminate\Session\TokenMismatchException;
+    }
 });
 
-use openid\services\IMementoOpenIdRequestService;
-use openid\OpenIdMessage;
-use openid\requests\OpenIdAuthenticationRequest;
-use openid\exceptions\InvalidOpenIdMessageException;
 
-Route::filter("openid.needs.auth.request",function(){
+Route::filter("openid.needs.auth.request", function () {
 
     $memento_service = App::make("openid\\services\\IMementoOpenIdRequestService");
 
     $openid_message = $memento_service->getCurrentRequest();
-    if($openid_message==null || !$openid_message->IsValid())
+    if ($openid_message == null || !$openid_message->IsValid())
         throw new InvalidOpenIdMessageException();
     $auth_request = new OpenIdAuthenticationRequest($openid_message);
-    if(!$auth_request->IsValid())
+    if (!$auth_request->IsValid())
         throw new InvalidOpenIdMessageException();
 });
 
-Route::filter("openid.save.request",function(){
+Route::filter("openid.save.request", function () {
 
     $memento_service = App::make("openid\\services\\IMementoOpenIdRequestService");
     $memento_service->saveCurrentRequest();
@@ -116,8 +113,8 @@ Route::filter("openid.save.request",function(){
 });
 
 
-Route::filter("ssl",function(){
-    if (!Request::secure()){
+Route::filter("ssl", function () {
+    if (!Request::secure()) {
         $memento_service = Registry::getInstance()->get("openid\\services\\IMementoOpenIdRequestService");
         $memento_service->saveCurrentRequest();
         return Redirect::secure(Request::getRequestUri());

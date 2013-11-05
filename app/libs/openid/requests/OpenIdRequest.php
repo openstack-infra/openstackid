@@ -1,39 +1,37 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/15/13
- * Time: 12:16 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\requests;
+
 use openid\OpenIdMessage;
 
-abstract class OpenIdRequest {
+abstract class OpenIdRequest
+{
 
-   protected $message;
+    protected $message;
 
-   public function __construct(OpenIdMessage $message){
-       $this->message = $message;
-   }
+    public function __construct(OpenIdMessage $message)
+    {
+        $this->message = $message;
+    }
 
-   public function getMessage(){
-       return $this->message;
-   }
+    public function getMessage()
+    {
+        return $this->message;
+    }
 
-   public function getMode(){
+    public function getMode()
+    {
         return $this->message->getMode();
-   }
+    }
 
-   abstract public function IsValid();
-
+    abstract public function IsValid();
 
     /**
-     * @param OpenIDProtocol_* $param
+     * @param OpenIDProtocol_ * $param
      * @return string
      */
-    public function getParam($param){
-       return $this->message->getParam($param);
+    public function getParam($param)
+    {
+        return $this->message->getParam($param);
     }
 }

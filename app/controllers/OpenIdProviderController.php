@@ -1,17 +1,10 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/14/13
- * Time: 6:05 PM
- * To change this template use File | Settings | File Templates.
- */
 
-use openid\IOpenIdProtocol;
-use openid\OpenIdMessage;
-use openid\strategies\OpenIdResponseStrategyFactoryMethod;
 use openid\exceptions\InvalidOpenIdMessageException;
+use openid\helpers\OpenIdErrorMessages;
+use openid\IOpenIdProtocol;
 use openid\services\IMementoOpenIdRequestService;
+use openid\strategies\OpenIdResponseStrategyFactoryMethod;
 
 class OpenIdProviderController extends BaseController
 {
@@ -28,11 +21,11 @@ class OpenIdProviderController extends BaseController
     {
         $msg = $this->memento_service->getCurrentRequest();
         if (is_null($msg) || !$msg->IsValid())
-            throw new InvalidOpenIdMessageException("there is not a valid OpenIdMessage set on request");
+            throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidOpenIdMessage);
         //get response and manage it taking in consideration its type (direct or indirect)
         $response = $this->openid_protocol->HandleOpenIdMessage($msg);
         $reflector = new ReflectionClass($response);
-        if($reflector->isSubclassOf("openid\\responses\\OpenIdResponse")){
+        if ($reflector->isSubclassOf('openid\\responses\\OpenIdResponse')) {
             $strategy = OpenIdResponseStrategyFactoryMethod::buildStrategy($response);
             return $strategy->handle($response);
         }

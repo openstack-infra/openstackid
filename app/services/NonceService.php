@@ -1,22 +1,19 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/24/13
- * Time: 9:11 PM
- */
 
 namespace services;
 
+use openid\exceptions\ReplayAttackException;
+use openid\helpers\OpenIdErrorMessages;
 use openid\model\OpenIdNonce;
 use openid\services\INonceService;
-use openid\exceptions\ReplayAttackException;
 
-class NonceService implements INonceService {
+class NonceService implements INonceService
+{
 
     private $redis;
 
-    public function __construct(){
+    public function __construct()
+    {
         $this->redis = \RedisLV4::connection();
     }
 
@@ -24,16 +21,18 @@ class NonceService implements INonceService {
      * @param OpenIdNonce $nonce
      * @return bool
      */
-    public function lockNonce(OpenIdNonce $nonce){
-        $raw_nonce     = $nonce->getRawFormat();
-        $cur_time      = time();
+    public function lockNonce(OpenIdNonce $nonce)
+    {
+        $raw_nonce = $nonce->getRawFormat();
+        $cur_time = time();
         $lock_lifetime = \ServerConfigurationService::getNonceLifetime();;
-        return $this->redis->setnx('lock.'.$raw_nonce,$cur_time+$lock_lifetime+1);
+        return $this->redis->setnx('lock.' . $raw_nonce, $cur_time + $lock_lifetime + 1);
     }
 
-    public function unlockNonce(OpenIdNonce $nonce){
-        $raw_nonce     = $nonce->getRawFormat();
-        $this->redis->del('lock.'.$raw_nonce);
+    public function unlockNonce(OpenIdNonce $nonce)
+    {
+        $raw_nonce = $nonce->getRawFormat();
+        $this->redis->del('lock.' . $raw_nonce);
     }
 
     /**
@@ -54,19 +53,18 @@ class NonceService implements INonceService {
      */
     public function markNonceAsInvalid(OpenIdNonce $nonce, $signature, $realm)
     {
-        $raw_nonce     =   $nonce->getRawFormat();
-        $key           =   $raw_nonce.$signature;
+        $raw_nonce = $nonce->getRawFormat();
+        $key = $raw_nonce . $signature;
 
-        try{
-            if($this->redis->exists($key)==0)
-                throw new ReplayAttackException(sprintf("nonce %s was already used!.",$nonce));
-            $old_realm     =   $this->redis->get($key);
-            if($realm!=$old_realm){
-                throw new ReplayAttackException(sprintf("nonce %s was not emit for realm !.",$realm));
+        try {
+            if ($this->redis->exists($key) == 0)
+                throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyUsed, $nonce));
+            $old_realm = $this->redis->get($key);
+            if ($realm != $old_realm) {
+                throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyEmittedForAnotherRealm, $realm));
             }
             $this->redis->del($key);
-        }
-        catch(ReplayAttackException $ex){
+        } catch (ReplayAttackException $ex) {
             $this->redis->del($key);
             throw $ex;
         }
@@ -77,10 +75,10 @@ class NonceService implements INonceService {
      * @param string $signature
      * @param string $realm
      */
-    public function associateNonce(OpenIdNonce $nonce, $signature,$realm)
+    public function associateNonce(OpenIdNonce $nonce, $signature, $realm)
     {
-        $raw_nonce     = $nonce->getRawFormat();
-        $lifetime      = \ServerConfigurationService::getNonceLifetime();
-        $this->redis->setex($raw_nonce.$signature,$lifetime,$realm);
+        $raw_nonce = $nonce->getRawFormat();
+        $lifetime = \ServerConfigurationService::getNonceLifetime();
+        $this->redis->setex($raw_nonce . $signature, $lifetime, $realm);
     }
 }

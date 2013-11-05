@@ -8,11 +8,13 @@
  */
 
 namespace openid\helpers;
+
+use openid\requests\OpenIdCheckAuthenticationRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdPositiveAssertionResponse;
-use openid\requests\OpenIdCheckAuthenticationRequest;
 
-class OpenIdSignatureBuilder {
+class OpenIdSignatureBuilder
+{
 
 
     /**
@@ -22,34 +24,37 @@ class OpenIdSignatureBuilder {
      * @param $claimed_sig
      * @return bool
      */
-    public static function verify(OpenIdCheckAuthenticationRequest $request,$macAlg,$secret,$claimed_sig){
+    public static function verify(OpenIdCheckAuthenticationRequest $request, $macAlg, $secret, $claimed_sig)
+    {
         $res = false;
         $signed = $request->getSigned();
-        $claimed_signed = explode(',',$signed);
+        $claimed_signed = explode(',', $signed);
         $data = '';
-        foreach($claimed_signed as $key){
-            $key_php = str_ireplace('.','_',$key);
+        foreach ($claimed_signed as $key) {
+            $key_php = str_ireplace('.', '_', $key);
             $val = $request->getParam($key_php);
             $data .= $key . ':' . $val . "\n";
         }
-        $computed_sig   = base64_encode(OpenIdCryptoHelper::computeHMAC($macAlg, $data, $secret));
-        if($claimed_sig==$computed_sig)
+        $computed_sig = base64_encode(OpenIdCryptoHelper::computeHMAC($macAlg, $data, $secret));
+        if ($claimed_sig == $computed_sig)
             $res = true;
         return $res;
     }
+
     /**
      * @param ResponseContext $context
      * @param $macAlg
      * @param $secret
      * @param OpenIdPositiveAssertionResponse $response
      */
-    public static function build(ResponseContext $context,$macAlg,$secret,OpenIdPositiveAssertionResponse &$response){
+    public static function build(ResponseContext $context, $macAlg, $secret, OpenIdPositiveAssertionResponse &$response)
+    {
         //do signing ...
         $signed = '';
         $data = '';
         $params = $context->getSignParams();
 
-        foreach($params as $key){
+        foreach ($params as $key) {
             if (strpos($key, 'openid.') === 0) {
                 $val = $response[$key];
                 $key = substr($key, strlen('openid.'));
@@ -62,7 +67,7 @@ class OpenIdSignatureBuilder {
         }
         $signed .= ',signed';
         $data .= 'signed:' . $signed . "\n";
-        $sig   = base64_encode(OpenIdCryptoHelper::computeHMAC($macAlg, $data, $secret));
+        $sig = base64_encode(OpenIdCryptoHelper::computeHMAC($macAlg, $data, $secret));
 
         $response->setSigned($signed);
         $response->setSig($sig);

@@ -1,17 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/26/13
- * Time: 5:22 PM
- */
 
 namespace services;
-use Exception;
-use openid\services\ILogService;
-use \Log;
 
-class LogService implements  ILogService {
+use Exception;
+use Log;
+use openid\services\ILogService;
+
+class LogService implements ILogService
+{
 
     public function error(Exception $exception)
     {

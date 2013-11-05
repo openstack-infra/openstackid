@@ -18,12 +18,14 @@ use openid\OpenIdProtocol;
  * In Response to Non-Immediate Requests
  * @package openid\responses
  */
-class OpenIdNonImmediateNegativeAssertion extends OpenIdIndirectResponse {
+class OpenIdNonImmediateNegativeAssertion extends OpenIdIndirectResponse
+{
 
-    public function __construct($return_url=null){
+    public function __construct($return_url = null)
+    {
         parent::__construct();
         $this->setMode(OpenIdProtocol::CancelMode);
-        if(!is_null($return_url) && !empty($return_url)){
+        if (!is_null($return_url) && !empty($return_url)) {
             $this->setReturnTo($return_url);
         }
     }

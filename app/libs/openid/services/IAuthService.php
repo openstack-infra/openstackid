@@ -8,9 +8,17 @@
  */
 
 namespace openid\services;
+
 use openid\model\IOpenIdUser;
 
-interface IAuthService {
+interface IAuthService
+{
+    const AuthorizationResponse_None = "None";
+    const AuthorizationResponse_AllowOnce = "AllowOnce";
+    const AuthorizationResponse_AllowForever = "AllowForever";
+    const AuthorizationResponse_DenyForever = "DenyForever";
+    const AuthorizationResponse_DenyOnce = "DenyOnce";
+
     /**
      * @return bool
      */
@@ -27,19 +35,15 @@ interface IAuthService {
      * @param $remember_me
      * @return mixed
      */
-    public function Login($username,$password,$remember_me);
+    public function Login($username, $password, $remember_me);
 
     public function getUserByUsername($username);
 
-    const AuthorizationResponse_None            = "None";
-    const AuthorizationResponse_AllowOnce       = "AllowOnce";
-    const AuthorizationResponse_AllowForever    = "AllowForever";
-    const AuthorizationResponse_DenyForever     = "DenyForever";
-    const AuthorizationResponse_DenyOnce        = "DenyOnce";
     /**
      * @return AuthorizationResponse_*
      */
     public function getUserAuthorizationResponse();
+
     public function setUserAuthorizationResponse($auth_response);
 
     public function logout();

@@ -8,13 +8,14 @@
  */
 
 namespace openid\exceptions;
-use \Exception;
 
-class InvalidOpenIdAuthenticationRequestMode extends Exception{
+use Exception;
 
-    public function __construct($message = "") {
-        $message = "Invalid OpenId Authentication Request Mode : ".$message;
-        parent::__construct($message, 0 , null);
+class InvalidOpenIdAuthenticationRequestMode extends Exception
+{
+    public function __construct($message = "")
+    {
+        $message = "Invalid OpenId Authentication Request Mode : " . $message;
+        parent::__construct($message, 0, null);
     }
-
 }

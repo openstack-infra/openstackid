@@ -1,33 +1,40 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/15/13
- * Time: 12:40 PM
- * To change this template use File | Settings | File Templates.
- */
-
 
 namespace auth;
+
 use Illuminate\Auth\UserInterface;
+use Member;
+use MemberPhoto;
 use openid\model\IOpenIdUser;
-use \Member;
-use \MemberPhoto;
 use openid\services\Registry;
 use openid\services\ServiceCatalog;
 
-class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
+class OpenIdUser extends \Eloquent implements UserInterface, IOpenIdUser
+{
 
     protected $table = 'openid_users';
     private $member;
 
-    public function trusted_sites(){
-        return $this->has_many("OpenIdTrustedSite");
+    public function trusted_sites()
+    {
+        return $this->hasMany("OpenIdTrustedSite", 'user_id');
     }
 
-    public function setMember($member){
-        $this->member=$member;
+    public function getActions()
+    {
+        return $this->actions()->orderBy('created_at', 'desc')->take(10)->get();
     }
+
+    public function actions()
+    {
+        return $this->hasMany("UserAction", 'user_id');
+    }
+
+    public function setMember($member)
+    {
+        $this->member = $member;
+    }
+
     /**
      * Get the unique identifier for the user.
      *
@@ -35,7 +42,7 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
      */
     public function getAuthIdentifier()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return $this->external_id;
@@ -48,7 +55,7 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
      */
     public function getAuthPassword()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return $this->member->Password;
@@ -56,7 +63,7 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getIdentifier()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return $this->identifier;
@@ -64,15 +71,20 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getEmail()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return $this->external_id;
     }
 
+    public function getFullName()
+    {
+        return $this->getFirstName() . " " . $this->getLastName();
+    }
+
     public function getFirstName()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return $this->member->FirstName;
@@ -80,15 +92,10 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getLastName()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return $this->member->Surname;
-    }
-
-    public function getFullName()
-    {
-        return $this->getFirstName()." ". $this->getLastName();
     }
 
     public function getNickName()
@@ -98,7 +105,7 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getGender()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return "";
@@ -106,7 +113,7 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getCountry()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return $this->member->Country;
@@ -114,7 +121,7 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getLanguage()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return $this->member->Locale;
@@ -122,7 +129,7 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getTimeZone()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return "";
@@ -130,13 +137,14 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getDateOfBirth()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return "";
     }
 
-    public function getId(){
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -162,7 +170,7 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getBio()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         return $this->member->Bio;
@@ -170,15 +178,15 @@ class OpenIdUser extends \Eloquent implements UserInterface , IOpenIdUser{
 
     public function getPic()
     {
-        if(is_null($this->member)){
+        if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
 
         $photoId = $this->member->PhotoID;
-        if(!is_null($photoId) && is_numeric($photoId) && $photoId>0){
-            $photo                        = MemberPhoto::where('ID','=',$photoId)->first();
+        if (!is_null($photoId) && is_numeric($photoId) && $photoId > 0) {
+            $photo = MemberPhoto::where('ID', '=', $photoId)->first();
             $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
-            $url                          = $server_configuration_service->getAssetsUrl($photo->Filename);
+            $url = $server_configuration_service->getAssetsUrl($photo->Filename);
             return $url;
         }
         return '';

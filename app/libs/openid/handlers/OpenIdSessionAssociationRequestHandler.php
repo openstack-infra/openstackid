@@ -9,57 +9,57 @@
 
 namespace openid\handlers;
 
+use Exception;
 use openid\exceptions\InvalidAssociationTypeException;
 use openid\exceptions\InvalidOpenIdMessageException;
+use openid\exceptions\InvalidSessionTypeException;
+use openid\handlers\factories\SessionAssociationRequestFactory;
+use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdMessage;
 use openid\requests\OpenIdAssociationSessionRequest;
+use openid\responses\OpenIdAssociationSessionUnsuccessfulResponse;
 use openid\responses\OpenIdDirectGenericErrorResponse;
 use openid\services\ILogService;
-use openid\handlers\factories\SessionAssociationRequestFactory;
-use \Exception;
-use openid\exceptions\InvalidSessionTypeException;
-use openid\responses\OpenIdAssociationSessionUnsuccessfulResponse;
+
 /**
  * Class OpenIdSessionAssociationRequestHandler
  * Implements http://openid.net/specs/openid-authentication-2_0.html#associations
  * @package openid\handlers
  */
-class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler{
+class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler
+{
 
-
-    public function __construct(ILogService $log ,$successor){
-        parent::__construct($successor,$log);
+    public function __construct(ILogService $log, $successor)
+    {
+        parent::__construct($successor, $log);
     }
 
-    protected function InternalHandle(OpenIdMessage $message){
+    protected function InternalHandle(OpenIdMessage $message)
+    {
         $this->current_request = null;
-        try{
+        try {
 
             $this->current_request = SessionAssociationRequestFactory::buildRequest($message);
 
-            if(!$this->current_request->IsValid())
-                throw new InvalidOpenIdMessageException("Association Session Request is Invalid!");
+            if (!$this->current_request->IsValid())
+                throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidAssociationSessionRequest);
 
             $strategy = SessionAssociationRequestFactory::buildSessionAssociationStrategy($message);
             return $strategy->handle();
-        }
-        catch (InvalidSessionTypeException $inv_session_ex) {
-            $response  = new OpenIdAssociationSessionUnsuccessfulResponse($inv_session_ex->getMessage());
+        } catch (InvalidSessionTypeException $inv_session_ex) {
+            $response = new OpenIdAssociationSessionUnsuccessfulResponse($inv_session_ex->getMessage());
             $this->log->error($inv_session_ex);
             return $response;
-        }
-        catch (InvalidAssociationTypeException $inv_assoc_ex) {
-            $response  = new OpenIdAssociationSessionUnsuccessfulResponse($inv_assoc_ex->getMessage());
+        } catch (InvalidAssociationTypeException $inv_assoc_ex) {
+            $response = new OpenIdAssociationSessionUnsuccessfulResponse($inv_assoc_ex->getMessage());
             $this->log->error($inv_assoc_ex);
             return $response;
-        }
-        catch (InvalidOpenIdMessageException $inv_msg_ex) {
-            $response  = new OpenIdDirectGenericErrorResponse($inv_msg_ex->getMessage());
+        } catch (InvalidOpenIdMessageException $inv_msg_ex) {
+            $response = new OpenIdDirectGenericErrorResponse($inv_msg_ex->getMessage());
             $this->log->error($inv_msg_ex);
             return $response;
-        }
-        catch (Exception $ex) {
-            $response  = new OpenIdDirectGenericErrorResponse('Server Error');
+        } catch (Exception $ex) {
+            $response = new OpenIdDirectGenericErrorResponse('Server Error');
             $this->log->error($ex);
             return $response;
         }

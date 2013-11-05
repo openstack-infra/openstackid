@@ -1,17 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/25/13
- * Time: 6:31 PM
- */
 
 namespace openid\responses;
 
-
 use openid\OpenIdProtocol;
 
-abstract class OpenIdAssociationSessionResponse extends OpenIdDirectResponse {
+abstract class OpenIdAssociationSessionResponse extends OpenIdDirectResponse
+{
 
     /** Common Response Parameters
      * @param $assoc_handle
@@ -29,12 +23,13 @@ abstract class OpenIdAssociationSessionResponse extends OpenIdDirectResponse {
      *        the association after this time has passed.
      *        An integer, represented in base 10 ASCII.
      */
-    public function __construct($assoc_handle,$session_type, $assoc_type,$expires_in){
+    public function __construct($assoc_handle, $session_type, $assoc_type, $expires_in)
+    {
         parent::__construct();
         $this[OpenIdProtocol::OpenIDProtocol_AssocHandle] = $assoc_handle;
         $this[OpenIdProtocol::OpenIDProtocol_SessionType] = $session_type;
-        $this[OpenIdProtocol::OpenIDProtocol_AssocType]   = $assoc_type;
-        $this[OpenIdProtocol::OpenIdProtocol_ExpiresIn]   = $expires_in;
+        $this[OpenIdProtocol::OpenIDProtocol_AssocType] = $assoc_type;
+        $this[OpenIdProtocol::OpenIdProtocol_ExpiresIn] = $expires_in;
     }
 
 } 

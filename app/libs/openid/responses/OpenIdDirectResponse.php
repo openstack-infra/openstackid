@@ -8,7 +8,9 @@
  */
 
 namespace openid\responses;
+
 use openid\exceptions\InvalidKVFormat;
+use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdProtocol;
 
 /**
@@ -16,23 +18,25 @@ use openid\OpenIdProtocol;
  * Implementation of 5.1.2. Direct Response
  * @package openid\responses
  */
-class OpenIdDirectResponse  extends OpenIdResponse {
+class OpenIdDirectResponse extends OpenIdResponse
+{
 
-   const OpenIdDirectResponse="OpenIdDirectResponse";
+    const OpenIdDirectResponse = "OpenIdDirectResponse";
+    const DirectResponseContentType = "text/plain";
 
-   const DirectResponseContentType ="text/plain";
-
-   public function __construct(){
+    public function __construct()
+    {
         // Successful Responses: A server receiving a valid request MUST send a
         // response with an HTTP status code of 200.
-        parent::__construct(self::HttpOkResponse,self::DirectResponseContentType);
+        parent::__construct(self::HttpOkResponse, self::DirectResponseContentType);
         /*
          * This particular value MUST be present for the response to be a valid OpenID 2.0
          * response. Future versions of the specification may define different values in order
          * to allow message recipients to properly interpret the request.
          */
-        $this["ns"]=OpenIdProtocol::OpenID2MessageType;
+        $this["ns"] = OpenIdProtocol::OpenID2MessageType;
     }
+
     /**
      * Implementation of 4.1.1.  Key-Value Form Encoding
      * @return string
@@ -40,7 +44,7 @@ class OpenIdDirectResponse  extends OpenIdResponse {
      */
     public function getContent()
     {
-        $kv_format ="";
+        $kv_format = "";
         if ($this->container !== null) {
             ksort($this->container);
             foreach ($this->container as $key => $value) {
@@ -49,15 +53,15 @@ class OpenIdDirectResponse  extends OpenIdResponse {
                 }
 
                 if (strpos($key, ':') !== false) {
-                    throw new InvalidKVFormat("key ".$key." has invalid char (':')");
+                    throw new InvalidKVFormat(sprintf(OpenIdErrorMessages::InvalidKVFormatChar, $key, ':'));
                 }
 
                 if (strpos($key, "\n") !== false) {
-                    throw new InvalidKVFormat("key ".$key." has invalid char ('\\n')");
+                    throw new InvalidKVFormat(sprintf(OpenIdErrorMessages::InvalidKVFormatChar, $key, '\\n'));
                 }
 
                 if (strpos($value, "\n") !== false) {
-                    throw new InvalidKVFormat("value ".$value." has invalid char ('\\n')");
+                    throw new InvalidKVFormat(sprintf(OpenIdErrorMessages::InvalidKVFormatChar, $value, '\\n'));
                 }
                 $kv_format .= "$key:$value\n";
             }

@@ -1,31 +1,29 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/25/13
- * Time: 11:55 AM
- */
 
 namespace openid\model;
+
 use openid\exceptions\InvalidNonce;
+use openid\helpers\OpenIdErrorMessages;
 use openid\services\Registry;
 
-class OpenIdNonce {
+class OpenIdNonce
+{
 
+    const NonceRegexFormat = '/(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)Z(.*)/';
+    const NonceTimeFormat = '%Y-%m-%dT%H:%M:%SZ';
     private $timestamp;
     private $unique_id;
     private $raw_format;
-    const NonceRegexFormat ='/(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)Z(.*)/';
-    const NonceTimeFormat  ='%Y-%m-%dT%H:%M:%SZ';
 
     /**
      * @param $nonce_str
      */
-    public function __construct($nonce_str){
+    public function __construct($nonce_str)
+    {
         // Extract a timestamp from the given nonce string
         $result = preg_match(self::NonceRegexFormat, $nonce_str, $matches);
         if ($result != 1 || count($matches) != 8) {
-            throw new InvalidNonce("Invalid format ".$nonce_str);
+            throw new InvalidNonce(sprintf(OpenIdErrorMessages::InvalidNonceFormatMessage, $nonce_str));
         }
 
         list($unused,
@@ -40,23 +38,26 @@ class OpenIdNonce {
         $timestamp = @gmmktime($tm_hour, $tm_min, $tm_sec, $tm_mon, $tm_mday, $tm_year);
 
         if ($timestamp === false || $timestamp < 0) {
-            throw new InvalidNonce("Invalid timestamp ".$nonce_str);
+            throw new InvalidNonce(sprintf(OpenIdErrorMessages::InvalidNonceTimestampMessage, $nonce_str));
         }
 
-        $this->timestamp  = $timestamp;
-        $this->unique_id  = $unique_id;
+        $this->timestamp = $timestamp;
+        $this->unique_id = $unique_id;
         $this->raw_format = $nonce_str;
     }
 
-    public function getRawFormat(){
+    public function getRawFormat()
+    {
         return $this->raw_format;
     }
 
-    public function getTimestamp(){
+    public function getTimestamp()
+    {
         return $this->timestamp;
     }
 
-    public function getUniqueId(){
+    public function getUniqueId()
+    {
         return $this->$unique_id;
     }
 
@@ -68,7 +69,8 @@ class OpenIdNonce {
      * A shorter range increases the chance that clock-skew and transaction time will cause
      * a spurious rejection.
      */
-    public function isValid(){
+    public function isValid()
+    {
         $server_configuration_service = Registry::getInstance()->get("openid\\services\\IServerConfigurationService");
         $allowed_skew = $server_configuration_service->getNonceLifetime();
         $now = time();

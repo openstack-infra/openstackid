@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/16/13
- * Time: 2:31 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\requests\contexts;
 
@@ -31,16 +24,17 @@ class RequestContext
         return $this->partial_views;
     }
 
-
     /**
      * Gets an associative array of current request trusted data
      * @return array
      */
-    public function getTrustedData(){
+    public function getTrustedData()
+    {
         return $this->trusted_data;
     }
 
-    public function setTrustedData($trusted_data){
-        $this->trusted_data = array_merge($this->trusted_data,$trusted_data);
+    public function setTrustedData($trusted_data)
+    {
+        $this->trusted_data = array_merge($this->trusted_data, $trusted_data);
     }
 }

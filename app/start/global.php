@@ -1,6 +1,5 @@
 <?php
 
-use openid\exceptions\InvalidOpenIdMessageException;
 /*
 |--------------------------------------------------------------------------
 | Register The Laravel Class Loader
@@ -14,10 +13,10 @@ use openid\exceptions\InvalidOpenIdMessageException;
 
 ClassLoader::addDirectories(array(
 
-	app_path().'/commands',
-	app_path().'/controllers',
-	app_path().'/models',
-	app_path().'/database/seeds',
+    app_path() . '/commands',
+    app_path() . '/controllers',
+    app_path() . '/models',
+    app_path() . '/database/seeds',
 
 ));
 
@@ -32,9 +31,16 @@ ClassLoader::addDirectories(array(
 |
 */
 
-$logFile = 'log-'.php_sapi_name().'.txt';
+$logFile = 'log-' . php_sapi_name() . '.txt';
 
-Log::useDailyFiles(storage_path().'/logs/'.$logFile);
+Log::useDailyFiles(storage_path() . '/logs/' . $logFile);
+$admin_email = 'sebastian@tipit.net';
+$from = 'noreply@openstack.org';
+$subject = 'openstackid error';
+$mono_log = Log::getMonolog();
+
+$handler = new Monolog\Handler\NativeMailerHandler($admin_email, $subject, $from);
+$mono_log->pushHandler($handler);
 
 /*
 |--------------------------------------------------------------------------
@@ -50,15 +56,13 @@ Log::useDailyFiles(storage_path().'/logs/'.$logFile);
 */
 
 
-App::error(function(Exception $exception, $code)
-{
-	Log::error($exception);
+App::error(function (Exception $exception, $code) {
+    Log::error($exception);
+    return View::make('404');
 });
 
 
-
-App::error(function(openid\exceptions\InvalidOpenIdMessageException $exception, $code)
-{
+App::error(function (openid\exceptions\InvalidOpenIdMessageException $exception, $code) {
     Log::error($exception);
     return View::make('404');
 });
@@ -74,9 +78,8 @@ App::error(function(openid\exceptions\InvalidOpenIdMessageException $exception, 
 |
 */
 
-App::down(function()
-{
-	return Response::make("Be right back!", 503);
+App::down(function () {
+    return Response::make("Be right back!", 503);
 });
 
 /*
@@ -90,4 +93,4 @@ App::down(function()
 |
 */
 
-require app_path().'/filters.php';
+require app_path() . '/filters.php';

@@ -1,17 +1,12 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/17/13
- * Time: 6:08 PM
- * To change this template use File | Settings | File Templates.
- */
+
 use openid\model\IAssociation;
 
-class OpenIdAssociation extends Eloquent implements  IAssociation{
+class OpenIdAssociation extends Eloquent implements IAssociation
+{
 
-    protected $table = 'openid_associations';
     public $timestamps = false;
+    protected $table = 'openid_associations';
 
     public function getMacFunction()
     {

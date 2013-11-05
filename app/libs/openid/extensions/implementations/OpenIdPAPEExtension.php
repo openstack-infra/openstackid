@@ -8,20 +8,32 @@
  */
 
 namespace openid\extensions\implementations;
+
 use openid\extensions\OpenIdExtension;
+use openid\OpenIdProtocol;
 use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
-use openid\OpenIdProtocol;
 
-class OpenIdPAPEExtension  extends OpenIdExtension {
+/**
+ * Class OpenIdPAPEExtension
+ * Implements http://openid.net/specs/openid-provider-authentication-policy-extension-1_0.html
+ * @package openid\extensions\implementations
+ */
+class OpenIdPAPEExtension extends OpenIdExtension
+{
 
-    const Prefix             = "pape";
+    const Prefix = "pape";
 
-    protected function populateProperties()
+    public static function param($param, $separator = '.')
     {
-        // TODO: Implement populateProperties() method.
+        return OpenIdProtocol::OpenIdPrefix . $separator . self::Prefix . $separator . $param;
+    }
+
+    public static function paramNamespace($separator = '.')
+    {
+        return OpenIdProtocol::OpenIdPrefix . $separator . OpenIdProtocol::OpenIDProtocol_NS . $separator . self::Prefix;
     }
 
     public function parseRequest(OpenIdRequest $request, RequestContext $context)
@@ -34,15 +46,13 @@ class OpenIdPAPEExtension  extends OpenIdExtension {
         // TODO: Implement prepareResponse() method.
     }
 
-    public function getTrustedData(OpenIdRequest $request){
+    public function getTrustedData(OpenIdRequest $request)
+    {
 
     }
 
-    public static function param($param, $separator='.'){
-        return OpenIdProtocol::OpenIdPrefix.$separator.self::Prefix.$separator.$param;
-    }
-
-    public static function paramNamespace($separator='.'){
-        return OpenIdProtocol::OpenIdPrefix . $separator . OpenIdProtocol::OpenIDProtocol_NS . $separator . self::Prefix;
+    protected function populateProperties()
+    {
+        // TODO: Implement populateProperties() method.
     }
 }

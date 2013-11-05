@@ -40,41 +40,13 @@ class OpenIdUriHelper
     const EncodedPattern = "/%([0-9A-Fa-f]{2})/";
     const URLIllegalCharRE = "/([^-A-Za-z0-9:\/\?#\[\]@\!\$&'\(\)\*\+,;=\._~\%])/";
 
-
-    public static function getUnreserved()
-    {
-        $_unreserved = array();
-        for ($i = 0; $i < 256; $i++) {
-            $_unreserved[$i] = false;
-        }
-
-        for ($i = ord('A'); $i <= ord('Z'); $i++) {
-            $_unreserved[$i] = true;
-        }
-
-        for ($i = ord('0'); $i <= ord('9'); $i++) {
-            $_unreserved[$i] = true;
-        }
-
-        for ($i = ord('a'); $i <= ord('z'); $i++) {
-            $_unreserved[$i] = true;
-        }
-
-        $_unreserved[ord('-')] = true;
-        $_unreserved[ord('.')] = true;
-        $_unreserved[ord('_')] = true;
-        $_unreserved[ord('~')] = true;
-
-        return $_unreserved;
-    }
-
     /**
      * Returns an absolute URL for the given one
      *
      * @param string $url absilute or relative URL
      * @return string
      */
-    public static  function absoluteUrl($url)
+    public static function absoluteUrl($url)
     {
         if (empty($url)) {
             return Zend_OpenId::selfUrl();
@@ -258,53 +230,242 @@ class OpenIdUriHelper
         return true;
     }
 
-    private static function startswith($s, $stuff)
+    /**
+     * Does this URL match the given trust root?
+     *
+     * Return whether the URL falls under the given trust root. This
+     * does not check whether the trust root is sane. If the URL or
+     * trust root do not parse, this function will return false.
+     *
+     * @param string $trust_root The trust root to match against
+     *
+     * @param string $url The URL to check
+     *
+     * @return bool $matches Whether the URL matches against the
+     * trust root
+     */
+    public static function checkRealm($trust_root, $url)
     {
-        return strpos($s, $stuff) === 0;
-    }
+        if (!filter_var($url, FILTER_VALIDATE_URL)) return false;
+        if (!self::_isSane($trust_root)) return false;
 
-    private static function remove_dot_segments($path)
-    {
-        $result_segments = array();
+        $trust_root_parsed = self::_parse($trust_root);
+        $url_parsed = self::_parse($url);
+        if (!$trust_root_parsed || !$url_parsed) {
+            return false;
+        }
 
-        while ($path) {
-            if (self::startswith($path, '../')) {
-                $path = substr($path, 3);
-            } else if (self::startswith($path, './')) {
-                $path = substr($path, 2);
-            } else if (self::startswith($path, '/./')) {
-                $path = substr($path, 2);
-            } else if ($path == '/.') {
-                $path = '/';
-            } else if (self::startswith($path, '/../')) {
-                $path = substr($path, 3);
-                if ($result_segments) {
-                    array_pop($result_segments);
-                }
-            } else if ($path == '/..') {
-                $path = '/';
-                if ($result_segments) {
-                    array_pop($result_segments);
-                }
-            } else if (($path == '..') ||
-                ($path == '.')
+        // Check hosts matching
+        if ($url_parsed['wildcard']) {
+            return false;
+        }
+        if ($trust_root_parsed['wildcard']) {
+            $host_tail = $trust_root_parsed['host'];
+            $host = $url_parsed['host'];
+            if ($host_tail &&
+                substr($host, -(strlen($host_tail))) != $host_tail &&
+                substr($host_tail, 1) != $host
             ) {
-                $path = '';
-            } else {
-                $i = 0;
-                if ($path[0] == '/') {
-                    $i = 1;
-                }
-                $i = strpos($path, '/', $i);
-                if ($i === false) {
-                    $i = strlen($path);
-                }
-                $result_segments[] = substr($path, 0, $i);
-                $path = substr($path, $i);
+                return false;
+            }
+        } else {
+            if ($trust_root_parsed['host'] != $url_parsed['host']) {
+                return false;
             }
         }
 
-        return implode('', $result_segments);
+        // Check path and query matching
+        $base_path = $trust_root_parsed['path'];
+        $path = $url_parsed['path'];
+        if (!isset($trust_root_parsed['query'])) {
+            if ($base_path != $path) {
+                if (substr($path, 0, strlen($base_path)) != $base_path) {
+                    return false;
+                }
+                if (substr($base_path, strlen($base_path) - 1, 1) != '/' &&
+                    substr($path, strlen($base_path), 1) != '/'
+                ) {
+                    return false;
+                }
+            }
+        } else {
+            $base_query = $trust_root_parsed['query'];
+            $query = @$url_parsed['query'];
+            $qplus = substr($query, 0, strlen($base_query) + 1);
+            $bqplus = $base_query . '&';
+            if ($base_path != $path ||
+                ($base_query != $query && $qplus != $bqplus)
+            ) {
+                return false;
+            }
+        }
+
+        // The port and scheme need to match exactly
+        return ($trust_root_parsed['scheme'] == $url_parsed['scheme'] &&
+            $url_parsed['port'] === $trust_root_parsed['port']);
+    }
+
+    /**
+     * Is this trust root sane?
+     *
+     * A trust root is sane if it is syntactically valid and it has a
+     * reasonable domain name. Specifically, the domain name must be
+     * more than one level below a standard TLD or more than two
+     * levels below a two-letter tld.
+     *
+     * For example, '*.com' is not a sane trust root, but '*.foo.com'
+     * is.  '*.co.uk' is not sane, but '*.bbc.co.uk' is.
+     *
+     * This check is not always correct, but it attempts to err on the
+     * side of marking sane trust roots insane instead of marking
+     * insane trust roots sane. For example, 'kink.fm' is marked as
+     * insane even though it "should" (for some meaning of should) be
+     * marked sane.
+     *
+     * This function should be used when creating OpenID servers to
+     * alert the users of the server when a consumer attempts to get
+     * the user to accept a suspicious trust root.
+     *
+     * @static
+     * @param string $trust_root The trust root to check
+     * @return bool $sanity Whether the trust root looks OK
+     */
+    private static function _isSane($trust_root)
+    {
+        $parts = self::_parse($trust_root);
+        if ($parts === false) {
+            return false;
+        }
+
+        // Localhost is a special case
+        if ($parts['host'] == 'localhost') {
+            return true;
+        }
+
+        $host_parts = explode('.', $parts['host']);
+        if ($parts['wildcard']) {
+            // Remove the empty string from the beginning of the array
+            array_shift($host_parts);
+        }
+
+        if ($host_parts && !$host_parts[count($host_parts) - 1]) {
+            array_pop($host_parts);
+        }
+
+        if (!$host_parts) {
+            return false;
+        }
+
+        // Don't allow adjacent dots
+        if (in_array('', $host_parts, true)) {
+            return false;
+        }
+
+        // Get the top-level domain of the host. If it is not a valid TLD,
+        // it's not sane.
+        preg_match(OpenIdUriHelper_TLDs, $parts['host'], $matches);
+        if (!$matches) {
+            return false;
+        }
+        $tld = $matches[1];
+
+        if (count($host_parts) == 1) {
+            return false;
+        }
+
+        if ($parts['wildcard']) {
+            // It's a 2-letter tld with a short second to last segment
+            // so there needs to be more than two segments specified
+            // (e.g. *.co.uk is insane)
+            $second_level = $host_parts[count($host_parts) - 2];
+            if (strlen($tld) == 2 && strlen($second_level) <= 3) {
+                return count($host_parts) > 2;
+            }
+        }
+
+        return true;
+    }
+
+    private static function _parse($trust_root)
+    {
+        $trust_root = self::urinorm($trust_root);
+        if ($trust_root === null) {
+            return false;
+        }
+
+        if (preg_match("/:\/\/[^:]+(:\d+){2,}(\/|$)/", $trust_root)) {
+            return false;
+        }
+
+        $parts = @parse_url($trust_root);
+        if ($parts === false) {
+            return false;
+        }
+
+        $required_parts = array('scheme', 'host');
+        $forbidden_parts = array('user', 'pass', 'fragment');
+        $keys = array_keys($parts);
+        if (array_intersect($keys, $required_parts) != $required_parts) {
+            return false;
+        }
+
+        if (array_intersect($keys, $forbidden_parts) != array()) {
+            return false;
+        }
+
+        if (!preg_match(OpenIdUriHelper_HostSegmentRe, $parts['host'])) {
+            return false;
+        }
+
+        $scheme = strtolower($parts['scheme']);
+        $allowed_schemes = array('http', 'https');
+        if (!in_array($scheme, $allowed_schemes)) {
+            return false;
+        }
+        $parts['scheme'] = $scheme;
+
+        $host = strtolower($parts['host']);
+        $hostparts = explode('*', $host);
+        switch (count($hostparts)) {
+            case 1:
+                $parts['wildcard'] = false;
+                break;
+            case 2:
+                if ($hostparts[0] ||
+                    ($hostparts[1] && substr($hostparts[1], 0, 1) != '.')
+                ) {
+                    return false;
+                }
+                $host = $hostparts[1];
+                $parts['wildcard'] = true;
+                break;
+            default:
+                return false;
+        }
+        if (strpos($host, ':') !== false) {
+            return false;
+        }
+
+        $parts['host'] = $host;
+
+        if (isset($parts['path'])) {
+            $path = strtolower($parts['path']);
+            if (substr($path, 0, 1) != '/') {
+                return false;
+            }
+        } else {
+            $path = '/';
+        }
+
+        $parts['path'] = $path;
+        if (!isset($parts['port'])) {
+            $parts['port'] = false;
+        }
+
+
+        $parts['unparsed'] = $trust_root;
+
+        return $parts;
     }
 
     private static function urinorm($uri)
@@ -428,245 +589,84 @@ class OpenIdUriHelper
         return $scheme . '://' . $authority . $path . $query . $fragment;
     }
 
-    private static function _parse($trust_root)
+    public static function getUnreserved()
     {
-        $trust_root = self::urinorm($trust_root);
-        if ($trust_root === null) {
-            return false;
+        $_unreserved = array();
+        for ($i = 0; $i < 256; $i++) {
+            $_unreserved[$i] = false;
         }
 
-        if (preg_match("/:\/\/[^:]+(:\d+){2,}(\/|$)/", $trust_root)) {
-            return false;
+        for ($i = ord('A'); $i <= ord('Z'); $i++) {
+            $_unreserved[$i] = true;
         }
 
-        $parts = @parse_url($trust_root);
-        if ($parts === false) {
-            return false;
+        for ($i = ord('0'); $i <= ord('9'); $i++) {
+            $_unreserved[$i] = true;
         }
 
-        $required_parts = array('scheme', 'host');
-        $forbidden_parts = array('user', 'pass', 'fragment');
-        $keys = array_keys($parts);
-        if (array_intersect($keys, $required_parts) != $required_parts) {
-            return false;
+        for ($i = ord('a'); $i <= ord('z'); $i++) {
+            $_unreserved[$i] = true;
         }
 
-        if (array_intersect($keys, $forbidden_parts) != array()) {
-            return false;
-        }
+        $_unreserved[ord('-')] = true;
+        $_unreserved[ord('.')] = true;
+        $_unreserved[ord('_')] = true;
+        $_unreserved[ord('~')] = true;
 
-        if (!preg_match(OpenIdUriHelper_HostSegmentRe, $parts['host'])) {
-            return false;
-        }
+        return $_unreserved;
+    }
 
-        $scheme = strtolower($parts['scheme']);
-        $allowed_schemes = array('http', 'https');
-        if (!in_array($scheme, $allowed_schemes)) {
-            return false;
-        }
-        $parts['scheme'] = $scheme;
+    private static function remove_dot_segments($path)
+    {
+        $result_segments = array();
 
-        $host = strtolower($parts['host']);
-        $hostparts = explode('*', $host);
-        switch (count($hostparts)) {
-            case 1:
-                $parts['wildcard'] = false;
-                break;
-            case 2:
-                if ($hostparts[0] ||
-                    ($hostparts[1] && substr($hostparts[1], 0, 1) != '.')
-                ) {
-                    return false;
+        while ($path) {
+            if (self::startswith($path, '../')) {
+                $path = substr($path, 3);
+            } else if (self::startswith($path, './')) {
+                $path = substr($path, 2);
+            } else if (self::startswith($path, '/./')) {
+                $path = substr($path, 2);
+            } else if ($path == '/.') {
+                $path = '/';
+            } else if (self::startswith($path, '/../')) {
+                $path = substr($path, 3);
+                if ($result_segments) {
+                    array_pop($result_segments);
                 }
-                $host = $hostparts[1];
-                $parts['wildcard'] = true;
-                break;
-            default:
-                return false;
-        }
-        if (strpos($host, ':') !== false) {
-            return false;
-        }
-
-        $parts['host'] = $host;
-
-        if (isset($parts['path'])) {
-            $path = strtolower($parts['path']);
-            if (substr($path, 0, 1) != '/') {
-                return false;
-            }
-        } else {
-            $path = '/';
-        }
-
-        $parts['path'] = $path;
-        if (!isset($parts['port'])) {
-            $parts['port'] = false;
-        }
-
-
-        $parts['unparsed'] = $trust_root;
-
-        return $parts;
-    }
-
-    /**
-     * Is this trust root sane?
-     *
-     * A trust root is sane if it is syntactically valid and it has a
-     * reasonable domain name. Specifically, the domain name must be
-     * more than one level below a standard TLD or more than two
-     * levels below a two-letter tld.
-     *
-     * For example, '*.com' is not a sane trust root, but '*.foo.com'
-     * is.  '*.co.uk' is not sane, but '*.bbc.co.uk' is.
-     *
-     * This check is not always correct, but it attempts to err on the
-     * side of marking sane trust roots insane instead of marking
-     * insane trust roots sane. For example, 'kink.fm' is marked as
-     * insane even though it "should" (for some meaning of should) be
-     * marked sane.
-     *
-     * This function should be used when creating OpenID servers to
-     * alert the users of the server when a consumer attempts to get
-     * the user to accept a suspicious trust root.
-     *
-     * @static
-     * @param string $trust_root The trust root to check
-     * @return bool $sanity Whether the trust root looks OK
-     */
-    private static function _isSane($trust_root)
-    {
-        $parts = self::_parse($trust_root);
-        if ($parts === false) {
-            return false;
-        }
-
-        // Localhost is a special case
-        if ($parts['host'] == 'localhost') {
-            return true;
-        }
-
-        $host_parts = explode('.', $parts['host']);
-        if ($parts['wildcard']) {
-            // Remove the empty string from the beginning of the array
-            array_shift($host_parts);
-        }
-
-        if ($host_parts && !$host_parts[count($host_parts) - 1]) {
-            array_pop($host_parts);
-        }
-
-        if (!$host_parts) {
-            return false;
-        }
-
-        // Don't allow adjacent dots
-        if (in_array('', $host_parts, true)) {
-            return false;
-        }
-
-        // Get the top-level domain of the host. If it is not a valid TLD,
-        // it's not sane.
-        preg_match(OpenIdUriHelper_TLDs, $parts['host'], $matches);
-        if (!$matches) {
-            return false;
-        }
-        $tld = $matches[1];
-
-        if (count($host_parts) == 1) {
-            return false;
-        }
-
-        if ($parts['wildcard']) {
-            // It's a 2-letter tld with a short second to last segment
-            // so there needs to be more than two segments specified
-            // (e.g. *.co.uk is insane)
-            $second_level = $host_parts[count($host_parts) - 2];
-            if (strlen($tld) == 2 && strlen($second_level) <= 3) {
-                return count($host_parts) > 2;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Does this URL match the given trust root?
-     *
-     * Return whether the URL falls under the given trust root. This
-     * does not check whether the trust root is sane. If the URL or
-     * trust root do not parse, this function will return false.
-     *
-     * @param string $trust_root The trust root to match against
-     *
-     * @param string $url The URL to check
-     *
-     * @return bool $matches Whether the URL matches against the
-     * trust root
-     */
-    public static function checkRealm($trust_root, $url)
-    {
-        if (!filter_var($url, FILTER_VALIDATE_URL)) return false;
-        if (!self::_isSane($trust_root)) return false;
-
-        $trust_root_parsed = self::_parse($trust_root);
-        $url_parsed = self::_parse($url);
-        if (!$trust_root_parsed || !$url_parsed) {
-            return false;
-        }
-
-        // Check hosts matching
-        if ($url_parsed['wildcard']) {
-            return false;
-        }
-        if ($trust_root_parsed['wildcard']) {
-            $host_tail = $trust_root_parsed['host'];
-            $host = $url_parsed['host'];
-            if ($host_tail &&
-                substr($host, -(strlen($host_tail))) != $host_tail &&
-                substr($host_tail, 1) != $host
+            } else if ($path == '/..') {
+                $path = '/';
+                if ($result_segments) {
+                    array_pop($result_segments);
+                }
+            } else if (($path == '..') ||
+                ($path == '.')
             ) {
-                return false;
-            }
-        } else {
-            if ($trust_root_parsed['host'] != $url_parsed['host']) {
-                return false;
+                $path = '';
+            } else {
+                $i = 0;
+                if ($path[0] == '/') {
+                    $i = 1;
+                }
+                $i = strpos($path, '/', $i);
+                if ($i === false) {
+                    $i = strlen($path);
+                }
+                $result_segments[] = substr($path, 0, $i);
+                $path = substr($path, $i);
             }
         }
 
-        // Check path and query matching
-        $base_path = $trust_root_parsed['path'];
-        $path = $url_parsed['path'];
-        if (!isset($trust_root_parsed['query'])) {
-            if ($base_path != $path) {
-                if (substr($path, 0, strlen($base_path)) != $base_path) {
-                    return false;
-                }
-                if (substr($base_path, strlen($base_path) - 1, 1) != '/' &&
-                    substr($path, strlen($base_path), 1) != '/'
-                ) {
-                    return false;
-                }
-            }
-        } else {
-            $base_query = $trust_root_parsed['query'];
-            $query = @$url_parsed['query'];
-            $qplus = substr($query, 0, strlen($base_query) + 1);
-            $bqplus = $base_query . '&';
-            if ($base_path != $path ||
-                ($base_query != $query && $qplus != $bqplus)
-            ) {
-                return false;
-            }
-        }
-
-        // The port and scheme need to match exactly
-        return ($trust_root_parsed['scheme'] == $url_parsed['scheme'] &&
-            $url_parsed['port'] === $trust_root_parsed['port']);
+        return implode('', $result_segments);
     }
 
-    public static function checkReturnTo($return_to){
+    private static function startswith($s, $stuff)
+    {
+        return strpos($s, $stuff) === 0;
+    }
+
+    public static function checkReturnTo($return_to)
+    {
         if (!filter_var($return_to, FILTER_VALIDATE_URL)) return false;
         $url_parsed = self::_parse($return_to);
         if (!$url_parsed) {
@@ -675,7 +675,8 @@ class OpenIdUriHelper
         return true;
     }
 
-    public static function isValidUrl($url){
+    public static function isValidUrl($url)
+    {
         return filter_var($url, FILTER_VALIDATE_URL);
     }
 }
