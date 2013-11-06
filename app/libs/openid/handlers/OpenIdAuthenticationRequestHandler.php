@@ -156,6 +156,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                 }
             }
 
+            $this->current_request_context->cleanTrustedData();
             foreach ($this->extensions as $ext) {
                 $data = $ext->getTrustedData($this->current_request);
                 $this->current_request_context->setTrustedData($data);
@@ -208,6 +209,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             if ($policy == IAuthService::AuthorizationResponse_DenyForever)
                 break;
 
+            $this->current_request_context->cleanTrustedData();
             foreach ($this->extensions as $ext) {
                 $data = $ext->getTrustedData($this->current_request);
                 $this->current_request_context->setTrustedData($data);
@@ -334,10 +336,13 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         switch ($authorization_response) {
             case IAuthService::AuthorizationResponse_AllowForever:
             {
+
+                $this->current_request_context->cleanTrustedData();
                 foreach ($this->extensions as $ext) {
                     $data = $ext->getTrustedData($this->current_request);
                     $this->current_request_context->setTrustedData($data);
                 }
+
                 $this->trusted_sites_service->addTrustedSite($currentUser, $this->current_request->getRealm(), IAuthService::AuthorizationResponse_AllowForever, $this->current_request_context->getTrustedData());
                 return $this->doAssertion();
             }
@@ -372,6 +377,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         }
         $currentUser = $this->authService->getCurrentUser();
 
+        $this->current_request_context->cleanTrustedData();
         foreach ($this->extensions as $ext) {
             $data = $ext->getTrustedData($this->current_request);
             $this->current_request_context->setTrustedData($data);

@@ -33,6 +33,10 @@ class RequestContext
         return $this->trusted_data;
     }
 
+    public function cleanTrustedData(){
+        $this->trusted_data = array();
+    }
+
     public function setTrustedData($trusted_data)
     {
         $this->trusted_data = array_merge($this->trusted_data, $trusted_data);

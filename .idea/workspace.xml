@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/UserController.php" afterPath="$PROJECT_DIR$/app/controllers/UserController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/login.blade.php" afterPath="$PROJECT_DIR$/app/views/login.blade.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" />
     </list>
     <ignored path="openidIdp.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -37,10 +37,41 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="login.blade.php" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="login.blade.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="16" column="4" selection-start="418" selection-end="418" vertical-scroll-proportion="0.8888889" vertical-offset="0" max-vertical-offset="1020">
+            <state line="7" column="28" selection-start="176" selection-end="176" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="1020">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TrustedSitesService.php" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/services/TrustedSitesService.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="21" column="0" selection-start="451" selection-end="451" vertical-scroll-proportion="0.33061224" vertical-offset="234" max-vertical-offset="1305">
+              <folding>
+                <element signature="e#28#57#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OpenIdAuthenticationRequestHandler.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="341" column="0" selection-start="15299" selection-end="15299" vertical-scroll-proportion="-1.46" vertical-offset="5042" max-vertical-offset="6720">
+              <folding>
+                <element signature="e#35#49#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RequestContext.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="35" column="36" selection-start="689" selection-end="705" vertical-scroll-proportion="-3.125" vertical-offset="450" max-vertical-offset="735">
               <folding />
             </state>
           </provider>
@@ -95,7 +126,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/app/config/mail.php" />
         <option value="$PROJECT_DIR$/app/config/session.php" />
         <option value="$PROJECT_DIR$/app/config/dev/mail.php" />
         <option value="$PROJECT_DIR$/app/filters.php" />
@@ -107,10 +137,11 @@
         <option value="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" />
         <option value="$PROJECT_DIR$/app/views/profile.blade.php" />
         <option value="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdErrorMessages.php" />
-        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
         <option value="$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php" />
         <option value="$PROJECT_DIR$/app/controllers/UserController.php" />
         <option value="$PROJECT_DIR$/app/views/login.blade.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
       </list>
     </option>
   </component>
@@ -265,7 +296,11 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="views" />
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openid" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -283,7 +318,63 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="controllers" />
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openid" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="requests" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openid" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="requests" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="contexts" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="libs" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -469,7 +560,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="66" y="38" width="1300" height="728" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -478,7 +569,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298639" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33974358" sideWeight="0.583045" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.41695502" sideWeight="0.6180945" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.41695502" sideWeight="0.6180945" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.4331465" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -510,29 +601,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/vendor/zendframework/zend-crypt/Zend/Crypt/PublicKey/DiffieHellman.php</url>
-          <line>129</line>
-          <option name="timeStamp" value="351" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/vendor/greggilbert/recaptcha/src/Greggilbert/Recaptcha/RecaptchaServiceProvider.php</url>
-          <line>66</line>
-          <option name="timeStamp" value="403" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Database/Connection.php</url>
-          <line>551</line>
-          <option name="timeStamp" value="449" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php</url>
-          <line>369</line>
-          <option name="timeStamp" value="453" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php</url>
-          <line>129</line>
-          <option name="timeStamp" value="459" />
+          <url>file://$PROJECT_DIR$/app/services/TrustedSitesService.php</url>
+          <line>21</line>
+          <option name="timeStamp" value="460" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -542,24 +613,10 @@
           </selected-grouping-rules>
         </breakpoints-dialog>
       </breakpoints-dialog>
-      <option name="time" value="460" />
+      <option name="time" value="463" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdRequest.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="0" selection-start="546" selection-end="546" vertical-scroll-proportion="0.75951904" vertical-offset="131" max-vertical-offset="630">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/services/UserActionService.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="49" selection-start="160" selection-end="160" vertical-scroll-proportion="0.17175573" vertical-offset="0" max-vertical-offset="524">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="25" column="84" selection-start="782" selection-end="832" vertical-scroll-proportion="0.6296296" vertical-offset="115" max-vertical-offset="2700">
@@ -599,7 +656,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="31" column="0" selection-start="1264" selection-end="1264" vertical-scroll-proportion="0.75308645" vertical-offset="99" max-vertical-offset="585">
           <folding>
-            <element signature="e#7#59#0" expanded="true" />
+            <element signature="e#7#59#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -621,13 +678,6 @@
     <entry file="file://$PROJECT_DIR$/app/services/ServerConfigurationService.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="35" column="46" selection-start="1102" selection-end="1128" vertical-scroll-proportion="0.30612245" vertical-offset="405" max-vertical-offset="2355">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="39" selection-start="396" selection-end="435" vertical-scroll-proportion="0.662963" vertical-offset="1" max-vertical-offset="6630">
           <folding />
         </state>
       </provider>
@@ -659,8 +709,33 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="4" selection-start="418" selection-end="418" vertical-scroll-proportion="0.8888889" vertical-offset="0" max-vertical-offset="1020">
+        <state line="7" column="28" selection-start="176" selection-end="176" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="1020">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="36" selection-start="689" selection-end="705" vertical-scroll-proportion="-3.125" vertical-offset="450" max-vertical-offset="735">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="341" column="0" selection-start="15299" selection-end="15299" vertical-scroll-proportion="-1.46" vertical-offset="5042" max-vertical-offset="6720">
+          <folding>
+            <element signature="e#35#49#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/services/TrustedSitesService.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="0" selection-start="451" selection-end="451" vertical-scroll-proportion="0.33061224" vertical-offset="234" max-vertical-offset="1305">
+          <folding>
+            <element signature="e#28#57#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
