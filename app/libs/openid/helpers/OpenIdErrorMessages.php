@@ -34,4 +34,5 @@ class OpenIdErrorMessages
     const InvalidOpenIdMessageModeMessage                = 'Invalid %s Mode';
     const InvalidMacFunctionMessage                      = "Invalid mac function %s";
     const InvalidPrivateAssociationMessage               = "Private Association %s was not emit for requested realm %s";
+    const AlreadyExistSessionMessage                     = "There is a current session with identity %s, but user wants to use a different identity %s";
 }

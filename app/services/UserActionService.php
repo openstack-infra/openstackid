@@ -10,12 +10,13 @@ use UserAction;
 class UserActionService implements IUserActionService
 {
 
-    public function addUserAction(IOpenIdUser $user, $ip, $user_action)
+    public function addUserAction(IOpenIdUser $user, $ip, $user_action, $realm=null)
     {
         try {
             $action = new UserAction();
-            $action->from_ip = $ip;
+            $action->from_ip     = $ip;
             $action->user_action = $user_action;
+            $action->realm       = $realm;
             $user = OpenIdUser::find($user->getId());
             if ($user) {
                 $user->actions()->save($action);

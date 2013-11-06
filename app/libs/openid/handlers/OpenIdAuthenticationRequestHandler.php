@@ -136,7 +136,35 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         } else {
             //user already logged
             $currentUser = $this->authService->getCurrentUser();
-            $sites = $this->trusted_sites_service->getTrustedSites($currentUser, $this->current_request->getRealm());
+            if (!$this->current_request->isIdentitySelectByOP()) {
+                $current_claimed_id = $this->current_request->getClaimedId();
+                $current_identity = $this->current_request->getIdentity();
+
+                // check is claimed identity match with current one
+                // if not logs out and do re login
+                $current_user = $this->authService->getCurrentUser();
+
+                if (is_null($current_user))
+                    throw new \Exception("User not set!");
+
+                $current_owned_identity = $this->server_configuration_service->getUserIdentityEndpointURL($current_user->getIdentifier());
+
+                if ($current_claimed_id != $current_owned_identity && $current_identity != $current_owned_identity) {
+                    $this->log->warning_msg(sprintf(OpenIdErrorMessages::AlreadyExistSessionMessage, $current_owned_identity, $current_identity));
+                    $this->authService->logout();
+                    return $this->doLogin();
+                }
+            }
+
+            foreach ($this->extensions as $ext) {
+                $data = $ext->getTrustedData($this->current_request);
+                $this->current_request_context->setTrustedData($data);
+            }
+
+            $requested_data = $this->current_request_context->getTrustedData();
+
+            $sites = $this->trusted_sites_service->getTrustedSites($currentUser, $this->current_request->getRealm(), $requested_data);
+
             $authorization_response = $this->authService->getUserAuthorizationResponse();
 
             if ($authorization_response == IAuthService::AuthorizationResponse_None) {
@@ -184,8 +212,8 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                 $data = $ext->getTrustedData($this->current_request);
                 $this->current_request_context->setTrustedData($data);
             }
-
             $requested_data = $this->current_request_context->getTrustedData();
+
             $trusted_data = $site->getData();
             $diff = array_diff($requested_data, $trusted_data);
             if (count($diff) == 0)
@@ -343,7 +371,16 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             return new OpenIdImmediateNegativeAssertion($this->current_request->getReturnTo());
         }
         $currentUser = $this->authService->getCurrentUser();
-        $sites = $this->trusted_sites_service->getTrustedSites($currentUser, $this->current_request->getRealm());
+
+        foreach ($this->extensions as $ext) {
+            $data = $ext->getTrustedData($this->current_request);
+            $this->current_request_context->setTrustedData($data);
+        }
+
+        $requested_data = $this->current_request_context->getTrustedData();
+
+        $sites = $this->trusted_sites_service->getTrustedSites($currentUser, $this->current_request->getRealm(), $requested_data);
+
         if (is_null($sites) || count($sites) == 0) {
             //need setup to continue
             return new OpenIdImmediateNegativeAssertion($this->current_request->getReturnTo());
@@ -357,14 +394,8 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             //if denied then break
             if ($policy == IAuthService::AuthorizationResponse_DenyForever)
                 break;
-
-            foreach ($this->extensions as $ext) {
-                $data = $ext->getTrustedData($this->current_request);
-                $this->current_request_context->setTrustedData($data);
-            }
-
-            $requested_data = $this->current_request_context->getTrustedData();
             $trusted_data = $site->getData();
+
             $diff = array_diff($requested_data, $trusted_data);
             if (count($diff) == 0)
                 break;

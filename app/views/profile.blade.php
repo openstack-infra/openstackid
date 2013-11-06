@@ -73,6 +73,7 @@
             <table class="table table-hover table-condensed">
                 <thead>
                 <tr>
+                    <th>From Realm</th>
                     <th>Action</th>
                     <th>From IP</th>
                     <th><i class="icon-info-sign accordion-toggle" title="Time is on UTC"></i>&nbsp;When</th>
@@ -81,6 +82,11 @@
                 <tbody>
                 @foreach ($actions as $action)
                 <tr>
+                    @if(is_null($action->realm))
+                    <td>Site</td>
+                    @else
+                    <td>{{ $action->realm }}</td>
+                    @endif
                     <td>{{ $action->user_action }}</td>
                     <td>{{ $action->from_ip }}</td>
                     <td>{{ $action->created_at }}</td>

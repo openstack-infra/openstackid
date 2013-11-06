@@ -9,6 +9,8 @@ use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\UserProviderInterface;
 use Log;
 use Member;
+use openid\helpers\OpenIdErrorMessages;
+use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\Registry;
 use openid\services\ServiceCatalog;
 
@@ -112,7 +114,26 @@ class CustomAuthProvider implements UserProviderInterface
             //reload user...
             $user = OpenIdUser::where('external_id', '=', $identifier)->first();
             $user->setMember($member);
-            return $user;
+
+            //check if we have a current openid message
+            $memento_service = Registry::getInstance()->get(ServiceCatalog::MementoService);
+            $msg = $memento_service->getCurrentRequest();
+            if (is_null($msg) || !$msg->IsValid() || !OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg))
+                return $user;
+            else {
+                $auth_request = new OpenIdAuthenticationRequest($msg);
+                if ($auth_request->isIdentitySelectByOP())
+                    return $user;
+                $claimed_id = $auth_request->getClaimedId();
+                $identity = $auth_request->getIdentity();
+                $current_identity = $server_configuration->getUserIdentityEndpointURL($user->getIdentifier());
+                if ($claimed_id == $current_identity || $identity == $current_identity)
+                    return $user;
+
+                Log::warning(sprintf(OpenIdErrorMessages::AlreadyExistSessionMessage, $current_identity, $identity));
+                return null;
+            }
+
         } catch (Exception $ex) {
             Log::error($ex);
             return null;

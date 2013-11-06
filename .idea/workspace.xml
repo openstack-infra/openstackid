@@ -2,133 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/database/migrations/2013_11_05_134406_create_user_activity_table.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/services/IUserActionService.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/models/UserAction.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/services/UserActionService.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/config/dev/app.php" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/config/dev/mail.php" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/tests/ExampleTest.php" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/tests/index.html" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/helpers/AssocHandleGenerator.php" afterPath="$PROJECT_DIR$/app/libs/openid/helpers/AssocHandleGenerator.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/AssociationService.php" afterPath="$PROJECT_DIR$/app/services/AssociationService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/AuthHelper.php" afterPath="$PROJECT_DIR$/app/libs/auth/AuthHelper.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/AuthService.php" afterPath="$PROJECT_DIR$/app/libs/auth/AuthService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/exceptions/AuthenticationException.php" afterPath="$PROJECT_DIR$/app/libs/auth/exceptions/AuthenticationException.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/AuthenticationServiceProvider.php" afterPath="$PROJECT_DIR$/app/libs/auth/AuthenticationServiceProvider.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/AuthenticationStrategy.php" afterPath="$PROJECT_DIR$/app/services/AuthenticationStrategy.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/BannedIP.php" afterPath="$PROJECT_DIR$/app/models/BannedIP.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/BaseController.php" afterPath="$PROJECT_DIR$/app/controllers/BaseController.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/database/migrations/2013_11_05_134406_create_user_activity_table.php" afterPath="$PROJECT_DIR$/app/database/migrations/2013_11_05_134406_create_user_activity_table.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php" afterPath="$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/DiffieHellmanTest.php" afterPath="$PROJECT_DIR$/app/tests/DiffieHellmanTest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/DiscoveryController.php" afterPath="$PROJECT_DIR$/app/controllers/DiscoveryController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/DiscoveryControllerTest.php" afterPath="$PROJECT_DIR$/app/tests/DiscoveryControllerTest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/HomeController.php" afterPath="$PROJECT_DIR$/app/controllers/HomeController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/model/IAssociation.php" afterPath="$PROJECT_DIR$/app/libs/openid/model/IAssociation.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IAssociationService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IAssociationService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IAuthService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IAuthService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/ILogService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/ILogService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IMementoOpenIdRequestService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IMementoOpenIdRequestService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/INonceService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/INonceService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/IOpenIdAuthenticationStrategy.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/IOpenIdAuthenticationStrategy.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/IOpenIdProtocol.php" afterPath="$PROJECT_DIR$/app/libs/openid/IOpenIdProtocol.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/strategies/IOpenIdResponseStrategy.php" afterPath="$PROJECT_DIR$/app/libs/openid/strategies/IOpenIdResponseStrategy.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/model/IOpenIdUser.php" afterPath="$PROJECT_DIR$/app/libs/openid/model/IOpenIdUser.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IServerConfigurationService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IServerConfigurationService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IServerExtensionsService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IServerExtensionsService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/model/ITrustedSite.php" afterPath="$PROJECT_DIR$/app/libs/openid/model/ITrustedSite.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/IUserService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/IUserService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidAssociationTypeException.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidAssociationTypeException.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidDHParam.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidDHParam.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidKVFormat.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidKVFormat.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidNonce.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidNonce.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidOpenIdAuthenticationRequestMode.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidOpenIdAuthenticationRequestMode.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidOpenIdMessageException.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidOpenIdMessageException.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidOpenIdMessageMode.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidOpenIdMessageMode.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidRequestContextException.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidRequestContextException.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidSessionTypeException.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/InvalidSessionTypeException.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/LogService.php" afterPath="$PROJECT_DIR$/app/services/LogService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/Member.php" afterPath="$PROJECT_DIR$/app/models/Member.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/MemberPhoto.php" afterPath="$PROJECT_DIR$/app/models/MemberPhoto.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/MementoRequestService.php" afterPath="$PROJECT_DIR$/app/services/MementoRequestService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/NonceService.php" afterPath="$PROJECT_DIR$/app/services/NonceService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXExtension.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdAXRequest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/OpenIdAssociation.php" afterPath="$PROJECT_DIR$/app/models/OpenIdAssociation.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAssociationSessionRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAssociationSessionRequest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdAssociationSessionResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdAssociationSessionResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdAssociationSessionUnsuccessfulResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdAssociationSessionUnsuccessfulResponse.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/IUserActionService.php" afterPath="$PROJECT_DIR$/app/services/IUserActionService.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdCheckAuthenticationRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdCheckAuthenticationRequest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdCheckAuthenticationRequestHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdCheckAuthenticationRequestHandler.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdCheckAuthenticationResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdCheckAuthenticationResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/OpenIdCryptoException.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/OpenIdCryptoException.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdCryptoHelper.php" afterPath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdCryptoHelper.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdDHAssociationSessionRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdDHAssociationSessionRequest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdDiffieHellmanAssociationSessionResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdDiffieHellmanAssociationSessionResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdDirectGenericErrorResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdDirectGenericErrorResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdDirectResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdDirectResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/strategies/OpenIdDirectResponseStrategy.php" afterPath="$PROJECT_DIR$/app/strategies/OpenIdDirectResponseStrategy.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdErrorMessages.php" afterPath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdErrorMessages.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/OpenIdExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/OpenIdExtension.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdImmediateNegativeAssertion.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdImmediateNegativeAssertion.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdIndirectResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php" afterPath="$PROJECT_DIR$/app/strategies/OpenIdIndirectResponseStrategy.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/OpenIdInvalidRealmException.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/OpenIdInvalidRealmException.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/OpenIdMessage.php" afterPath="$PROJECT_DIR$/app/libs/openid/OpenIdMessage.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdMessageHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdMessageHandler.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdNonImmediateNegativeAssertion.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdNonImmediateNegativeAssertion.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/model/OpenIdNonce.php" afterPath="$PROJECT_DIR$/app/libs/openid/model/OpenIdNonce.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdOAuthExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdOAuthExtension.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdPAPEExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdPAPEExtension.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdPositiveAssertionResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdPositiveAssertionResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" afterPath="$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/OpenIdProtocolTest.php" afterPath="$PROJECT_DIR$/app/tests/OpenIdProtocolTest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/OpenIdProviderController.php" afterPath="$PROJECT_DIR$/app/controllers/OpenIdProviderController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php" afterPath="$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdRequest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/strategies/OpenIdResponseStrategyFactoryMethod.php" afterPath="$PROJECT_DIR$/app/libs/openid/strategies/OpenIdResponseStrategyFactoryMethod.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/strategies/OpenIdResponseStrategyProvider.php" afterPath="$PROJECT_DIR$/app/strategies/OpenIdResponseStrategyProvider.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdSREGExtension.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdSREGExtension.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdSREGRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/extensions/implementations/OpenIdSREGRequest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/OpenIdServiceProvider.php" afterPath="$PROJECT_DIR$/app/libs/openid/OpenIdServiceProvider.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdSessionAssociationRequestHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdSessionAssociationRequestHandler.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdSignatureBuilder.php" afterPath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdSignatureBuilder.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/OpenIdTrustedSite.php" afterPath="$PROJECT_DIR$/app/models/OpenIdTrustedSite.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdUnencryptedAssociationSessionResponse.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/OpenIdUnencryptedAssociationSessionResponse.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdUriHelper.php" afterPath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdUriHelper.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/OpenIdUser.php" afterPath="$PROJECT_DIR$/app/libs/auth/OpenIdUser.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/contexts/PartialView.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/contexts/PartialView.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/Registry.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/Registry.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/exceptions/ReplayAttackException.php" afterPath="$PROJECT_DIR$/app/libs/openid/exceptions/ReplayAttackException.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/contexts/RequestContext.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/responses/contexts/ResponseContext.php" afterPath="$PROJECT_DIR$/app/libs/openid/responses/contexts/ResponseContext.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/ServerConfiguration.php" afterPath="$PROJECT_DIR$/app/models/ServerConfiguration.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/ServerConfigurationService.php" afterPath="$PROJECT_DIR$/app/services/ServerConfigurationService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/Facades/ServerConfigurationService.php" afterPath="$PROJECT_DIR$/app/services/Facades/ServerConfigurationService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/models/ServerExtension.php" afterPath="$PROJECT_DIR$/app/models/ServerExtension.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/ServerExtensionTest.php" afterPath="$PROJECT_DIR$/app/tests/ServerExtensionTest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/ServerExtensionsService.php" afterPath="$PROJECT_DIR$/app/services/ServerExtensionsService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/ServiceCatalog.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/ServiceCatalog.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/ServicesProvider.php" afterPath="$PROJECT_DIR$/app/services/ServicesProvider.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/factories/SessionAssociationRequestFactory.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/factories/SessionAssociationRequestFactory.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/TrustedSitesService.php" afterPath="$PROJECT_DIR$/app/services/TrustedSitesService.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/UserActionService.php" afterPath="$PROJECT_DIR$/app/services/UserActionService.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/UserController.php" afterPath="$PROJECT_DIR$/app/controllers/UserController.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/UserService.php" afterPath="$PROJECT_DIR$/app/services/UserService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/UserTest.php" afterPath="$PROJECT_DIR$/app/tests/UserTest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSDocumentBuilder.php" afterPath="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSDocumentBuilder.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/tests/XRDSDocumentTest.php" afterPath="$PROJECT_DIR$/app/tests/XRDSDocumentTest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSService.php" afterPath="$PROJECT_DIR$/app/libs/openid/XRDS/XRDSService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/config/app.php" afterPath="$PROJECT_DIR$/app/config/app.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/filters.php" afterPath="$PROJECT_DIR$/app/filters.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/start/global.php" afterPath="$PROJECT_DIR$/app/start/global.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/config/mail.php" afterPath="$PROJECT_DIR$/app/config/mail.php" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/login.blade.php" afterPath="$PROJECT_DIR$/app/views/login.blade.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/profile.blade.php" afterPath="$PROJECT_DIR$/app/views/profile.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/routes.php" afterPath="$PROJECT_DIR$/app/routes.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/config/session.php" afterPath="$PROJECT_DIR$/app/config/session.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="openidIdp.iws" />
@@ -162,7 +47,37 @@
     </favorites_list>
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name="login.blade.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="7" column="30" selection-start="178" selection-end="178" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="930">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CustomAuthProvider.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="129" column="0" selection-start="4528" selection-end="4528" vertical-scroll-proportion="-3.75" vertical-offset="1845" max-vertical-offset="2640">
+              <folding>
+                <element signature="e#25#69#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Guard.php" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Auth/Guard.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="271" column="0" selection-start="6495" selection-end="6495" vertical-scroll-proportion="0.36042404" vertical-offset="3888" max-vertical-offset="8745">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -180,22 +95,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/app/tests/OpenIdProviderControllerTest.php" />
-        <option value="$PROJECT_DIR$/app/tests/ServerExtensionTest.php" />
-        <option value="$PROJECT_DIR$/app/tests/UserTest.php" />
-        <option value="$PROJECT_DIR$/app/tests/XRDSDocumentTest.php" />
-        <option value="$PROJECT_DIR$/app/controllers/BaseController.php" />
-        <option value="$PROJECT_DIR$/app/controllers/DiscoveryController.php" />
-        <option value="$PROJECT_DIR$/app/controllers/HomeController.php" />
-        <option value="$PROJECT_DIR$/app/controllers/OpenIdProviderController.php" />
-        <option value="$PROJECT_DIR$/app/controllers/UserController.php" />
         <option value="$PROJECT_DIR$/app/config/mail.php" />
         <option value="$PROJECT_DIR$/app/config/session.php" />
         <option value="$PROJECT_DIR$/app/config/dev/mail.php" />
         <option value="$PROJECT_DIR$/app/filters.php" />
-        <option value="$PROJECT_DIR$/app/services/TrustedSitesService.php" />
+        <option value="$PROJECT_DIR$/app/database/migrations/2013_11_05_134406_create_user_activity_table.php" />
+        <option value="$PROJECT_DIR$/app/services/UserActionService.php" />
+        <option value="$PROJECT_DIR$/app/services/IUserActionService.php" />
         <option value="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" />
+        <option value="$PROJECT_DIR$/app/services/TrustedSitesService.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" />
+        <option value="$PROJECT_DIR$/app/views/profile.blade.php" />
+        <option value="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdErrorMessages.php" />
         <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
+        <option value="$PROJECT_DIR$/app/controllers/UserController.php" />
+        <option value="$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php" />
+        <option value="$PROJECT_DIR$/app/views/login.blade.php" />
       </list>
     </option>
   </component>
@@ -304,7 +219,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -351,132 +265,27 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="tests" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openid" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openid" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="handlers" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libs" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="config" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="openidIdp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="config" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="dev" />
+              <option name="myItemId" value="views" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="73" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="92" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="recentsLimit" value="5" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="72" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="recentsLimit" value="5" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../../www.openstack.org" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="100" />
-    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="955" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="954" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="955" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="100" />
     <property name="GoToClass.includeJavaFiles" value="false" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="92" />
@@ -642,17 +451,16 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="66" y="38" width="1300" height="728" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.56685346" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24740484" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24567474" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298639" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33333334" sideWeight="0.583045" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.41695502" sideWeight="0.6180945" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33974358" sideWeight="0.583045" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.41695502" sideWeight="0.6180945" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.4331465" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -661,6 +469,7 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="PHP-CGI Server" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871974" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -699,13 +508,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="php">
           <url>file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php</url>
-          <line>138</line>
-          <option name="timeStamp" value="452" />
+          <line>369</line>
+          <option name="timeStamp" value="453" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="php">
-          <url>file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php</url>
-          <line>341</line>
-          <option name="timeStamp" value="453" />
+          <url>file://$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php</url>
+          <line>129</line>
+          <option name="timeStamp" value="459" />
         </line-breakpoint>
       </breakpoints>
       <breakpoints-dialog>
@@ -715,130 +524,125 @@
           </selected-grouping-rules>
         </breakpoints-dialog>
       </breakpoints-dialog>
-      <option name="time" value="455" />
+      <option name="time" value="460" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/config/session.php">
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdRequest.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="22" selection-start="552" selection-end="552" vertical-scroll-proportion="59.875" vertical-offset="1707" max-vertical-offset="1965">
+        <state line="34" column="0" selection-start="546" selection-end="546" vertical-scroll-proportion="0.75951904" vertical-offset="131" max-vertical-offset="630">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/config/view.php">
+    <entry file="file://$PROJECT_DIR$/app/services/UserActionService.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="9.375" vertical-offset="225" max-vertical-offset="555">
+        <state line="9" column="49" selection-start="160" selection-end="160" vertical-scroll-proportion="0.17175573" vertical-offset="0" max-vertical-offset="524">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/config/workbench.php">
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/OpenIdProtocol.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
+        <state line="25" column="84" selection-start="782" selection-end="832" vertical-scroll-proportion="0.6296296" vertical-offset="115" max-vertical-offset="2700">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/config/dev/mail.php">
+    <entry file="file://$PROJECT_DIR$/app/views/profile.blade.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="21" selection-start="485" selection-end="485" vertical-scroll-proportion="59.25" vertical-offset="1677" max-vertical-offset="1935">
+        <state line="75" column="29" selection-start="3340" selection-end="3340" vertical-scroll-proportion="0.5607477" vertical-offset="945" max-vertical-offset="1665">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/storage/logs/log-apache2handler-2013-11-05.txt">
-      <provider editor-type-id="com.intellij.persistence.database.editor.CsvTableFileEditorProvider">
-        <state />
-      </provider>
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-13.264151" vertical-offset="3515" max-vertical-offset="3825">
+        <state line="18" column="56" selection-start="385" selection-end="414" vertical-scroll-proportion="-8.75" vertical-offset="0" max-vertical-offset="1725">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/filters.php">
+    <entry file="file://$PROJECT_DIR$/app/libs/openid/helpers/OpenIdErrorMessages.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="94" column="0" selection-start="2905" selection-end="2905" vertical-scroll-proportion="-58.75" vertical-offset="0" max-vertical-offset="1935">
-          <folding>
-            <element signature="e#6#58#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/storage/logs/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="307">
+        <state line="36" column="36" selection-start="2403" selection-end="2429" vertical-scroll-proportion="0.79452056" vertical-offset="44" max-vertical-offset="555">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/config/dev/app.php">
+    <entry file="file://$PROJECT_DIR$/app/storage/logs/log-apache2handler-2013-11-06.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="13.125" vertical-offset="315" max-vertical-offset="2910">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/config/app.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="5.625" vertical-offset="135" max-vertical-offset="2910">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/config/dev/database.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="17" selection-start="46" selection-end="46" vertical-scroll-proportion="0.26501766" vertical-offset="0" max-vertical-offset="1680">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Exception/Handler.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="130" column="0" selection-start="2959" selection-end="2959" vertical-scroll-proportion="0.17234468" vertical-offset="1789" max-vertical-offset="5700">
+        <state line="18" column="12" selection-start="156" selection-end="162" vertical-scroll-proportion="0.5046729" vertical-offset="0" max-vertical-offset="535">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/OpenIdProviderController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="0" selection-start="988" selection-end="988" vertical-scroll-proportion="0.59876543" vertical-offset="99" max-vertical-offset="585">
+        <state line="31" column="0" selection-start="1264" selection-end="1264" vertical-scroll-proportion="0.75308645" vertical-offset="99" max-vertical-offset="585">
           <folding>
             <element signature="e#7#59#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/services/TrustedSitesService.php">
+    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Controllers/Controller.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="48" selection-start="203" selection-end="203" vertical-scroll-proportion="0.17612524" vertical-offset="0" max-vertical-offset="720">
+        <state line="125" column="0" selection-start="3086" selection-end="3086" vertical-scroll-proportion="0.15430862" vertical-offset="1738" max-vertical-offset="4590">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php">
+    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Routing/Route.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="35" selection-start="379" selection-end="394" vertical-scroll-proportion="0.54389316" vertical-offset="0" max-vertical-offset="524">
-          <folding>
-            <element signature="e#36#65#0" expanded="true" />
-          </folding>
+        <state line="57" column="0" selection-start="1317" selection-end="1317" vertical-scroll-proportion="0.16221374" vertical-offset="740" max-vertical-offset="7275">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php">
+    <entry file="file://$PROJECT_DIR$/app/services/ServerConfigurationService.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="68" column="0" selection-start="1955" selection-end="1955" vertical-scroll-proportion="0.11340206" vertical-offset="905" max-vertical-offset="1590">
+        <state line="35" column="46" selection-start="1102" selection-end="1128" vertical-scroll-proportion="0.30612245" vertical-offset="405" max-vertical-offset="2355">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="145" column="53" selection-start="6619" selection-end="6619" vertical-scroll-proportion="4.2391305" vertical-offset="225" max-vertical-offset="6165">
+        <state line="12" column="39" selection-start="396" selection-end="435" vertical-scroll-proportion="0.662963" vertical-offset="1" max-vertical-offset="6630">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="119" column="0" selection-start="5100" selection-end="5100" vertical-scroll-proportion="0.3" vertical-offset="1704" max-vertical-offset="4275">
           <folding>
-            <element signature="e#35#49#0" expanded="true" />
+            <element signature="e#7#59#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="30" selection-start="178" selection-end="178" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="930">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="129" column="0" selection-start="4528" selection-end="4528" vertical-scroll-proportion="-3.75" vertical-offset="1845" max-vertical-offset="2640">
+          <folding>
+            <element signature="e#25#69#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Auth/Guard.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="271" column="0" selection-start="6495" selection-end="6495" vertical-scroll-proportion="0.36042404" vertical-offset="3888" max-vertical-offset="8745">
+          <folding />
         </state>
       </provider>
     </entry>

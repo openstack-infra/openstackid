@@ -1,5 +1,6 @@
 <?php
 
+use openid\exceptions\InvalidOpenIdMessageException;
 use openid\exceptions\InvalidRequestContextException;
 use openid\OpenIdProtocol;
 use openid\responses\OpenIdNonImmediateNegativeAssertion;
@@ -11,6 +12,7 @@ use openid\services\IUserService;
 use openid\strategies\OpenIdResponseStrategyFactoryMethod;
 use openid\XRDS\XRDSDocumentBuilder;
 use services\IUserActionService;
+use \openid\requests\OpenIdAuthenticationRequest;
 
 class UserController extends BaseController
 {
@@ -45,8 +47,24 @@ class UserController extends BaseController
 
     public function getLogin()
     {
-        if (Auth::guest())
-            return View::make("login");
+        if (Auth::guest()){
+            $msg = $this->memento_service->getCurrentRequest();
+            if (is_null($msg) || !$msg->IsValid() || !OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg))
+                return View::make("login");
+            else{
+                $auth_request = new OpenIdAuthenticationRequest($msg);
+                $params = array('realm'=>$auth_request->getRealm());
+                if(!$auth_request->isIdentitySelectByOP()){
+                    $params['claimed_id'] = $auth_request->getClaimedId();
+                    $params['identity'] = $auth_request->getIdentity();
+                    $params['identity_select'] = false;
+                }
+                else{
+                    $params['identity_select'] = true;
+                }
+                return View::make("login",$params);
+            }
+        }
         else {
             return Redirect::action("UserController@getProfile");
         }
@@ -88,20 +106,22 @@ class UserController extends BaseController
                 $username = Input::get("username");
                 $password = Input::get("password");
                 $remember = Input::get("remember");
+
                 if (is_null($remember))
                     $remember = false;
                 else
                     $remember = true;
-                if ($this->auth_service->Login($username, $password, $remember)) {
 
-                    $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), $this->getUserIp(), IUserActionService::LoginAction);
+                if ($this->auth_service->Login($username, $password, $remember)) {
                     $msg = $this->memento_service->getCurrentRequest();
                     if (!is_null($msg) && $msg->IsValid()) {
                         //go to authentication flow again
+                        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), $this->getUserIp(), IUserActionService::LoginAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
                         return Redirect::action("OpenIdProviderController@op_endpoint");
                     } else {
                         $user = $this->auth_service->getCurrentUser();
                         $identifier = $user->getIdentifier();
+                        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), $this->getUserIp(), IUserActionService::LoginAction);
                         return Redirect::action("UserController@getIdentity", array("identifier" => $identifier));
                     }
                 }
@@ -158,7 +178,12 @@ class UserController extends BaseController
         try {
             $trust_action = input::get("trust");
             if (!is_null($trust_action) && is_array($trust_action)) {
-                $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), $this->getUserIp(), IUserActionService::ConsentAction);
+
+                $msg = $this->memento_service->getCurrentRequest();
+                if (is_null($msg) || !$msg->IsValid())
+                    throw new InvalidOpenIdMessageException();
+
+                $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), $this->getUserIp(), IUserActionService::ConsentAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
                 $this->auth_service->setUserAuthorizationResponse($trust_action[0]);
                 return Redirect::action('OpenIdProviderController@op_endpoint');
             }

@@ -15,6 +15,7 @@ class CreateUserActivityTable extends Migration {
         {
             $table->bigIncrements('id')->unsigned();
             $table->string('from_ip',254);
+            $table->string('realm',1024)->nullable();
             $table->string('user_action',512);
             $table->bigInteger("user_id")->unsigned();
             $table->index('user_id');

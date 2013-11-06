@@ -69,6 +69,15 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
         return $realm;
     }
 
+    public function isIdentitySelectByOP(){
+        $claimed_id = $this->getClaimedId();
+        $identity   = $this->getIdentity();
+        //http://specs.openid.net/auth/2.0/identifier_select
+        if ($claimed_id == $identity && $identity == OpenIdProtocol::IdentifierSelectType)
+            return true;
+        return false;
+    }
+
     /**
      * @param $claimed_id The Claimed Identifier.
      * @param $identity The OP-Local Identifier.

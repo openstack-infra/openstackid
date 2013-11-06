@@ -3,8 +3,15 @@
 <title>Welcome to openstackId - Sign in </title>
 @stop
 @section('content')
+
+<h4>Welcome to OpenstackId!!!</h4>
+@if(isset($identity_select) && !$identity_select)
+<legend>
+    Sign in to <b>{{$realm}}</b> using <b>{{$identity}}</b>
+</legend>
+@endif
+
 <div class="span4" id="sidebar">
-    <h4>Welcome to OpenstackId!!!</h4>
     <div class="well">
         {{ Form::open(array('url' => URL::action('UserController@postLogin'), 'method' => 'post',  "autocomplete" => "off")) }}
         <fieldset>

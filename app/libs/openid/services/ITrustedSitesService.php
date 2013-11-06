@@ -4,7 +4,6 @@
 namespace openid\services;
 
 use openid\model\IOpenIdUser;
-use openid\model\ITrustedSite;
 
 interface ITrustedSitesService
 {
@@ -17,7 +16,7 @@ interface ITrustedSitesService
      * @param $return_to
      * @return  \array
      */
-    public function getTrustedSites(IOpenIdUser $user, $realm);
+    public function getTrustedSites(IOpenIdUser $user, $realm, $data = array());
 
     public function getAllTrustedSitesByUser(IOpenIdUser $user);
 }
