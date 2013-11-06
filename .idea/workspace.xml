@@ -2,19 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/database/migrations/2013_11_05_134406_create_user_activity_table.php" afterPath="$PROJECT_DIR$/app/database/migrations/2013_11_05_134406_create_user_activity_table.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php" afterPath="$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" afterPath="$PROJECT_DIR$/app/libs/openid/services/ITrustedSitesService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/IUserActionService.php" afterPath="$PROJECT_DIR$/app/services/IUserActionService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" afterPath="$PROJECT_DIR$/app/libs/openid/requests/OpenIdAuthenticationRequest.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" afterPath="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdErrorMessages.php" afterPath="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdErrorMessages.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/TrustedSitesService.php" afterPath="$PROJECT_DIR$/app/services/TrustedSitesService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/services/UserActionService.php" afterPath="$PROJECT_DIR$/app/services/UserActionService.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/UserController.php" afterPath="$PROJECT_DIR$/app/controllers/UserController.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/login.blade.php" afterPath="$PROJECT_DIR$/app/views/login.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/profile.blade.php" afterPath="$PROJECT_DIR$/app/views/profile.blade.php" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="openidIdp.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -48,11 +36,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="login.blade.php" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="login.blade.php" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="30" selection-start="178" selection-end="178" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="930">
+            <state line="9" column="3" selection-start="214" selection-end="214" vertical-scroll-proportion="0.5" vertical-offset="0" max-vertical-offset="990">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UserController.php" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="119" column="0" selection-start="5100" selection-end="5100" vertical-scroll-proportion="-42.75" vertical-offset="759" max-vertical-offset="4275">
+              <folding>
+                <element signature="e#7#59#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -68,10 +67,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Guard.php" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Guard.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Auth/Guard.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="271" column="0" selection-start="6495" selection-end="6495" vertical-scroll-proportion="0.36042404" vertical-offset="3888" max-vertical-offset="8745">
+            <state line="271" column="0" selection-start="6495" selection-end="6495" vertical-scroll-proportion="-4.25" vertical-offset="3888" max-vertical-offset="8745">
               <folding />
             </state>
           </provider>
@@ -266,6 +265,24 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="views" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="openidIdp" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="app" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="controllers" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -614,22 +631,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="119" column="0" selection-start="5100" selection-end="5100" vertical-scroll-proportion="0.3" vertical-offset="1704" max-vertical-offset="4275">
-          <folding>
-            <element signature="e#7#59#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="30" selection-start="178" selection-end="178" vertical-scroll-proportion="-4.375" vertical-offset="0" max-vertical-offset="930">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php">
       <provider selected="true" editor-type-id="text-editor">
         <state line="129" column="0" selection-start="4528" selection-end="4528" vertical-scroll-proportion="-3.75" vertical-offset="1845" max-vertical-offset="2640">
@@ -641,7 +642,23 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/vendor/laravel/framework/src/Illuminate/Auth/Guard.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="271" column="0" selection-start="6495" selection-end="6495" vertical-scroll-proportion="0.36042404" vertical-offset="3888" max-vertical-offset="8745">
+        <state line="271" column="0" selection-start="6495" selection-end="6495" vertical-scroll-proportion="-4.25" vertical-offset="3888" max-vertical-offset="8745">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="119" column="0" selection-start="5100" selection-end="5100" vertical-scroll-proportion="-42.75" vertical-offset="759" max-vertical-offset="4275">
+          <folding>
+            <element signature="e#7#59#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="3" selection-start="214" selection-end="214" vertical-scroll-proportion="0.5" vertical-offset="0" max-vertical-offset="990">
           <folding />
         </state>
       </provider>
