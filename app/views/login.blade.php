@@ -5,14 +5,16 @@
 @section('content')
 
 <h4>Welcome to OpenstackId!!!</h4>
-@if(isset($identity_select) && !$identity_select)
-    <legend>
-       Sign in to <b>{{$realm}}</b> using <b>{{$identity}}</b>
-    </legend>
-@else
-    <legend>
-       Sign in to <b>{{$realm}}</b> using your openstackid
-    </legend>
+@if(isset($identity_select))
+    @if(!$identity_select)
+        <legend>
+           Sign in to <b>{{$realm}}</b> using <b>{{$identity}}</b>
+        </legend>
+    @else
+        <legend>
+           Sign in to <b>{{$realm}}</b> using your openstackid
+        </legend>
+    @endif
 @endif
 
 <div class="span4" id="sidebar">

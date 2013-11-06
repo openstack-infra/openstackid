@@ -54,6 +54,7 @@ class UserController extends BaseController
             else{
                 $auth_request = new OpenIdAuthenticationRequest($msg);
                 $params = array('realm'=>$auth_request->getRealm());
+
                 if(!$auth_request->isIdentitySelectByOP()){
                     $params['claimed_id'] = $auth_request->getClaimedId();
                     $params['identity'] = $auth_request->getIdentity();

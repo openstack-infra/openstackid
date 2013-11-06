@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdc3929b-040d-4e45-bbd9-fa8f8bc87073" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/controllers/UserController.php" afterPath="$PROJECT_DIR$/app/controllers/UserController.php" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/views/login.blade.php" afterPath="$PROJECT_DIR$/app/views/login.blade.php" />
     </list>
     <ignored path="openidIdp.iws" />
@@ -39,7 +40,7 @@
       <file leaf-file-name="login.blade.php" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="3" selection-start="214" selection-end="214" vertical-scroll-proportion="0.5" vertical-offset="0" max-vertical-offset="990">
+            <state line="16" column="4" selection-start="418" selection-end="418" vertical-scroll-proportion="0.8888889" vertical-offset="0" max-vertical-offset="1020">
               <folding />
             </state>
           </provider>
@@ -48,7 +49,7 @@
       <file leaf-file-name="UserController.php" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="119" column="0" selection-start="5100" selection-end="5100" vertical-scroll-proportion="-42.75" vertical-offset="759" max-vertical-offset="4275">
+            <state line="56" column="0" selection-start="2423" selection-end="2423" vertical-scroll-proportion="-5.25" vertical-offset="714" max-vertical-offset="4290">
               <folding>
                 <element signature="e#7#59#0" expanded="true" />
               </folding>
@@ -107,8 +108,8 @@
         <option value="$PROJECT_DIR$/app/views/profile.blade.php" />
         <option value="$PROJECT_DIR$/app/libs/openid/helpers/OpenIdErrorMessages.php" />
         <option value="$PROJECT_DIR$/app/libs/openid/handlers/OpenIdAuthenticationRequestHandler.php" />
-        <option value="$PROJECT_DIR$/app/controllers/UserController.php" />
         <option value="$PROJECT_DIR$/app/libs/auth/CustomAuthProvider.php" />
+        <option value="$PROJECT_DIR$/app/controllers/UserController.php" />
         <option value="$PROJECT_DIR$/app/views/login.blade.php" />
       </list>
     </option>
@@ -649,7 +650,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/controllers/UserController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="119" column="0" selection-start="5100" selection-end="5100" vertical-scroll-proportion="-42.75" vertical-offset="759" max-vertical-offset="4275">
+        <state line="56" column="0" selection-start="2423" selection-end="2423" vertical-scroll-proportion="-5.25" vertical-offset="714" max-vertical-offset="4290">
           <folding>
             <element signature="e#7#59#0" expanded="true" />
           </folding>
@@ -658,7 +659,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/views/login.blade.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="3" selection-start="214" selection-end="214" vertical-scroll-proportion="0.5" vertical-offset="0" max-vertical-offset="990">
+        <state line="16" column="4" selection-start="418" selection-end="418" vertical-scroll-proportion="0.8888889" vertical-offset="0" max-vertical-offset="1020">
           <folding />
         </state>
       </provider>
