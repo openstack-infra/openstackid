@@ -17,13 +17,8 @@ use openid\services\ServiceCatalog;
 class CustomAuthProvider implements UserProviderInterface
 {
 
-    /**
-     * @var UserService
-     */
-    private $userService;
 
-    public function __construct()
-    {
+    public function __construct(){
 
     }
 
@@ -59,10 +54,11 @@ class CustomAuthProvider implements UserProviderInterface
     public function retrieveByCredentials(array $credentials)
     {
 
-        if (!isset($credentials['username']) || !isset($credentials['password']))
-            throw new AuthenticationException("invalid crendentials");
-
         try {
+
+            if (!isset($credentials['username']) || !isset($credentials['password']))
+                throw new AuthenticationException("invalid crendentials");
+
             $identifier = $credentials['username'];
             $password = $credentials['password'];
             $user = OpenIdUser::where('external_id', '=', $identifier)->first();
@@ -74,7 +70,7 @@ class CustomAuthProvider implements UserProviderInterface
             //get SS member
             $member = Member::where('Email', '=', $identifier)->first();
             if (is_null($member)) //member must exists
-                return null;
+                throw new AuthenticationException(sprintf("member %s does not exists!", $identifier));
 
             $user_service = Registry::getInstance()->get(ServiceCatalog::UserService);
 
@@ -87,7 +83,6 @@ class CustomAuthProvider implements UserProviderInterface
                 $user->last_login_date = gmdate("Y-m-d H:i:s", time());
                 $user->Save();
             }
-
 
             $user_name = $member->FirstName . "." . $member->Surname;
             //do association between user and member
@@ -118,7 +113,7 @@ class CustomAuthProvider implements UserProviderInterface
             //check if we have a current openid message
             $memento_service = Registry::getInstance()->get(ServiceCatalog::MementoService);
             $msg = $memento_service->getCurrentRequest();
-            if (is_null($msg) || !$msg->IsValid() || !OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg))
+            if (is_null($msg) || !$msg->isValid() || !OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg))
                 return $user;
             else {
                 $auth_request = new OpenIdAuthenticationRequest($msg);
@@ -135,6 +130,8 @@ class CustomAuthProvider implements UserProviderInterface
             }
 
         } catch (Exception $ex) {
+            $checkpoint_service = Registry::getInstance()->get(ServiceCatalog::CheckPointService);
+            $checkpoint_service->trackException($ex);
             Log::error($ex);
             return null;
         }

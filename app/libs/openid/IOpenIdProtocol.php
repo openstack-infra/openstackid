@@ -24,5 +24,5 @@ interface IOpenIdProtocol
      * @param OpenIdMessage $openIdMessage
      * @return responses\OpenIdResponse response
      */
-    public function HandleOpenIdMessage(OpenIdMessage $openIdMessage);
+    public function handleOpenIdMessage(OpenIdMessage $openIdMessage);
 }

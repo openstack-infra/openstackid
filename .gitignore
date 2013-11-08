@@ -6,3 +6,4 @@ composer.lock
 /app/storage/*
 .idea/*
 
+.idea

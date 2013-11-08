@@ -35,7 +35,7 @@ class OpenIdSREGRequest extends OpenIdRequest
         $this->log = Registry::getInstance()->get(ServiceCatalog::LogService);
     }
 
-    public function IsValid()
+    public function isValid()
     {
         try {
             //check identifier

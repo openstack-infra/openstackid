@@ -174,8 +174,8 @@ class OpenIdProtocol implements IOpenIdProtocol
         return $xrds;
     }
 
-    public function HandleOpenIdMessage(OpenIdMessage $openIdMessage)
+    public function handleOpenIdMessage(OpenIdMessage $openIdMessage)
     {
-        return $this->request_handlers->HandleMessage($openIdMessage);
+        return $this->request_handlers->handleMessage($openIdMessage);
     }
 }

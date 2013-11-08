@@ -50,7 +50,7 @@ class OpenIdAXExtension extends OpenIdExtension
     {
         try {
             $ax_request = new OpenIdAXRequest($request->getMessage());
-            if (!$ax_request->IsValid()) return;
+            if (!$ax_request->isValid()) return;
             $attributes = $ax_request->getRequiredAttributes();
             $data = array();
             foreach ($attributes as $attr) {
@@ -67,7 +67,7 @@ class OpenIdAXExtension extends OpenIdExtension
     {
         try {
             $ax_request = new OpenIdAXRequest($request->getMessage());
-            if (!$ax_request->IsValid()) return;
+            if (!$ax_request->isValid()) return;
 
             $response->addParam(self::paramNamespace(), self::NamespaceUrl);
             $response->addParam(self::param(self::Mode), self::FetchResponse);
@@ -115,7 +115,7 @@ class OpenIdAXExtension extends OpenIdExtension
         $data = array();
         try {
             $ax_request = new OpenIdAXRequest($request->getMessage());
-            if ($ax_request->IsValid()) {
+            if ($ax_request->isValid()) {
                 $attributes = $ax_request->getRequiredAttributes();
                 foreach ($attributes as $attr) {
                     array_push($data, $attr);

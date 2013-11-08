@@ -34,31 +34,35 @@ class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler
         parent::__construct($successor, $log);
     }
 
-    protected function InternalHandle(OpenIdMessage $message)
+    protected function internalHandle(OpenIdMessage $message)
     {
         $this->current_request = null;
         try {
 
             $this->current_request = SessionAssociationRequestFactory::buildRequest($message);
 
-            if (!$this->current_request->IsValid())
+            if (!$this->current_request->isValid())
                 throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidAssociationSessionRequest);
 
             $strategy = SessionAssociationRequestFactory::buildSessionAssociationStrategy($message);
             return $strategy->handle();
         } catch (InvalidSessionTypeException $inv_session_ex) {
+            $this->checkpoint_service->trackException($inv_session_ex);
             $response = new OpenIdAssociationSessionUnsuccessfulResponse($inv_session_ex->getMessage());
             $this->log->error($inv_session_ex);
             return $response;
         } catch (InvalidAssociationTypeException $inv_assoc_ex) {
+            $this->checkpoint_service->trackException($inv_assoc_ex);
             $response = new OpenIdAssociationSessionUnsuccessfulResponse($inv_assoc_ex->getMessage());
             $this->log->error($inv_assoc_ex);
             return $response;
         } catch (InvalidOpenIdMessageException $inv_msg_ex) {
             $response = new OpenIdDirectGenericErrorResponse($inv_msg_ex->getMessage());
+            $this->checkpoint_service->trackException($inv_msg_ex);
             $this->log->error($inv_msg_ex);
             return $response;
         } catch (Exception $ex) {
+            $this->checkpoint_service->trackException($ex);
             $response = new OpenIdDirectGenericErrorResponse('Server Error');
             $this->log->error($ex);
             return $response;
@@ -69,7 +73,7 @@ class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler
      * @param OpenIdMessage $message
      * @return bool
      */
-    protected function CanHandle(OpenIdMessage $message)
+    protected function canHandle(OpenIdMessage $message)
     {
         $res = OpenIdAssociationSessionRequest::IsOpenIdAssociationSessionRequest($message);
         return $res;

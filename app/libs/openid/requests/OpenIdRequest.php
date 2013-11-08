@@ -24,7 +24,7 @@ abstract class OpenIdRequest
         return $this->message->getMode();
     }
 
-    abstract public function IsValid();
+    abstract public function isValid();
 
     /**
      * @param OpenIDProtocol_ * $param

@@ -20,7 +20,5 @@ interface IServerConfigurationService
 
     public function getNonceLifetime();
 
-    public function isValidIP($remote_address);
-
     public function getAssetsUrl($asset_path);
 }

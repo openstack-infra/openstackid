@@ -34,7 +34,7 @@ class OpenIdAXRequest extends OpenIdRequest
      * @return bool
      * @throws InvalidOpenIdMessageException
      */
-    public function IsValid()
+    public function isValid()
     {
         try {
             //check identifier

@@ -135,21 +135,4 @@ class ServerConfigurationService implements IServerConfigurationService
         }
     }
 
-    public function isValidIP($remote_address)
-    {
-        $res = true;
-        try {
-            $banned_ip = BannedIP::where("ip", "=", $remote_address)->first();
-            if ($banned_ip) {
-                $banned_ip->hits = $banned_ip->hits + 1;
-                $banned_ip->Save();
-                sleep(2 ^ $banned_ip->hits);
-                $res = false;
-            }
-        } catch (Exception $ex) {
-            Log::error($ex);
-            $res = false;
-        }
-        return $res;
-    }
 }

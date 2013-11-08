@@ -15,17 +15,13 @@ use openid\services\ServiceCatalog;
 |
 */
 
+
+//SAP (single access point)
 App::before(function ($request) {
     try {
-        $ip = $request->server('HTTP_CLIENT_IP');
-        if (empty($ip))
-            $ip = $request->server('HTTP_X_FORWARDED_FOR');
-        if (empty($ip))
-            $ip = $request->server('REMOTE_ADDR');
-
-        $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
-        if (!$server_configuration_service->isValidIP($ip)) {
-            Log::error(sprintf("blackisted IP access %s", $ip));
+        //checkpoint security pattern entry point
+        $checkpoint_service = Registry::getInstance()->get(ServiceCatalog::CheckPointService);
+        if (!$checkpoint_service->check()) {
             return View::make('404');
         }
     } catch (Exception $ex) {
@@ -98,10 +94,10 @@ Route::filter("openid.needs.auth.request", function () {
     $memento_service = App::make("openid\\services\\IMementoOpenIdRequestService");
 
     $openid_message = $memento_service->getCurrentRequest();
-    if ($openid_message == null || !$openid_message->IsValid())
+    if ($openid_message == null || !$openid_message->isValid())
         throw new InvalidOpenIdMessageException();
     $auth_request = new OpenIdAuthenticationRequest($openid_message);
-    if (!$auth_request->IsValid())
+    if (!$auth_request->isValid())
         throw new InvalidOpenIdMessageException();
 });
 

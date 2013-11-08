@@ -13,6 +13,8 @@ use openid\exceptions\InvalidOpenIdMessageException;
 use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdMessage;
 use openid\services\ILogService;
+use openid\services\Registry;
+use openid\services\ServiceCatalog;
 
 /**
  * Class OpenIdMessageHandler
@@ -26,11 +28,13 @@ abstract class OpenIdMessageHandler
     protected $successor;
     protected $current_request;
     protected $log;
+    protected $checkpoint_service;
 
     public function __construct($successor, ILogService $log)
     {
         $this->successor = $successor;
         $this->log = $log;
+        $this->checkpoint_service = Registry::getInstance()->get(ServiceCatalog::CheckPointService);
     }
 
     /**
@@ -40,16 +44,18 @@ abstract class OpenIdMessageHandler
      * @return mixed
      * @throws \openid\exceptions\InvalidOpenIdMessageException
      */
-    public function HandleMessage(OpenIdMessage $message)
+    public function handleMessage(OpenIdMessage $message)
     {
-        if ($this->CanHandle($message)) {
+        if ($this->canHandle($message)) {
             //handle request
-            return $this->InternalHandle($message);
+            return $this->internalHandle($message);
         } else if (isset($this->successor) && !is_null($this->successor)) {
             return $this->successor->HandleMessage($message);
         }
         $this->log->warning_msg(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
-        throw new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
+        $ex  = new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
+        $this->checkpoint_service->trackException($ex);
+        throw $ex;
     }
 
     /**
@@ -58,12 +64,12 @@ abstract class OpenIdMessageHandler
      * @param OpenIdMessage $message
      * @return bool
      */
-    abstract protected function CanHandle(OpenIdMessage $message);
+    abstract protected function canHandle(OpenIdMessage $message);
 
     /**
      * Handler specific logic
      * @param OpenIdMessage $message
      * @return mixed
      */
-    abstract protected function InternalHandle(OpenIdMessage $message);
+    abstract protected function internalHandle(OpenIdMessage $message);
 }

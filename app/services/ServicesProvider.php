@@ -24,7 +24,10 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(ServiceCatalog::UserService, 'services\\UserService');
         $this->app->singleton(ServiceCatalog::NonceService, 'services\\NonceService');
         $this->app->singleton(ServiceCatalog::LogService, 'services\\LogService');
+        $this->app->singleton("openid\\services\\ISecurityPolicyCounterMeasure", 'services\\DelayCounterMeasure');
+        $this->app->singleton("openid\\services\\ISecurityPolicy", 'services\\BlacklistSecurityPolicy');
         $this->app->singleton('services\\IUserActionService', 'services\\UserActionService');
+        $this->app->singleton(ServiceCatalog::CheckPointService, 'services\\CheckPointService');
 
         Registry::getInstance()->set(ServiceCatalog::MementoService, $this->app->make(ServiceCatalog::MementoService));
         Registry::getInstance()->set(ServiceCatalog::AuthenticationStrategy, $this->app->make(ServiceCatalog::AuthenticationStrategy));
@@ -35,6 +38,7 @@ class ServicesProvider extends ServiceProvider
         Registry::getInstance()->set(ServiceCatalog::UserService, $this->app->make(ServiceCatalog::UserService));
         Registry::getInstance()->set(ServiceCatalog::NonceService, $this->app->make(ServiceCatalog::NonceService));
         Registry::getInstance()->set(ServiceCatalog::LogService, $this->app->make(ServiceCatalog::LogService));
+        Registry::getInstance()->set(ServiceCatalog::CheckPointService, $this->app->make(ServiceCatalog::CheckPointService));
     }
 
     public function register()

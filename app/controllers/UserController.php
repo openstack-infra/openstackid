@@ -13,6 +13,7 @@ use openid\strategies\OpenIdResponseStrategyFactoryMethod;
 use openid\XRDS\XRDSDocumentBuilder;
 use services\IUserActionService;
 use \openid\requests\OpenIdAuthenticationRequest;
+use services\IPHelper;
 
 class UserController extends BaseController
 {
@@ -49,7 +50,7 @@ class UserController extends BaseController
     {
         if (Auth::guest()){
             $msg = $this->memento_service->getCurrentRequest();
-            if (is_null($msg) || !$msg->IsValid() || !OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg))
+            if (is_null($msg) || !$msg->isValid() || !OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg))
                 return View::make("login");
             else{
                 $auth_request = new OpenIdAuthenticationRequest($msg);
@@ -74,7 +75,7 @@ class UserController extends BaseController
     public function cancelLogin()
     {
         $msg = $this->memento_service->getCurrentRequest();
-        if (!is_null($msg) && $msg->IsValid()) {
+        if (!is_null($msg) && $msg->isValid()) {
             $cancel_response = new OpenIdNonImmediateNegativeAssertion();
             $cancel_response->setReturnTo($msg->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo));
             $strategy = OpenIdResponseStrategyFactoryMethod::buildStrategy($cancel_response);
@@ -113,16 +114,16 @@ class UserController extends BaseController
                 else
                     $remember = true;
 
-                if ($this->auth_service->Login($username, $password, $remember)) {
+                if ($this->auth_service->login($username, $password, $remember)) {
                     $msg = $this->memento_service->getCurrentRequest();
-                    if (!is_null($msg) && $msg->IsValid()) {
+                    if (!is_null($msg) && $msg->isValid()) {
                         //go to authentication flow again
-                        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), $this->getUserIp(), IUserActionService::LoginAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
+                        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(), IUserActionService::LoginAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
                         return Redirect::action("OpenIdProviderController@op_endpoint");
                     } else {
                         $user = $this->auth_service->getCurrentUser();
                         $identifier = $user->getIdentifier();
-                        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), $this->getUserIp(), IUserActionService::LoginAction);
+                        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(), IUserActionService::LoginAction);
                         return Redirect::action("UserController@getIdentity", array("identifier" => $identifier));
                     }
                 }
@@ -139,15 +140,6 @@ class UserController extends BaseController
         }
     }
 
-    private function getUserIp()
-    {
-        $ip = Request::server('HTTP_CLIENT_IP');
-        if (empty($ip))
-            $ip = Request::server('HTTP_X_FORWARDED_FOR');
-        if (empty($ip))
-            $ip = Request::server('REMOTE_ADDR');
-        return $ip;
-    }
 
     public function getConsent()
     {
@@ -181,10 +173,10 @@ class UserController extends BaseController
             if (!is_null($trust_action) && is_array($trust_action)) {
 
                 $msg = $this->memento_service->getCurrentRequest();
-                if (is_null($msg) || !$msg->IsValid())
+                if (is_null($msg) || !$msg->isValid())
                     throw new InvalidOpenIdMessageException();
 
-                $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), $this->getUserIp(), IUserActionService::ConsentAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
+                $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(), IUserActionService::ConsentAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
                 $this->auth_service->setUserAuthorizationResponse($trust_action[0]);
                 return Redirect::action('OpenIdProviderController@op_endpoint');
             }
@@ -239,7 +231,7 @@ class UserController extends BaseController
 
     public function logout()
     {
-        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), $this->getUserIp(), IUserActionService::LogoutAction);
+        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(), IUserActionService::LogoutAction);
         Auth::logout();
         return Redirect::action("UserController@getLogin");
     }

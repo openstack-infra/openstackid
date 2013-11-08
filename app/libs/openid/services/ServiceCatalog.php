@@ -15,4 +15,5 @@ class ServiceCatalog
     const NonceService = 'openid\\services\\INonceService';
     const LogService = 'openid\\services\\ILogService';
     const AuthenticationService = 'openid\\services\\IAuthService';
+    const CheckPointService = 'openid\\services\\ICheckPointService';
 }

@@ -10,6 +10,9 @@
 | your classes in the "global" namespace without Composer updating.
 |
 */
+use openid\exceptions\InvalidOpenIdMessageException;
+use \openid\services\Registry;
+use \openid\services\ServiceCatalog;
 
 ClassLoader::addDirectories(array(
 
@@ -57,13 +60,21 @@ $mono_log->pushHandler($handler);
 
 
 App::error(function (Exception $exception, $code) {
+    $checkpoint_service = Registry::getInstance()->get(ServiceCatalog::CheckPointService);
     Log::error($exception);
+    if($checkpoint_service ){
+        $checkpoint_service->trackException($exception);
+    }
     return View::make('404');
 });
 
 
-App::error(function (openid\exceptions\InvalidOpenIdMessageException $exception, $code) {
+App::error(function (InvalidOpenIdMessageException $exception, $code) {
+    $checkpoint_service = Registry::getInstance()->get(ServiceCatalog::CheckPointService);
     Log::error($exception);
+    if($checkpoint_service ){
+        $checkpoint_service->trackException($exception);
+    }
     return View::make('404');
 });
 

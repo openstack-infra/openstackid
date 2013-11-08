@@ -22,7 +22,7 @@ class OpenIdCheckAuthenticationRequest extends OpenIdAuthenticationRequest
         return false;
     }
 
-    public function IsValid()
+    public function isValid()
     {
         $mode = $this->getMode();
         $claimed_assoc = $this->getAssocHandle();

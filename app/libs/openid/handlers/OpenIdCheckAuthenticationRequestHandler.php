@@ -36,13 +36,13 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
         $this->nonce_service = $nonce_service;
     }
 
-    protected function InternalHandle(OpenIdMessage $message)
+    protected function internalHandle(OpenIdMessage $message)
     {
         $this->current_request = null;
         try {
             $this->current_request = new OpenIdCheckAuthenticationRequest($message);
 
-            if (!$this->current_request->IsValid())
+            if (!$this->current_request->isValid())
                 throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidOpenIdCheckAuthenticationRequestMessage);
             $claimed_nonce = new OpenIdNonce($this->current_request->getNonce());
 
@@ -89,28 +89,33 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
             }
             return new OpenIdCheckAuthenticationResponse($is_valid, $claimed_invalidate_handle);
         } catch (InvalidAssociationTypeException $inv_assoc_ex) {
+            $this->checkpoint_service->trackException($inv_assoc_ex);
             $this->log->warning($inv_assoc_ex);
             $response = new OpenIdDirectGenericErrorResponse($inv_assoc_ex->getMessage());
             return $response;
         } catch (ReplayAttackException $replay_ex) {
+            $this->checkpoint_service->trackException($replay_ex);
             $this->log->warning($replay_ex);
             $response = new OpenIdDirectGenericErrorResponse($replay_ex->getMessage());
             return $response;
         } catch (InvalidNonce $inv_nonce_ex) {
+            $this->checkpoint_service->trackException($inv_nonce_ex);
             $this->log->error($inv_nonce_ex);
             $response = new OpenIdDirectGenericErrorResponse($inv_nonce_ex->getMessage());
             return $response;
         } catch (InvalidOpenIdMessageException $inv_msg_ex) {
+            $this->checkpoint_service->trackException($inv_msg_ex);
             $this->log->error($inv_msg_ex);
             $response = new OpenIdDirectGenericErrorResponse($inv_msg_ex->getMessage());
             return $response;
         } catch (Exception $ex) {
+            $this->checkpoint_service->trackException($ex);
             $this->log->error($ex);
             return new OpenIdDirectGenericErrorResponse("Server Error");
         }
     }
 
-    protected function CanHandle(OpenIdMessage $message)
+    protected function canHandle(OpenIdMessage $message)
     {
         $res = OpenIdCheckAuthenticationRequest::IsOpenIdCheckAuthenticationRequest($message);
         return $res;

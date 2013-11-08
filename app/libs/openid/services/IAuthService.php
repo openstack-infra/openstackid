@@ -35,7 +35,7 @@ interface IAuthService
      * @param $remember_me
      * @return mixed
      */
-    public function Login($username, $password, $remember_me);
+    public function login($username, $password, $remember_me);
 
     public function getUserByUsername($username);
 

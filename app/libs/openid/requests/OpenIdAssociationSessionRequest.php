@@ -29,7 +29,7 @@ class OpenIdAssociationSessionRequest extends OpenIdRequest
      * @throws \openid\exceptions\InvalidSessionTypeException
      * @throws \openid\exceptions\InvalidAssociationTypeException
      */
-    public function IsValid()
+    public function isValid()
     {
         $mode = $this->getMode();
         if ($mode != OpenIdProtocol::AssociateMode)

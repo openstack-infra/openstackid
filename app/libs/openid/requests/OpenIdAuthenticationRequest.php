@@ -28,7 +28,7 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
         return $this->getParam(OpenIdProtocol::OpenIDProtocol_AssocHandle);
     }
 
-    public function IsValid()
+    public function isValid()
     {
         $return_to = $this->getReturnTo();
         $claimed_id = $this->getClaimedId();

@@ -66,7 +66,7 @@ class OpenIdSREGExtension extends OpenIdExtension
         try {
             $simple_reg_request = new OpenIdSREGRequest($request->getMessage());
 
-            if (!$simple_reg_request->IsValid()) return;
+            if (!$simple_reg_request->isValid()) return;
             $attributes = $simple_reg_request->getRequiredAttributes();
             $opt_attributes = $simple_reg_request->getOptionalAttributes();
             $policy_url = $simple_reg_request->getPolicyUrl();
@@ -89,7 +89,7 @@ class OpenIdSREGExtension extends OpenIdExtension
     {
         try {
             $simple_reg_request = new OpenIdSREGRequest($request->getMessage());
-            if (!$simple_reg_request->IsValid()) return;
+            if (!$simple_reg_request->isValid()) return;
 
             $response->addParam(self::paramNamespace(), self::NamespaceUrl);
             $attributes = $simple_reg_request->getRequiredAttributes();
@@ -135,7 +135,7 @@ class OpenIdSREGExtension extends OpenIdExtension
         $data = array();
         try {
             $simple_reg_request = new OpenIdSREGRequest($request->getMessage());
-            if ($simple_reg_request->IsValid()) {
+            if ($simple_reg_request->isValid()) {
                 $attributes = $simple_reg_request->getRequiredAttributes();
                 $opt_attributes = $simple_reg_request->getOptionalAttributes();
                 $attributes = array_merge($attributes, $opt_attributes);

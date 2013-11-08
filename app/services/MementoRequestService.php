@@ -46,7 +46,7 @@ class MementoRequestService implements IMementoOpenIdRequestService
     public function getCurrentRequest()
     {
         $msg = new OpenIdMessage(Input::all());
-        if (!$msg->IsValid()) {
+        if (!$msg->isValid()) {
             $msg = null;
             $old_data = Input::old();
             $openid_params = array();

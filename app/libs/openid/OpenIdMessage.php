@@ -73,7 +73,7 @@ class OpenIdMessage implements \ArrayAccess
         return null;
     }
 
-    public function IsValid()
+    public function isValid()
     {
         $ns = $this->getParam(OpenIdProtocol::OpenIDProtocol_NS);
         $mode = $this->getParam(OpenIdProtocol::OpenIDProtocol_Mode);
