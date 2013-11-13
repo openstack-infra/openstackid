@@ -24,4 +24,6 @@ interface ISecurityPolicy {
      * @return mixed
      */
     public function apply(Exception $ex);
+
+    public function setCounterMeasure(ISecurityPolicyCounterMeasure $counter_measure);
 } 

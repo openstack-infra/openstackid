@@ -2,7 +2,6 @@
 
 
 namespace auth;
-
 use auth\exceptions\AuthenticationException;
 use Exception;
 use Illuminate\Auth\UserInterface;
@@ -13,6 +12,7 @@ use openid\helpers\OpenIdErrorMessages;
 use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\Registry;
 use openid\services\ServiceCatalog;
+use  auth\exceptions\AuthenticationInvalidPasswordAttemptException;
 
 class CustomAuthProvider implements UserProviderInterface
 {
@@ -64,17 +64,17 @@ class CustomAuthProvider implements UserProviderInterface
             $user = OpenIdUser::where('external_id', '=', $identifier)->first();
 
             //check user status...
-            if (!is_null($user) && ($user->lock || !$user->active))
+            if (!is_null($user) && ($user->lock || !$user->active)){
+                Log::warning(sprintf("user %s is on lock state",$identifier));
                 return null;
+            }
 
             //get SS member
             $member = Member::where('Email', '=', $identifier)->first();
             if (is_null($member)) //member must exists
                 throw new AuthenticationException(sprintf("member %s does not exists!", $identifier));
 
-            $user_service = Registry::getInstance()->get(ServiceCatalog::UserService);
 
-            $valid_password = $member->checkPassword($password);
             //if user does not exists, then create it
             if (is_null($user)) {
                 //create user
@@ -84,28 +84,26 @@ class CustomAuthProvider implements UserProviderInterface
                 $user->Save();
             }
 
+            $user_service = Registry::getInstance()->get(ServiceCatalog::UserService);
+
+            $valid_password = $member->checkPassword($password);
+
+            if(!$valid_password)
+                throw new AuthenticationInvalidPasswordAttemptException($identifier,sprintf("invalid login attempt for user %s ",$identifier));
+
             $user_name = $member->FirstName . "." . $member->Surname;
             //do association between user and member
             $user_service->associateUser($user->id, strtolower($user_name));
 
             $server_configuration = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
 
-            if (!$valid_password) {
-                //apply lock policy
-                if ($user->login_failed_attempt < $server_configuration->getMaxFailedLoginAttempts())
-                    $user_service->updateFailedLoginAttempts($user->id);
-                else {
-                    $user_service->lockUser($user->id);
-                }
-                $user = null;
-            } else {
-                //update user fields
-                $user->last_login_date = gmdate("Y-m-d H:i:s", time());
-                $user->login_failed_attempt = 0;
-                $user->active = true;
-                $user->lock = false;
-                $user->Save();
-            }
+            //update user fields
+            $user->last_login_date = gmdate("Y-m-d H:i:s", time());
+            $user->login_failed_attempt = 0;
+            $user->active = true;
+            $user->lock = false;
+            $user->Save();
+
             //reload user...
             $user = OpenIdUser::where('external_id', '=', $identifier)->first();
             $user->setMember($member);
@@ -116,6 +114,7 @@ class CustomAuthProvider implements UserProviderInterface
             if (is_null($msg) || !$msg->isValid() || !OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg))
                 return $user;
             else {
+                //check if current user is has the same identity that the one claimed on openid message
                 $auth_request = new OpenIdAuthenticationRequest($msg);
                 if ($auth_request->isIdentitySelectByOP())
                     return $user;
@@ -124,8 +123,8 @@ class CustomAuthProvider implements UserProviderInterface
                 $current_identity = $server_configuration->getUserIdentityEndpointURL($user->getIdentifier());
                 if ($claimed_id == $current_identity || $identity == $current_identity)
                     return $user;
-
                 Log::warning(sprintf(OpenIdErrorMessages::AlreadyExistSessionMessage, $current_identity, $identity));
+                //if not return fail ( we cant log in with a different user that the one stated on the authentication message!
                 return null;
             }
 

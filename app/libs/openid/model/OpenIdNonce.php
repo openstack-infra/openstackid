@@ -72,7 +72,7 @@ class OpenIdNonce
     public function isValid()
     {
         $server_configuration_service = Registry::getInstance()->get("openid\\services\\IServerConfigurationService");
-        $allowed_skew = $server_configuration_service->getNonceLifetime();
+        $allowed_skew = $server_configuration_service->getConfigValue("Nonce.Lifetime");
         $now = time();
         // Time after which we should not use the nonce
         $past = $now - $allowed_skew;

@@ -11,5 +11,5 @@ namespace openid\services;
  */
 interface ISecurityPolicyCounterMeasure
 {
-    public function trigger();
+    public function trigger(array $params);
 } 

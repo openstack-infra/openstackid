@@ -3,13 +3,14 @@
 namespace services;
 
 use BannedIP;
+use DateTime;
 use DB;
 use Exception;
 use Log;
 use openid\services\ISecurityPolicy;
 use openid\services\ISecurityPolicyCounterMeasure;
+use openid\services\IServerConfigurationService;
 use UserExceptionTrail;
-use \DateTime;
 
 /**
  * Class BlacklistSecurityPolicy
@@ -19,37 +20,28 @@ use \DateTime;
 class BlacklistSecurityPolicy implements ISecurityPolicy
 {
 
-    const BannedIpLifeTimeSeconds = 21600;// 6 hs
-    const MinutesWithoutExceptions = 5;
-    const ReplayAttackExceptionInitialDelay = 10;
-    const MaxInvalidNonceAttempts = 10;
-    const InvalidNonceInitialDelay = 10;
-    const MaxInvalidOpenIdMessageExceptionAttempts = 10;
-    const InvalidOpenIdMessageExceptionInitialDelay = 10;
-    const MaxOpenIdInvalidRealmExceptionAttempts = 10;
-    const OpenIdInvalidRealmExceptionInitialDelay = 10;
-    const MaxInvalidOpenIdMessageModeAttempts = 10;
-    const InvalidOpenIdMessageModeInitialDelay = 10;
-    const MaxInvalidOpenIdAuthenticationRequestModeAttempts = 10;
-    const InvalidOpenIdAuthenticationRequestModeInitialDelay = 10;
-    const MaxAuthenticationExceptionAttempts = 10;
-    const AuthenticationExceptionInitialDelay = 20;
-
+    private $server_configuration_service;
     private $redis;
     private $counter_measure;
 
-    public function __construct(ISecurityPolicyCounterMeasure $counter_measure)
+    public function __construct(IServerConfigurationService $server_configuration_service)
     {
-        $this->counter_measure = $counter_measure;
+
         $this->redis = \RedisLV4::connection();
+        $this->server_configuration_service = $server_configuration_service;
     }
 
+    /**
+     * Check policy
+     * @return bool
+     */
     public function check()
     {
         $res = true;
         $remote_address = IPHelper::getUserIp();
 
         try {
+            //check if banned ip is on redis ...
             if ($this->redis->exists($remote_address)) {
                 $this->redis->incr($remote_address);
                 $res = false;
@@ -61,18 +53,19 @@ class BlacklistSecurityPolicy implements ISecurityPolicy
                     //set lock
                     $success = $this->redis->setnx("lock." . $remote_address, 1);
 
-                    if (!$success)
-                        throw new Exception("BlacklistSecurityPolicy->check : lock already taken!");
+                    if (!$success) // if we cant get lock, then error
+                        throw new Exception(sprintf("BlacklistSecurityPolicy->check : lock already taken for banned ip %s!", $banned_ip->ip));
 
                     try {
-                        $issued             = $banned_ip->created_at;
-                        $utc_now            = gmdate("Y-m-d H:i:s", time());
-                        $utc_now            = DateTime::createFromFormat("Y-m-d H:i:s", $utc_now);
+
+                        $issued = $banned_ip->created_at;
+                        $utc_now = gmdate("Y-m-d H:i:s", time());
+                        $utc_now = DateTime::createFromFormat("Y-m-d H:i:s", $utc_now);
 
                         //get time lived on seconds
-                        $time_lived_seconds = abs($utc_now->getTimestamp()-$issued->getTimestamp());
+                        $time_lived_seconds = abs($utc_now->getTimestamp() - $issued->getTimestamp());
 
-                        if ($time_lived_seconds >= self::BannedIpLifeTimeSeconds) {
+                        if ($time_lived_seconds >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds")) {
                             //void banned ip
                             $banned_ip->delete();
                         } else {
@@ -82,7 +75,7 @@ class BlacklistSecurityPolicy implements ISecurityPolicy
                             $success = $this->redis->setnx($banned_ip->ip, $banned_ip->hits);
                             if ($success) {
                                 //set remaining time to live
-                                $this->redis->expire($remote_address, (self::BannedIpLifeTimeSeconds - $time_lived_seconds) );
+                                $this->redis->expire($remote_address, ($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds") - $time_lived_seconds));
                             }
                             $res = false;
                             //release lock
@@ -105,6 +98,11 @@ class BlacklistSecurityPolicy implements ISecurityPolicy
         return $res;
     }
 
+    /**
+     * Apply security policy
+     * @param Exception $ex
+     * @return mixed|void
+     */
     public function apply(Exception $ex)
     {
         try {
@@ -113,50 +111,50 @@ class BlacklistSecurityPolicy implements ISecurityPolicy
             //check exception count by type on last "MinutesWithoutExceptions" minutes...
             $exception_count = UserExceptionTrail::where('from_ip', '=', $remote_ip)
                 ->where('exception_type', '=', $exception_class)
-                ->where('created_at', '>', DB::raw('( UTC_TIMESTAMP() - INTERVAL ' . self::MinutesWithoutExceptions . ' MINUTE )'))
+                ->where('created_at', '>', DB::raw('( UTC_TIMESTAMP() - INTERVAL ' . $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MinutesWithoutExceptions") . ' MINUTE )'))
                 ->count();
 
             switch ($exception_class) {
                 case 'openid\exceptions\ReplayAttackException':
                 {
                     //on replay attack , ban ip..
-                    $this->createBannedIP(self::ReplayAttackExceptionInitialDelay, $exception_class);
+                    $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.ReplayAttackExceptionInitialDelay"), $exception_class);
                 }
                     break;
                 case 'openid\exceptions\InvalidNonce':
                 {
-                    if ($exception_count >= self::MaxInvalidNonceAttempts)
-                        $this->createBannedIP(self::InvalidNonceInitialDelay, $exception_class);
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxInvalidNonceAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.InvalidNonceInitialDelay"), $exception_class);
                 }
                     break;
                 case 'openid\exceptions\InvalidOpenIdMessageException':
                 {
-                    if ($exception_count >= self::MaxInvalidOpenIdMessageExceptionAttempts)
-                        $this->createBannedIP(self::InvalidOpenIdMessageExceptionInitialDelay, $exception_class);
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxInvalidOpenIdMessageExceptionAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.InvalidOpenIdMessageExceptionInitialDelay"), $exception_class);
                 }
                     break;
                 case 'openid\exceptions\OpenIdInvalidRealmException':
                 {
-                    if ($exception_count >= self::MaxOpenIdInvalidRealmExceptionAttempts)
-                        $this->createBannedIP(self::OpenIdInvalidRealmExceptionInitialDelay, $exception_class);
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxOpenIdInvalidRealmExceptionAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OpenIdInvalidRealmExceptionInitialDelay"), $exception_class);
                 }
                     break;
                 case 'openid\exceptions\InvalidOpenIdMessageMode':
                 {
-                    if ($exception_count >= self::MaxInvalidOpenIdMessageModeAttempts)
-                        $this->createBannedIP(self::InvalidOpenIdMessageModeInitialDelay, $exception_class);
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxInvalidOpenIdMessageModeAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.InvalidOpenIdMessageModeInitialDelay"), $exception_class);
                 }
                     break;
                 case 'openid\exceptions\InvalidOpenIdAuthenticationRequestMode':
                 {
-                    if ($exception_count >= self::MaxInvalidOpenIdAuthenticationRequestModeAttempts)
-                        $this->createBannedIP(self::InvalidOpenIdAuthenticationRequestModeInitialDelay, $exception_class);
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxInvalidOpenIdAuthenticationRequestModeAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.InvalidOpenIdAuthenticationRequestModeInitialDelay"), $exception_class);
                 }
                     break;
                 case 'auth\exceptions\AuthenticationException':
                 {
-                    if ($exception_count >= self::MaxAuthenticationExceptionAttempts)
-                        $this->createBannedIP(self::AuthenticationExceptionInitialDelay, $exception_class);
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxAuthenticationExceptionAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay"), $exception_class);
                 }
                     break;
             }
@@ -177,7 +175,7 @@ class BlacklistSecurityPolicy implements ISecurityPolicy
             //try to create on redis
             $success = $this->redis->setnx($remote_address, $initial_hits);
             if ($success) {
-                $this->redis->expire($remote_address, self::BannedIpLifeTimeSeconds);
+                $this->redis->expire($remote_address, $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds"));
             }
 
             Log::warning(sprintf("BlacklistSecurityPolicy: Banning ip %s by Exception %s", $remote_address, $exception_type));
@@ -193,5 +191,10 @@ class BlacklistSecurityPolicy implements ISecurityPolicy
         } catch (Exception $ex) {
             Log::error($ex);
         }
+    }
+
+    public function setCounterMeasure(ISecurityPolicyCounterMeasure $counter_measure)
+    {
+        $this->counter_measure = $counter_measure;
     }
 }

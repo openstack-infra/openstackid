@@ -2,8 +2,8 @@
 
 namespace services;
 
-use \Exception;
-use \Log;
+use Exception;
+use Log;
 use openid\services\ICheckPointService;
 use openid\services\ISecurityPolicy;
 
@@ -15,18 +15,18 @@ class CheckPointService implements ICheckPointService
     public function __construct(ISecurityPolicy $policy)
     {
         $this->policies = array();
-        array_push($this->policies,$policy);
+        array_push($this->policies, $policy);
     }
 
-    public function check(){
+    public function check()
+    {
         $res = false;
-        try{
-            foreach($this->policies as $policy){
+        try {
+            foreach ($this->policies as $policy) {
                 $res = $policy->check();
-                if(!$res) break;
+                if (!$res) break;
             }
-        }
-        catch(Exception $ex){
+        } catch (Exception $ex) {
             Log::error($ex);
         }
         return $res;
@@ -47,7 +47,7 @@ class CheckPointService implements ICheckPointService
             $user_trail->exception_type = $class_name;
             $user_trail->Save();
             //applying policies
-            foreach($this->policies as $policy){
+            foreach ($this->policies as $policy) {
                 $policy->apply($ex);
             }
         } catch (Exception $ex) {
@@ -57,6 +57,6 @@ class CheckPointService implements ICheckPointService
 
     public function addPolicy(ISecurityPolicy $policy)
     {
-        array_push($this->policies,$policy);
+        array_push($this->policies, $policy);
     }
 }

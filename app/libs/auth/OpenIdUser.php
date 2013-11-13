@@ -186,7 +186,7 @@ class OpenIdUser extends \Eloquent implements UserInterface, IOpenIdUser
         if (!is_null($photoId) && is_numeric($photoId) && $photoId > 0) {
             $photo = MemberPhoto::where('ID', '=', $photoId)->first();
             $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
-            $url = $server_configuration_service->getAssetsUrl($photo->Filename);
+            $url = $server_configuration_service->getConfigValue("Assets.Url").$photo->Filename;
             return $url;
         }
         return '';

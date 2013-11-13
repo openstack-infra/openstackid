@@ -62,7 +62,7 @@ class SessionAssociationDHStrategy implements ISessionAssociationStrategy
             $server_public_key = base64_encode($dh->getPublicKey(DiffieHellman::FORMAT_BTWOC));
             $enc_mac_key = base64_encode($HMAC_secret_handle ^ $hashed_shared_secret);
             $assoc_handle = AssocHandleGenerator::generate();
-            $expires_in = $this->server_configuration_service->getSessionAssociationLifetime();
+            $expires_in = $this->server_configuration_service->getConfigValue("Session.Association.Lifetime");
             $response = new OpenIdDiffieHellmanAssociationSessionResponse($assoc_handle, $session_type, $assoc_type, $expires_in, $server_public_key, $enc_mac_key);
             $issued = gmdate("Y-m-d H:i:s", time());
             $this->association_service->addAssociation($assoc_handle, $HMAC_secret_handle, $assoc_type, $expires_in, $issued, IAssociation::TypeSession, null);

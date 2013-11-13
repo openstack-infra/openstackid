@@ -2,10 +2,10 @@
 
 namespace services;
 
-use BannedIP;
 use Exception;
 use openid\services\IServerConfigurationService;
 use ServerConfiguration;
+
 
 class ServerConfigurationService implements IServerConfigurationService
 {
@@ -22,15 +22,46 @@ class ServerConfigurationService implements IServerConfigurationService
     private $max_failed_login_attempts_2_show_captcha;
     private $nonce_lifetime;
     private $assets_url;
+    private $redis;
+    private $default_config_params;
 
     public function __construct()
     {
+        //todo: remove all specific methods per key and use getConfigValue
         $this->private_association_lifetime = null;
         $this->session_association_lifetime = null;
         $this->max_failed_login_attempts = null;
         $this->max_failed_login_attempts_2_show_captcha = null;
         $this->nonce_lifetime = null;
         $this->assets_url = null;
+
+
+        $this->redis = \RedisLV4::connection();
+
+        //default config values
+        $this->default_config_params = array();
+        $this->default_config_params["Private.Association.Lifetime"] = 240;
+        $this->default_config_params["Session.Association.Lifetime"] = 21600;
+        $this->default_config_params["MaxFailed.Login.Attempts"] = 10;
+        $this->default_config_params["MaxFailed.LoginAttempts.2ShowCaptcha"] = 3;
+        $this->default_config_params["Nonce.Lifetime"] = 360;
+        $this->default_config_params["Assets.Url"] = 'http://www.openstack.org/';
+        $this->default_config_params["BlacklistSecurityPolicy.BannedIpLifeTimeSeconds"] = 21600;
+        $this->default_config_params["BlacklistSecurityPolicy.MinutesWithoutExceptions"] = 5;
+        $this->default_config_params["BlacklistSecurityPolicy.ReplayAttackExceptionInitialDelay"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidNonceAttempts"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.InvalidNonceInitialDelay"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidOpenIdMessageExceptionAttempts"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.InvalidOpenIdMessageExceptionInitialDelay"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxOpenIdInvalidRealmExceptionAttempts"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.OpenIdInvalidRealmExceptionInitialDelay"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidOpenIdMessageModeAttempts"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.InvalidOpenIdMessageModeInitialDelay"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidOpenIdAuthenticationRequestModeAttempts"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.InvalidOpenIdAuthenticationRequestModeInitialDelay"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxAuthenticationExceptionAttempts"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay"] = 20;
+
     }
 
     public function getUserIdentityEndpointURL($identifier)
@@ -45,94 +76,33 @@ class ServerConfigurationService implements IServerConfigurationService
         return $url;
     }
 
-    public function getPrivateAssociationLifetime()
+       /**
+     * get config value from redis and if not in redis check for it on table server_configuration
+     * @param $key
+     * @return mixed
+     */
+    public function getConfigValue($key)
     {
+        $res = null;
         try {
-            if (is_null($this->private_association_lifetime)) {
-                $conf = ServerConfiguration::where('key', '=', 'Private.Association.Lifetime')->first();
-                if (!$conf || !is_numeric($conf->value)) $this->private_association_lifetime = self::DefaultPrivateAssociationLifetime;
-                else $this->private_association_lifetime = intval($conf->value);
-            }
-            return $this->private_association_lifetime;
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return self::DefaultPrivateAssociationLifetime;
-        }
-    }
 
-    public function getSessionAssociationLifetime()
-    {
-        try {
-            if (is_null($this->session_association_lifetime)) {
-                $conf = ServerConfiguration::where('key', '=', 'Session.Association.Lifetime')->first();
-                if (!$conf || !is_numeric($conf->value)) $this->session_association_lifetime = self::DefaultSessionAssociationLifetime;
-                else $this->session_association_lifetime = intval($conf->value);
+            if (!$this->redis->exists($key)) {
+                $conf = ServerConfiguration::where('key', '=', $key)->first();
+                if ($conf)
+                    $this->redis->setnx($key, $conf->value);
+                else if (isset($this->default_config_params[$key]))
+                    $this->redis->setnx($key, $this->default_config_params[$key]);
+                else return null;
             }
-            return $this->session_association_lifetime;
+            $res = $this->redis->get($key);
         } catch (Exception $ex) {
             Log::error($ex);
-            return self::DefaultSessionAssociationLifetime;
-        }
-    }
+            if (isset($this->default_config_params[$key])) {
+                $res = $this->default_config_params[$key];
+            }
 
-    public function getMaxFailedLoginAttempts()
-    {
-        try {
-            if (is_null($this->max_failed_login_attempts)) {
-                $conf = ServerConfiguration::where('key', '=', 'MaxFailed.Login.Attempts')->first();
-                if (!$conf || !is_numeric($conf->value)) $this->max_failed_login_attempts = self::DefaultMaxFailedLoginAttempts;
-                else $this->max_failed_login_attempts = intval($conf->value);
-            }
-            return $this->max_failed_login_attempts;
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return self::DefaultMaxFailedLoginAttempts;
         }
-    }
-
-    public function getMaxFailedLoginAttempts2ShowCaptcha()
-    {
-        try {
-            if (is_null($this->max_failed_login_attempts_2_show_captcha)) {
-                $conf = ServerConfiguration::where('key', '=', 'MaxFailed.LoginAttempts.2ShowCaptcha')->first();
-                if (!$conf || !is_numeric($conf->value)) $this->max_failed_login_attempts_2_show_captcha = self::DefaultMaxFailedLoginAttempts2ShowCaptcha;
-                else $this->max_failed_login_attempts_2_show_captcha = intval($conf->value);
-            }
-            return $this->max_failed_login_attempts_2_show_captcha;
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return self::DefaultMaxFailedLoginAttempts2ShowCaptcha;
-        }
-    }
-
-    public function getNonceLifetime()
-    {
-        try {
-            if (is_null($this->nonce_lifetime)) {
-                $conf = ServerConfiguration::where('key', '=', 'Nonce.Lifetime')->first();
-                if (!$conf || !is_numeric($conf->value)) $this->nonce_lifetime = self::DefaultNonceLifetime;
-                else $this->nonce_lifetime = intval($conf->value);
-            }
-            return $this->nonce_lifetime;
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return self::DefaultNonceLifetime;
-        }
-    }
-
-    public function getAssetsUrl($asset_path)
-    {
-        try {
-            if (is_null($this->assets_url)) {
-                $conf = ServerConfiguration::where('key', '=', 'Assets.Url')->first();
-                if (!$conf) $this->assets_url = self::DefaultAssetsUrl;
-                else $this->assets_url = $conf->value;
-            }
-            return $this->assets_url . $asset_path;
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return self::DefaultAssetsUrl . $asset_path;
-        }
+        return $res;
     }
 
 }

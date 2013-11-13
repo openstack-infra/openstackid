@@ -2,6 +2,8 @@
 
 namespace services;
 
+use Exception;
+use Log;
 use openid\exceptions\ReplayAttackException;
 use openid\helpers\OpenIdErrorMessages;
 use openid\model\OpenIdNonce;
@@ -25,7 +27,7 @@ class NonceService implements INonceService
     {
         $raw_nonce = $nonce->getRawFormat();
         $cur_time = time();
-        $lock_lifetime = \ServerConfigurationService::getNonceLifetime();;
+        $lock_lifetime = \ServerConfigurationService::getConfigValue("Nonce.Lifetime");
         return $this->redis->setnx('lock.' . $raw_nonce, $cur_time + $lock_lifetime + 1);
     }
 
@@ -77,8 +79,12 @@ class NonceService implements INonceService
      */
     public function associateNonce(OpenIdNonce $nonce, $signature, $realm)
     {
-        $raw_nonce = $nonce->getRawFormat();
-        $lifetime = \ServerConfigurationService::getNonceLifetime();
-        $this->redis->setex($raw_nonce . $signature, $lifetime, $realm);
+        try {
+            $raw_nonce = $nonce->getRawFormat();
+            $lifetime = \ServerConfigurationService::getConfigValue("Nonce.Lifetime");
+            $this->redis->setex($raw_nonce . $signature, $lifetime, $realm);
+        } catch (Exception $ex) {
+            Log::error($ex);
+        }
     }
 }

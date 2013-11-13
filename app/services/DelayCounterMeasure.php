@@ -4,6 +4,7 @@ namespace services;
 
 use \Log;
 use openid\services\ISecurityPolicyCounterMeasure;
+use Exception;
 
 class DelayCounterMeasure implements ISecurityPolicyCounterMeasure
 {
@@ -13,7 +14,7 @@ class DelayCounterMeasure implements ISecurityPolicyCounterMeasure
         $this->redis = \RedisLV4::connection();
     }
 
-    public function trigger()
+    public function trigger(array $params)
     {
         try {
             $remote_address = IPHelper::getUserIp();

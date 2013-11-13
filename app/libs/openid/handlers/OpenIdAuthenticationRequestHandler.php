@@ -288,7 +288,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             // if not present or if it already void then enter on dumb mode
             $new_secret = OpenIdCryptoHelper::generateSecret(OpenIdProtocol::SignatureAlgorithmHMAC_SHA256);
             $new_handle = AssocHandleGenerator::generate();
-            $lifetime = $this->server_configuration_service->getPrivateAssociationLifetime();
+            $lifetime = $this->server_configuration_service->getConfigValue("Private.Association.Lifetime");
             $issued = gmdate("Y-m-d H:i:s", time());
             //create private association ...
             $this->association_service->addAssociation($new_handle, $new_secret, OpenIdProtocol::SignatureAlgorithmHMAC_SHA256, $lifetime, $issued, IAssociation::TypePrivate, $realm);

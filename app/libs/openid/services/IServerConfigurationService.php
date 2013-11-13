@@ -6,19 +6,18 @@ namespace openid\services;
 
 interface IServerConfigurationService
 {
+    /**
+     *
+     * @return mixed
+     */
     public function getOPEndpointURL();
 
+    /**
+     *
+     * @return mixed
+     */
     public function getUserIdentityEndpointURL($identifier);
 
-    public function getPrivateAssociationLifetime();
+    public function getConfigValue($key);
 
-    public function getSessionAssociationLifetime();
-
-    public function getMaxFailedLoginAttempts();
-
-    public function getMaxFailedLoginAttempts2ShowCaptcha();
-
-    public function getNonceLifetime();
-
-    public function getAssetsUrl($asset_path);
 }

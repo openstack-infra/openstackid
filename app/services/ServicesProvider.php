@@ -24,10 +24,29 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(ServiceCatalog::UserService, 'services\\UserService');
         $this->app->singleton(ServiceCatalog::NonceService, 'services\\NonceService');
         $this->app->singleton(ServiceCatalog::LogService, 'services\\LogService');
-        $this->app->singleton("openid\\services\\ISecurityPolicyCounterMeasure", 'services\\DelayCounterMeasure');
-        $this->app->singleton("openid\\services\\ISecurityPolicy", 'services\\BlacklistSecurityPolicy');
+        $this->app->singleton("services\\DelayCounterMeasure", 'services\\DelayCounterMeasure');
+        $this->app->singleton("services\\LockUserCounterMeasure", 'services\\LockUserCounterMeasure');
+        $this->app->singleton("services\\BlacklistSecurityPolicy", 'services\\BlacklistSecurityPolicy');
+        $this->app->singleton("services\\LockUserSecurityPolicy", 'services\\LockUserSecurityPolicy');
+
         $this->app->singleton('services\\IUserActionService', 'services\\UserActionService');
-        $this->app->singleton(ServiceCatalog::CheckPointService, 'services\\CheckPointService');
+        $this->app->singleton(ServiceCatalog::CheckPointService,
+        function(){
+            //set security policies
+            $delay_counter_measure = $this->app->make("services\\DelayCounterMeasure");
+
+            $blacklist_security_policy = $this->app->make("services\\BlacklistSecurityPolicy");
+            $blacklist_security_policy->setCounterMeasure($delay_counter_measure);
+
+            $lock_user_counter_measure = $this->app->make("services\\LockUserCounterMeasure");
+
+            $lock_user_security_policy = $this->app->make("services\\LockUserSecurityPolicy");
+            $lock_user_security_policy->setCounterMeasure($lock_user_counter_measure);
+
+            $checkpoint_service = new CheckPointService($blacklist_security_policy);
+            $checkpoint_service->addPolicy($lock_user_security_policy);
+            return $checkpoint_service;
+        });
 
         Registry::getInstance()->set(ServiceCatalog::MementoService, $this->app->make(ServiceCatalog::MementoService));
         Registry::getInstance()->set(ServiceCatalog::AuthenticationStrategy, $this->app->make(ServiceCatalog::AuthenticationStrategy));

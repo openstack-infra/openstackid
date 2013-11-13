@@ -88,7 +88,7 @@ class UserController extends BaseController
     public function postLogin()
     {
         try {
-            $max_login_attempts_2_show_captcha = $this->server_configuration_service->getMaxFailedLoginAttempts2ShowCaptcha();
+            $max_login_attempts_2_show_captcha = $this->server_configuration_service->getConfigValue("MaxFailed.LoginAttempts.2ShowCaptcha");
             $data = Input::all();
             $login_attempts = intval(Input::get('login_attempts'));
             // Build the validation constraint set.

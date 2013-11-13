@@ -10,6 +10,8 @@ use openid\helpers\OpenIdErrorMessages;
 use openid\model\IAssociation;
 use openid\services\IAssociationService;
 use OpenIdAssociation;
+use Exception;
+use Log;
 
 class AssociationService implements IAssociationService
 {
@@ -30,6 +32,7 @@ class AssociationService implements IAssociationService
      */
     public function getAssociation($handle, $realm = null)
     {
+
         // check if association is on redis cache
         if ($this->redis->exists($handle)) {
             $values = $this->redis->hmget($handle, array(
