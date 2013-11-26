@@ -18,7 +18,7 @@ use Exception;
 class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
 {
 
-    public function trigger(array $params)
+    public function trigger(array $params = array())
     {
         try {
             if (!isset($params["user_identifier"])) return;

@@ -14,7 +14,7 @@ class DelayCounterMeasure implements ISecurityPolicyCounterMeasure
         $this->redis = \RedisLV4::connection();
     }
 
-    public function trigger(array $params)
+    public function trigger(array $params = array())
     {
         try {
             $remote_address = IPHelper::getUserIp();
