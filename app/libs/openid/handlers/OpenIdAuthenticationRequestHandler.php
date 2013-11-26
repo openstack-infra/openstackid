@@ -161,24 +161,38 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                 }
             }
 
-            $this->current_request_context->cleanTrustedData();
-            foreach ($this->extensions as $ext) {
-                $data = $ext->getTrustedData($this->current_request);
-                $this->current_request_context->setTrustedData($data);
-            }
-
-            $requested_data = $this->current_request_context->getTrustedData();
-
-            $sites = $this->trusted_sites_service->getTrustedSites($currentUser, $this->current_request->getRealm(), $requested_data);
-
             $authorization_response = $this->authService->getUserAuthorizationResponse();
 
             if ($authorization_response == IAuthService::AuthorizationResponse_None) {
+                $this->current_request_context->cleanTrustedData();
+                foreach ($this->extensions as $ext) {
+                    $data = $ext->getTrustedData($this->current_request);
+                    $this->current_request_context->setTrustedData($data);
+                }
+                $requested_data = $this->current_request_context->getTrustedData();
+                $sites = $this->trusted_sites_service->getTrustedSites($currentUser, $this->current_request->getRealm(), $requested_data);
+
                 if (!is_null($sites) && count($sites) > 0) {
-                    return $this->checkTrustedSite($sites);
+                    $site   = $sites[0];
+                    $policy = $site->getAuthorizationPolicy();
+                    switch ($policy) {
+                        case IAuthService::AuthorizationResponse_AllowForever:
+                        {
+                            return $this->doAssertion();
+                        }
+                        break;
+                        case IAuthService::AuthorizationResponse_DenyForever:
+                            // black listed site
+                            return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $site->getRealm()), null, null, $this->current_request);
+                            break;
+                        default:
+                            throw new \Exception("Invalid Realm Policy");
+                            break;
+                    }
                 } else {
                     return $this->doConsentProcess();
                 }
+
             } else {
                 return $this->checkAuthorizationResponse($authorization_response);
             }
@@ -198,55 +212,6 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         return $this->auth_strategy->doLogin($this->current_request, $this->current_request_context);
     }
 
-    /**
-     * @param object $sites
-     * @return mixed|OpenIdIndirectGenericErrorResponse|OpenIdPositiveAssertionResponse
-     * @throws \Exception
-     */
-    private function checkTrustedSite($sites)
-    {
-        $policy = IAuthService::AuthorizationResponse_DenyForever;
-        $diff = array();
-        //iterate over all configurations for that realm
-        foreach ($sites as $site) {
-            $policy = $site->getAuthorizationPolicy();
-            //if denied then break
-            if ($policy == IAuthService::AuthorizationResponse_DenyForever)
-                break;
-
-            $this->current_request_context->cleanTrustedData();
-            foreach ($this->extensions as $ext) {
-                $data = $ext->getTrustedData($this->current_request);
-                $this->current_request_context->setTrustedData($data);
-            }
-            $requested_data = $this->current_request_context->getTrustedData();
-
-            $trusted_data = $site->getData();
-            $diff = array_diff($requested_data, $trusted_data);
-            if (count($diff) == 0)
-                break;
-        }
-
-        switch ($policy) {
-            case IAuthService::AuthorizationResponse_AllowForever:
-            {
-                if (!count($diff)) //already approved request
-                    return $this->doAssertion();
-                else {
-                    return $this->doConsentProcess();
-                }
-            }
-                break;
-            case IAuthService::AuthorizationResponse_DenyForever:
-                // black listed site
-                return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $site->getRealm()), null, null, $this->current_request);
-                break;
-            default:
-                throw new \Exception("Invalid Realm Policy");
-                break;
-        }
-
-    }
 
     /**
      * Create Positive Identity Assertion
@@ -396,21 +361,8 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             //need setup to continue
             return new OpenIdImmediateNegativeAssertion($this->current_request->getReturnTo());
         }
-
-        $policy = IAuthService::AuthorizationResponse_DenyForever;
-        $diff = array();
-        //iterate over all configurations for that realm
-        foreach ($sites as $site) {
-            $policy = $site->getAuthorizationPolicy();
-            //if denied then break
-            if ($policy == IAuthService::AuthorizationResponse_DenyForever)
-                break;
-            $trusted_data = $site->getData();
-
-            $diff = array_diff($requested_data, $trusted_data);
-            if (count($diff) == 0)
-                break;
-        }
+        $site   = $sites[0];
+        $policy = $site->getAuthorizationPolicy();
 
         switch ($policy) {
             case IAuthService::AuthorizationResponse_DenyForever:
@@ -421,15 +373,9 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                 break;
             case IAuthService::AuthorizationResponse_AllowForever:
             {
-
-                if (!count($diff)) //already approved request
-                    return $this->doAssertion();
-                else {
-                    //need setup to continue
-                    return new OpenIdImmediateNegativeAssertion($this->current_request->getReturnTo());
-                }
+                return $this->doAssertion();
             }
-                break;
+            break;
             default:
                 return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $this->current_request->getRealm()), null, null, $this->current_request);
                 break;

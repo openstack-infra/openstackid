@@ -4,6 +4,7 @@ namespace services;
 
 use openid\model\IOpenIdUser;
 use openid\model\ITrustedSite;
+use openid\services\IAuthService;
 use openid\services\ILogService;
 use openid\services\ITrustedSitesService;
 use OpenIdTrustedSite;
@@ -53,20 +54,81 @@ class TrustedSitesService implements ITrustedSitesService
     {
         $sites = null;
         try {
-            if (count($data) > 0) {
-                $json_data = json_encode($data);
-                $sites = OpenIdTrustedSite::where("realm", "=", $realm)
-                    ->where("user_id", "=", $user->getId())
-                    ->where("data", "=", $json_data)
-                    ->get();
-                if (count($sites) > 0)
-                    return $sites;
+            //get all possible sub-domains
+            $sub_domains = $this->getSubDomains($realm);
+            //get current scheme
+            $schema      = $this->getScheme($realm);
+            //build query....
+            $query = OpenIdTrustedSite::where("user_id", "=", $user->getId());
+            //add or condition for all given sub-domains
+            foreach ($sub_domains as $sub_domain) {
+                $query = $query->orWhere(function ($query_aux) use ($sub_domain,$schema) {
+                    $query_aux->where('realm', '=', $schema.$sub_domain);
+                });
             }
-            $sites = OpenIdTrustedSite::where("realm", "=", $realm)->where("user_id", "=", $user->getId())->get();
+            //add conditions for all possible pre approved data
+            foreach ($data as $value) {
+                $query = $query->where("data", "LIKE", '%"' . $value . '"%');
+            }
+            $sites = $query->get();
+
         } catch (\Exception $ex) {
             $this->log->error($ex);
         }
-        return $sites;
+
+        $res = array();
+        //iterate over all retrieved sites and check the set policies by user
+        foreach ($sites as $site) {
+            $policy = $site->getAuthorizationPolicy();
+            //if denied then break
+            if ($policy == IAuthService::AuthorizationResponse_DenyForever) {
+                array_push($res, $site);
+                break;
+            }
+            $trusted_data = $site->getData();
+            $diff = array_diff($data, $trusted_data);
+            //if pre approved data is contained or equal than a former one
+            if (count($diff) == 0) {
+                array_push($res, $site);
+                break;
+            }
+        }
+        return $res;
+    }
+
+    private function getScheme($url){
+        $url = strtolower($url);
+        $url = parse_url($url);
+        $scheme = 'http://';
+        if(isset($url['scheme']) && !empty($url['scheme']))
+        {
+            $scheme = $url['scheme'].'://';
+        }
+        return $scheme;
+    }
+
+    /**
+     * Get all possible sub-domains for a given url
+     * @param $url
+     * @return array
+     */
+    private function getSubDomains($url)
+    {
+        $res = array();
+        $url = strtolower($url);
+        $url = parse_url($url);
+        $authority = $url['host'];
+        $components = explode('.', $authority);
+        $len = count($components);
+        for ($i = 0; $i < $len; $i++) {
+            if ($components[$i] == '*') continue;
+            $str = '';
+            for ($j = $i; $j < $len; $j++)
+                $str .= $components[$j] . '.';
+            $str = trim($str, '.');
+            array_push($res, '*.' . $str);
+        }
+        return $res;
     }
 
     public function getAllTrustedSitesByUser(IOpenIdUser $user)
