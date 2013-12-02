@@ -46,7 +46,7 @@ class AssociationService implements IAssociationService
                 if (is_null($realm) || empty($realm) || $values[5] != $realm) {
                     throw new OpenIdInvalidRealmException(sprintf(OpenIdErrorMessages::InvalidPrivateAssociationMessage, $handle, $realm));
                 }
-                $success = $this->redis->setnx('lock.get.' . 1);
+                $success = $this->redis->setnx('lock.get.'. $handle . 1);
                 if (!$success) { // only one time we could use this handle
                     throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackPrivateAssociationAlreadyUsed, $handle));
                 }
