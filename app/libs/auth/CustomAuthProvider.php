@@ -74,6 +74,10 @@ class CustomAuthProvider implements UserProviderInterface
             if (is_null($member)) //member must exists
                 throw new AuthenticationException(sprintf("member %s does not exists!", $identifier));
 
+            $valid_password = $member->checkPassword($password);
+
+            if(!$valid_password)
+                throw new AuthenticationInvalidPasswordAttemptException($identifier,sprintf("invalid login attempt for user %s ",$identifier));
 
             //if user does not exists, then create it
             if (is_null($user)) {
@@ -83,14 +87,10 @@ class CustomAuthProvider implements UserProviderInterface
                 $user->identifier  = $member->Email;
                 $user->last_login_date = gmdate("Y-m-d H:i:s", time());
                 $user->Save();
+                $user = OpenIdUser::where('external_id', '=', $identifier)->first();
             }
 
             $user_service = Registry::getInstance()->get(ServiceCatalog::UserService);
-
-            $valid_password = $member->checkPassword($password);
-
-            if(!$valid_password)
-                throw new AuthenticationInvalidPasswordAttemptException($identifier,sprintf("invalid login attempt for user %s ",$identifier));
 
             $user_name = $member->FirstName . "." . $member->Surname;
             //do association between user and member

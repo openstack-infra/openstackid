@@ -14,7 +14,6 @@ class UserService implements IUserService
     {
         try {
             $user = OpenIdUser::where('id', '=', $id)->first();
-            if (!empty($user->identifier)) return $user->identifier;
             if (!is_null($user)) {
                 \DB::transaction(function () use ($id, $proposed_username) {
                     $done = false;
