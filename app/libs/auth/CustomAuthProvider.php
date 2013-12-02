@@ -80,6 +80,7 @@ class CustomAuthProvider implements UserProviderInterface
                 //create user
                 $user = new OpenIdUser();
                 $user->external_id = $member->Email;
+                $user->identifier  = $member->Email;
                 $user->last_login_date = gmdate("Y-m-d H:i:s", time());
                 $user->Save();
             }
