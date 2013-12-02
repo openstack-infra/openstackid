@@ -27,6 +27,8 @@ class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
             $user_service = Registry::getInstance()->get(ServiceCatalog::UserService);
 
             $user = OpenIdUser::where('external_id', '=', $user_identifier)->first();
+            if(is_null($user))
+                return;
             //apply lock policy
             if ($user->login_failed_attempt < $server_configuration->getConfigValue("MaxFailed.Login.Attempts"))
                 $user_service->updateFailedLoginAttempts($user->id);
