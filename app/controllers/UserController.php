@@ -11,6 +11,7 @@ use services\IUserActionService;
 use strategies\DefaultLoginStrategy;
 use strategies\OpenIdConsentStrategy;
 use strategies\OpenIdLoginStrategy;
+use openid\requests\OpenIdAuthenticationRequest;
 
 class UserController extends BaseController
 {
@@ -32,19 +33,18 @@ class UserController extends BaseController
                                 IUserService $user_service,
                                 IUserActionService $user_action_service)
     {
-        $this->memento_service = $memento_service;
-        $this->auth_service = $auth_service;
+        $this->memento_service              = $memento_service;
+        $this->auth_service                 = $auth_service;
         $this->server_configuration_service = $server_configuration_service;
-        $this->trusted_sites_service = $trusted_sites_service;
-        $this->discovery = $discovery;
-        $this->user_service = $user_service;
-        $this->user_action_service = $user_action_service;
+        $this->trusted_sites_service        = $trusted_sites_service;
+        $this->discovery                    = $discovery;
+        $this->user_service                 = $user_service;
+        $this->user_action_service          = $user_action_service;
         //filters
         $this->beforeFilter('csrf', array('only' => array('postLogin', 'postConsent')));
 
-
         $msg = $this->memento_service->getCurrentRequest();
-        if (!is_null($msg) && $msg->isValid()) {
+        if (!is_null($msg) && $msg->isValid() && OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg)) {
             //openid stuff
             $this->beforeFilter('openid.save.request');
             $this->beforeFilter('openid.needs.auth.request', array('only' => array('getConsent')));

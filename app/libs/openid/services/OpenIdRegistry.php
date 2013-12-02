@@ -3,7 +3,7 @@
 namespace openid\services;
 
 
-class Registry
+class OpenIdRegistry
 {
 
     private static $instance = null;
@@ -14,7 +14,7 @@ class Registry
     public static function getInstance()
     {
         if (self::$instance === null) {
-            self::$instance = new Registry();
+            self::$instance = new OpenIdRegistry();
         }
 
         return self::$instance;

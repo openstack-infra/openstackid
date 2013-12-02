@@ -11,8 +11,8 @@
 |
 */
 use openid\exceptions\InvalidOpenIdMessageException;
-use \openid\services\Registry;
-use \openid\services\ServiceCatalog;
+use \openid\services\OpenIdRegistry;
+use \openid\services\OpenIdServiceCatalog;
 
 ClassLoader::addDirectories(array(
 
@@ -60,7 +60,7 @@ $mono_log->pushHandler($handler);
 
 
 App::error(function (Exception $exception, $code) {
-    $checkpoint_service = Registry::getInstance()->get(ServiceCatalog::CheckPointService);
+    $checkpoint_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::CheckPointService);
     Log::error($exception);
     if($checkpoint_service ){
         $checkpoint_service->trackException($exception);
@@ -70,7 +70,7 @@ App::error(function (Exception $exception, $code) {
 
 
 App::error(function (InvalidOpenIdMessageException $exception, $code) {
-    $checkpoint_service = Registry::getInstance()->get(ServiceCatalog::CheckPointService);
+    $checkpoint_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::CheckPointService);
     Log::error($exception);
     if($checkpoint_service ){
         $checkpoint_service->trackException($exception);

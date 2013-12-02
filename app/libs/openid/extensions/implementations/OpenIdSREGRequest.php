@@ -11,8 +11,8 @@ namespace openid\extensions\implementations;
 use Exception;
 use openid\OpenIdMessage;
 use openid\requests\OpenIdRequest;
-use openid\services\Registry;
-use openid\services\ServiceCatalog;
+use openid\services\OpenIdRegistry;
+use openid\services\OpenIdServiceCatalog;
 
 /**
  * Class OpenIdSREGRequest
@@ -32,7 +32,7 @@ class OpenIdSREGRequest extends OpenIdRequest
         parent::__construct($message);
         $this->attributes = array();
         $this->optional_attributes = array();
-        $this->log = Registry::getInstance()->get(ServiceCatalog::LogService);
+        $this->log = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::LogService);
     }
 
     public function isValid()

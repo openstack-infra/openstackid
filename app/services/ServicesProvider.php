@@ -3,8 +3,8 @@
 namespace services;
 
 use Illuminate\Support\ServiceProvider;
-use openid\services\Registry;
-use openid\services\ServiceCatalog;
+use openid\services\OpenIdRegistry;
+use openid\services\OpenIdServiceCatalog;
 
 class ServicesProvider extends ServiceProvider
 {
@@ -15,22 +15,23 @@ class ServicesProvider extends ServiceProvider
 
         //register on boot bc we rely on Illuminate\Redis\ServiceProvider\RedisServiceProvider
 
-        $this->app->singleton(ServiceCatalog::MementoService, 'services\\MementoRequestService');
-        $this->app->singleton(ServiceCatalog::AuthenticationStrategy, 'services\\AuthenticationStrategy');
-        $this->app->singleton(ServiceCatalog::ServerExtensionsService, 'services\\ServerExtensionsService');
-        $this->app->singleton(ServiceCatalog::AssociationService, 'services\\AssociationService');
-        $this->app->singleton(ServiceCatalog::TrustedSitesService, 'services\\TrustedSitesService');
-        $this->app->singleton(ServiceCatalog::ServerConfigurationService, 'services\\ServerConfigurationService');
-        $this->app->singleton(ServiceCatalog::UserService, 'services\\UserService');
-        $this->app->singleton(ServiceCatalog::NonceService, 'services\\NonceService');
-        $this->app->singleton(ServiceCatalog::LogService, 'services\\LogService');
+        $this->app->singleton(OpenIdServiceCatalog::MementoService, 'services\\MementoRequestService');
+        $this->app->singleton(OpenIdServiceCatalog::AuthenticationStrategy, 'services\\AuthenticationStrategy');
+        $this->app->singleton(OpenIdServiceCatalog::ServerExtensionsService, 'services\\ServerExtensionsService');
+        $this->app->singleton(OpenIdServiceCatalog::AssociationService, 'services\\AssociationService');
+        $this->app->singleton(OpenIdServiceCatalog::TrustedSitesService, 'services\\TrustedSitesService');
+        $this->app->singleton(OpenIdServiceCatalog::ServerConfigurationService, 'services\\ServerConfigurationService');
+        $this->app->singleton(OpenIdServiceCatalog::UserService, 'services\\UserService');
+        $this->app->singleton(OpenIdServiceCatalog::NonceService, 'services\\NonceService');
+        $this->app->singleton(OpenIdServiceCatalog::LogService, 'services\\LogService');
+
         $this->app->singleton("services\\DelayCounterMeasure", 'services\\DelayCounterMeasure');
         $this->app->singleton("services\\LockUserCounterMeasure", 'services\\LockUserCounterMeasure');
         $this->app->singleton("services\\BlacklistSecurityPolicy", 'services\\BlacklistSecurityPolicy');
         $this->app->singleton("services\\LockUserSecurityPolicy", 'services\\LockUserSecurityPolicy');
 
         $this->app->singleton('services\\IUserActionService', 'services\\UserActionService');
-        $this->app->singleton(ServiceCatalog::CheckPointService,
+        $this->app->singleton(OpenIdServiceCatalog::CheckPointService,
         function(){
             //set security policies
             $delay_counter_measure = $this->app->make("services\\DelayCounterMeasure");
@@ -48,16 +49,16 @@ class ServicesProvider extends ServiceProvider
             return $checkpoint_service;
         });
 
-        Registry::getInstance()->set(ServiceCatalog::MementoService, $this->app->make(ServiceCatalog::MementoService));
-        Registry::getInstance()->set(ServiceCatalog::AuthenticationStrategy, $this->app->make(ServiceCatalog::AuthenticationStrategy));
-        Registry::getInstance()->set(ServiceCatalog::ServerExtensionsService, $this->app->make(ServiceCatalog::ServerExtensionsService));
-        Registry::getInstance()->set(ServiceCatalog::AssociationService, $this->app->make(ServiceCatalog::AssociationService));
-        Registry::getInstance()->set(ServiceCatalog::TrustedSitesService, $this->app->make(ServiceCatalog::TrustedSitesService));
-        Registry::getInstance()->set(ServiceCatalog::ServerConfigurationService, $this->app->make(ServiceCatalog::ServerConfigurationService));
-        Registry::getInstance()->set(ServiceCatalog::UserService, $this->app->make(ServiceCatalog::UserService));
-        Registry::getInstance()->set(ServiceCatalog::NonceService, $this->app->make(ServiceCatalog::NonceService));
-        Registry::getInstance()->set(ServiceCatalog::LogService, $this->app->make(ServiceCatalog::LogService));
-        Registry::getInstance()->set(ServiceCatalog::CheckPointService, $this->app->make(ServiceCatalog::CheckPointService));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::MementoService, $this->app->make(OpenIdServiceCatalog::MementoService));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::AuthenticationStrategy, $this->app->make(OpenIdServiceCatalog::AuthenticationStrategy));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::ServerExtensionsService, $this->app->make(OpenIdServiceCatalog::ServerExtensionsService));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::AssociationService, $this->app->make(OpenIdServiceCatalog::AssociationService));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::TrustedSitesService, $this->app->make(OpenIdServiceCatalog::TrustedSitesService));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::ServerConfigurationService, $this->app->make(OpenIdServiceCatalog::ServerConfigurationService));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::UserService, $this->app->make(OpenIdServiceCatalog::UserService));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::NonceService, $this->app->make(OpenIdServiceCatalog::NonceService));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::LogService, $this->app->make(OpenIdServiceCatalog::LogService));
+        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::CheckPointService, $this->app->make(OpenIdServiceCatalog::CheckPointService));
     }
 
     public function register()

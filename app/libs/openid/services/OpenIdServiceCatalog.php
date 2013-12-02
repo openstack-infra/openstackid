@@ -3,7 +3,7 @@
 namespace openid\services;
 
 
-class ServiceCatalog
+class OpenIdServiceCatalog
 {
     const MementoService = 'openid\\services\\IMementoOpenIdRequestService';
     const AuthenticationStrategy = 'openid\\handlers\\IOpenIdAuthenticationStrategy';

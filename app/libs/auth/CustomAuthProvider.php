@@ -10,8 +10,8 @@ use Log;
 use Member;
 use openid\helpers\OpenIdErrorMessages;
 use openid\requests\OpenIdAuthenticationRequest;
-use openid\services\Registry;
-use openid\services\ServiceCatalog;
+use openid\services\OpenIdRegistry;
+use openid\services\OpenIdServiceCatalog;
 use  auth\exceptions\AuthenticationInvalidPasswordAttemptException;
 
 class CustomAuthProvider implements UserProviderInterface
@@ -60,8 +60,8 @@ class CustomAuthProvider implements UserProviderInterface
                 throw new AuthenticationException("invalid crendentials");
 
             $identifier = $credentials['username'];
-            $password = $credentials['password'];
-            $user = OpenIdUser::where('external_id', '=', $identifier)->first();
+            $password   = $credentials['password'];
+            $user       = OpenIdUser::where('external_id', '=', $identifier)->first();
 
             //check user status...
             if (!is_null($user) && ($user->lock || !$user->active)){
@@ -90,13 +90,13 @@ class CustomAuthProvider implements UserProviderInterface
                 $user = OpenIdUser::where('external_id', '=', $identifier)->first();
             }
 
-            $user_service = Registry::getInstance()->get(ServiceCatalog::UserService);
+            $user_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::UserService);
 
             $user_name = $member->FirstName . "." . $member->Surname;
             //do association between user and member
             $user_service->associateUser($user->id, strtolower($user_name));
 
-            $server_configuration = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
+            $server_configuration = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
 
             //update user fields
             $user->last_login_date = gmdate("Y-m-d H:i:s", time());
@@ -110,7 +110,7 @@ class CustomAuthProvider implements UserProviderInterface
             $user->setMember($member);
 
             //check if we have a current openid message
-            $memento_service = Registry::getInstance()->get(ServiceCatalog::MementoService);
+            $memento_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::MementoService);
             $msg = $memento_service->getCurrentRequest();
             if (is_null($msg) || !$msg->isValid() || !OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg))
                 return $user;
@@ -130,7 +130,7 @@ class CustomAuthProvider implements UserProviderInterface
             }
 
         } catch (Exception $ex) {
-            $checkpoint_service = Registry::getInstance()->get(ServiceCatalog::CheckPointService);
+            $checkpoint_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::CheckPointService);
             $checkpoint_service->trackException($ex);
             Log::error($ex);
             return null;

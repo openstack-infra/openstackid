@@ -10,8 +10,8 @@ namespace services;
 
 use Log;
 use openid\services\ISecurityPolicyCounterMeasure;
-use openid\services\Registry;
-use openid\services\ServiceCatalog;
+use openid\services\OpenIdRegistry;
+use openid\services\OpenIdServiceCatalog;
 use auth\OpenIdUser;
 use Exception;
 
@@ -23,8 +23,8 @@ class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
         try {
             if (!isset($params["user_identifier"])) return;
             $user_identifier = $params["user_identifier"];
-            $server_configuration = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
-            $user_service = Registry::getInstance()->get(ServiceCatalog::UserService);
+            $server_configuration = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
+            $user_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::UserService);
 
             $user = OpenIdUser::where('external_id', '=', $user_identifier)->first();
             if(is_null($user))

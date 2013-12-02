@@ -5,8 +5,8 @@ namespace openid;
 use openid\handlers\OpenIdAuthenticationRequestHandler;
 use openid\handlers\OpenIdCheckAuthenticationRequestHandler;
 use openid\handlers\OpenIdSessionAssociationRequestHandler;
-use openid\services\Registry;
-use openid\services\ServiceCatalog;
+use openid\services\OpenIdRegistry;
+use openid\services\OpenIdServiceCatalog;
 use openid\XRDS\XRDSDocumentBuilder;
 use openid\XRDS\XRDSService;
 
@@ -116,15 +116,15 @@ class OpenIdProtocol implements IOpenIdProtocol
     {
         //create chain of responsibility
 
-        $auth_service = Registry::getInstance()->get(ServiceCatalog::AuthenticationService);
-        $memento_request_service = Registry::getInstance()->get(ServiceCatalog::MementoService);
-        $auth_strategy = Registry::getInstance()->get(ServiceCatalog::AuthenticationStrategy);
-        $server_extension_service = Registry::getInstance()->get(ServiceCatalog::ServerExtensionsService);
-        $association_service = Registry::getInstance()->get(ServiceCatalog::AssociationService);
-        $trusted_sites_service = Registry::getInstance()->get(ServiceCatalog::TrustedSitesService);
-        $server_config_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
-        $nonce_service = Registry::getInstance()->get(ServiceCatalog::NonceService);
-        $log = Registry::getInstance()->get(ServiceCatalog::LogService);
+        $auth_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::AuthenticationService);
+        $memento_request_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::MementoService);
+        $auth_strategy = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::AuthenticationStrategy);
+        $server_extension_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::ServerExtensionsService);
+        $association_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
+        $trusted_sites_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::TrustedSitesService);
+        $server_config_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
+        $nonce_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::NonceService);
+        $log = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::LogService);
 
         $check_auth = new OpenIdCheckAuthenticationRequestHandler($association_service, $nonce_service, $log, null);
         $session_assoc = new OpenIdSessionAssociationRequestHandler($log, $check_auth);
@@ -158,8 +158,8 @@ class OpenIdProtocol implements IOpenIdProtocol
 
     public function getXRDSDiscovery($mode, $canonical_id = null)
     {
-        $server_extension_service = Registry::getInstance()->get(ServiceCatalog::ServerExtensionsService);
-        $server_config_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
+        $server_extension_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::ServerExtensionsService);
+        $server_config_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
 
         $active_extensions = $server_extension_service->getAllActiveExtensions();
         $extensions = array();

@@ -6,8 +6,8 @@ use Illuminate\Auth\UserInterface;
 use Member;
 use MemberPhoto;
 use openid\model\IOpenIdUser;
-use openid\services\Registry;
-use openid\services\ServiceCatalog;
+use openid\services\OpenIdRegistry;
+use openid\services\OpenIdServiceCatalog;
 
 class OpenIdUser extends \Eloquent implements UserInterface, IOpenIdUser
 {
@@ -185,7 +185,7 @@ class OpenIdUser extends \Eloquent implements UserInterface, IOpenIdUser
         $photoId = $this->member->PhotoID;
         if (!is_null($photoId) && is_numeric($photoId) && $photoId > 0) {
             $photo = MemberPhoto::where('ID', '=', $photoId)->first();
-            $server_configuration_service = Registry::getInstance()->get(ServiceCatalog::ServerConfigurationService);
+            $server_configuration_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
             $url = $server_configuration_service->getConfigValue("Assets.Url").$photo->Filename;
             return $url;
         }
