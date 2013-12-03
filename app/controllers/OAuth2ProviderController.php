@@ -1,7 +1,9 @@
 <?php
-use oauth2\IOAuth2Protocol;
-use oauth2\services\IMementoOAuth2RequestService;
 
+use oauth2\IOAuth2Protocol;
+use oauth2\services\IMementoOAuth2AuthenticationRequestService;
+use oauth2\exceptions\InvalidAuthorizationRequestException;
+use oauth2\strategies\OAuth2ResponseStrategyFactoryMethod;
 /**
  * Class OAuth2ProviderController
  */
@@ -12,17 +14,25 @@ class OAuth2ProviderController extends BaseController {
 
     /**
      * @param IOAuth2Protocol $oauth2_protocol
-     * @param IMementoOAuth2RequestService $memento_service
+     * @param IMementoOAuth2AuthenticationRequestService $memento_service
      */
-    public function __construct(IOAuth2Protocol $oauth2_protocol, IMementoOAuth2RequestService $memento_service){
+    public function __construct(IOAuth2Protocol $oauth2_protocol, IMementoOAuth2AuthenticationRequestService $memento_service){
         $this->oauth2_protocol = $oauth2_protocol;
         $this->memento_service = $memento_service;
     }
 
     public function authorize(){
         $request = $this->memento_service->getCurrentRequest();
-        if (is_null($request) || !$request->isValid())
-            throw new \Exception();
-        $response = $this->$oauth2_protocol->authorize($request);
+        $response = $this->oauth2_protocol->authorize($request);
+        $reflector = new ReflectionClass($response);
+        if ($reflector->isSubclassOf('oauth2\\responses\\OAuth2Response')) {
+            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($response);
+            return $strategy->handle($response);
+        }
+        return $response;
+    }
+
+    public function token(){
+
     }
 } 

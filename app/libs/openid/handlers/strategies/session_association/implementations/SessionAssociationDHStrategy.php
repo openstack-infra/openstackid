@@ -9,14 +9,14 @@
 namespace openid\handlers\strategies\implementations;
 
 use openid\handlers\strategies\ISessionAssociationStrategy;
-use openid\requests\OpenIdDHAssociationSessionRequest;
-use openid\responses\OpenIdDiffieHellmanAssociationSessionResponse;
-use Zend\Crypt\PublicKey\DiffieHellman;
+use openid\helpers\AssocHandleGenerator;
 use openid\helpers\OpenIdCryptoHelper;
 use openid\model\IAssociation;
-use openid\services\OpenIdRegistry;
+use openid\requests\OpenIdDHAssociationSessionRequest;
+use openid\responses\OpenIdDiffieHellmanAssociationSessionResponse;
 use openid\services\OpenIdServiceCatalog;
-use openid\helpers\AssocHandleGenerator;
+use utils\services\Registry;
+use Zend\Crypt\PublicKey\DiffieHellman;
 
 class SessionAssociationDHStrategy implements ISessionAssociationStrategy
 {
@@ -32,9 +32,9 @@ class SessionAssociationDHStrategy implements ISessionAssociationStrategy
     public function __construct(OpenIdDHAssociationSessionRequest $request)
     {
         $this->current_request = $request;
-        $this->association_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
-        $this->server_configuration_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog:: ServerConfigurationService);
-        $this->log = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog:: LogService);
+        $this->association_service = Registry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
+        $this->server_configuration_service = Registry::getInstance()->get(OpenIdServiceCatalog:: ServerConfigurationService);
+        $this->log = Registry::getInstance()->get(OpenIdServiceCatalog:: LogService);
     }
 
     /**

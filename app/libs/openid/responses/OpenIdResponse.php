@@ -8,45 +8,23 @@
  */
 
 namespace openid\responses;
+use openid\OpenIdProtocol;
+use utils\http\HttpResponse;
+use openid\exceptions\InvalidOpenIdMessageMode;
 
-use openid\OpenIdMessage;
-
-abstract class OpenIdResponse extends OpenIdMessage
+abstract class OpenIdResponse extends HttpResponse
 {
-
-    const HttpOkResponse = 200;
-    const HttpErrorResponse = 400;
-    protected $http_code;
-    protected $content_type;
 
     public function __construct($http_code, $content_type)
     {
-        $this->http_code = $http_code;
-        $this->content_type = $content_type;
+        parent::__construct($http_code, $content_type);
     }
 
-    abstract public function getContent();
-
-    public function getHttpCode()
+    protected function setMode($mode)
     {
-        return $this->http_code;
+        if (!OpenIdProtocol::isValidMode($mode))
+            throw new InvalidOpenIdMessageMode(sprintf(OpenIdErrorMessages::InvalidOpenIdMessageModeMessage, $mode));
+        $this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)] = $mode;;
     }
 
-    protected function setHttpCode($http_code)
-    {
-        $this->http_code = $http_code;
-    }
-
-    public function getContentType()
-    {
-        return $this->content_type;
-    }
-
-    abstract public function getType();
-
-    public function addParam($name, $value)
-    {
-        //todo: validate if $name is a valid openid 2.0 param name?
-        $this[$name] = $value;
-    }
 }

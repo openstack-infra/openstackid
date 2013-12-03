@@ -5,7 +5,7 @@ namespace openid\requests;
 use openid\helpers\OpenIdUriHelper;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
-use openid\services\OpenIdRegistry;
+use utils\services\Registry;
 
 class OpenIdCheckAuthenticationRequest extends OpenIdAuthenticationRequest
 {
@@ -32,7 +32,7 @@ class OpenIdCheckAuthenticationRequest extends OpenIdAuthenticationRequest
         $claimed_identity = $this->getClaimedId();
         $claimed_realm = $this->getRealm();
         $claimed_returnTo = $this->getReturnTo();
-        $server_configuration_service = OpenIdRegistry::getInstance()->get("openid\\services\\IServerConfigurationService");
+        $server_configuration_service = Registry::getInstance()->get("openid\\services\\IServerConfigurationService");
         if (
             !is_null($mode) && !empty($mode) && $mode == OpenIdProtocol::CheckAuthenticationMode
             && !is_null($claimed_returnTo) && !empty($claimed_returnTo) && OpenIdUriHelper::checkReturnTo($claimed_returnTo)

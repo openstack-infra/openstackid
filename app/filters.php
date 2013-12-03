@@ -1,9 +1,9 @@
 <?php
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\requests\OpenIdAuthenticationRequest;
-use openid\services\OpenIdRegistry;
 use openid\services\OpenIdServiceCatalog;
-
+use utils\services\Registry;
+use \utils\services\UtilsServiceCatalog;
 /*
 |--------------------------------------------------------------------------
 | Application & Route Filters
@@ -20,7 +20,7 @@ use openid\services\OpenIdServiceCatalog;
 App::before(function ($request) {
     try {
         //checkpoint security pattern entry point
-        $checkpoint_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::CheckPointService);
+        $checkpoint_service = Registry::getInstance()->get(UtilsServiceCatalog::CheckPointService);
         if (!$checkpoint_service->check()) {
             return View::make('404');
         }
@@ -111,7 +111,7 @@ Route::filter("openid.save.request", function () {
 
 Route::filter("ssl", function () {
     if (!Request::secure()) {
-        $memento_service = OpenIdRegistry::getInstance()->get("openid\\services\\IMementoOpenIdRequestService");
+        $memento_service = Registry::getInstance()->get("openid\\services\\IMementoOpenIdRequestService");
         $memento_service->saveCurrentRequest();
         return Redirect::secure(Request::getRequestUri());
     }

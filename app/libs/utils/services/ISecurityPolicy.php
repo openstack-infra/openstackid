@@ -1,8 +1,8 @@
 <?php
 
-namespace openid\services;
+namespace utils\services;
 
-use \Exception;
+use Exception;
 
 /**
  * Interface ISecurityPolicy

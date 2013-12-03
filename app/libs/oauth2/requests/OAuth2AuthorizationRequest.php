@@ -25,8 +25,41 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
         OAuth2Protocol::OAuth2Protocol_State        => OAuth2Protocol::OAuth2Protocol_State
     );
 
+    public function getResponseType(){
+        return $this[OAuth2Protocol::OAuth2Protocol_ResponseType];
+    }
+
+    public function getClientId(){
+        return $this[OAuth2Protocol::OAuth2Protocol_ClientId];
+    }
+
+    public function getRedirectUri(){
+        return $this[OAuth2Protocol::OAuth2Protocol_RedirectUri];
+    }
+
+    public function getScope(){
+        return $this[OAuth2Protocol::OAuth2Protocol_Scope];
+    }
+
+
+    public function getState(){
+        return (isset($this[OAuth2Protocol::OAuth2Protocol_State]))? $this[OAuth2Protocol::OAuth2Protocol_State]:null;
+    }
+
     public function isValid()
     {
-        // TODO: Implement isValid() method.
+        if(!isset($this[OAuth2Protocol::OAuth2Protocol_ResponseType]))
+            return false;
+
+        if(!isset($this[OAuth2Protocol::OAuth2Protocol_ClientId]))
+            return false;
+
+        if(!isset($this[OAuth2Protocol::OAuth2Protocol_RedirectUri]))
+            return false;
+
+        if(!isset($this[OAuth2Protocol::OAuth2Protocol_Scope]))
+            return false;
+
+        return true;
     }
 }

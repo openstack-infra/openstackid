@@ -13,6 +13,7 @@ use services\IUserActionService;
 use \Auth;
 use \Redirect;
 use \View;
+use \Session;
 
 class OpenIdConsentStrategy implements IConsentStrategy
 {

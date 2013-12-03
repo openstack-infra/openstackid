@@ -11,48 +11,21 @@ namespace openid;
 
 use openid\exceptions\InvalidOpenIdMessageMode;
 use openid\helpers\OpenIdErrorMessages;
+use utils\http\HttpMessage;
 
 /**
  * Class OpenIdMessage
  * Implements a base OpenId Message
  * @package openid
  */
-class OpenIdMessage implements \ArrayAccess
+class OpenIdMessage extends HttpMessage
 {
-
-    protected $container = array();
 
     public function __construct(array $values)
     {
-        $this->container = $values;
+        parent::__construct($values);
     }
 
-    /**
-     * arrayaccess methods
-     * */
-    public function offsetSet($offset, $value)
-    {
-        if (is_null($offset)) {
-            $this->container[] = $value;
-        } else {
-            $this->container[$offset] = $value;
-        }
-    }
-
-    public function offsetExists($offset)
-    {
-        return isset($this->container[$offset]);
-    }
-
-    public function offsetUnset($offset)
-    {
-        unset($this->container[$offset]);
-    }
-
-    public function offsetGet($offset)
-    {
-        return isset($this->container[$offset]) ? $this->container[$offset] : null;
-    }
 
     public function getMode()
     {

@@ -5,12 +5,14 @@ namespace openid\strategies;
 use openid\responses\OpenIdDirectResponse;
 use openid\responses\OpenIdIndirectResponse;
 use openid\responses\OpenIdResponse;
-use openid\services\OpenIdRegistry;
+use utils\IHttpResponseStrategy;
+use utils\services\Registry;
 
 class OpenIdResponseStrategyFactoryMethod
 {
     /**
      * @param OpenIdResponse $response
+     * @return IHttpResponseStrategy
      * @throws \Exception
      */
     public static function buildStrategy(OpenIdResponse $response)
@@ -19,12 +21,12 @@ class OpenIdResponseStrategyFactoryMethod
         switch ($type) {
             case OpenIdIndirectResponse::OpenIdIndirectResponse:
             {
-                return OpenIdRegistry::getInstance()->get(OpenIdIndirectResponse::OpenIdIndirectResponse);
+                return Registry::getInstance()->get(OpenIdIndirectResponse::OpenIdIndirectResponse);
             }
                 break;
             case OpenIdDirectResponse::OpenIdDirectResponse:
             {
-                return OpenIdRegistry::getInstance()->get(OpenIdDirectResponse::OpenIdDirectResponse);
+                return Registry::getInstance()->get(OpenIdDirectResponse::OpenIdDirectResponse);
             }
                 break;
             default:

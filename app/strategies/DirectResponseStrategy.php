@@ -2,10 +2,10 @@
 
 namespace strategies;
 
-use openid\strategies\IOpenIdResponseStrategy;
+use utils\IHttpResponseStrategy;
 use Response;
 
-class OpenIdDirectResponseStrategy implements IOpenIdResponseStrategy
+class DirectResponseStrategy implements IHttpResponseStrategy
 {
 
     public function handle($response)

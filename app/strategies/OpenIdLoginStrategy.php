@@ -12,7 +12,7 @@ use Redirect;
 use services\IPHelper;
 use services\IUserActionService;
 use View;
-
+use openid\services\IAuthService;
 class OpenIdLoginStrategy implements ILoginStrategy
 {
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace openid\services;
+namespace utils\services;
 
 
-class OpenIdRegistry
+class Registry
 {
 
     private static $instance = null;
@@ -14,7 +14,7 @@ class OpenIdRegistry
     public static function getInstance()
     {
         if (self::$instance === null) {
-            self::$instance = new OpenIdRegistry();
+            self::$instance = new Registry();
         }
 
         return self::$instance;

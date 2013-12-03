@@ -33,6 +33,11 @@ Route::group(array("before" => "ssl"), function () {
     Route::get('/accounts/user/login', "UserController@getLogin");
     Route::post('/accounts/user/login', "UserController@postLogin");
     Route::get('/accounts/user/login/cancel', "UserController@cancelLogin");
+
+    //oauth2 endpoint
+
+    Route::get('/oauth2/auth',"OAuth2ProviderController@authorize");
+    Route::post('/oauth2/token',"OAuth2ProviderController@token");
 });
 
 Route::group(array("before" => array("ssl", "auth")), function () {

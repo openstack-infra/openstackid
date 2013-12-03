@@ -7,8 +7,6 @@ use DateTime;
 use DB;
 use Exception;
 use Log;
-use openid\services\ISecurityPolicy;
-use openid\services\ISecurityPolicyCounterMeasure;
 use openid\services\IServerConfigurationService;
 use UserExceptionTrail;
 
@@ -17,7 +15,7 @@ use UserExceptionTrail;
  * implements check point security pattern
  * @package services
  */
-class BlacklistSecurityPolicy implements ISecurityPolicy
+class BlacklistSecurityPolicy implements \utils\services\ISecurityPolicy
 {
 
     private $server_configuration_service;
@@ -193,7 +191,7 @@ class BlacklistSecurityPolicy implements ISecurityPolicy
         }
     }
 
-    public function setCounterMeasure(ISecurityPolicyCounterMeasure $counter_measure)
+    public function setCounterMeasure(\utils\services\ISecurityPolicyCounterMeasure $counter_measure)
     {
         $this->counter_measure = $counter_measure;
     }

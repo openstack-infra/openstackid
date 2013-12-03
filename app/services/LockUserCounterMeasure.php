@@ -8,14 +8,13 @@
 
 namespace services;
 
-use Log;
-use openid\services\ISecurityPolicyCounterMeasure;
-use openid\services\OpenIdRegistry;
-use openid\services\OpenIdServiceCatalog;
 use auth\OpenIdUser;
 use Exception;
+use Log;
+use openid\services\OpenIdServiceCatalog;
+use utils\services\Registry;
 
-class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
+class LockUserCounterMeasure implements \utils\services\ISecurityPolicyCounterMeasure
 {
 
     public function trigger(array $params = array())
@@ -23,8 +22,8 @@ class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
         try {
             if (!isset($params["user_identifier"])) return;
             $user_identifier = $params["user_identifier"];
-            $server_configuration = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
-            $user_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::UserService);
+            $server_configuration = Registry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
+            $user_service = \utils\services\Registry::getInstance()->get(OpenIdServiceCatalog::UserService);
 
             $user = OpenIdUser::where('external_id', '=', $user_identifier)->first();
             if(is_null($user))

@@ -4,8 +4,8 @@ namespace services;
 
 use Exception;
 use Log;
-use openid\services\ICheckPointService;
-use openid\services\ISecurityPolicy;
+use utils\services\ICheckPointService;
+use utils\services\ISecurityPolicy;
 
 class CheckPointService implements ICheckPointService
 {

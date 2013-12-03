@@ -5,8 +5,8 @@ namespace openid\requests;
 use openid\helpers\OpenIdUriHelper;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
-use openid\services\OpenIdRegistry;
 use openid\services\OpenIdServiceCatalog;
+use utils\services\Registry;
 
 class OpenIdAuthenticationRequest extends OpenIdRequest
 {
@@ -91,7 +91,7 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
          * other information in its payload, using extensions.
          */
 
-        $server_configuration_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
+        $server_configuration_service = Registry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
         if (is_null($claimed_id) && is_null($identity))
             return false;
         //http://specs.openid.net/auth/2.0/identifier_select

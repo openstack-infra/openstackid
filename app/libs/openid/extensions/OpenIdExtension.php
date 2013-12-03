@@ -13,8 +13,9 @@ use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
-use openid\services\OpenIdRegistry;
 use openid\services\OpenIdServiceCatalog;
+use utils\services\Registry;
+use utils\services\UtilsServiceCatalog;
 
 /**
  * Class OpenIdExtension
@@ -43,7 +44,7 @@ abstract class OpenIdExtension
         $this->name = $name;
         $this->view = $view;
         $this->description = $description;
-        $this->log = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::LogService);
+        $this->log = Registry::getInstance()->get(UtilsServiceCatalog::LogService);
     }
 
     public function getNamespace()

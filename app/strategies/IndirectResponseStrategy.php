@@ -3,11 +3,11 @@
 
 namespace strategies;
 
-use openid\strategies\IOpenIdResponseStrategy;
+use utils\IHttpResponseStrategy;
 use Redirect;
 use Response;
 
-class OpenIdIndirectResponseStrategy implements IOpenIdResponseStrategy
+class IndirectResponseStrategy implements IHttpResponseStrategy
 {
 
     public function handle($response)

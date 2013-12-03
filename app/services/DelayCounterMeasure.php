@@ -2,11 +2,10 @@
 
 namespace services;
 
-use \Log;
-use openid\services\ISecurityPolicyCounterMeasure;
 use Exception;
+use Log;
 
-class DelayCounterMeasure implements ISecurityPolicyCounterMeasure
+class DelayCounterMeasure implements \utils\services\ISecurityPolicyCounterMeasure
 {
     private $redis;
 

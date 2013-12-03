@@ -1,23 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 12/2/13
- * Time: 5:05 PM
- */
 
 namespace oauth2\services;
+use oauth2\requests\OAuth2AuthorizationRequest;
 
-
-interface IMementoOAuth2RequestService {
+interface IMementoOAuth2AuthenticationRequestService {
     /**
-     * Save current OAuth2Request till next request
+     * Save current OAuth2AuthorizationRequest till next request
      * @return bool
      */
     public function saveCurrentRequest();
 
     /** Retrieve last OpenIdMessage
-     * @return OAuth2Request;
+     * @return OAuth2AuthorizationRequest;
      */
     public function getCurrentRequest();
 

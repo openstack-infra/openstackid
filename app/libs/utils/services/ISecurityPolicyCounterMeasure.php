@@ -1,6 +1,6 @@
 <?php
 
-namespace openid\services;
+namespace utils\services;
 
 /**
  * Interface ISecurityPolicyCounterMeasure

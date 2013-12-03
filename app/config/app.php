@@ -116,8 +116,9 @@ return array(
         'openid\OpenIdServiceProvider',
         'auth\AuthenticationServiceProvider',
         'services\ServicesProvider',
-        'strategies\OpenIdResponseStrategyProvider',
+        'strategies\StrategyProvider',
         'Greggilbert\Recaptcha\RecaptchaServiceProvider',
+        'oauth2\OAuth2ServiceProvider'
 	),
 
 	/*

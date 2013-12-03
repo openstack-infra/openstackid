@@ -5,8 +5,8 @@ namespace services;
 use DB;
 use Exception;
 use Log;
-use openid\services\ISecurityPolicy;
-use openid\services\ISecurityPolicyCounterMeasure;
+use utils\services\ISecurityPolicy;
+use utils\services\ISecurityPolicyCounterMeasure;
 
 
 class LockUserSecurityPolicy implements ISecurityPolicy

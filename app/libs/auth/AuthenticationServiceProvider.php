@@ -3,8 +3,8 @@
 namespace auth;
 
 use Illuminate\Support\ServiceProvider;
-use openid\services\OpenIdRegistry;
 use openid\services\OpenIdServiceCatalog;
+use utils\services\Registry;
 
 class AuthenticationServiceProvider extends ServiceProvider
 {
@@ -12,7 +12,7 @@ class AuthenticationServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->singleton(OpenIdServiceCatalog::AuthenticationService, 'auth\\AuthService');
-        OpenIdRegistry::getInstance()->set(OpenIdServiceCatalog::AuthenticationService, $this->app->make(OpenIdServiceCatalog::AuthenticationService));
+        Registry::getInstance()->set(OpenIdServiceCatalog::AuthenticationService, $this->app->make(OpenIdServiceCatalog::AuthenticationService));
     }
 
     public function register()

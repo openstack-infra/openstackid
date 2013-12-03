@@ -12,9 +12,10 @@ namespace openid\handlers;
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdMessage;
-use openid\services\ILogService;
-use openid\services\OpenIdRegistry;
 use openid\services\OpenIdServiceCatalog;
+use utils\services\ILogService;
+use utils\services\Registry;
+use utils\services\UtilsServiceCatalog;
 
 /**
  * Class OpenIdMessageHandler
@@ -34,7 +35,7 @@ abstract class OpenIdMessageHandler
     {
         $this->successor = $successor;
         $this->log = $log;
-        $this->checkpoint_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::CheckPointService);
+        $this->checkpoint_service = Registry::getInstance()->get(UtilsServiceCatalog::CheckPointService);
     }
 
     /**

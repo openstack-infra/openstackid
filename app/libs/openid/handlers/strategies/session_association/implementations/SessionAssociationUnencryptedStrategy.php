@@ -10,16 +10,16 @@ namespace openid\handlers\strategies\implementations;
 
 use openid\exceptions\InvalidDHParam;
 use openid\handlers\strategies\ISessionAssociationStrategy;
+use openid\helpers\AssocHandleGenerator;
+use openid\helpers\OpenIdCryptoHelper;
+use openid\model\IAssociation;
 use openid\requests\OpenIdAssociationSessionRequest;
 use openid\responses\OpenIdAssociationSessionResponse;
 use openid\responses\OpenIdUnencryptedAssociationSessionResponse;
+use openid\services\OpenIdServiceCatalog;
+use utils\services\Registry;
 use Zend\Crypt\Exception\InvalidArgumentException;
 use Zend\Crypt\Exception\RuntimeException;
-use openid\helpers\OpenIdCryptoHelper;
-use openid\model\IAssociation;
-use openid\services\OpenIdRegistry;
-use openid\services\OpenIdServiceCatalog;
-use openid\helpers\AssocHandleGenerator;
 
 class SessionAssociationUnencryptedStrategy implements ISessionAssociationStrategy {
 
@@ -32,9 +32,9 @@ class SessionAssociationUnencryptedStrategy implements ISessionAssociationStrate
     public function __construct(OpenIdAssociationSessionRequest $request)
     {
         $this->current_request = $request;
-        $this->association_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
-        $this->server_configuration_service = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog:: ServerConfigurationService);
-        $this->log = OpenIdRegistry::getInstance()->get(OpenIdServiceCatalog:: LogService);
+        $this->association_service = Registry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
+        $this->server_configuration_service = Registry::getInstance()->get(OpenIdServiceCatalog:: ServerConfigurationService);
+        $this->log = Registry::getInstance()->get(OpenIdServiceCatalog:: LogService);
     }
 
     /**

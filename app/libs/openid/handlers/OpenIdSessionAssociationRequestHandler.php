@@ -19,7 +19,7 @@ use openid\OpenIdMessage;
 use openid\requests\OpenIdAssociationSessionRequest;
 use openid\responses\OpenIdAssociationSessionUnsuccessfulResponse;
 use openid\responses\OpenIdDirectGenericErrorResponse;
-use openid\services\ILogService;
+use utils\services\ILogService;
 
 /**
  * Class OpenIdSessionAssociationRequestHandler

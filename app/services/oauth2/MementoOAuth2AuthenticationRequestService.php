@@ -2,11 +2,12 @@
 
 namespace services\oauth2;
 
-use oauth2\services\IMementoOAuth2RequestService;
+use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\OAuth2Request;
 use oauth2\requests\OAuth2AuthorizationRequest;
+use Input;
 
-class MementoOAuth2RequestService  implements IMementoOAuth2RequestService{
+class MementoOAuth2AuthenticationRequestService  implements IMementoOAuth2AuthenticationRequestService{
 
     /**
      * Save current OAuth2AuthorizationRequest till next request
@@ -50,6 +51,7 @@ class MementoOAuth2RequestService  implements IMementoOAuth2RequestService{
     {
         $msg = new OAuth2AuthorizationRequest(Input::all());
         if (!$msg->isValid()) {
+            //if not valid , then check on old input
             $msg = null;
             $old_data = Input::old();
             $oauth2_params = array();

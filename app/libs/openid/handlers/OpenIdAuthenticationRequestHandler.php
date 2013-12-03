@@ -24,12 +24,12 @@ use openid\responses\OpenIdNonImmediateNegativeAssertion;
 use openid\responses\OpenIdPositiveAssertionResponse;
 use openid\services\IAssociationService;
 use openid\services\IAuthService;
-use openid\services\ILogService;
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\INonceService;
 use openid\services\IServerConfigurationService;
 use openid\services\IServerExtensionsService;
 use openid\services\ITrustedSitesService;
+use utils\services\ILogService;
 
 /**
  * Class OpenIdAuthenticationRequestHandler

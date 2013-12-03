@@ -1,7 +1,7 @@
 <?php
 
-namespace openid\services;
-use \Exception;
+namespace utils\services;
+use Exception;
 
 /**
  * Interface ICheckPointService

@@ -16,8 +16,8 @@ use openid\requests\OpenIdCheckAuthenticationRequest;
 use openid\responses\OpenIdCheckAuthenticationResponse;
 use openid\responses\OpenIdDirectGenericErrorResponse;
 use openid\services\IAssociationService;
-use openid\services\ILogService;
 use openid\services\INonceService;
+use utils\services\ILogService;
 
 class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
 {
