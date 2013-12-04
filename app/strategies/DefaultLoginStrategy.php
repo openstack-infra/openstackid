@@ -1,12 +1,12 @@
 <?php
 namespace strategies;
 
-use \Auth;
-use \Redirect;
-use \View;
+use Auth;
+use Redirect;
 use services\IPHelper;
 use services\IUserActionService;
-use openid\services\IAuthService;
+use utils\services\IAuthService;
+use View;
 
 class DefaultLoginStrategy implements ILoginStrategy
 {

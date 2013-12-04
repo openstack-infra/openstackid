@@ -3,7 +3,9 @@ use openid\exceptions\InvalidOpenIdMessageException;
 use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
-use \utils\services\UtilsServiceCatalog;
+use utils\services\UtilsServiceCatalog;
+use oauth2\services\OAuth2ServiceCatalog;
+use oauth2\exceptions\InvalidAuthorizationRequestException;
 /*
 |--------------------------------------------------------------------------
 | Application & Route Filters
@@ -91,11 +93,12 @@ Route::filter('csrf', function () {
 
 Route::filter("openid.needs.auth.request", function () {
 
-    $memento_service = App::make("openid\\services\\IMementoOpenIdRequestService");
-
+    $memento_service = App::make(OpenIdServiceCatalog::MementoService);
     $openid_message = $memento_service->getCurrentRequest();
+
     if ($openid_message == null || !$openid_message->isValid())
         throw new InvalidOpenIdMessageException();
+
     $auth_request = new OpenIdAuthenticationRequest($openid_message);
     if (!$auth_request->isValid())
         throw new InvalidOpenIdMessageException();
@@ -103,11 +106,26 @@ Route::filter("openid.needs.auth.request", function () {
 
 Route::filter("openid.save.request", function () {
 
-    $memento_service = App::make("openid\\services\\IMementoOpenIdRequestService");
+    $memento_service = App::make(OpenIdServiceCatalog::MementoService);
     $memento_service->saveCurrentRequest();
 
 });
 
+Route::filter("oauth2.save.request", function () {
+
+    $memento_service = App::make(OAuth2ServiceCatalog::MementoService);
+    $memento_service->saveCurrentRequest();
+});
+
+Route::filter("oauth2.needs.auth.request", function () {
+
+    $memento_service = App::make(OAuth2ServiceCatalog::MementoService);
+    $oauth2_message = $memento_service->getCurrentRequest();
+
+    if ($oauth2_message == null || !$oauth2_message->isValid())
+        throw new InvalidAuthorizationRequestException();
+
+});
 
 Route::filter("ssl", function () {
     if (!Request::secure()) {

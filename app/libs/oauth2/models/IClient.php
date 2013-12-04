@@ -10,8 +10,9 @@ namespace oauth2\models;
 
 
 interface IClient {
-    const ClientType_Public       = "public";
-    const ClientType_Confidential = "confidential";
+
+    const ClientType_Public       = 1;
+    const ClientType_Confidential = 2;
 
     public function getClientId();
     public function getClientSecret();

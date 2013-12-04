@@ -1,9 +1,9 @@
 <?php
 
 use openid\IOpenIdProtocol;
-use openid\services\IAuthService;
 use openid\services\IServerConfigurationService;
 use openid\XRDS\XRDSDocumentBuilder;
+use utils\services\IAuthService;
 
 class DiscoveryController extends BaseController
 {

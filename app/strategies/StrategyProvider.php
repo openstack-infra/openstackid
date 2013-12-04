@@ -17,6 +17,7 @@ class StrategyProvider extends ServiceProvider
         $this->app->singleton(OpenIdDirectResponse::OpenIdDirectResponse, 'strategies\\DirectResponseStrategy');
         $this->app->singleton(OpenIdIndirectResponse::OpenIdIndirectResponse, 'strategies\\IndirectResponseStrategy');
         $this->app->singleton(OAuth2IndirectResponse::OpenIdIndirectResponse, 'strategies\\IndirectResponseStrategy');
+        $this->app->singleton('oauth2\\strategies\\IOAuth2AuthenticationStrategy', 'strategies\\OAuth2AuthenticationStrategy');
 
         Registry::getInstance()->set(OpenIdDirectResponse::OpenIdDirectResponse, $this->app->make(OpenIdDirectResponse::OpenIdDirectResponse));
         Registry::getInstance()->set(OpenIdIndirectResponse::OpenIdIndirectResponse, $this->app->make(OpenIdIndirectResponse::OpenIdIndirectResponse));

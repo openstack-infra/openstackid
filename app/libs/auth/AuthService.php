@@ -3,9 +3,8 @@
 namespace auth;
 
 use Auth;
-use openid\services\AuthorizationResponse_;
-use openid\services\IAuthService;
 use Session;
+use utils\services\IAuthService;
 
 class AuthService implements IAuthService
 {

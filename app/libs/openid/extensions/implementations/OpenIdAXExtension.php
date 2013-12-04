@@ -11,6 +11,7 @@ use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
 use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
+use utils\services\UtilsServiceCatalog;
 
 
 /**
@@ -73,7 +74,7 @@ class OpenIdAXExtension extends OpenIdExtension
             $response->addParam(self::param(self::Mode), self::FetchResponse);
             $context->addSignParam(self::param(self::Mode));
             $attributes = $ax_request->getRequiredAttributes();
-            $auth_service = Registry::getInstance()->get(OpenIdServiceCatalog::AuthenticationService);
+            $auth_service = Registry::getInstance()->get(UtilsServiceCatalog::AuthenticationService);
             $user = $auth_service->getCurrentUser();
             foreach ($attributes as $attr) {
                 $response->addParam(self::param(self::Type) . "." . $attr, self::$available_properties[$attr]);

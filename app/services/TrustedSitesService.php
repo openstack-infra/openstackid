@@ -4,9 +4,9 @@ namespace services;
 
 use openid\model\IOpenIdUser;
 use openid\model\ITrustedSite;
-use openid\services\IAuthService;
 use openid\services\ITrustedSitesService;
 use OpenIdTrustedSite;
+use utils\services\IAuthService;
 use utils\services\ILogService;
 
 class TrustedSitesService implements ITrustedSitesService

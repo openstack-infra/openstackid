@@ -23,12 +23,12 @@ use openid\responses\OpenIdIndirectGenericErrorResponse;
 use openid\responses\OpenIdNonImmediateNegativeAssertion;
 use openid\responses\OpenIdPositiveAssertionResponse;
 use openid\services\IAssociationService;
-use openid\services\IAuthService;
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\INonceService;
 use openid\services\IServerConfigurationService;
 use openid\services\IServerExtensionsService;
 use openid\services\ITrustedSitesService;
+use utils\services\IAuthService;
 use utils\services\ILogService;
 
 /**

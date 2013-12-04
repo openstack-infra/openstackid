@@ -4,12 +4,12 @@ namespace oauth2\exceptions;
 
 use Exception;
 
-class InvalidAuthorizationRequestException extends Exception
+class OAuth2GenericException extends Exception
 {
 
     public function __construct($message = "")
     {
-        $message = "Invalid Authorization Request : " . $message;
+        $message = "OAuth2 Generic Exception : " . $message;
         parent::__construct($message, 0, null);
     }
 

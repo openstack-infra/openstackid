@@ -117,7 +117,7 @@ class OpenIdProtocol implements IOpenIdProtocol
     {
         //create chain of responsibility
 
-        $auth_service = Registry::getInstance()->get(OpenIdServiceCatalog::AuthenticationService);
+        $auth_service = Registry::getInstance()->get(UtilsServiceCatalog::AuthenticationService);
         $memento_request_service = Registry::getInstance()->get(OpenIdServiceCatalog::MementoService);
         $auth_strategy = Registry::getInstance()->get(OpenIdServiceCatalog::AuthenticationStrategy);
         $server_extension_service = Registry::getInstance()->get(OpenIdServiceCatalog::ServerExtensionsService);

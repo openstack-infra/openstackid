@@ -2,18 +2,18 @@
 
 namespace strategies;
 
+use Auth;
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\exceptions\InvalidRequestContextException;
 use openid\OpenIdProtocol;
-use openid\services\IAuthService;
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\IServerConfigurationService;
+use Redirect;
 use services\IPHelper;
 use services\IUserActionService;
-use \Auth;
-use \Redirect;
-use \View;
-use \Session;
+use Session;
+use utils\services\IAuthService;
+use View;
 
 class OpenIdConsentStrategy implements IConsentStrategy
 {
@@ -35,7 +35,7 @@ class OpenIdConsentStrategy implements IConsentStrategy
     public function getConsent()
     {
         $data = $this->getViewData();
-        return View::make("consent", $data);
+        return View::make("openid.consent", $data);
     }
 
     private function getViewData()

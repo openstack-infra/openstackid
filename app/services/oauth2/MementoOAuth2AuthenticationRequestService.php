@@ -6,6 +6,7 @@ use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\OAuth2Request;
 use oauth2\requests\OAuth2AuthorizationRequest;
 use Input;
+use Session;
 
 class MementoOAuth2AuthenticationRequestService  implements IMementoOAuth2AuthenticationRequestService{
 

@@ -3,16 +3,18 @@
 namespace strategies;
 
 use Auth;
+use Redirect;
+use View;
 use openid\OpenIdProtocol;
 use openid\requests\OpenIdAuthenticationRequest;
 use openid\responses\OpenIdNonImmediateNegativeAssertion;
 use openid\services\IMementoOpenIdRequestService;
 use openid\strategies\OpenIdResponseStrategyFactoryMethod;
-use Redirect;
 use services\IPHelper;
 use services\IUserActionService;
-use View;
-use openid\services\IAuthService;
+use utils\services\IAuthService;
+
+
 class OpenIdLoginStrategy implements ILoginStrategy
 {
 

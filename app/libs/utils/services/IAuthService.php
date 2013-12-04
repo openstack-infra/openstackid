@@ -1,15 +1,7 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/15/13
- * Time: 4:39 PM
- * To change this template use File | Settings | File Templates.
- */
 
-namespace openid\services;
+namespace utils\services;
 
-use openid\model\IOpenIdUser;
 
 interface IAuthService
 {
@@ -24,11 +16,7 @@ interface IAuthService
      */
     public function isUserLogged();
 
-    /**
-     * @return IOpenIdUser
-     */
     public function getCurrentUser();
-
     /**
      * @param $username
      * @param $password
@@ -39,9 +27,6 @@ interface IAuthService
 
     public function getUserByUsername($username);
 
-    /**
-     * @return AuthorizationResponse_*
-     */
     public function getUserAuthorizationResponse();
 
     public function setUserAuthorizationResponse($auth_response);

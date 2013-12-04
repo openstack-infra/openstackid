@@ -10,6 +10,7 @@ namespace utils\services;
 
 
 class UtilsServiceCatalog {
-    const CheckPointService = 'utils\\services\\ICheckPointService';
-    const LogService = '\utils\services\ILogService';
+    const CheckPointService     = 'utils\\services\\ICheckPointService';
+    const LogService            = 'utils\\services\\ILogService';
+    const AuthenticationService = 'utils\\services\\IAuthService';
 } 

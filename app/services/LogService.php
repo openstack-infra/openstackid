@@ -4,7 +4,7 @@ namespace services;
 
 use Exception;
 use Log;
-use \utils\services\ILogService;
+use utils\services\ILogService;
 
 class LogService implements ILogService
 {

@@ -18,6 +18,7 @@ use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
 use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
+use utils\services\UtilsServiceCatalog;
 
 /**
  * Class OpenIdSREGExtension
@@ -96,7 +97,7 @@ class OpenIdSREGExtension extends OpenIdExtension
             $opt_attributes = $simple_reg_request->getOptionalAttributes();
             $attributes = array_merge($attributes, $opt_attributes);
 
-            $auth_service = Registry::getInstance()->get(OpenIdServiceCatalog::AuthenticationService);
+            $auth_service = Registry::getInstance()->get(UtilsServiceCatalog::AuthenticationService);
             $user = $auth_service->getCurrentUser();
 
             foreach ($attributes as $attr => $value) {

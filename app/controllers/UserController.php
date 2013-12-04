@@ -1,6 +1,6 @@
 <?php
 
-use openid\services\IAuthService;
+use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\IServerConfigurationService;
 use openid\services\ITrustedSitesService;
@@ -11,12 +11,16 @@ use services\IUserActionService;
 use strategies\DefaultLoginStrategy;
 use strategies\OpenIdConsentStrategy;
 use strategies\OpenIdLoginStrategy;
-use openid\requests\OpenIdAuthenticationRequest;
+use utils\services\IAuthService;
+use oauth2\services\IMementoOAuth2AuthenticationRequestService;
+use strategies\OAuth2LoginStrategy;
+use strategies\OAuth2ConsentStrategy;
 
 class UserController extends BaseController
 {
 
-    private $memento_service;
+    private $openid_memento_service;
+    private $oauth2_memento_service;
     private $auth_service;
     private $server_configuration_service;
     private $discovery;
@@ -25,7 +29,8 @@ class UserController extends BaseController
     private $login_strategy;
     private $consent_strategy;
 
-    public function __construct(IMementoOpenIdRequestService $memento_service,
+    public function __construct(IMementoOpenIdRequestService $openid_memento_service,
+                                IMementoOAuth2AuthenticationRequestService $oauth2_memento_service,
                                 IAuthService $auth_service,
                                 IServerConfigurationService $server_configuration_service,
                                 ITrustedSitesService $trusted_sites_service,
@@ -33,7 +38,8 @@ class UserController extends BaseController
                                 IUserService $user_service,
                                 IUserActionService $user_action_service)
     {
-        $this->memento_service              = $memento_service;
+        $this->openid_memento_service       = $openid_memento_service;
+        $this->oauth2_memento_service       = $oauth2_memento_service;
         $this->auth_service                 = $auth_service;
         $this->server_configuration_service = $server_configuration_service;
         $this->trusted_sites_service        = $trusted_sites_service;
@@ -43,19 +49,26 @@ class UserController extends BaseController
         //filters
         $this->beforeFilter('csrf', array('only' => array('postLogin', 'postConsent')));
 
-        $msg = $this->memento_service->getCurrentRequest();
-        if (!is_null($msg) && $msg->isValid() && OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($msg)) {
+        $openid_msg = $this->openid_memento_service->getCurrentRequest();
+        $oauth2_msg = $this->oauth2_memento_service->getCurrentRequest();
+        if (!is_null($openid_msg) && $openid_msg->isValid() && OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($openid_msg)) {
             //openid stuff
             $this->beforeFilter('openid.save.request');
             $this->beforeFilter('openid.needs.auth.request', array('only' => array('getConsent')));
-            $this->login_strategy   = new OpenIdLoginStrategy($memento_service, $user_action_service, $auth_service);
-            $this->consent_strategy = new OpenIdConsentStrategy($memento_service, $auth_service, $server_configuration_service, $user_action_service);
+            $this->login_strategy   = new OpenIdLoginStrategy($openid_memento_service, $user_action_service, $auth_service);
+            $this->consent_strategy = new OpenIdConsentStrategy($openid_memento_service, $auth_service, $server_configuration_service, $user_action_service);
+        }
+        else if(!is_null($oauth2_msg) && $oauth2_msg->isValid()){
+            $this->beforeFilter('oauth2.save.request');
+            $this->beforeFilter('oauth2.needs.auth.request', array('only' => array('getConsent')));
+            $this->login_strategy   = new OAuth2LoginStrategy();
+            $this->consent_strategy = new OAuth2ConsentStrategy($auth_service);
         } else {
             //default stuff
             $this->login_strategy   = new DefaultLoginStrategy($user_action_service, $auth_service);
             $this->consent_strategy = null;
         }
-        //oauth2 stuff
+
     }
 
     public function getLogin()

@@ -13,5 +13,4 @@ class OpenIdServiceCatalog
     const ServerConfigurationService = 'openid\\services\\IServerConfigurationService';
     const UserService = 'openid\\services\\IUserService';
     const NonceService = 'openid\\services\\INonceService';
-    const AuthenticationService = 'openid\\services\\IAuthService';
 }
