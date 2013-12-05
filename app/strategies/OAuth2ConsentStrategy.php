@@ -34,7 +34,7 @@ class OAuth2ConsentStrategy implements  IConsentStrategy {
 
     public function getConsent()
     {
-        $request = $this->memento_service->getCurrentRequest();
+        $request = $this->memento_service->getCurrentAuthorizationRequest();
         $client_id = $request->getClientId();
         $client    = $this->client_service->getClientById($client_id);
         $scopes    = explode(' ',$request->getScope());

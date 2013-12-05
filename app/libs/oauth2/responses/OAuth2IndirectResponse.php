@@ -7,7 +7,7 @@ abstract class OAuth2IndirectResponse extends OAuth2Response {
     protected $return_to;
 
     const IndirectResponseContentType = "application/x-www-form-urlencoded";
-    const OpenIdIndirectResponse ='OAuth2IndirectResponse';
+    const OAuth2IndirectResponse ='OAuth2IndirectResponse';
 
     public function __construct()
     {
@@ -19,7 +19,7 @@ abstract class OAuth2IndirectResponse extends OAuth2Response {
 
     public function getType()
     {
-        return self::OpenIdIndirectResponse;
+        return self::OAuth2IndirectResponse;
     }
 
     public function setReturnTo($return_to){

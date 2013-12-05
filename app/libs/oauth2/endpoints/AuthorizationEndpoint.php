@@ -1,6 +1,7 @@
 <?php
 
 namespace oauth2\endpoints;
+
 use oauth2\requests\OAuth2Request;
 use oauth2\OAuth2Protocol;
 use oauth2\grant_types\AuthorizationCodeGrantType;
@@ -11,9 +12,10 @@ use oauth2\services\ITokenService;
 use utils\services\IAuthService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 
-
 /**
  * Class AuthorizationEndpoint
+ * Authorization Endpoint Implementation
+ * http://tools.ietf.org/html/rfc6749#section-3.1
  * @package oauth2\endpoints
  */
 class AuthorizationEndpoint implements IOAuth2Endpoint {

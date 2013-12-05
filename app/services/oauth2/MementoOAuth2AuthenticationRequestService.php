@@ -2,6 +2,7 @@
 
 namespace services\oauth2;
 
+use oauth2\requests\OAuth2AccessTokenRequest;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\OAuth2Request;
 use oauth2\requests\OAuth2AuthorizationRequest;
@@ -14,7 +15,7 @@ class MementoOAuth2AuthenticationRequestService  implements IMementoOAuth2Authen
      * Save current OAuth2AuthorizationRequest till next request
      * @return bool
      */
-    public function saveCurrentRequest()
+    public function saveCurrentAuthorizationRequest()
     {
         $input         = Input::all();
         $oauth2_params = array();
@@ -48,7 +49,7 @@ class MementoOAuth2AuthenticationRequestService  implements IMementoOAuth2Authen
     /** Retrieve last OAuth2AuthorizationRequest
      * @return OAuth2AuthorizationRequest;
      */
-    public function getCurrentRequest()
+    public function getCurrentAuthorizationRequest()
     {
         $msg = new OAuth2AuthorizationRequest(Input::all());
         if (!$msg->isValid()) {
@@ -71,5 +72,11 @@ class MementoOAuth2AuthenticationRequestService  implements IMementoOAuth2Authen
     public function clearCurrentRequest()
     {
         // TODO: Implement clearCurrentRequest() method.
+    }
+
+    public function getCurrentAccessTokenRequest()
+    {
+        $msg = new OAuth2AccessTokenRequest(Input::all());
+        return $msg;
     }
 }

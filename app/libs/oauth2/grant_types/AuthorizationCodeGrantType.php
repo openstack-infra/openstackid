@@ -20,7 +20,12 @@ use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use oauth2\exceptions\AccessDeniedException;
 use oauth2\models\IClient;
 
-
+/**
+ * Class AuthorizationCodeGrantType
+ * Authorization Code Grant Implementation
+ * http://tools.ietf.org/html/rfc6749#section-4.1
+ * @package oauth2\grant_types
+ */
 class AuthorizationCodeGrantType implements IGrantType {
 
     private $client_service;
@@ -82,15 +87,15 @@ class AuthorizationCodeGrantType implements IGrantType {
         $state         = $request->getState();
         //check user logged
         if (!$this->auth_service->isUserLogged()) {
-            $this->memento_service->saveCurrentRequest();
-            return $this->auth_strategy->doLogin($this->memento_service->getCurrentRequest());
+            $this->memento_service->saveCurrentAuthorizationRequest();
+            return $this->auth_strategy->doLogin($this->memento_service->getCurrentAuthorizationRequest());
         }
 
 
         $authorization_response = $this->auth_service->getUserAuthorizationResponse();
         if($authorization_response === IAuthService::AuthorizationResponse_None){
-            $this->memento_service->saveCurrentRequest();
-            return $this->auth_strategy->doConsent($this->memento_service->getCurrentRequest());
+            $this->memento_service->saveCurrentAuthorizationRequest();
+            return $this->auth_strategy->doConsent($this->memento_service->getCurrentAuthorizationRequest());
         }
         else if ($authorization_response === IAuthService::AuthorizationResponse_DenyOnce){
             throw new AccessDeniedException;
@@ -109,8 +114,6 @@ class AuthorizationCodeGrantType implements IGrantType {
         return $response;
     }
 
-
-
     public function getResponseType()
     {
         return OAuth2Protocol::OAuth2Protocol_ResponseType_Code;
@@ -120,5 +123,4 @@ class AuthorizationCodeGrantType implements IGrantType {
     {
         // TODO: Implement getType() method.
     }
-
 }

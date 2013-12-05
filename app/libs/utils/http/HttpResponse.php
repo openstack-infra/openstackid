@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 12/3/13
- * Time: 11:26 AM
- */
 
 namespace utils\http;
 
@@ -13,6 +7,7 @@ abstract class HttpResponse extends HttpMessage
 {
     const HttpOkResponse = 200;
     const HttpErrorResponse = 400;
+
     protected $http_code;
     protected $content_type;
 

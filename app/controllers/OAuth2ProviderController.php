@@ -22,11 +22,14 @@ class OAuth2ProviderController extends BaseController {
         $this->memento_service = $memento_service;
     }
 
+    /**
+     * Authorize HTTP Endpoint
+     * @return mixed
+     */
     public function authorize(){
-        $request   = $this->memento_service->getCurrentRequest();
+        $request   = $this->memento_service->getCurrentAuthorizationRequest();
         $response  = $this->oauth2_protocol->authorize($request);
         $reflector = new ReflectionClass($response);
-
         if ($reflector->isSubclassOf('oauth2\\responses\\OAuth2Response')) {
             $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($response);
             return $strategy->handle($response);
@@ -34,7 +37,18 @@ class OAuth2ProviderController extends BaseController {
         return $response;
     }
 
+    /**
+     * Token HTTP Endpoint
+     * @return mixed
+     */
     public function token(){
-
+        $request   = $this->memento_service->getCurrentAccessTokenRequest();
+        $response  = $this->oauth2_protocol->token($request);
+        $reflector = new ReflectionClass($response);
+        if ($reflector->isSubclassOf('oauth2\\responses\\OAuth2Response')) {
+            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($response);
+            return $strategy->handle($response);
+        }
+        return $response;
     }
 } 

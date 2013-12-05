@@ -114,13 +114,13 @@ Route::filter("openid.save.request", function () {
 Route::filter("oauth2.save.request", function () {
 
     $memento_service = App::make(OAuth2ServiceCatalog::MementoService);
-    $memento_service->saveCurrentRequest();
+    $memento_service->saveCurrentAuthorizationRequest();
 });
 
 Route::filter("oauth2.needs.auth.request", function () {
 
     $memento_service = App::make(OAuth2ServiceCatalog::MementoService);
-    $oauth2_message = $memento_service->getCurrentRequest();
+    $oauth2_message = $memento_service->getCurrentAuthorizationRequest();
 
     if ($oauth2_message == null || !$oauth2_message->isValid())
         throw new InvalidAuthorizationRequestException();
@@ -129,8 +129,12 @@ Route::filter("oauth2.needs.auth.request", function () {
 
 Route::filter("ssl", function () {
     if (!Request::secure()) {
-        $memento_service = Registry::getInstance()->get("openid\\services\\IMementoOpenIdRequestService");
-        $memento_service->saveCurrentRequest();
+        $openid_memento_service = Registry::getInstance()->get(OpenIdServiceCatalog::MementoService);
+        $openid_memento_service->saveCurrentRequest();
+
+        $oauth2_memento_service = App::make(OAuth2ServiceCatalog::MementoService);
+        $oauth2_memento_service->saveCurrentAuthorizationRequest();
+
         return Redirect::secure(Request::getRequestUri());
     }
 });

@@ -41,8 +41,8 @@ use utils\services\ILogService;
 
 class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
 {
-    private $authService;
-    private $mementoRequestService;
+    private $auth_service;
+    private $memento_service;
     private $auth_strategy;
     private $server_extensions_service;
     private $association_service;
@@ -53,7 +53,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     private $nonce_service;
 
     public function __construct(IAuthService $authService,
-                                IMementoOpenIdRequestService $mementoRequestService,
+                                IMementoOpenIdRequestService $memento_service,
                                 IOpenIdAuthenticationStrategy $auth_strategy,
                                 IServerExtensionsService $server_extensions_service,
                                 IAssociationService $association_service,
@@ -64,15 +64,15 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                                 $successor)
     {
         parent::__construct($successor, $log);
-        $this->authService = $authService;
-        $this->mementoRequestService = $mementoRequestService;
-        $this->auth_strategy = $auth_strategy;
-        $this->server_extensions_service = $server_extensions_service;
-        $this->association_service = $association_service;
-        $this->trusted_sites_service = $trusted_sites_service;
+        $this->auth_service                 = $authService;
+        $this->memento_service              = $memento_service;
+        $this->auth_strategy                = $auth_strategy;
+        $this->server_extensions_service    = $server_extensions_service;
+        $this->association_service          = $association_service;
+        $this->trusted_sites_service        = $trusted_sites_service;
         $this->server_configuration_service = $server_configuration_service;
-        $this->extensions = $this->server_extensions_service->getAllActiveExtensions();
-        $this->nonce_service = $nonce_service;
+        $this->extensions                   = $this->server_extensions_service->getAllActiveExtensions();
+        $this->nonce_service                = $nonce_service;
     }
 
     /**
@@ -136,18 +136,18 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
      */
     private function doSetupMode()
     {
-        if (!$this->authService->isUserLogged()) {
+        if (!$this->auth_service->isUserLogged()) {
             return $this->doLogin();
         } else {
             //user already logged
-            $currentUser = $this->authService->getCurrentUser();
+            $currentUser = $this->auth_service->getCurrentUser();
             if (!$this->current_request->isIdentitySelectByOP()) {
                 $current_claimed_id = $this->current_request->getClaimedId();
                 $current_identity = $this->current_request->getIdentity();
 
                 // check is claimed identity match with current one
                 // if not logs out and do re login
-                $current_user = $this->authService->getCurrentUser();
+                $current_user = $this->auth_service->getCurrentUser();
 
                 if (is_null($current_user))
                     throw new \Exception("User not set!");
@@ -156,12 +156,12 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
 
                 if ($current_claimed_id != $current_owned_identity && $current_identity != $current_owned_identity) {
                     $this->log->warning_msg(sprintf(OpenIdErrorMessages::AlreadyExistSessionMessage, $current_owned_identity, $current_identity));
-                    $this->authService->logout();
+                    $this->auth_service->logout();
                     return $this->doLogin();
                 }
             }
 
-            $authorization_response = $this->authService->getUserAuthorizationResponse();
+            $authorization_response = $this->auth_service->getUserAuthorizationResponse();
 
             if ($authorization_response == IAuthService::AuthorizationResponse_None) {
                 $this->current_request_context->cleanTrustedData();
@@ -208,7 +208,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         foreach ($this->extensions as $ext) {
             $ext->parseRequest($this->current_request, $this->current_request_context);
         }
-        $this->mementoRequestService->saveCurrentRequest();
+        $this->memento_service->saveCurrentRequest();
         return $this->auth_strategy->doLogin($this->current_request, $this->current_request_context);
     }
 
@@ -222,7 +222,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     private function doAssertion()
     {
 
-        $currentUser = $this->authService->getCurrentUser();
+        $currentUser = $this->auth_service->getCurrentUser();
         $context = new ResponseContext;
 
         //initial signature params
@@ -277,7 +277,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
          * so associate $nonce with signature and realm
          */
         $this->nonce_service->associateNonce($nonce, $response->getSig(), $realm);
-        $this->mementoRequestService->clearCurrentRequest();
+        $this->memento_service->clearCurrentRequest();
         return $response;
     }
 
@@ -287,7 +287,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     private function doConsentProcess()
     {
         //do consent process
-        $this->mementoRequestService->saveCurrentRequest();
+        $this->memento_service->saveCurrentRequest();
         foreach ($this->extensions as $ext) {
             $ext->parseRequest($this->current_request, $this->current_request_context);
         }
@@ -302,7 +302,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     private function checkAuthorizationResponse($authorization_response)
     {
         // check response
-        $currentUser = $this->authService->getCurrentUser();
+        $currentUser = $this->auth_service->getCurrentUser();
         switch ($authorization_response) {
             case IAuthService::AuthorizationResponse_AllowForever:
             {
@@ -342,10 +342,10 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
      */
     protected function doImmediateMode()
     {
-        if (!$this->authService->isUserLogged()) {
+        if (!$this->auth_service->isUserLogged()) {
             return new OpenIdImmediateNegativeAssertion($this->current_request->getReturnTo());
         }
-        $currentUser = $this->authService->getCurrentUser();
+        $currentUser = $this->auth_service->getCurrentUser();
 
         $this->current_request_context->cleanTrustedData();
         foreach ($this->extensions as $ext) {

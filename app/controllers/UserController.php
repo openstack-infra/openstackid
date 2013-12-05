@@ -54,7 +54,7 @@ class UserController extends BaseController
         $this->beforeFilter('csrf', array('only' => array('postLogin', 'postConsent')));
 
         $openid_msg = $this->openid_memento_service->getCurrentRequest();
-        $oauth2_msg = $this->oauth2_memento_service->getCurrentRequest();
+        $oauth2_msg = $this->oauth2_memento_service->getCurrentAuthorizationRequest();
         if (!is_null($openid_msg) && $openid_msg->isValid() && OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($openid_msg)) {
             //openid stuff
             $this->beforeFilter('openid.save.request');
