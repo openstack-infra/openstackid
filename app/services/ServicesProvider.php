@@ -11,12 +11,9 @@ use utils\services\UtilsServiceCatalog;
 class ServicesProvider extends ServiceProvider
 {
 
-
     public function boot()
     {
-
         //register on boot bc we rely on Illuminate\Redis\ServiceProvider\RedisServiceProvider
-
         $this->app->singleton(OpenIdServiceCatalog::MementoService, 'services\\MementoRequestService');
         $this->app->singleton(OpenIdServiceCatalog::AuthenticationStrategy, 'services\\AuthenticationStrategy');
         $this->app->singleton(OpenIdServiceCatalog::ServerExtensionsService, 'services\\ServerExtensionsService');
@@ -66,10 +63,12 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(OAuth2ServiceCatalog::MementoService, 'services\\oauth2\\MementoOAuth2AuthenticationRequestService');
         $this->app->singleton(OAuth2ServiceCatalog::ClientService, 'services\\oauth2\\ClientService');
         $this->app->singleton(OAuth2ServiceCatalog::TokenService, 'services\\oauth2\\TokenService');
+        $this->app->singleton(OAuth2ServiceCatalog::ScopeService, 'services\\oauth2\\ApiScopeService');
 
         Registry::getInstance()->set(OAuth2ServiceCatalog::MementoService, $this->app->make(OAuth2ServiceCatalog::MementoService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::ClientService, $this->app->make(OAuth2ServiceCatalog::ClientService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::TokenService, $this->app->make(OAuth2ServiceCatalog::TokenService));
+        Registry::getInstance()->set(OAuth2ServiceCatalog::ScopeService, $this->app->make(OAuth2ServiceCatalog::ScopeService));
     }
 
     public function register()

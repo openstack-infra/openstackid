@@ -20,6 +20,11 @@ class OpenIdUser extends \Eloquent implements UserInterface, IOpenIdUser
         return $this->hasMany("OpenIdTrustedSite", 'user_id');
     }
 
+    public function clients()
+    {
+        return $this->hasMany("Client", 'user_id');
+    }
+
     public function getActions()
     {
         return $this->actions()->orderBy('created_at', 'desc')->take(10)->get();

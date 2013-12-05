@@ -2,6 +2,13 @@
 @section('title')
 <title>Welcome to openstackId - consent </title>
 @stop
+
+@section('header_right')
+@if(Auth::check())
+Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()->identifier}}</a>
+@endif
+@stop
+
 @section('content')
 <div class="container">
     <h4>OpenstackId - Openid verification</h4>

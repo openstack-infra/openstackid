@@ -15,10 +15,10 @@ class CreateOauth2ApiScope extends Migration {
         {
             $table->bigIncrements('id')->unsigned();
             $table->string('name',512);
+            $table->string('short_description',512);
             $table->text('description');
             $table->boolean('active');
             $table->timestamps();
-
             $table->bigInteger("api_id")->unsigned();
             $table->index('api_id');
             $table->foreign('api_id')->references('id')->on('oauth2_api');

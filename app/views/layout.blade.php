@@ -12,7 +12,9 @@
             <div class="span5">
                 <h1 id="logo"><a href="/">Open Stack</a></h1>
             </div>
-            <div class="span7"></div>
+            <div class="span7">
+                @yield('header_right')
+            </div>
         </header>
         <div class="row" id="main-content">
             @yield('content')

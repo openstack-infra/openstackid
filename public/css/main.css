@@ -33,3 +33,21 @@
 .margin-top-20{
     margin-top: 20px;
 }
+
+.popover-content{
+    font-size: 12px!important;
+    font-style: normal;
+    font-weight: normal;
+}
+
+.popover{
+    max-width: 500px !important;
+}
+
+.info{
+    cursor: pointer;
+}
+
+.privacy-policy{
+    font-size: 10px;
+}

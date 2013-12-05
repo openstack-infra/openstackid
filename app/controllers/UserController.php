@@ -15,6 +15,8 @@ use utils\services\IAuthService;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use strategies\OAuth2LoginStrategy;
 use strategies\OAuth2ConsentStrategy;
+use oauth2\services\IClientService;
+use oauth2\services\IApiScopeService;
 
 class UserController extends BaseController
 {
@@ -36,7 +38,9 @@ class UserController extends BaseController
                                 ITrustedSitesService $trusted_sites_service,
                                 DiscoveryController $discovery,
                                 IUserService $user_service,
-                                IUserActionService $user_action_service)
+                                IUserActionService $user_action_service,
+                                IClientService $client_service,
+                                IApiScopeService $scope_service)
     {
         $this->openid_memento_service       = $openid_memento_service;
         $this->oauth2_memento_service       = $oauth2_memento_service;
@@ -62,7 +66,7 @@ class UserController extends BaseController
             $this->beforeFilter('oauth2.save.request');
             $this->beforeFilter('oauth2.needs.auth.request', array('only' => array('getConsent')));
             $this->login_strategy   = new OAuth2LoginStrategy();
-            $this->consent_strategy = new OAuth2ConsentStrategy($auth_service);
+            $this->consent_strategy = new OAuth2ConsentStrategy($auth_service,$oauth2_memento_service,$scope_service,$client_service);
         } else {
             //default stuff
             $this->login_strategy   = new DefaultLoginStrategy($user_action_service, $auth_service);

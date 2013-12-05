@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 12/3/13
- * Time: 4:37 PM
- */
 
 namespace oauth2\models;
 
@@ -23,4 +17,8 @@ interface IClient {
     public function isScopeAllowed($scope);
     public function isRealmAllowed($realm);
     public function isUriAllowed($uri);
+    public function getApplicationName();
+    public function getApplicationLogo();
+    public function getApplicationDescription();
+    public function getDeveloperEmail();
 } 
