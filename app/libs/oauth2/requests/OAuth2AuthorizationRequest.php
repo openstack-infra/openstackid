@@ -1,12 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 12/2/13
- * Time: 2:42 PM
- */
 
 namespace oauth2\requests;
+
 use oauth2\OAuth2Protocol;
 
 class OAuth2AuthorizationRequest extends OAuth2Request {

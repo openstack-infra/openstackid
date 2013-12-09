@@ -13,9 +13,9 @@ use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\exceptions\OAuth2GenericException;
 use oauth2\exceptions\AccessDeniedException;
+use oauth2\exceptions\ExpiredAuthorizationCodeException;
 use Exception;
 use oauth2\responses\OAuth2DirectErrorResponse;
-use oauth2\responses\OAuth2DirectResponse;
 use oauth2\responses\OAuth2IndirectErrorResponse;
 use utils\services\ILogService;
 use oauth2\services\IClientService;
@@ -23,6 +23,8 @@ use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\ITokenService;
 use utils\services\IAuthService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
+use oauth2\exceptions\InvalidAuthorizationCodeException;
+use oauth2\exceptions\ReplayAttackException;
 
 /**
  * Class OAuth2Protocol
@@ -41,7 +43,7 @@ class OAuth2Protocol implements  IOAuth2Protocol{
     {
         $this->log_service = $log_service;
         $this->authorize_endpoint = new AuthorizationEndpoint($client_service,$token_service,$auth_service,$memento_service,$auth_strategy);
-        $this->token_endpoint     = new TokenEndpoint;
+        $this->token_endpoint     = new TokenEndpoint($client_service,$token_service,$auth_service,$memento_service,$auth_strategy);
     }
 
     private $authorize_endpoint;
@@ -56,15 +58,32 @@ class OAuth2Protocol implements  IOAuth2Protocol{
     const OAuth2Protocol_ResponseType_Token = 'token';
 
     public static $valid_responses_types = array(
-        self::OAuth2Protocol_ResponseType_Code =>self::OAuth2Protocol_ResponseType_Code,
+        self::OAuth2Protocol_ResponseType_Code  => self::OAuth2Protocol_ResponseType_Code,
         self::OAuth2Protocol_ResponseType_Token => self::OAuth2Protocol_ResponseType_Token
+    );
+
+    public static $valid_grant_types = array(
+        self::OAuth2Protocol_GrantType_AuthCode               => self::OAuth2Protocol_GrantType_AuthCode,
+        self::OAuth2Protocol_GrantType_Implicit               => self::OAuth2Protocol_GrantType_Implicit,
+        self::OAuth2Protocol_GrantType_ResourceOwner_Password => self::OAuth2Protocol_GrantType_ResourceOwner_Password,
+        self::OAuth2Protocol_GrantType_ClientCredentials      => self::OAuth2Protocol_GrantType_ClientCredentials,
     );
 
     const OAuth2Protocol_ResponseType                  = "response_type";
     const OAuth2Protocol_ClientId                      = "client_id";
+    const OAuth2Protocol_ClientSecret                  = "client_secret";
+
+    const OAuth2Protocol_AccessToken                   = "access_token";
+    const OAuth2Protocol_TokenType                     = "token_type";
+    const OAuth2Protocol_AccessToken_ExpiresIn         = "expires_in";
+    const OAuth2Protocol_RefreshToken                  = "refresh_token";
+
+
     const OAuth2Protocol_RedirectUri                   = "redirect_uri";
     const OAuth2Protocol_Scope                         = "scope";
     const OAuth2Protocol_State                         = "state";
+    const OAuth2Protocol_GrantType                     = 'grant_type';
+
     const OAuth2Protocol_Error                         = "error";
     const OAuth2Protocol_ErrorDescription              = "error_description";
     const OAuth2Protocol_ErrorUri                      = "error_uri";
@@ -153,6 +172,34 @@ class OAuth2Protocol implements  IOAuth2Protocol{
         catch(InvalidOAuth2Request $ex1){
             $this->log_service->error($ex1);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
+        }
+        catch(InvalidAuthorizationCodeException $ex2){
+            $this->log_service->error($ex2);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(InvalidClientException $ex3){
+            $this->log_service->error($ex3);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(UriNotAllowedException $ex4){
+            $this->log_service->error($ex4);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(UnAuthorizedClientException $ex5){
+            $this->log_service->error($ex5);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(ExpiredAuthorizationCodeException $ex6){
+            $this->log_service->error($ex6);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
+        }
+        catch(ReplayAttackException $ex7){
+            $this->log_service->error($ex7);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
+        }
+        catch(Exception $ex){
+            $this->log_service->error($ex);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_ServerError);
         }
     }
 }

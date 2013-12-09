@@ -16,6 +16,8 @@ abstract class Token {
     protected $issued;
     protected $client_id;
     protected $len;
+    protected $scope;
+
     const DefaultByteLength = 32;
 
     public function __construct($len = self::DefaultByteLength){
@@ -35,5 +37,15 @@ abstract class Token {
         return $this->lifetime;
     }
 
+    public function getScope(){
+        return $this->scope;
+    }
+
+    public function getClientId(){
+       return $this->$client_id;
+    }
+
     public abstract function toJSON();
+
+    public abstract function fromJSON($json);
 } 

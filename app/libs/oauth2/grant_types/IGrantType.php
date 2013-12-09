@@ -14,6 +14,7 @@ interface IGrantType {
 
     public function canHandle(OAuth2Request $request);
     public function handle(OAuth2Request $request);
+    public function completeFlow(OAuth2Request $request);
     public function getResponseType();
     public function getType();
 }

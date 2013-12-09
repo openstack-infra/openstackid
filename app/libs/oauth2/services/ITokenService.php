@@ -1,37 +1,37 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 12/3/13
- * Time: 6:11 PM
- */
 
 namespace oauth2\services;
 
-
-use oauth2\models\Token;
+use oauth2\models\AuthorizationCode;
+use oauth2\models\AccessToken;
+use oauth2\models\RefreshToken;
 
 interface ITokenService {
     /**
      * @param $client_id
-     * @param null $redirect_uri
-     * @return Token
-     */
-    public function getAuthorizationCode($client_id,$redirect_uri=null);
-
-    /**
-     * @param $auth_code
-     * @param $client_id
      * @param $scope
      * @param null $redirect_uri
-     * @return Token
+     * @return AuthorizationCode
      */
-    public function getAccessToken($auth_code,$client_id,$scope,$redirect_uri=null);
+    public function createAuthorizationCode($client_id, $scope, $redirect_uri = null);
+
 
     /**
-     * @param $client_id
-     * @param $scope
-     * @return Token
+     * @param $value
+     * @return AuthorizationCode
      */
-    public function getRefreshToken($client_id,$scope);
+    public function getAuthorizationCode($value);
+
+    /**
+     * @param $auth_code AuthorizationCode
+     * @param null $redirect_uri
+     * @return AccessToken
+     */
+    public function createAccessToken(AuthorizationCode $auth_code,$redirect_uri=null);
+
+    /**
+     * @param $access_token
+     * @return RefreshToken
+     */
+    public function createRefreshToken(AccessToken $access_token);
 } 

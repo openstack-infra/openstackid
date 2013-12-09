@@ -16,4 +16,9 @@ interface IClientService {
      * @return IClient
      */
     public function getClientById($client_id);
+
+    /**
+     * @return list
+     */
+    public function getCurrentClientAuthInfo();
 } 
