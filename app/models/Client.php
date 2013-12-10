@@ -92,4 +92,9 @@ class Client extends Eloquent implements IClient {
         $email = $user->external_id;
         return $email;
     }
+
+    public function getId()
+    {
+        return $this->id;
+    }
 }

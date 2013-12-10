@@ -22,7 +22,7 @@ use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use ReflectionClass;
 use utils\services\IAuthService;
-use oauth2\responses\AccessTokenResponse;
+use oauth2\responses\OAuth2AccessTokenResponse;
 
 /**
  * Class AuthorizationCodeGrantType
@@ -130,7 +130,7 @@ class AuthorizationCodeGrantType implements IGrantType
 
     /** Implementation of http://tools.ietf.org/html/rfc6749#section-4.1.3
      * @param OAuth2Request $request
-     * @return AccessTokenResponse
+     * @return OAuth2AccessTokenResponse
      * @throws \oauth2\exceptions\InvalidAuthorizationCodeException
      * @throws \oauth2\exceptions\ExpiredAuthorizationCodeException
      * @throws \Exception
@@ -196,8 +196,7 @@ class AuthorizationCodeGrantType implements IGrantType
 
                $access_token  = $this->token_service->createAccessToken($auth_code,$current_redirect_uri);
                $refresh_token = $this->token_service->createRefreshToken($access_token);
-               $response      = new AccessTokenResponse($access_token->getValue(),$access_token->getLifetime(), $refresh_token->getValue());
-
+               $response      = new OAuth2AccessTokenResponse($access_token->getValue(),$access_token->getLifetime(), $refresh_token->getValue());
                return $response;
 
         }

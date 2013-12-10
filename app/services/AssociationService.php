@@ -46,7 +46,7 @@ class AssociationService implements IAssociationService
                 if (is_null($realm) || empty($realm) || $values[5] != $realm) {
                     throw new OpenIdInvalidRealmException(sprintf(OpenIdErrorMessages::InvalidPrivateAssociationMessage, $handle, $realm));
                 }
-                $success = $this->redis->setnx('lock.get.'. $handle . 1);
+                $success = $this->redis->setnx('lock.get.assoc.'. $handle . 1);
                 if (!$success) { // only one time we could use this handle
                     throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackPrivateAssociationAlreadyUsed, $handle));
                 }
@@ -71,7 +71,7 @@ class AssociationService implements IAssociationService
                 if (is_null($realm) || empty($realm) || $assoc->realm != $realm) {
                     throw new OpenIdInvalidRealmException(sprintf(OpenIdErrorMessages::InvalidPrivateAssociationMessage, $handle, $realm));
                 }
-                $success = $this->redis->setnx('lock.get.'. $handle, 1);
+                $success = $this->redis->setnx('lock.get.assoc.'. $handle, 1);
                 if (!$success) {
                     throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackPrivateAssociationAlreadyUsed, $handle));
                 }
@@ -109,7 +109,7 @@ class AssociationService implements IAssociationService
     public function addAssociation($handle, $secret, $mac_function, $lifetime, $issued, $type, $realm = null)
     {
 
-        $success = $this->redis->setnx('lock.add.' . $handle, 1);
+        $success = $this->redis->setnx('lock.add.assoc.' . $handle, 1);
         if (!$success) {
             throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackPrivateAssociationAlreadyUsed, $handle));
         }

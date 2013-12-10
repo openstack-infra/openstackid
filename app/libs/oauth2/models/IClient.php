@@ -8,6 +8,7 @@ interface IClient {
     const ClientType_Public       = 1;
     const ClientType_Confidential = 2;
 
+    public function getId();
     public function getClientId();
     public function getClientSecret();
     public function getClientType();

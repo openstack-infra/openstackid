@@ -25,6 +25,7 @@ use utils\services\IAuthService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use oauth2\exceptions\InvalidAuthorizationCodeException;
 use oauth2\exceptions\ReplayAttackException;
+use utils\services\ICheckPointService;
 
 /**
  * Class OAuth2Protocol
@@ -34,20 +35,24 @@ use oauth2\exceptions\ReplayAttackException;
 class OAuth2Protocol implements  IOAuth2Protocol{
 
     private $log_service;
-    public function __construct( ILogService $log_service,
+    public function __construct(
+                                ILogService $log_service,
                                 IClientService $client_service,
                                 ITokenService $token_service,
                                 IAuthService $auth_service,
                                 IMementoOAuth2AuthenticationRequestService $memento_service,
-                                IOAuth2AuthenticationStrategy $auth_strategy)
+                                IOAuth2AuthenticationStrategy $auth_strategy,
+                                ICheckPointService $checkpoint_service)
     {
-        $this->log_service = $log_service;
+        $this->log_service        = $log_service;
+        $this->checkpoint_service = $checkpoint_service;
         $this->authorize_endpoint = new AuthorizationEndpoint($client_service,$token_service,$auth_service,$memento_service,$auth_strategy);
         $this->token_endpoint     = new TokenEndpoint($client_service,$token_service,$auth_service,$memento_service,$auth_strategy);
     }
 
     private $authorize_endpoint;
     private $token_endpoint;
+    private $checkpoint_service;
 
     const OAuth2Protocol_GrantType_AuthCode               = 'authorization_code';
     const OAuth2Protocol_GrantType_Implicit               = 'implicit';
@@ -122,38 +127,47 @@ class OAuth2Protocol implements  IOAuth2Protocol{
         }
         catch(InvalidOAuth2Request $ex1){
             $this->log_service->error($ex1);
+            $this->checkpoint_service->trackException($ex1);
             return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest, $request->getRedirectUri());
         }
         catch(UnsupportedResponseTypeException $ex2){
             $this->log_service->error($ex2);
+            $this->checkpoint_service->trackException($ex2);
             return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnsupportedResponseType, $request->getRedirectUri());
         }
         catch(InvalidClientException $ex3){
             $this->log_service->error($ex3);
+            $this->checkpoint_service->trackException($ex3);
             return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $request->getRedirectUri());
         }
         catch(UriNotAllowedException $ex4){
             $this->log_service->error($ex4);
+            $this->checkpoint_service->trackException($ex4);
             throw $ex4;
         }
         catch(ScopeNotAllowedException $ex5){
             $this->log_service->error($ex5);
+            $this->checkpoint_service->trackException($ex5);
             return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidScope, $request->getRedirectUri());
         }
         catch(UnAuthorizedClientException $ex6){
             $this->log_service->error($ex6);
+            $this->checkpoint_service->trackException($ex6);
             return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $request->getRedirectUri());
         }
         catch(AccessDeniedException $ex7){
             $this->log_service->error($ex7);
+            $this->checkpoint_service->trackException($ex7);
             return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_AccessDenied, $request->getRedirectUri());
         }
         catch(OAuth2GenericException $ex8){
             $this->log_service->error($ex8);
+            $this->checkpoint_service->trackException($ex8);
             return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_ServerError, $request->getRedirectUri());
         }
         catch(Exception $ex){
             $this->log_service->error($ex);
+            $this->checkpoint_service->trackException($ex);
             return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_ServerError, $request->getRedirectUri());
         }
     }
@@ -171,34 +185,42 @@ class OAuth2Protocol implements  IOAuth2Protocol{
         }
         catch(InvalidOAuth2Request $ex1){
             $this->log_service->error($ex1);
+            $this->checkpoint_service->trackException($ex1);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
         }
         catch(InvalidAuthorizationCodeException $ex2){
             $this->log_service->error($ex2);
+            $this->checkpoint_service->trackException($ex2);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
         }
         catch(InvalidClientException $ex3){
             $this->log_service->error($ex3);
+            $this->checkpoint_service->trackException($ex3);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
         }
         catch(UriNotAllowedException $ex4){
             $this->log_service->error($ex4);
+            $this->checkpoint_service->trackException($ex4);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
         }
         catch(UnAuthorizedClientException $ex5){
             $this->log_service->error($ex5);
+            $this->checkpoint_service->trackException($ex5);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
         }
         catch(ExpiredAuthorizationCodeException $ex6){
             $this->log_service->error($ex6);
+            $this->checkpoint_service->trackException($ex6);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
         }
         catch(ReplayAttackException $ex7){
             $this->log_service->error($ex7);
+            $this->checkpoint_service->trackException($ex7);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
         }
         catch(Exception $ex){
             $this->log_service->error($ex);
+            $this->checkpoint_service->trackException($ex);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_ServerError);
         }
     }

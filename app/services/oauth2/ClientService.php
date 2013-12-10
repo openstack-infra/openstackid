@@ -5,6 +5,8 @@ use oauth2\models\IClient;
 use oauth2\services\IClientService;
 use Client;
 use oauth2\OAuth2Protocol;
+use Request;
+use Input;
 
 class ClientService implements IClientService{
 

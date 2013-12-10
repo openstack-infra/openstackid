@@ -13,6 +13,13 @@ class AuthorizationCode extends Token {
         parent::__construct(Token::DefaultByteLength);
     }
 
+    /**
+     * @param $client_id
+     * @param $scope
+     * @param $redirect_uri
+     * @param int $lifetime
+     * @return AuthorizationCode
+     */
     public static function create($client_id, $scope, $redirect_uri, $lifetime = 600){
         $instance = new self();
         $instance->value        = Rand::getString($instance->len,null,true);
@@ -23,12 +30,13 @@ class AuthorizationCode extends Token {
         return $instance;
     }
 
-    public static function load($value, $client_id, $scope, $redirect_uri, $lifetime = 600){
+    public static function load($value, $client_id, $scope, $redirect_uri = null, $issued = null, $lifetime = 600){
         $instance = new self();
         $instance->value        = $value;
         $instance->scope        = $scope;
         $instance->redirect_uri = $redirect_uri;
         $instance->client_id    = $client_id;
+        $instance->issued       = $issued;
         $instance->lifetime     = $lifetime;
         return $instance;
     }

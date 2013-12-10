@@ -16,6 +16,7 @@ use openid\requests\OpenIdDHAssociationSessionRequest;
 use openid\responses\OpenIdDiffieHellmanAssociationSessionResponse;
 use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
+use utils\services\UtilsServiceCatalog;
 use Zend\Crypt\PublicKey\DiffieHellman;
 
 class SessionAssociationDHStrategy implements ISessionAssociationStrategy
@@ -34,7 +35,7 @@ class SessionAssociationDHStrategy implements ISessionAssociationStrategy
         $this->current_request = $request;
         $this->association_service = Registry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
         $this->server_configuration_service = Registry::getInstance()->get(OpenIdServiceCatalog:: ServerConfigurationService);
-        $this->log = Registry::getInstance()->get(OpenIdServiceCatalog:: LogService);
+        $this->log = Registry::getInstance()->get(UtilsServiceCatalog:: LogService);
     }
 
     /**

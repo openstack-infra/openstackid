@@ -18,18 +18,22 @@ class UserService implements IUserService
                 \DB::transaction(function () use ($id, $proposed_username) {
                     $done = false;
                     $fragment_nbr = 1;
+                    $aux_proposed_username = $proposed_username;
                     do {
-                        $old_user = \DB::table('openid_users')->where('identifier', '=', $proposed_username)->first();
+                        $old_user = \DB::table('openid_users')
+                                    ->where('identifier', '=', $aux_proposed_username)
+                                    ->where('id', '<>', $id)
+                                    ->first();
                         if (is_null($old_user)) {
-                            \DB::table('openid_users')->where('id', '=', $id)->update(array('identifier' => $proposed_username));
+                            \DB::table('openid_users')->where('id', '=', $id)->update(array('identifier' => $aux_proposed_username));
                             $done = true;
                         } else {
-                            $proposed_username = $proposed_username . "." . $fragment_nbr;
+                            $aux_proposed_username = $proposed_username . "." . $fragment_nbr;
                             $fragment_nbr++;
                         }
 
                     } while (!$done);
-                    return $proposed_username;
+                    return $aux_proposed_username;
                 });
             }
         } catch (Exception $ex) {

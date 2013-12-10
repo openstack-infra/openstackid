@@ -42,7 +42,7 @@ abstract class Token {
     }
 
     public function getClientId(){
-       return $this->$client_id;
+       return $this->client_id;
     }
 
     public abstract function toJSON();
