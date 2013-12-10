@@ -30,6 +30,7 @@ class UserController extends BaseController
     private $user_action_service;
     private $login_strategy;
     private $consent_strategy;
+    private $client_service;
 
     public function __construct(IMementoOpenIdRequestService $openid_memento_service,
                                 IMementoOAuth2AuthenticationRequestService $oauth2_memento_service,
@@ -50,6 +51,7 @@ class UserController extends BaseController
         $this->discovery                    = $discovery;
         $this->user_service                 = $user_service;
         $this->user_action_service          = $user_action_service;
+        $this->client_service               = $client_service;
         //filters
         $this->beforeFilter('csrf', array('only' => array('postLogin', 'postConsent')));
 
@@ -198,18 +200,21 @@ class UserController extends BaseController
 
     public function getProfile()
     {
-        $user = $this->auth_service->getCurrentUser();
-        $sites = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
+        $user    = $this->auth_service->getCurrentUser();
+        $sites   = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
         $actions = $user->getActions();
+        $clients = $user->getClients();
+
         return View::make("profile", array(
-            "username" => $user->getFullName(),
-            "openid_url" => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
-            "identifier " => $user->getIdentifier(),
-            "sites" => $sites,
-            "show_pic" => $user->getShowProfilePic(),
+            "username"       => $user->getFullName(),
+            "openid_url"     => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
+            "identifier "    => $user->getIdentifier(),
+            "sites"          => $sites,
+            "show_pic"       => $user->getShowProfilePic(),
             "show_full_name" => $user->getShowProfileFullName(),
-            "show_email" => $user->getShowProfileEmail(),
-            'actions' => $actions
+            "show_email"     => $user->getShowProfileEmail(),
+            'actions'        => $actions,
+            'clients'        => $clients,
         ));
     }
 
@@ -227,5 +232,18 @@ class UserController extends BaseController
         $user = $this->auth_service->getCurrentUser();
         $this->user_service->saveProfileInfo($user->getId(), $show_pic, $show_full_name, $show_email);
         return Redirect::action("UserController@getProfile");
+    }
+
+    public function getEditRegisteredClient($id){
+        return 'error';
+    }
+
+    public function getDeleteRegisteredClient($id){
+        return 'error';
+    }
+
+    public function postAddRegisteredClient(){
+        //$this->client_service->addClient()
+        return 'error';
     }
 }

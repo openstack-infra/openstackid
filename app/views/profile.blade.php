@@ -3,8 +3,10 @@
 @section('title')
 <title>Welcome to openstackId - Edit Profile</title>
 @stop
+
 @section('content')
 <div class="span7" id="sidebar">
+
     <div class="row-fluid">
         <div class="span12">
             Hello, {{{ $username }}}.
@@ -12,6 +14,7 @@
             <div>Your OPENID: <a href="{{ str_replace("%23","#",$openid_url) }}">{{ str_replace("%23","#",$openid_url) }}</a></div>
         </div>
     </div>
+
     <div class="row-fluid">
         <div class="span12">
             {{ Form::open(array('url' => URL::action('UserController@postUserProfileOptions'), 'method' => 'post')) }}
@@ -66,6 +69,37 @@
     </div>
     @endif
 
+    @if (count($clients)>0)
+    <div class="row-fluid">
+        <div id="clients" class="span12">
+            <legend><i class="icon-info-sign accordion-toggle" title="Users can keep track of their registered applications and manage them"></i>&nbsp;Registered Applications</legend>
+            {{ HTML::link(URL::action("UserController@postAddRegisteredClient",null),'Add',array('class'=>'btn add-client','title'=>'Adds a Registered Application')) }}
+            <table class="table table-hover table-condensed">
+                <thead>
+                <tr>
+                    <th>Application Name</th>
+                    <th>Client Id</th>
+                    <th>Client Secret</th>
+                    <th>&nbsp;</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach ($clients as $client)
+                    <tr>
+                        <td>{{ $client->app_name }}</td>
+                        <td>{{ $client->client_id}}</td>
+                        <td>{{ $client->client_secret }}</td>
+                        <td>&nbsp;
+                            {{ HTML::link(URL::action("UserController@getEditRegisteredClient",array("id"=>$client->id)),'Edit',array('class'=>'btn edit-client','title'=>'Edits a Registered Application')) }}
+                            {{ HTML::link(URL::action("UserController@getDeleteRegisteredClient",array("id"=>$client->id)),'Delete',array('class'=>'btn del-client','title'=>'Deletes a Registered Application')) }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
     @if (count($actions)>0)
     <div class="row-fluid">
         <div id="actions" class="span12">
@@ -101,5 +135,40 @@
 </div>
 <div class="span5">
 </div>
+
+@stop
+
+@section('scripts')
+<script type="application/javascript">
+    $(document).ready(function() {
+
+        $("body").on('click',".del-client",function(event){
+            var link = $(this).attr('href');
+            $.ajax(
+                {
+                    type: "GET",
+                    url: link,
+                    dataType: "json",
+                    timeout:60000,
+                    success: function (data,textStatus,jqXHR) {
+                        //load data...
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert( "Request failed: " + textStatus );
+                    }
+                }
+            );
+            event.preventDefault();
+            return false;
+        });
+
+        $("body").on('click',".add-client",function(event){
+            var link = $(this).attr('href');
+            event.preventDefault();
+            return false;
+        });
+    });
+</script>
 @stop
 

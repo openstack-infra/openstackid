@@ -47,4 +47,7 @@ Route::group(array("before" => array("ssl", "auth")), function () {
     Route::any("/accounts/user/profile", "UserController@getProfile");
     Route::any("/accounts/user/profile/trusted_site/delete/{id}", "UserController@get_deleteTrustedSite");
     Route::post('/accounts/user/profile/update', 'UserController@postUserProfileOptions');
+    Route::get('/accounts/user/profile/clients/edit/{id}','UserController@getEditRegisteredClient');
+    Route::get('/accounts/user/profile/clients/delete/{id}','UserController@getDeleteRegisteredClient');
+    Route::get('/accounts/user/profile/clients/add','UserController@postAddRegisteredClient');
 });

@@ -47,4 +47,57 @@ class ClientService implements IClientService{
         $client_secret = Input::get(OAuth2Protocol::OAuth2Protocol_ClientSecret,'');
         return array($client_id,$client_secret);
     }
+
+    public function getClientByIdentifier($id)
+    {
+        // TODO: Implement getClientByIdentifier() method.
+    }
+
+    public function addClient($client_id, $client_secret,$client_type, $user_id, $app_name, $app_description, $app_logo=null)
+    {
+        $client                = new Client;
+        $client->app_name      = $app_name;
+        $client->app_logo      = $app_logo;
+        $client->client_id     = $client_id;
+        $client->client_secret = $client_secret;
+        $client->client_type   = $client_type;
+        $client->user_id       = $user_id;
+        $client->active        = true;
+        $client->Save();
+    }
+
+    public function addClientScope($id, $scope_id)
+    {
+        // TODO: Implement addClientScope() method.
+    }
+
+    public function deleteClientScope($id, $scope_id)
+    {
+        // TODO: Implement deleteClientScope() method.
+    }
+
+    public function addClientAllowedUri($id, $uri)
+    {
+        // TODO: Implement addClientAllowedUri() method.
+    }
+
+    public function deleteClientAllowedUri($id, $uri)
+    {
+        // TODO: Implement deleteClientAllowedUri() method.
+    }
+
+    public function addClientAllowedRealm($id, $realm)
+    {
+        // TODO: Implement addClientAllowedRealm() method.
+    }
+
+    public function deleteClientAllowedRealm($id, $realm)
+    {
+        // TODO: Implement deleteClientAllowedRealm() method.
+    }
+
+    public function deleteClientByIdentifier($id)
+    {
+        // TODO: Implement deleteClientByIdentifier() method.
+    }
 }

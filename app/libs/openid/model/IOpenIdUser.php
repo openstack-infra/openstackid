@@ -1,17 +1,8 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/17/13
- * Time: 3:55 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\model;
 
-
 interface IOpenIdUser {
-
     public function getId();
     public function getIdentifier();
     public function getEmail();

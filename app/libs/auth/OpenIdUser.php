@@ -8,8 +8,9 @@ use MemberPhoto;
 use openid\model\IOpenIdUser;
 use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
+use oauth2\models\IOAuth2User;
 
-class OpenIdUser extends \Eloquent implements UserInterface, IOpenIdUser
+class OpenIdUser extends \Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
 {
 
     protected $table = 'openid_users';
@@ -195,5 +196,10 @@ class OpenIdUser extends \Eloquent implements UserInterface, IOpenIdUser
             return $url;
         }
         return '';
+    }
+
+    public function getClients()
+    {
+        return $this->clients()->get();
     }
 }
