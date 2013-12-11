@@ -17,7 +17,9 @@ class CreateOauth2ApiScope extends Migration {
             $table->string('name',512);
             $table->string('short_description',512);
             $table->text('description');
-            $table->boolean('active');
+            $table->boolean('active')->default(true);
+            $table->boolean('default')->default(false);
+            $table->boolean('system')->default(false);
             $table->timestamps();
             $table->bigInteger("api_id")->unsigned();
             $table->index('api_id');

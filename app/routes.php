@@ -49,5 +49,9 @@ Route::group(array("before" => array("ssl", "auth")), function () {
     Route::post('/accounts/user/profile/update', 'UserController@postUserProfileOptions');
     Route::get('/accounts/user/profile/clients/edit/{id}','UserController@getEditRegisteredClient');
     Route::get('/accounts/user/profile/clients/delete/{id}','UserController@getDeleteRegisteredClient');
-    Route::get('/accounts/user/profile/clients/add','UserController@postAddRegisteredClient');
+    Route::post('/accounts/user/profile/clients/add','UserController@postAddRegisteredClient');
+    Route::get('/accounts/user/profile/clients/regenerate/clientsecret/{id}','UserController@getRegenerateClientSecret');
+    Route::post('/accounts/user/profile/clients/redirect_uri/add','UserController@postAddAllowedRedirectUri');
+    Route::get('/accounts/user/profile/clients/redirect_uri/delete/{id}/{uri_id}','UserController@getDeleteClientAllowedUri');
+    Route::post('/accounts/user/profile/clients/scope/add','UserController@postAddAllowedScope');
 });

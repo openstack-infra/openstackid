@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {{ HTML::style('css/bootstrap.min.css') }}
     {{ HTML::style('css/main.css') }}
+    {{ HTML::style('css/smoothness/jquery-ui-1.10.3.custom.min.css') }}
 </head>
 <body>
     <div class="container">
@@ -23,6 +24,9 @@
     </div>
     {{ HTML::script('js/jquery-2.0.3.min.js')}}
     {{ HTML::script('js/bootstrap.min.js')}}
+    {{ HTML::script('js/jquery-ui-1.10.3.custom.min.js')}}
+    {{ HTML::script('js/jquery.validate.min.js')}}
+    {{ HTML::script('js/additional-methods.min.js')}}
     @yield('scripts')
 </body>
 

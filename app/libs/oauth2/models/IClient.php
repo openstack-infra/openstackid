@@ -12,6 +12,7 @@ interface IClient {
     public function getClientId();
     public function getClientSecret();
     public function getClientType();
+    public function getFriendlyClientType();
     public function getClientAuthorizedRealms();
     public function getClientScopes();
     public function getClientRegisteredUris();
@@ -22,4 +23,5 @@ interface IClient {
     public function getApplicationLogo();
     public function getApplicationDescription();
     public function getDeveloperEmail();
+    public function getUserId();
 } 

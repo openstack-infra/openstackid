@@ -7,4 +7,9 @@ interface IApiScopeService {
      * @return mixed
      */
     public function getScopesByName(array $scopes_names);
+
+    /** get all active scopes
+     * @return mixed
+     */
+    public function getAvailableScopes();
 } 

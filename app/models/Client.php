@@ -5,6 +5,16 @@ class Client extends Eloquent implements IClient {
 
     protected $table = 'oauth2_client';
 
+    public function getFriendlyClientType(){
+        switch($this->client_type){
+            case IClient::ClientType_Confidential:
+                return 'Web Application';
+            break;
+            default:
+                return 'Browser (JS Client)';
+                break;
+        }
+    }
 
     public function user()
     {
@@ -14,6 +24,11 @@ class Client extends Eloquent implements IClient {
     public function scopes()
     {
         return $this->belongsToMany('ApiScope','oauth2_client_api_scope','client_id','scope_id');
+    }
+
+    public function authorized_uris()
+    {
+        return $this->hasMany('ClientAuthorizedUri','client_id');
     }
 
     public function getClientId()
@@ -38,12 +53,12 @@ class Client extends Eloquent implements IClient {
 
     public function getClientScopes()
     {
-        // TODO: Implement getClientScopes() method.
+        return $this->scopes()->get();
     }
 
     public function getClientRegisteredUris()
     {
-        // TODO: Implement getClientRegisteredUris() method.
+        return $this->authorized_uris()->get();
     }
 
     public function isScopeAllowed($scope)
@@ -91,6 +106,11 @@ class Client extends Eloquent implements IClient {
         $user = $this->user()->first();
         $email = $user->external_id;
         return $email;
+    }
+
+    public function getUserId(){
+        $user = $this->user()->first();
+        return $user->id;
     }
 
     public function getId()

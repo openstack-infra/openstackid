@@ -5,7 +5,7 @@
 @stop
 
 @section('content')
-<div class="span7" id="sidebar">
+<div class="span8" id="sidebar">
 
     <div class="row-fluid">
         <div class="span12">
@@ -73,13 +73,13 @@
     <div class="row-fluid">
         <div id="clients" class="span12">
             <legend><i class="icon-info-sign accordion-toggle" title="Users can keep track of their registered applications and manage them"></i>&nbsp;Registered Applications</legend>
-            {{ HTML::link(URL::action("UserController@postAddRegisteredClient",null),'Add',array('class'=>'btn add-client','title'=>'Adds a Registered Application')) }}
+            {{ HTML::link(URL::action("UserController@postAddRegisteredClient",null),'Register Application',array('class'=>'btn add-client','title'=>'Adds a Registered Application')) }}
             <table class="table table-hover table-condensed">
                 <thead>
                 <tr>
                     <th>Application Name</th>
-                    <th>Client Id</th>
-                    <th>Client Secret</th>
+                    <th>Type</th>
+                    <th>Modified</th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
@@ -87,8 +87,8 @@
                 @foreach ($clients as $client)
                     <tr>
                         <td>{{ $client->app_name }}</td>
-                        <td>{{ $client->client_id}}</td>
-                        <td>{{ $client->client_secret }}</td>
+                        <td>{{ $client->getFriendlyClientType()}}</td>
+                        <td>{{ $client->updated_at }}</td>
                         <td>&nbsp;
                             {{ HTML::link(URL::action("UserController@getEditRegisteredClient",array("id"=>$client->id)),'Edit',array('class'=>'btn edit-client','title'=>'Edits a Registered Application')) }}
                             {{ HTML::link(URL::action("UserController@getDeleteRegisteredClient",array("id"=>$client->id)),'Delete',array('class'=>'btn del-client','title'=>'Deletes a Registered Application')) }}</td>
@@ -98,6 +98,27 @@
             </table>
         </div>
     </div>
+
+    <div id="dialog-form" title="Register new Application">
+        <p style="font-size: 10px;">* You need to register your application to get the necessary credentials to call a Openstack API</p>
+        <form>
+            <fieldset>
+                <label for="app-name">Application Name</label>
+                <input type="text" name="app-name" id="app-name">
+
+                <label for="app-description">Application Description</label>
+                <textarea style="resize: none;" rows="4" cols="50" name="app-description" id="app-description">
+                </textarea>
+
+                <label for="app-type">Application Type</label>
+                <select name="app-type" id="app-type">
+                    <option value="2">Web Application</option>
+                    <option value="1">Browser (JS Client)</option>
+                </select>
+            </fieldset>
+        </form>
+    </div>
+
     @endif
 
     @if (count($actions)>0)
@@ -166,8 +187,55 @@
         $("body").on('click',".add-client",function(event){
             var link = $(this).attr('href');
             event.preventDefault();
+            $( "#dialog-form" ).dialog( "open" );
             return false;
         });
+
+
+
+        $("#dialog-form").dialog({
+            autoOpen: false,
+            height: 450,
+            width: 455,
+            modal: true,
+            buttons: {
+                "Register": function() {
+                    var app_name = $('#app-name','#dialog-form').val()
+                    var app_desc = $('#app-description','#dialog-form').val()
+                    var app_type = $('#app-type','#dialog-form').val()
+                    var application = {};
+                    application.app_name = app_name;
+                    application.app_desc = app_desc;
+                    application.app_type = app_type;
+
+                    var link = $(this).attr('href');
+                    $.ajax(
+                        {
+                            type: "POST",
+                            url: '{{URL::action("UserController@postAddRegisteredClient",null)}}',
+                            data: JSON.stringify(application),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            timeout:60000,
+                            success: function (data,textStatus,jqXHR) {
+                                //load data...
+
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                alert( "Request failed: " + textStatus );
+                            }
+                        }
+                    );
+
+                    $(this).dialog( "close" );
+                },
+                Cancel: function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+
+        });
+
     });
 </script>
 @stop

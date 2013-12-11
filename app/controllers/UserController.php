@@ -1,5 +1,8 @@
 <?php
 
+use oauth2\services\IApiScopeService;
+use oauth2\services\IClientService;
+use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\IServerConfigurationService;
@@ -9,14 +12,12 @@ use openid\XRDS\XRDSDocumentBuilder;
 use services\IPHelper;
 use services\IUserActionService;
 use strategies\DefaultLoginStrategy;
+use strategies\OAuth2ConsentStrategy;
+use strategies\OAuth2LoginStrategy;
 use strategies\OpenIdConsentStrategy;
 use strategies\OpenIdLoginStrategy;
 use utils\services\IAuthService;
-use oauth2\services\IMementoOAuth2AuthenticationRequestService;
-use strategies\OAuth2LoginStrategy;
-use strategies\OAuth2ConsentStrategy;
-use oauth2\services\IClientService;
-use oauth2\services\IApiScopeService;
+
 
 class UserController extends BaseController
 {
@@ -31,6 +32,7 @@ class UserController extends BaseController
     private $login_strategy;
     private $consent_strategy;
     private $client_service;
+    private $scope_service;
 
     public function __construct(IMementoOpenIdRequestService $openid_memento_service,
                                 IMementoOAuth2AuthenticationRequestService $oauth2_memento_service,
@@ -43,15 +45,16 @@ class UserController extends BaseController
                                 IClientService $client_service,
                                 IApiScopeService $scope_service)
     {
-        $this->openid_memento_service       = $openid_memento_service;
-        $this->oauth2_memento_service       = $oauth2_memento_service;
-        $this->auth_service                 = $auth_service;
+        $this->openid_memento_service = $openid_memento_service;
+        $this->oauth2_memento_service = $oauth2_memento_service;
+        $this->auth_service = $auth_service;
         $this->server_configuration_service = $server_configuration_service;
-        $this->trusted_sites_service        = $trusted_sites_service;
-        $this->discovery                    = $discovery;
-        $this->user_service                 = $user_service;
-        $this->user_action_service          = $user_action_service;
-        $this->client_service               = $client_service;
+        $this->trusted_sites_service = $trusted_sites_service;
+        $this->discovery = $discovery;
+        $this->user_service = $user_service;
+        $this->user_action_service = $user_action_service;
+        $this->client_service = $client_service;
+        $this->scope_service = $scope_service;
         //filters
         $this->beforeFilter('csrf', array('only' => array('postLogin', 'postConsent')));
 
@@ -61,17 +64,16 @@ class UserController extends BaseController
             //openid stuff
             $this->beforeFilter('openid.save.request');
             $this->beforeFilter('openid.needs.auth.request', array('only' => array('getConsent')));
-            $this->login_strategy   = new OpenIdLoginStrategy($openid_memento_service, $user_action_service, $auth_service);
+            $this->login_strategy = new OpenIdLoginStrategy($openid_memento_service, $user_action_service, $auth_service);
             $this->consent_strategy = new OpenIdConsentStrategy($openid_memento_service, $auth_service, $server_configuration_service, $user_action_service);
-        }
-        else if(!is_null($oauth2_msg) && $oauth2_msg->isValid()){
+        } else if (!is_null($oauth2_msg) && $oauth2_msg->isValid()) {
             $this->beforeFilter('oauth2.save.request');
             $this->beforeFilter('oauth2.needs.auth.request', array('only' => array('getConsent')));
-            $this->login_strategy   = new OAuth2LoginStrategy();
-            $this->consent_strategy = new OAuth2ConsentStrategy($auth_service,$oauth2_memento_service,$scope_service,$client_service);
+            $this->login_strategy = new OAuth2LoginStrategy();
+            $this->consent_strategy = new OAuth2ConsentStrategy($auth_service, $oauth2_memento_service, $scope_service, $client_service);
         } else {
             //default stuff
-            $this->login_strategy   = new DefaultLoginStrategy($user_action_service, $auth_service);
+            $this->login_strategy = new DefaultLoginStrategy($user_action_service, $auth_service);
             $this->consent_strategy = null;
         }
 
@@ -200,21 +202,21 @@ class UserController extends BaseController
 
     public function getProfile()
     {
-        $user    = $this->auth_service->getCurrentUser();
-        $sites   = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
+        $user = $this->auth_service->getCurrentUser();
+        $sites = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
         $actions = $user->getActions();
         $clients = $user->getClients();
 
         return View::make("profile", array(
-            "username"       => $user->getFullName(),
-            "openid_url"     => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
-            "identifier "    => $user->getIdentifier(),
-            "sites"          => $sites,
-            "show_pic"       => $user->getShowProfilePic(),
+            "username" => $user->getFullName(),
+            "openid_url" => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
+            "identifier " => $user->getIdentifier(),
+            "sites" => $sites,
+            "show_pic" => $user->getShowProfilePic(),
             "show_full_name" => $user->getShowProfileFullName(),
-            "show_email"     => $user->getShowProfileEmail(),
-            'actions'        => $actions,
-            'clients'        => $clients,
+            "show_email" => $user->getShowProfileEmail(),
+            'actions' => $actions,
+            'clients' => $clients,
         ));
     }
 
@@ -234,16 +236,152 @@ class UserController extends BaseController
         return Redirect::action("UserController@getProfile");
     }
 
-    public function getEditRegisteredClient($id){
+    public function getEditRegisteredClient($id)
+    {
+        $client = $this->client_service->getClientByIdentifier($id);
+
+        if (is_null($client)) {
+            Log::warning(sprintf("invalid oauth2 client id %s", $id));
+            return View::make("404");
+        }
+
+        $allowed_uris = $client->getClientRegisteredUris();
+        $selected_scopes = $client->getClientScopes();
+        $aux_scopes = array();
+        foreach ($selected_scopes as $scope) {
+            array_push($aux_scopes, $scope->id);
+        }
+        $scopes = $this->scope_service->getAvailableScopes();
+
+        return View::make("edit-registered-client",
+            array('client' => $client,
+                'allowed_uris' => $allowed_uris,
+                'selected_scopes' => $aux_scopes,
+                'scopes' => $scopes
+            ));
+    }
+
+    public function getDeleteRegisteredClient($id)
+    {
         return 'error';
     }
 
-    public function getDeleteRegisteredClient($id){
-        return 'error';
+    public function postAddRegisteredClient()
+    {
+        try {
+            $input = Input::All();
+            $user = $this->auth_service->getCurrentUser();
+            // todo: check application unique name
+            // Build the validation constraint set.
+            $rules = array(
+                'app_name' => 'required',
+                'app_desc' => 'required',
+                'app_type' => 'required',
+            );
+
+            // Create a new validator instance.
+            $validator = Validator::make($input, $rules);
+
+            if ($validator->passes()) {
+                $app_name = trim($input['app_name']);
+                $app_desc = trim($input['app_desc']);
+                $app_type = $input['app_type'];
+                $this->client_service->addClient($app_type, $user->getId(), $app_name, $app_desc, '');
+                return Response::json(array('status' => 'OK'));
+            }
+
+            throw new Exception("invalid param!");
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return Response::json(array('status' => 'ERROR'));
+        }
     }
 
-    public function postAddRegisteredClient(){
-        //$this->client_service->addClient()
-        return 'error';
+    public function postAddAllowedRedirectUri()
+    {
+        try {
+            $input = Input::All();
+            // Build the validation constraint set.
+            $rules = array(
+                'redirect_uri' => 'url',
+                'client_id' => 'required',
+            );
+
+            $messages = array(
+                'url' => 'You must give a valid url'
+            );
+
+            // Create a new validator instance.
+            $validator = Validator::make($input, $rules, $messages);
+            if ($validator->passes()) {
+                $this->client_service->addClientAllowedUri($input['client_id'], $input['redirect_uri']);
+                return Redirect::back();
+            } else {
+                return Redirect::back()
+                    ->withErrors($validator)
+                    ->withInput();
+            }
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return View::make("404");
+        }
+    }
+
+    public function getDeleteClientAllowedUri($id, $uri_id)
+    {
+        try {
+            $this->client_service->deleteClientAllowedUri($id, $uri_id);
+            return Redirect::back();
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return View::make("404");
+        }
+    }
+
+    public function getRegenerateClientSecret($id)
+    {
+        try {
+            $this->client_service->regenerateClientSecret($id);
+            return Redirect::back();
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return View::make("404");
+        }
+    }
+
+    public function postAddAllowedScope()
+    {
+        try {
+            $input = Input::All();
+            $user = $this->auth_service->getCurrentUser();
+
+            // Build the validation constraint set.
+            $rules = array(
+                'id'        => 'required',
+                'checked'   => 'required',
+                'client_id' => 'required',
+            );
+
+            // Create a new validator instance.
+            $validator = Validator::make($input, $rules);
+            if ($validator->passes()) {
+                $client_id = $input['client_id'];
+                $client = $this->client_service->getClientByIdentifier($client_id);
+                if(is_null($client) || $client->getUserId()!==$user->getId())
+                    throw new Exception('invalid client id for current user');
+                $checked  = $input['checked'];
+                $scope_id = $input['id'];
+                if($checked){
+                    $this->client_service->addClientScope($client_id,$scope_id);
+                }
+                else{
+                    $this->client_service->deleteClientScope($client_id,$scope_id);
+                }
+                return Response::json(array('status' => 'OK'));
+            }
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return Response::json(array('status' => 'ERROR'));
+        }
     }
 }

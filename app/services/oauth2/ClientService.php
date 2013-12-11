@@ -7,6 +7,9 @@ use Client;
 use oauth2\OAuth2Protocol;
 use Request;
 use Input;
+use ClientAuthorizedUri;
+use Zend\Math\Rand;
+
 
 class ClientService implements IClientService{
 
@@ -50,11 +53,14 @@ class ClientService implements IClientService{
 
     public function getClientByIdentifier($id)
     {
-        // TODO: Implement getClientByIdentifier() method.
+        $client = Client::where('id', '=', $id)->first();
+        return $client;
     }
 
-    public function addClient($client_id, $client_secret,$client_type, $user_id, $app_name, $app_description, $app_logo=null)
+    public function addClient($client_type, $user_id, $app_name, $app_description, $app_logo='')
     {
+        $client_id             = Rand::getString(32).'.openstack.client';
+        $client_secret         = Rand::getString(16);
         $client                = new Client;
         $client->app_name      = $app_name;
         $client->app_logo      = $app_logo;
@@ -64,26 +70,44 @@ class ClientService implements IClientService{
         $client->user_id       = $user_id;
         $client->active        = true;
         $client->Save();
+        //default allowed url
+        $this->addClientAllowedUri($client->getId(),'https://localhost');
     }
 
     public function addClientScope($id, $scope_id)
     {
-        // TODO: Implement addClientScope() method.
+        $client = Client::find($id);
+        if(!is_null($client)){
+            $client->scopes()->attach($scope_id);
+        }
     }
 
     public function deleteClientScope($id, $scope_id)
     {
-        // TODO: Implement deleteClientScope() method.
+        $client = Client::find($id);
+        if(!is_null($client)){
+            $client->scopes()->detach($scope_id);
+        }
     }
 
     public function addClientAllowedUri($id, $uri)
     {
-        // TODO: Implement addClientAllowedUri() method.
+        $client_authorized_uri = new ClientAuthorizedUri;
+        $client_authorized_uri->client_id = $id;
+        $client_authorized_uri->uri = $uri;
+        $client_authorized_uri->Save();
     }
 
-    public function deleteClientAllowedUri($id, $uri)
+    /**
+     * Deletes a former client allowed redirection Uri
+     * @param $id client identifier
+     * @param $uri_id uri identifier
+     */
+    public function deleteClientAllowedUri($id, $uri_id)
     {
-        // TODO: Implement deleteClientAllowedUri() method.
+        $uri = ClientAuthorizedUri::where('id','=',$uri_id)->where('client_id','=',$id);
+        if(!is_null($uri))
+            $uri->Delete();
     }
 
     public function addClientAllowedRealm($id, $realm)
@@ -91,7 +115,7 @@ class ClientService implements IClientService{
         // TODO: Implement addClientAllowedRealm() method.
     }
 
-    public function deleteClientAllowedRealm($id, $realm)
+    public function deleteClientAllowedRealm($id, $realm_id)
     {
         // TODO: Implement deleteClientAllowedRealm() method.
     }
@@ -99,5 +123,17 @@ class ClientService implements IClientService{
     public function deleteClientByIdentifier($id)
     {
         // TODO: Implement deleteClientByIdentifier() method.
+    }
+
+    /**
+     * Regenerates Client Secret
+     * @param $id client id
+     * @return mixed
+     */
+    public function regenerateClientSecret($id){
+        $client_secret         = Rand::getString(16);
+        $client = $this->getClientByIdentifier($id);
+        $client->client_secret = $client_secret;
+        $client->Save();
     }
 }
