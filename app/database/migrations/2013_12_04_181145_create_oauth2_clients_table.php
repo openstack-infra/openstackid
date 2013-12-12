@@ -14,7 +14,7 @@ class CreateOauth2ClientsTable extends Migration {
         Schema::create('oauth2_client', function($table)
         {
             $table->bigIncrements('id')->unsigned();
-            $table->string('app_name',255)->unique();
+            $table->string('app_name',255);
             $table->text('app_description');
             $table->string('app_logo',255);
             $table->string('client_id',255)->unique();

@@ -73,6 +73,7 @@ Route::filter('guest', function () {
     if (Auth::check()) return Redirect::to('/');
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | CSRF Protection Filter
@@ -88,6 +89,11 @@ Route::filter('csrf', function () {
     if (Session::token() != Input::get('_token')) {
         throw new Illuminate\Session\TokenMismatchException;
     }
+});
+
+Route::filter('ajax', function()
+{
+    if (!Request::ajax()) App::abort(404);
 });
 
 
@@ -136,6 +142,25 @@ Route::filter("ssl", function () {
         $oauth2_memento_service->saveCurrentAuthorizationRequest();
 
         return Redirect::secure(Request::getRequestUri());
+    }
+});
+
+Route::filter('user.owns.client.policy',function($route, $request, $protocol ='http'){
+    try{
+
+        $authentication_service = App::make(UtilsServiceCatalog::AuthenticationService);
+        $client_service         = App::make(OAuth2ServiceCatalog::ClientService);
+        $client_id              = $route->getParameter('id');
+        $client                 = $client_service->getClientByIdentifier($client_id);
+        $user = $authentication_service->getCurrentUser();
+        if (is_null($client) || $client->getUserId() !== $user->getId())
+            throw new Exception('invalid client id for current user');
+    } catch (Exception $ex) {
+        Log::error($ex);
+        if($protocol==='json')
+            return Response::json(array('status' => 'ERROR'));
+        else
+            return View::make('404');
     }
 });
 

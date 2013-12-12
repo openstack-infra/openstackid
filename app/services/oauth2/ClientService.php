@@ -1,17 +1,32 @@
 <?php
 
 namespace services\oauth2;
-use oauth2\models\IClient;
-use oauth2\services\IClientService;
+
 use Client;
-use oauth2\OAuth2Protocol;
-use Request;
-use Input;
 use ClientAuthorizedUri;
+use Input;
+use oauth2\models\IClient;
+use oauth2\OAuth2Protocol;
+use oauth2\services\IClientService;
+use oauth2\exceptions\AllowedClientUriAlreadyExistsException;
+use Request;
+use utils\services\IAuthService;
 use Zend\Math\Rand;
 
 
-class ClientService implements IClientService{
+/**
+ * Class ClientService
+ * @package services\oauth2
+ */
+class ClientService implements IClientService
+{
+
+    private $auth_service;
+
+    public function __construct(IAuthService $auth_service)
+    {
+        $this->auth_service = $auth_service;
+    }
 
     /**
      * @param $client_id
@@ -37,18 +52,18 @@ class ClientService implements IClientService{
     {
         //check first http basic auth header
         $auth_header = Request::header('Authorization');
-        if(!is_null($auth_header) && !empty($auth_header)){
+        if (!is_null($auth_header) && !empty($auth_header)) {
             $auth_header = trim($auth_header);
-            $auth_header = explode(' ',$auth_header);
-            $auth_header_content  = $auth_header[1];
-            $auth_header_content  = base64_decode($auth_header_content);
-            $auth_header_content  = explode(':',$auth_header_content);
+            $auth_header = explode(' ', $auth_header);
+            $auth_header_content = $auth_header[1];
+            $auth_header_content = base64_decode($auth_header_content);
+            $auth_header_content = explode(':', $auth_header_content);
             //client_id:client_secret
-            return array($auth_header_content[0],$auth_header_content[1]);
+            return array($auth_header_content[0], $auth_header_content[1]);
         }
-        $client_id     = Input::get(OAuth2Protocol::OAuth2Protocol_ClientId,'');
-        $client_secret = Input::get(OAuth2Protocol::OAuth2Protocol_ClientSecret,'');
-        return array($client_id,$client_secret);
+        $client_id = Input::get(OAuth2Protocol::OAuth2Protocol_ClientId, '');
+        $client_secret = Input::get(OAuth2Protocol::OAuth2Protocol_ClientSecret, '');
+        return array($client_id, $client_secret);
     }
 
     public function getClientByIdentifier($id)
@@ -57,27 +72,28 @@ class ClientService implements IClientService{
         return $client;
     }
 
-    public function addClient($client_type, $user_id, $app_name, $app_description, $app_logo='')
+    public function addClient($client_type, $user_id, $app_name, $app_description, $app_logo = '')
     {
-        $client_id             = Rand::getString(32).'.openstack.client';
-        $client_secret         = Rand::getString(16);
-        $client                = new Client;
-        $client->app_name      = $app_name;
-        $client->app_logo      = $app_logo;
-        $client->client_id     = $client_id;
+        $client_id = Rand::getString(32) . '.openstack.client';
+        $client_secret = Rand::getString(16);
+        $client = new Client;
+        $client->app_name = $app_name;
+        $client->app_logo = $app_logo;
+        $client->client_id = $client_id;
         $client->client_secret = $client_secret;
-        $client->client_type   = $client_type;
-        $client->user_id       = $user_id;
-        $client->active        = true;
+        $client->client_type = $client_type;
+        $client->user_id = $user_id;
+        $client->active = true;
         $client->Save();
         //default allowed url
-        $this->addClientAllowedUri($client->getId(),'https://localhost');
+        $this->addClientAllowedUri($client->getId(), 'https://localhost');
     }
+
 
     public function addClientScope($id, $scope_id)
     {
         $client = Client::find($id);
-        if(!is_null($client)){
+        if (!is_null($client)) {
             $client->scopes()->attach($scope_id);
         }
     }
@@ -85,17 +101,9 @@ class ClientService implements IClientService{
     public function deleteClientScope($id, $scope_id)
     {
         $client = Client::find($id);
-        if(!is_null($client)){
+        if (!is_null($client)) {
             $client->scopes()->detach($scope_id);
         }
-    }
-
-    public function addClientAllowedUri($id, $uri)
-    {
-        $client_authorized_uri = new ClientAuthorizedUri;
-        $client_authorized_uri->client_id = $id;
-        $client_authorized_uri->uri = $uri;
-        $client_authorized_uri->Save();
     }
 
     /**
@@ -105,10 +113,26 @@ class ClientService implements IClientService{
      */
     public function deleteClientAllowedUri($id, $uri_id)
     {
-        $uri = ClientAuthorizedUri::where('id','=',$uri_id)->where('client_id','=',$id);
-        if(!is_null($uri))
+        $uri = ClientAuthorizedUri::where('id', '=', $uri_id)->where('client_id', '=', $id);
+        if (!is_null($uri))
             $uri->Delete();
     }
+
+    public function addClientAllowedUri($id, $uri)
+    {
+        $client = Client::find($id);
+        if (!is_null($client)) {
+            $client_uri = ClientAuthorizedUri::where('uri', '=', $uri)->where('client_id', '=', $id)->get();
+            if(!is_null($client_uri)){
+                throw new AllowedClientUriAlreadyExistsException(sprintf('uri : %s',$uri));
+            }
+            $client_authorized_uri = new ClientAuthorizedUri;
+            $client_authorized_uri->client_id = $id;
+            $client_authorized_uri->uri       = $uri;
+            $client_authorized_uri->Save();
+        }
+    }
+
 
     public function addClientAllowedRealm($id, $realm)
     {
@@ -122,7 +146,12 @@ class ClientService implements IClientService{
 
     public function deleteClientByIdentifier($id)
     {
-        // TODO: Implement deleteClientByIdentifier() method.
+        $client = Client::find($id);
+        if (!is_null($client)) {
+            $client->authorized_uris()->delete();
+            $client->scopes()->detach();
+            $client->delete();
+        }
     }
 
     /**
@@ -130,10 +159,15 @@ class ClientService implements IClientService{
      * @param $id client id
      * @return mixed
      */
-    public function regenerateClientSecret($id){
-        $client_secret         = Rand::getString(16);
-        $client = $this->getClientByIdentifier($id);
-        $client->client_secret = $client_secret;
-        $client->Save();
+    public function regenerateClientSecret($id)
+    {
+        $client = Client::find($id);
+        if (!is_null($client)) {
+            $client_secret = Rand::getString(16);
+            $client->client_secret = $client_secret;
+            $client->Save();
+            return $client->client_secret;
+        }
+        return '';
     }
 }

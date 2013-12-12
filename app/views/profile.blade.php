@@ -163,35 +163,12 @@
 <script type="application/javascript">
     $(document).ready(function() {
 
-        $("body").on('click',".del-client",function(event){
-            var link = $(this).attr('href');
-            $.ajax(
-                {
-                    type: "GET",
-                    url: link,
-                    dataType: "json",
-                    timeout:60000,
-                    success: function (data,textStatus,jqXHR) {
-                        //load data...
-
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert( "Request failed: " + textStatus );
-                    }
-                }
-            );
-            event.preventDefault();
-            return false;
-        });
-
         $("body").on('click',".add-client",function(event){
             var link = $(this).attr('href');
             event.preventDefault();
             $( "#dialog-form" ).dialog( "open" );
             return false;
         });
-
-
 
         $("#dialog-form").dialog({
             autoOpen: false,

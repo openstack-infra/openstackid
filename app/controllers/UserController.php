@@ -3,6 +3,7 @@
 use oauth2\services\IApiScopeService;
 use oauth2\services\IClientService;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
+use oauth2\exceptions\AllowedClientUriAlreadyExistsException;
 use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\IServerConfigurationService;
@@ -76,6 +77,21 @@ class UserController extends BaseController
             $this->login_strategy = new DefaultLoginStrategy($user_action_service, $auth_service);
             $this->consent_strategy = null;
         }
+
+
+        $this->beforeFilter('user.owns.client.policy:json', array('only' => array(
+            'postAddAllowedScope',
+            'getRegenerateClientSecret',
+            'getDeleteClientAllowedUri',
+            'postAddAllowedRedirectUri',
+            'getRegisteredClientUris')));
+
+         $this->beforeFilter('ajax', array('only' => array(
+             'postAddAllowedScope',
+             'getRegenerateClientSecret',
+             'getDeleteClientAllowedUri',
+             'postAddAllowedRedirectUri',
+             'getRegisteredClientUris')));
 
     }
 
@@ -261,9 +277,32 @@ class UserController extends BaseController
             ));
     }
 
+    public function getRegisteredClientUris($id){
+        try {
+            $client = $this->client_service->getClientByIdentifier($id);
+            $allowed_uris = $client->getClientRegisteredUris();
+
+            $container = array();
+            foreach($allowed_uris as $uri){
+                array_push($container,array('id'=>$uri->id,'redirect_uri'=>$uri->uri));
+            }
+
+            return Response::json(array('status' => 'OK','allowed_uris'=>$container));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return Response::json(array('status' => 'ERROR'));
+        }
+    }
+
     public function getDeleteRegisteredClient($id)
     {
-        return 'error';
+        try {
+            $this->client_service->deleteClientByIdentifier($id);
+            return Redirect::back();
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return View::make("404");
+        }
     }
 
     public function postAddRegisteredClient()
@@ -297,33 +336,34 @@ class UserController extends BaseController
         }
     }
 
-    public function postAddAllowedRedirectUri()
+    public function postAddAllowedRedirectUri($id)
     {
         try {
             $input = Input::All();
             // Build the validation constraint set.
             $rules = array(
                 'redirect_uri' => 'url',
-                'client_id' => 'required',
-            );
 
+            );
             $messages = array(
                 'url' => 'You must give a valid url'
             );
-
             // Create a new validator instance.
             $validator = Validator::make($input, $rules, $messages);
             if ($validator->passes()) {
-                $this->client_service->addClientAllowedUri($input['client_id'], $input['redirect_uri']);
-                return Redirect::back();
+                $this->client_service->addClientAllowedUri($id, $input['redirect_uri']);
+                return Response::json(array('status' => 'OK'));
             } else {
-                return Redirect::back()
-                    ->withErrors($validator)
-                    ->withInput();
+                return Response::json(array('status' => 'ERROR'));
             }
-        } catch (Exception $ex) {
+        }
+        catch (AllowedClientUriAlreadyExistsException $ex1) {
+            Log::error($ex1);
+            return Response::json(array('status' => 'ERROR','msg'=>'Uri already exists!'));
+        }
+        catch (Exception $ex) {
             Log::error($ex);
-            return View::make("404");
+            return Response::json(array('status' => 'ERROR','msg'=>'There was an error!'));
         }
     }
 
@@ -331,46 +371,42 @@ class UserController extends BaseController
     {
         try {
             $this->client_service->deleteClientAllowedUri($id, $uri_id);
-            return Redirect::back();
+            return Response::json(array('status' => 'OK'));
         } catch (Exception $ex) {
             Log::error($ex);
-            return View::make("404");
+            return Response::json(array('status' => 'ERROR'));
         }
     }
 
     public function getRegenerateClientSecret($id)
     {
         try {
-            $this->client_service->regenerateClientSecret($id);
-            return Redirect::back();
+            $new_secret = $this->client_service->regenerateClientSecret($id);
+            return Response::json(array('status' => 'OK','new_secret'=>$new_secret));
         } catch (Exception $ex) {
             Log::error($ex);
-            return View::make("404");
+            return Response::json(array('status' => 'ERROR'));
         }
     }
 
-    public function postAddAllowedScope()
+    public function postAddAllowedScope($id)
     {
         try {
             $input = Input::All();
-            $user = $this->auth_service->getCurrentUser();
+
 
             // Build the validation constraint set.
             $rules = array(
-                'id'        => 'required',
+                'scope_id'        => 'required',
                 'checked'   => 'required',
-                'client_id' => 'required',
             );
 
             // Create a new validator instance.
             $validator = Validator::make($input, $rules);
             if ($validator->passes()) {
-                $client_id = $input['client_id'];
-                $client = $this->client_service->getClientByIdentifier($client_id);
-                if(is_null($client) || $client->getUserId()!==$user->getId())
-                    throw new Exception('invalid client id for current user');
-                $checked  = $input['checked'];
-                $scope_id = $input['id'];
+                $client_id = $id;
+                $checked   = $input['checked'];
+                $scope_id  = $input['scope_id'];
                 if($checked){
                     $this->client_service->addClientScope($client_id,$scope_id);
                 }
