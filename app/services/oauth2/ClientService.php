@@ -161,6 +161,7 @@ class ClientService implements IClientService
      */
     public function regenerateClientSecret($id)
     {
+        //TODO: should revoke all auth codes and access tokens
         $client = Client::find($id);
         if (!is_null($client)) {
             $client_secret = Rand::getString(16);

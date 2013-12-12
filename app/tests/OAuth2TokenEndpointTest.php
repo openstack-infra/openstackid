@@ -5,13 +5,13 @@ class OAuth2TokenEndpointTest extends TestCase {
     public function testToken(){
 
         $params = array(
-            'code'          => 'MnhzPw9qsB9XLj/zAyP34naQPjJ0nbw3',
+            'code'          => '5wXwH623NLJ+gXz7BUk+zrUuVB1mN1vX',
             'redirect_uri'  => 'https://developers.google.com/oauthplayground',
             'grant_type'    => 'authorization_code',
         );
 
         $client_id     = '1';
-        $client_secret = '1';
+        $client_secret = '44FuVlIL8qA8YISg';
         $response = $this->action("POST", "OAuth2ProviderController@token",
             $params,
             array(),

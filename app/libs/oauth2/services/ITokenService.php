@@ -41,6 +41,8 @@ interface ITokenService {
      */
     public function getAccessToken($value);
 
+    public function revokeAccessToken($value);
+
     /**
      * @param $access_token
      * @return RefreshToken
@@ -48,4 +50,6 @@ interface ITokenService {
     public function createRefreshToken(AccessToken $access_token);
 
     public function getRefreshToken($value);
+
+    public function getRevokeToken($value);
 } 

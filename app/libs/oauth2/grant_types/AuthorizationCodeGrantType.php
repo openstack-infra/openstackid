@@ -23,7 +23,7 @@ use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use ReflectionClass;
 use utils\services\IAuthService;
 use oauth2\responses\OAuth2AccessTokenResponse;
-
+use Zend\Crypt\Hash;
 /**
  * Class AuthorizationCodeGrantType
  * Authorization Code Grant Implementation

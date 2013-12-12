@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 12/3/13
- * Time: 6:14 PM
- */
 
 namespace oauth2\models;
-
 
 abstract class Token {
 
@@ -17,6 +10,8 @@ abstract class Token {
     protected $client_id;
     protected $len;
     protected $scope;
+    protected $audience;
+    protected $from_ip;
 
     const DefaultByteLength = 32;
 
@@ -43,6 +38,14 @@ abstract class Token {
 
     public function getClientId(){
        return $this->client_id;
+    }
+
+    public function getAudience(){
+        return $this->audience;
+    }
+
+    public function getFromIp(){
+        return $this->from_ip;
     }
 
     public abstract function toJSON();
