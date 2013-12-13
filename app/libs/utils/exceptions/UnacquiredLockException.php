@@ -1,15 +1,15 @@
 <?php
 
-namespace openid\exceptions;
+namespace utils\exceptions;
 
 use Exception;
 
-class ReplayAttackException extends Exception
+class UnacquiredLockException extends Exception
 {
 
     public function __construct($message = "")
     {
-        $message = "Possible Replay Attack : " . $message;
+        $message = "Unacquired Lock : " . $message;
         parent::__construct($message, 0, null);
     }
 

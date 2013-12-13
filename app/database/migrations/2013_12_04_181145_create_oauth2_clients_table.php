@@ -18,7 +18,7 @@ class CreateOauth2ClientsTable extends Migration {
             $table->text('app_description');
             $table->string('app_logo',255);
             $table->string('client_id',255)->unique();
-            $table->string('client_secret',255)->unique();
+            $table->string('client_secret',255)->nullable();
             $table->smallInteger('client_type');
             $table->boolean('active')->default(true);
             $table->boolean('locked')->default(false);

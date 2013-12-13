@@ -74,13 +74,14 @@ class ClientService implements IClientService
 
     public function addClient($client_type, $user_id, $app_name, $app_description, $app_logo = '')
     {
-        $client_id = Rand::getString(32) . '.openstack.client';
-        $client_secret = Rand::getString(16);
+
         $client = new Client;
         $client->app_name = $app_name;
         $client->app_logo = $app_logo;
-        $client->client_id = $client_id;
-        $client->client_secret = $client_secret;
+        $client->client_id = Rand::getString(32) . '.openstack.client';
+        //only generates secret for confidential clients
+        if($client_type==IClient::ClientType_Confidential)
+            $client->client_secret = Rand::getString(16);
         $client->client_type = $client_type;
         $client->user_id = $user_id;
         $client->active = true;
@@ -122,7 +123,7 @@ class ClientService implements IClientService
     {
         $client = Client::find($id);
         if (!is_null($client)) {
-            $client_uri = ClientAuthorizedUri::where('uri', '=', $uri)->where('client_id', '=', $id)->get();
+            $client_uri = ClientAuthorizedUri::where('uri', '=', $uri)->where('client_id', '=', $id)->first();
             if(!is_null($client_uri)){
                 throw new AllowedClientUriAlreadyExistsException(sprintf('uri : %s',$uri));
             }

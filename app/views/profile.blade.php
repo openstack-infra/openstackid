@@ -69,11 +69,12 @@
     </div>
     @endif
 
-    @if (count($clients)>0)
+
     <div class="row-fluid">
         <div id="clients" class="span12">
             <legend><i class="icon-info-sign accordion-toggle" title="Users can keep track of their registered applications and manage them"></i>&nbsp;Registered Applications</legend>
             {{ HTML::link(URL::action("UserController@postAddRegisteredClient",null),'Register Application',array('class'=>'btn add-client','title'=>'Adds a Registered Application')) }}
+            @if (count($clients)>0)
             <table class="table table-hover table-condensed">
                 <thead>
                 <tr>
@@ -96,6 +97,7 @@
                 @endforeach
                 </tbody>
             </table>
+            @endif
         </div>
     </div>
 
@@ -107,9 +109,7 @@
                 <input type="text" name="app-name" id="app-name">
 
                 <label for="app-description">Application Description</label>
-                <textarea style="resize: none;" rows="4" cols="50" name="app-description" id="app-description">
-                </textarea>
-
+                <textarea style="resize: none;" rows="4" cols="50" name="app-description" id="app-description"></textarea>
                 <label for="app-type">Application Type</label>
                 <select name="app-type" id="app-type">
                     <option value="2">Web Application</option>
@@ -119,7 +119,7 @@
         </form>
     </div>
 
-    @endif
+
 
     @if (count($actions)>0)
     <div class="row-fluid">

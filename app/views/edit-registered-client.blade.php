@@ -32,6 +32,7 @@
                     <span id="client_id">{{ $client->client_id }}</span>
                 </div>
             </div>
+            @if($client->client_type === oauth2\models\IClient::ClientType_Confidential)
             <div class="row-fluid">
                 <div class="span12">
                     <label for="client_secret" class="label-client-secret">Client Secret</label>
@@ -39,6 +40,7 @@
                     {{ HTML::link(URL::action("UserController@getRegenerateClientSecret",array("id"=>$client->id)),'Regenerate',array('class'=>'btn regenerate-client-secret','title'=>'Regenerates Client Secret')) }}
                 </div>
             </div>
+            @endif
         </div>
     </div>
     <h3><i class="icon-info-sign accordion-toggle" title="Authorized Client Redirection Uris"></i>&nbsp;Authorized Redirection Uris</h3>

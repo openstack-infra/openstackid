@@ -9,24 +9,28 @@ use Exception;
 use Log;
 use openid\services\IServerConfigurationService;
 use UserExceptionTrail;
-
+use utils\exceptions\UnacquiredLockException;
+use utils\services\ILockManagerService;
+use \utils\services\ISecurityPolicy;
 /**
  * Class BlacklistSecurityPolicy
  * implements check point security pattern
  * @package services
  */
-class BlacklistSecurityPolicy implements \utils\services\ISecurityPolicy
+class BlacklistSecurityPolicy implements ISecurityPolicy
 {
 
     private $server_configuration_service;
     private $redis;
     private $counter_measure;
+    private $lock_manager_service;
 
-    public function __construct(IServerConfigurationService $server_configuration_service)
+    public function __construct(IServerConfigurationService $server_configuration_service,ILockManagerService $lock_manager_service)
     {
 
         $this->redis = \RedisLV4::connection();
         $this->server_configuration_service = $server_configuration_service;
+        $this->lock_manager_service = $lock_manager_service;
     }
 
     /**
@@ -49,10 +53,7 @@ class BlacklistSecurityPolicy implements \utils\services\ISecurityPolicy
                 //if exists ?
                 if ($banned_ip) {
                     //set lock
-                    $success = $this->redis->setnx("lock." . $remote_address, 1);
-
-                    if (!$success) // if we cant get lock, then error
-                        throw new Exception(sprintf("BlacklistSecurityPolicy->check : lock already taken for banned ip %s!", $banned_ip->ip));
+                    $this->lock_manager_service->acquireLock("lock.ip." . $remote_address);
 
                     try {
 
@@ -77,18 +78,23 @@ class BlacklistSecurityPolicy implements \utils\services\ISecurityPolicy
                             }
                             $res = false;
                             //release lock
-                            $this->redis->del("lock." . $remote_address);
+
                         }
                     } catch (Exception $ex) {
                         //release lock
-                        $this->redis->del("lock." . $remote_address);
+
                         Log::error($ex);
                         $res = false;
                     }
+
+                    $this->lock_manager_service->releaseLock("lock.ip." . $remote_address);
                 }
             }
             if (!$res)
                 $this->counter_measure->trigger();
+        } catch (UnacquiredLockException $ex1) {
+            Log::error($ex1);
+            $res = false;
         } catch (Exception $ex) {
             Log::error($ex);
             $res = false;

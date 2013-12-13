@@ -46,8 +46,8 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
                 throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidOpenIdCheckAuthenticationRequestMessage);
             $claimed_nonce = new OpenIdNonce($this->current_request->getNonce());
 
-            if (!$this->nonce_service->lockNonce($claimed_nonce))
-                throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyUsed, $claimed_nonce->getRawFormat()));
+            $this->nonce_service->lockNonce($claimed_nonce);
+
             /**
              *  For verifying signatures an OP MUST only use private associations and MUST NOT
              *  use associations that have shared keys. If the verification request contains a handle
@@ -88,6 +88,7 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
                 $is_valid = 'true';
             }
             return new OpenIdCheckAuthenticationResponse($is_valid, $claimed_invalidate_handle);
+
         } catch (InvalidAssociationTypeException $inv_assoc_ex) {
             $this->checkpoint_service->trackException($inv_assoc_ex);
             $this->log->warning($inv_assoc_ex);

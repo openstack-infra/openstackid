@@ -49,7 +49,7 @@ return array(
         'mysql' => array(
             'driver'    => 'mysql',
             'host'      => 'localhost',
-            'database'  => 'openstackid_openid',
+            'database'  => 'openstackid',
             'username'  => 'root',
             'password'  => 'Koguryo@1981',
             'charset'   => 'utf8',

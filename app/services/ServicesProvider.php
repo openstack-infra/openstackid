@@ -23,6 +23,7 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(OpenIdServiceCatalog::UserService, 'services\\UserService');
         $this->app->singleton(OpenIdServiceCatalog::NonceService, 'services\\NonceService');
         $this->app->singleton(UtilsServiceCatalog::LogService, 'services\\LogService');
+        $this->app->singleton(UtilsServiceCatalog::LockManagerService, 'services\\LockManagerService');
 
         $this->app->singleton("services\\DelayCounterMeasure", 'services\\DelayCounterMeasure');
         $this->app->singleton("services\\LockUserCounterMeasure", 'services\\LockUserCounterMeasure');

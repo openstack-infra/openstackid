@@ -13,4 +13,5 @@ class UtilsServiceCatalog {
     const CheckPointService     = 'utils\\services\\ICheckPointService';
     const LogService            = 'utils\\services\\ILogService';
     const AuthenticationService = 'utils\\services\\IAuthService';
+    const LockManagerService    = 'utils\\services\\ILockManagerService';
 } 

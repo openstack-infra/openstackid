@@ -8,33 +8,41 @@ use openid\exceptions\ReplayAttackException;
 use openid\helpers\OpenIdErrorMessages;
 use openid\model\OpenIdNonce;
 use openid\services\INonceService;
+use utils\exceptions\UnacquiredLockException;
+use utils\services\ILockManagerService;
+
 
 class NonceService implements INonceService
 {
 
     private $redis;
 
-    public function __construct()
+    public function __construct(ILockManagerService $lock_manager_service)
     {
         $this->redis = \RedisLV4::connection();
+        $this->lock_manager_service = $lock_manager_service;
     }
 
     /**
      * @param OpenIdNonce $nonce
+     * @throws ReplayAttackException
      * @return bool
      */
     public function lockNonce(OpenIdNonce $nonce)
     {
         $raw_nonce = $nonce->getRawFormat();
-        $cur_time = time();
         $lock_lifetime = \ServerConfigurationService::getConfigValue("Nonce.Lifetime");
-        return $this->redis->setnx('lock.' . $raw_nonce, $cur_time + $lock_lifetime + 1);
+        try {
+            $this->lock_manager_service->acquireLock('lock.nonce.' . $raw_nonce, $lock_lifetime);
+        } catch (UnacquiredLockException $ex) {
+            throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyUsed, $nonce->getRawFormat()));
+        }
     }
 
     public function unlockNonce(OpenIdNonce $nonce)
     {
         $raw_nonce = $nonce->getRawFormat();
-        $this->redis->del('lock.' . $raw_nonce);
+        $this->lock_manager_service->releaseLock('lock.nonce.' . $raw_nonce);
     }
 
     /**
