@@ -420,4 +420,31 @@ class UserController extends BaseController
             return Response::json(array('status' => 'ERROR'));
         }
     }
+
+    public function postActivateClient(){
+        try {
+            $input = Input::All();
+
+            $user = $this->auth_service->getCurrentUser();
+            // Build the validation constraint set.
+            $rules = array(
+                'id'        => 'required',
+                'active'   => 'required',
+            );
+
+            // Create a new validator instance.
+            $validator = Validator::make($input, $rules);
+            if ($validator->passes()) {
+
+                $id   = $input['id'];
+                $active      = $input['active'];
+                $this->client_service->activateClient($id,$active,$user->getId());
+
+                return Response::json(array('status' => 'OK'));
+            }
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return Response::json(array('status' => 'ERROR'));
+        }
+    }
 }

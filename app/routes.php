@@ -55,4 +55,5 @@ Route::group(array("before" => array("ssl", "auth")), function () {
     Route::get('/accounts/user/profile/clients/redirect_uri/list/{id}','UserController@getRegisteredClientUris');
     Route::get('/accounts/user/profile/clients/redirect_uri/delete/{id}/{uri_id}','UserController@getDeleteClientAllowedUri');
     Route::post('/accounts/user/profile/clients/scope/add/{id}','UserController@postAddAllowedScope');
+    Route::post('/accounts/user/profile/clients/activate','UserController@postActivateClient');
 });

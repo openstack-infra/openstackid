@@ -186,4 +186,12 @@ class ClientService implements IClientService
             $client->Save();
         }
     }
+
+    public function activateClient($id,$active,$user_id){
+        $client = $this->getClientByIdentifier($id);
+        if(!is_null($client) && $client->getUserId()==$user_id){
+            $client->active = $active;
+            $client->Save();
+        }
+    }
 }

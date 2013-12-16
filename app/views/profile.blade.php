@@ -80,6 +80,8 @@
                 <tr>
                     <th>Application Name</th>
                     <th>Type</th>
+                    <th>Is Active</th>
+                    <th>Is Locked</th>
                     <th>Modified</th>
                     <th>&nbsp;</th>
                 </tr>
@@ -89,6 +91,20 @@
                     <tr>
                         <td>{{ $client->app_name }}</td>
                         <td>{{ $client->getFriendlyClientType()}}</td>
+                        <td>
+                                <input type="checkbox" class="app-active-checkbox" id="app-active_{{$client->id}}"
+                                @if ( $client->active)
+                                checked
+                                @endif
+                                value="{{$client->id}}"/>
+                        </td>
+                        <td>
+                            <input type="checkbox" class="app-locked-checkbox" id="app-locked_{{$client->id}}"
+                            @if ( $client->locked)
+                            checked
+                            @endif
+                            value="{{$client->id}}" disabled="disabled" />
+                        </td>
                         <td>{{ $client->updated_at }}</td>
                         <td>&nbsp;
                             {{ HTML::link(URL::action("UserController@getEditRegisteredClient",array("id"=>$client->id)),'Edit',array('class'=>'btn edit-client','title'=>'Edits a Registered Application')) }}
@@ -114,6 +130,7 @@
                 <select name="app-type" id="app-type">
                     <option value="2">Web Application</option>
                     <option value="1">Browser (JS Client)</option>
+                    <option value="1">Native Application</option>
                 </select>
             </fieldset>
         </form>
@@ -169,6 +186,32 @@
             $( "#dialog-form" ).dialog( "open" );
             return false;
         });
+
+
+        $("body").on('click',".app-active-checkbox",function(event){
+
+            var client    = {};
+            client.id     = $(this).attr('value');
+            client.active = $(this).is(':checked');
+            $.ajax(
+                {
+                    type: "POST",
+                    url: '{{ URL::action("UserController@postActivateClient") }}',
+                    data: JSON.stringify(client),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    timeout:60000,
+                    success: function (data,textStatus,jqXHR) {
+                        //load data...
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert( "Request failed: " + textStatus );
+                    }
+                }
+            );
+        });
+
+
 
         $("#dialog-form").dialog({
             autoOpen: false,

@@ -57,4 +57,7 @@ interface IClientService {
      * @return mixed
      */
     public function lockClient($client_id);
+
+
+    public function activateClient($id, $active,$user_id);
 } 

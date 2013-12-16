@@ -78,7 +78,7 @@ class TokenService implements ITokenService
         $hashed_value = Hash::compute('sha256', $value);
 
         if (!$this->redis->exists($hashed_value))
-            throw new InvalidAuthorizationCodeException("auth_code %s ", $value);
+            throw new InvalidAuthorizationCodeException(sprintf("auth_code %s ", $value));
 
         try {
             $this->lock_manager_service->acquireLock('lock.get.authcode.' . $hashed_value);
