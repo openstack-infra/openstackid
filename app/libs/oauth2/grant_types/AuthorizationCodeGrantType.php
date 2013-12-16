@@ -4,17 +4,17 @@ namespace oauth2\grant_types;
 
 use Exception;
 use oauth2\exceptions\AccessDeniedException;
+use oauth2\exceptions\InvalidAuthorizationCodeException;
 use oauth2\exceptions\InvalidClientException;
 use oauth2\exceptions\OAuth2GenericException;
 use oauth2\exceptions\ScopeNotAllowedException;
 use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
-use oauth2\exceptions\InvalidAuthorizationCodeException;
-use oauth2\exceptions\ExpiredAuthorizationCodeException;
 use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
 use oauth2\requests\OAuth2Request;
+use oauth2\responses\OAuth2AccessTokenResponse;
 use oauth2\responses\OAuth2AuthorizationResponse;
 use oauth2\services\IClientService;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
@@ -22,8 +22,7 @@ use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use ReflectionClass;
 use utils\services\IAuthService;
-use oauth2\responses\OAuth2AccessTokenResponse;
-use Zend\Crypt\Hash;
+
 /**
  * Class AuthorizationCodeGrantType
  * Authorization Code Grant Implementation
@@ -41,11 +40,11 @@ class AuthorizationCodeGrantType implements IGrantType
 
     public function __construct(IClientService $client_service, ITokenService $token_service, IAuthService $auth_service, IMementoOAuth2AuthenticationRequestService $memento_service, IOAuth2AuthenticationStrategy $auth_strategy)
     {
-        $this->client_service  = $client_service;
-        $this->token_service   = $token_service;
-        $this->auth_service    = $auth_service;
+        $this->client_service = $client_service;
+        $this->token_service = $token_service;
+        $this->auth_service = $auth_service;
         $this->memento_service = $memento_service;
-        $this->auth_strategy   = $auth_strategy;
+        $this->auth_strategy = $auth_strategy;
     }
 
     public function canHandle(OAuth2Request $request)
@@ -54,7 +53,7 @@ class AuthorizationCodeGrantType implements IGrantType
         $class_name = $reflector->getName();
         return
             ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest' && $request->isValid()) ||
-            ($class_name == 'oauth2\requests\OAuth2AccessTokenRequest'   && $request->isValid() && $request->getGrantType() == OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode);
+            ($class_name == 'oauth2\requests\OAuth2AccessTokenRequest' && $request->isValid() && $request->getGrantType() == OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode);
     }
 
     /**
@@ -144,65 +143,77 @@ class AuthorizationCodeGrantType implements IGrantType
         $class_name = $reflector->getName();
         if ($class_name == 'oauth2\requests\OAuth2AccessTokenRequest') {
 
-               $code      = $request->getCode();
-               // verify that the authorization code is valid
-               // The client MUST NOT use the authorization code
-               // more than once.  If an authorization code is used more than
-               // once, the authorization server MUST deny the request and SHOULD
-               // revoke (when possible) all tokens previously issued based on
-               // that authorization code.  The authorization code is bound to
-               // the client identifier and redirection URI.
-               $auth_code = $this->token_service->getAuthorizationCode($code);
-               // verify that the authorization code is valid
-               if(is_null($auth_code)){
-                   throw new InvalidAuthorizationCodeException();
-               }
+            //get client credentials from request..
+            list($current_client_id, $current_client_secret) = $this->client_service->getCurrentClientAuthInfo();
 
-               list($current_client_id,$current_client_secret) = $this->client_service->getCurrentClientAuthInfo();
+            if (empty($current_client_id) || empty($current_client_secret))
+                throw new InvalidClientException;
 
-               if(empty($current_client_id) || empty($current_client_secret))
-                   throw new InvalidClientException;
+            //retrieve client from storage..
+            $current_client = $this->client_service->getClientById($current_client_id);
 
-               $client_id            = $auth_code->getClientId();
+            if (is_null($current_client))
+                throw new InvalidClientException;
 
-               //ensure that the authorization code was issued to the authenticated
-               //confidential client, or if the client is public, ensure that the
-               //code was issued to "client_id" in the request
-               if($client_id !== $current_client_id)
-                   throw new UnAuthorizedClientException;
+            if(!$current_client->isActive() || $current_client->isLocked()){
+                throw new UnAuthorizedClientException();
+            }
 
-               $current_client       = $this->client_service->getClientById($current_client_id);
+            //only confidential clients could use this grant type
+            if ($current_client->getClientType() !== IClient::ClientType_Confidential)
+                throw new UnAuthorizedClientException();
 
-               if(is_null($current_client))
-                   throw new InvalidClientException;
+            //verify client credentials
+            if ($current_client->getClientSecret() !== $current_client_secret)
+                throw new UnAuthorizedClientException;
 
-               if ($current_client->getClientType() !== IClient::ClientType_Confidential)
-                    throw new UnAuthorizedClientException();
+            $current_redirect_uri = $request->getRedirectUri();
+            //verify redirect uri
+            if (!$current_client->isUriAllowed($current_redirect_uri))
+                throw new UriNotAllowedException();
 
-               if($current_client->getClientSecret()!==$current_client_secret)
-                   throw new UnAuthorizedClientException;
+            $code = $request->getCode();
+            // verify that the authorization code is valid
+            // The client MUST NOT use the authorization code
+            // more than once.  If an authorization code is used more than
+            // once, the authorization server MUST deny the request and SHOULD
+            // revoke (when possible) all tokens previously issued based on
+            // that authorization code.  The authorization code is bound to
+            // the client identifier and redirection URI.
+            $auth_code = $this->token_service->getAuthorizationCode($code);
+            // verify that the authorization code is valid
+            if (is_null($auth_code)) {
+                throw new InvalidAuthorizationCodeException();
+            }
 
-               $current_redirect_uri = $request->getRedirectUri();
+            $client_id = $auth_code->getClientId();
 
-               if(!$current_client->isUriAllowed($current_redirect_uri))
-                   throw new UriNotAllowedException();
+            //ensure that the authorization code was issued to the authenticated
+            //confidential client, or if the client is public, ensure that the
+            //code was issued to "client_id" in the request
+            if ($client_id !== $current_client_id)
+                throw new UnAuthorizedClientException;
 
-               // ensure that the "redirect_uri" parameter is present if the
-               // "redirect_uri" parameter was included in the initial authorization
-               // and if included ensure that their values are identical.
-               $redirect_uri         = $auth_code->getRedirectUri();
-               if(!empty($redirect_uri) && $redirect_uri!==$current_redirect_uri)
-                   throw new UriNotAllowedException();
 
-               $access_token  = $this->token_service->createAccessToken($auth_code,$current_redirect_uri);
-               $refresh_token = $this->token_service->createRefreshToken($access_token);
-               $response      = new OAuth2AccessTokenResponse($access_token->getValue(),$access_token->getLifetime(), $refresh_token->getValue());
-               return $response;
+            // ensure that the "redirect_uri" parameter is present if the
+            // "redirect_uri" parameter was included in the initial authorization
+            // and if included ensure that their values are identical.
+            $redirect_uri = $auth_code->getRedirectUri();
+            if (!empty($redirect_uri) && $redirect_uri !== $current_redirect_uri)
+                throw new UriNotAllowedException();
+
+            $access_token = $this->token_service->createAccessToken($auth_code, $current_redirect_uri);
+            //emits refresh token
+            $refresh_token = null;
+            if ($current_client->use_refresh_token)
+                $refresh_token = $this->token_service->createRefreshToken($access_token);
+
+            $response = new OAuth2AccessTokenResponse($access_token->getValue(), $access_token->getLifetime(), !is_null($refresh_token) ? $refresh_token->getValue() : null);
+            return $response;
 
         }
         throw new Exception('Invalid Request Type');
     }
-
 
     public function getResponseType()
     {

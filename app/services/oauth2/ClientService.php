@@ -172,4 +172,18 @@ class ClientService implements IClientService
         }
         return '';
     }
+
+    /**
+     * Lock a client application by client id
+     * @param $client_id client id
+     * @return mixed
+     */
+    public function lockClient($client_id)
+    {
+        $client = $this->getClientById($client_id);
+        if(!is_null($client)){
+            $client->locked = true;
+            $client->Save();
+        }
+    }
 }

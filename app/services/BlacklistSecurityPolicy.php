@@ -7,30 +7,22 @@ use DateTime;
 use DB;
 use Exception;
 use Log;
-use openid\services\IServerConfigurationService;
+use utils\services\IServerConfigurationService;
 use UserExceptionTrail;
 use utils\exceptions\UnacquiredLockException;
 use utils\services\ILockManagerService;
-use \utils\services\ISecurityPolicy;
 /**
  * Class BlacklistSecurityPolicy
  * implements check point security pattern
  * @package services
  */
-class BlacklistSecurityPolicy implements ISecurityPolicy
+class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
 {
 
-    private $server_configuration_service;
-    private $redis;
-    private $counter_measure;
-    private $lock_manager_service;
 
-    public function __construct(IServerConfigurationService $server_configuration_service,ILockManagerService $lock_manager_service)
+    public function __construct(IServerConfigurationService $server_configuration_service, ILockManagerService $lock_manager_service)
     {
-
-        $this->redis = \RedisLV4::connection();
-        $this->server_configuration_service = $server_configuration_service;
-        $this->lock_manager_service = $lock_manager_service;
+        parent::__construct($server_configuration_service,$lock_manager_service);
     }
 
     /**
@@ -161,44 +153,28 @@ class BlacklistSecurityPolicy implements ISecurityPolicy
                         $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay"), $exception_class);
                 }
                     break;
+                case 'oauth2\exceptions\ReplayAttackException':
+                {
+
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("AuthorizationCodeRedeemPolicy.MaxAuthCodeReplayAttackAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("AuthorizationCodeRedeemPolicy.AuthCodeReplayAttackInitialDelay"), $exception_class);
+
+                }
+                    break;
+
+                case 'oauth2\exceptions\InvalidAuthorizationCodeException':
+                {
+
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("AuthorizationCodeRedeemPolicy.MaxInvalidAuthorizationCodeAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("AuthorizationCodeRedeemPolicy.InvalidAuthorizationCodeInitialDelay"), $exception_class);
+
+                }
+                    break;
             }
         } catch (Exception $ex) {
             Log::error($ex);
         }
     }
 
-    /**
-     * internal function to create a new banned ip
-     * @param $initial_hits
-     * @param $exception_type
-     */
-    private function createBannedIP($initial_hits, $exception_type)
-    {
-        try {
-            $remote_address = IPHelper::getUserIp();
-            //try to create on redis
-            $success = $this->redis->setnx($remote_address, $initial_hits);
-            if ($success) {
-                $this->redis->expire($remote_address, $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds"));
-            }
 
-            Log::warning(sprintf("BlacklistSecurityPolicy: Banning ip %s by Exception %s", $remote_address, $exception_type));
-            //try to create on db
-            $banned_ip = BannedIP::where("ip", "=", $remote_address)->first();
-            if (!$banned_ip) {
-                $banned_ip = new BannedIP();
-                $banned_ip->ip = $remote_address;
-            }
-            $banned_ip->exception_type = $exception_type;
-            $banned_ip->hits = $initial_hits;
-            $banned_ip->Save();
-        } catch (Exception $ex) {
-            Log::error($ex);
-        }
-    }
-
-    public function setCounterMeasure(\utils\services\ISecurityPolicyCounterMeasure $counter_measure)
-    {
-        $this->counter_measure = $counter_measure;
-    }
 }

@@ -82,8 +82,20 @@ class Client extends Eloquent implements IClient {
 
     public function isUriAllowed($uri)
     {
-        $uri = ClientAuthorizedUri::where('client_id', '=', $this->id)->where('uri','=',$uri)->first();
-        return !is_null($uri);
+        if(! filter_var($uri, FILTER_VALIDATE_URL)) return false;
+        $parts = @parse_url($uri);
+        if ($parts === false) {
+            return false;
+        }
+        if($parts['scheme']!=='https')
+            return false;
+        $client_authorized_uri = ClientAuthorizedUri::where('client_id', '=', $this->id)->where('uri','=',$uri)->first();
+        if(is_null($client_authorized_uri)){
+            $aux_uri = $parts['scheme'].'://'.strtolower($parts['host']).strtolower($parts['path']);
+            $client_authorized_uri = ClientAuthorizedUri::where('client_id', '=', $this->id)->where('uri','=',$aux_uri)->first();
+            return !is_null($client_authorized_uri);
+        }
+        return true;
     }
 
     public function getApplicationName()
@@ -116,5 +128,15 @@ class Client extends Eloquent implements IClient {
     public function getId()
     {
         return $this->id;
+    }
+
+    public function isLocked()
+    {
+        return $this->locked;
+    }
+
+    public function isActive()
+    {
+        return $this->active;
     }
 }

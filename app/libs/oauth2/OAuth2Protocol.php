@@ -46,6 +46,7 @@ class OAuth2Protocol implements  IOAuth2Protocol{
     {
         $this->log_service        = $log_service;
         $this->checkpoint_service = $checkpoint_service;
+        $this->client_service     = $client_service;
         $this->authorize_endpoint = new AuthorizationEndpoint($client_service,$token_service,$auth_service,$memento_service,$auth_strategy);
         $this->token_endpoint     = new TokenEndpoint($client_service,$token_service,$auth_service,$memento_service,$auth_strategy);
     }
@@ -53,6 +54,7 @@ class OAuth2Protocol implements  IOAuth2Protocol{
     private $authorize_endpoint;
     private $token_endpoint;
     private $checkpoint_service;
+    private $client_service;
 
     const OAuth2Protocol_GrantType_AuthCode               = 'authorization_code';
     const OAuth2Protocol_GrantType_Implicit               = 'implicit';
@@ -112,6 +114,21 @@ class OAuth2Protocol implements  IOAuth2Protocol{
     );
 
 
+    private function validateRedirectUri(OAuth2Request $request){
+        $redirect_uri = $request->getRedirectUri();
+        if(is_null($redirect_uri))
+            return null;
+        $client_id    = $request->getClientId();
+        if(is_null($client_id))
+            return null;
+        $client       = $this->client_service->getClientByIdentifier($client_id);
+        if(is_null($client))
+            return null;
+        if(!$client->isUriAllowed($redirect_uri))
+            return null;
+        return $redirect_uri;
+    }
+
     /**
      * @param OAuth2Request $request
      * @return mixed|OAuth2IndirectErrorResponse
@@ -128,17 +145,32 @@ class OAuth2Protocol implements  IOAuth2Protocol{
         catch(InvalidOAuth2Request $ex1){
             $this->log_service->error($ex1);
             $this->checkpoint_service->trackException($ex1);
-            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest, $request->getRedirectUri());
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if(is_null($redirect_uri))
+                throw $ex1;
+
+            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest, $redirect_uri);
         }
         catch(UnsupportedResponseTypeException $ex2){
             $this->log_service->error($ex2);
             $this->checkpoint_service->trackException($ex2);
-            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnsupportedResponseType, $request->getRedirectUri());
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if(is_null($redirect_uri))
+                throw $ex2;
+
+            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnsupportedResponseType, $redirect_uri);
         }
         catch(InvalidClientException $ex3){
             $this->log_service->error($ex3);
             $this->checkpoint_service->trackException($ex3);
-            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $request->getRedirectUri());
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if(is_null($redirect_uri))
+                throw $ex3;
+
+            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
         }
         catch(UriNotAllowedException $ex4){
             $this->log_service->error($ex4);
@@ -148,27 +180,52 @@ class OAuth2Protocol implements  IOAuth2Protocol{
         catch(ScopeNotAllowedException $ex5){
             $this->log_service->error($ex5);
             $this->checkpoint_service->trackException($ex5);
-            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidScope, $request->getRedirectUri());
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if(is_null($redirect_uri))
+                throw $ex5;
+
+            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidScope, $redirect_uri);
         }
         catch(UnAuthorizedClientException $ex6){
             $this->log_service->error($ex6);
             $this->checkpoint_service->trackException($ex6);
-            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $request->getRedirectUri());
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if(is_null($redirect_uri))
+                throw $ex6;
+
+            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
         }
         catch(AccessDeniedException $ex7){
             $this->log_service->error($ex7);
             $this->checkpoint_service->trackException($ex7);
-            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_AccessDenied, $request->getRedirectUri());
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if(is_null($redirect_uri))
+                throw $ex7;
+
+            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_AccessDenied, $redirect_uri);
         }
         catch(OAuth2GenericException $ex8){
             $this->log_service->error($ex8);
             $this->checkpoint_service->trackException($ex8);
-            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_ServerError, $request->getRedirectUri());
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if(is_null($redirect_uri))
+                throw $ex8;
+
+            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_ServerError, $redirect_uri);
         }
         catch(Exception $ex){
             $this->log_service->error($ex);
             $this->checkpoint_service->trackException($ex);
-            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_ServerError, $request->getRedirectUri());
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if(is_null($redirect_uri))
+                throw $ex;
+
+            return new OAuth2IndirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_ServerError, $redirect_uri);
         }
     }
 

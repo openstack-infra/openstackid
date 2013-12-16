@@ -24,11 +24,16 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(OpenIdServiceCatalog::NonceService, 'services\\NonceService');
         $this->app->singleton(UtilsServiceCatalog::LogService, 'services\\LogService');
         $this->app->singleton(UtilsServiceCatalog::LockManagerService, 'services\\LockManagerService');
+        $this->app->singleton(UtilsServiceCatalog::ServerConfigurationService, 'services\\ServerConfigurationService');
 
         $this->app->singleton("services\\DelayCounterMeasure", 'services\\DelayCounterMeasure');
         $this->app->singleton("services\\LockUserCounterMeasure", 'services\\LockUserCounterMeasure');
+        $this->app->singleton("services\\oauth2\\RevokeAuthorizationCodeRelatedTokens", 'services\\oauth2\\RevokeAuthorizationCodeRelatedTokens');
+
         $this->app->singleton("services\\BlacklistSecurityPolicy", 'services\\BlacklistSecurityPolicy');
         $this->app->singleton("services\\LockUserSecurityPolicy", 'services\\LockUserSecurityPolicy');
+
+        $this->app->singleton("services\\oauth2\\AuthorizationCodeRedeemPolicy", 'services\\oauth2\\AuthorizationCodeRedeemPolicy');
 
         $this->app->singleton('services\\IUserActionService', 'services\\UserActionService');
         $this->app->singleton(UtilsServiceCatalog::CheckPointService,
@@ -39,13 +44,19 @@ class ServicesProvider extends ServiceProvider
             $blacklist_security_policy = $this->app->make("services\\BlacklistSecurityPolicy");
             $blacklist_security_policy->setCounterMeasure($delay_counter_measure);
 
+            $revoke_tokens_counter_measure = $this->app->make("services\\oauth2\\RevokeAuthorizationCodeRelatedTokens");
+
+            $authorization_code_redeem_Policy = $this->app->make("services\\oauth2\\AuthorizationCodeRedeemPolicy");
+            $authorization_code_redeem_Policy->setCounterMeasure($revoke_tokens_counter_measure);
+
             $lock_user_counter_measure = $this->app->make("services\\LockUserCounterMeasure");
 
             $lock_user_security_policy = $this->app->make("services\\LockUserSecurityPolicy");
             $lock_user_security_policy->setCounterMeasure($lock_user_counter_measure);
-
+            //policies...
             $checkpoint_service = new CheckPointService($blacklist_security_policy);
             $checkpoint_service->addPolicy($lock_user_security_policy);
+            $checkpoint_service->addPolicy($authorization_code_redeem_Policy);
             return $checkpoint_service;
         });
 
@@ -60,6 +71,7 @@ class ServicesProvider extends ServiceProvider
 
         Registry::getInstance()->set(UtilsServiceCatalog::LogService, $this->app->make(UtilsServiceCatalog::LogService));
         Registry::getInstance()->set(UtilsServiceCatalog::CheckPointService, $this->app->make(UtilsServiceCatalog::CheckPointService));
+        Registry::getInstance()->set(UtilsServiceCatalog::ServerConfigurationService, $this->app->make(UtilsServiceCatalog::ServerConfigurationService));
 
         $this->app->singleton(OAuth2ServiceCatalog::MementoService, 'services\\oauth2\\MementoOAuth2AuthenticationRequestService');
         $this->app->singleton(OAuth2ServiceCatalog::ClientService, 'services\\oauth2\\ClientService');

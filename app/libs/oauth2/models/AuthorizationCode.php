@@ -20,22 +20,24 @@ class AuthorizationCode extends Token {
      * @param int $lifetime
      * @return AuthorizationCode
      */
-    public static function create($client_id, $scope, $redirect_uri, $lifetime = 600){
+    public static function create($client_id, $scope, $redirect_uri, $audience='', $lifetime = 600){
         $instance = new self();
         $instance->value        = Rand::getString($instance->len,null,true);
         $instance->scope        = $scope;
         $instance->redirect_uri = $redirect_uri;
         $instance->client_id    = $client_id;
         $instance->lifetime     = $lifetime;
+        $instance->audience     = $audience;
         return $instance;
     }
 
-    public static function load($value, $client_id, $scope, $redirect_uri = null, $issued = null, $lifetime = 600){
+    public static function load($value, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600){
         $instance = new self();
         $instance->value        = $value;
         $instance->scope        = $scope;
         $instance->redirect_uri = $redirect_uri;
         $instance->client_id    = $client_id;
+        $instance->audience     = $audience;
         $instance->issued       = $issued;
         $instance->lifetime     = $lifetime;
         return $instance;

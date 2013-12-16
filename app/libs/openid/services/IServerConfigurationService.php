@@ -18,6 +18,6 @@ interface IServerConfigurationService
      */
     public function getUserIdentityEndpointURL($identifier);
 
-    public function getConfigValue($key);
+
 
 }

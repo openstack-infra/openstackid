@@ -58,7 +58,7 @@ class ServerConfigurationSeeder extends Seeder {
 
         ServerConfiguration::create(
             array(
-                'key'   => 'BlacklistSecurityPolicy.BannedIpLifeTimeSeconds',
+                'key'   => 'BannedIpLifeTimeSeconds',
                 'value' => '21600',
             )
         );
@@ -159,6 +159,42 @@ class ServerConfigurationSeeder extends Seeder {
             array(
                 'key'   => 'BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay',
                 'value' => '20',
+            )
+        );
+
+        ServerConfiguration::create(
+            array(
+                'key'   => 'AuthorizationCodeRedeemPolicy.MinutesWithoutExceptions',
+                'value' => '5',
+            )
+        );
+
+        ServerConfiguration::create(
+            array(
+                'key'   => 'AuthorizationCodeRedeemPolicy.MaxAuthCodeReplayAttackAttempts',
+                'value' => '3',
+            )
+        );
+
+
+        ServerConfiguration::create(
+            array(
+                'key'   => 'AuthorizationCodeRedeemPolicy.AuthCodeReplayAttackInitialDelay',
+                'value' => '10',
+            )
+        );
+
+        ServerConfiguration::create(
+            array(
+                'key'   => 'AuthorizationCodeRedeemPolicy.MaxInvalidAuthorizationCodeAttempts',
+                'value' => '3',
+            )
+        );
+
+        ServerConfiguration::create(
+            array(
+                'key'   => 'AuthorizationCodeRedeemPolicy.InvalidAuthorizationCodeInitialDelay',
+                'value' => '10',
             )
         );
     }

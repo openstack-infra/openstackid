@@ -50,4 +50,11 @@ interface IClientService {
      * @return mixed
      */
     public function regenerateClientSecret($id);
+
+    /**
+     * Lock a client application by client id
+     * @param $client_id client id
+     * @return mixed
+     */
+    public function lockClient($client_id);
 } 

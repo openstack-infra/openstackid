@@ -24,4 +24,7 @@ interface IClient {
     public function getApplicationDescription();
     public function getDeveloperEmail();
     public function getUserId();
+    public function isLocked();
+    public function isActive();
+
 } 

@@ -10,6 +10,7 @@ use oauth2\models\AccessToken;
 use oauth2\models\AuthorizationCode;
 use oauth2\models\RefreshToken;
 use oauth2\models\Token;
+use oauth2\services\Authorization;
 use oauth2\services\IClientService;
 use oauth2\services\ITokenService;
 use RefreshToken as DBRefreshToken;
@@ -17,6 +18,7 @@ use services\IPHelper;
 use Zend\Crypt\Hash;
 use utils\exceptions\UnacquiredLockException;
 use utils\services\ILockManagerService;
+use DB;
 
 /**
  * Class TokenService
@@ -25,8 +27,6 @@ use utils\services\ILockManagerService;
 
 class TokenService implements ITokenService
 {
-
-
     private $redis;
     private $client_service;
     private $lock_manager_service;
@@ -52,12 +52,13 @@ class TokenService implements ITokenService
         $hashed_value = Hash::compute('sha256', $value);
 
         $this->redis->hmset($hashed_value, array(
-            'value' => $hashed_value,
-            'client_id' => $code->getClientId(),
-            'scope' => $code->getScope(),
+            'value'        => $hashed_value,
+            'client_id'    => $code->getClientId(),
+            'scope'        => $code->getScope(),
             'redirect_uri' => $code->getRedirectUri(),
-            'issued' => $code->getIssued(),
-            'lifetime' => $code->getLifetime(),
+            'issued'       => $code->getIssued(),
+            'lifetime'     => $code->getLifetime(),
+            'audience'     => ''
         ));
 
         $this->redis->expire($hashed_value, $code->getLifetime());
@@ -75,6 +76,7 @@ class TokenService implements ITokenService
     {
 
         $hashed_value = Hash::compute('sha256', $value);
+
         if (!$this->redis->exists($hashed_value))
             throw new InvalidAuthorizationCodeException("auth_code %s ", $value);
 
@@ -82,18 +84,19 @@ class TokenService implements ITokenService
             $this->lock_manager_service->acquireLock('lock.get.authcode.' . $hashed_value);
 
             $values = $this->redis->hmget($hashed_value, array(
-                "value",
-                "client_id",
-                "scope",
-                "redirect_uri",
-                "issued",
-                "lifetime"
+                'value',
+                'client_id',
+                'scope',
+                'redirect_uri',
+                'issued',
+                'lifetime',
+                'audience'
             ));
 
-            $code = AuthorizationCode::load($values[0], $values[1], $values[2], $values[3], $values[4], $values[5]);
+            $code = AuthorizationCode::load($values[0], $values[1], $values[2],$values[6], $values[3], $values[4], $values[5]);
             return $code;
         } catch (UnacquiredLockException $ex1) {
-            throw new ReplayAttackException("auth_code %s ", $value);
+            throw new ReplayAttackException($value, sprintf("auth_code %s ", $value));
         }
     }
 
@@ -203,7 +206,7 @@ class TokenService implements ITokenService
                 'audience'
             ));
 
-            $code = AuthorizationCode::load($values[3], $values[1], $values[2]);
+            $code = AuthorizationCode::load($values[3], $values[1], $values[2],$values[7]);
             $access_token = AccessToken::load($values[0], $code, $values[4], $values[5], $values[6], $values[7]);
         } catch (UnacquiredLockException $ex1) {
             throw new InvalidAccessTokenException("access token %s ", $value);
@@ -267,6 +270,7 @@ class TokenService implements ITokenService
         $refresh_token_db->scope = $refresh_token->getScope();
         $refresh_token_db->client_id = $client->getId();
         $refresh_token_db->from_ip = IPHelper::getUserIp();
+        $refresh_token_db->audience = '';
         $refresh_token_db->Save();
 
         return $refresh_token;
@@ -280,6 +284,26 @@ class TokenService implements ITokenService
     public function getRevokeToken($value)
     {
 
+    }
+
+    /**
+     * Revokes all related tokens to a specific auth code
+     * @param $auth_code Authorization Code
+     * @return mixed
+     */
+    public function revokeAuthCodeRelatedTokens($auth_code)
+    {
+        $auth_code_hashed_value = Hash::compute('sha256', $auth_code);
+
+        DB::transaction(function () use ($auth_code_hashed_value) {
+            $db_access_tokens = DBAccessToken::where('associated_authorization_code','=',$auth_code_hashed_value)->get();
+            foreach($db_access_tokens as $db_access_token){
+                $access_token_value = $db_access_token->value;
+                DBRefreshToken::where('associated_access_token','=',$access_token_value)->delete();
+                $this->redis->del($access_token_value);
+                $db_access_token->delete();
+            }
+        });
     }
 }
 

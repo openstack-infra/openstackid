@@ -36,7 +36,7 @@ Route::group(array("before" => "ssl"), function () {
 
     //oauth2 endpoint
 
-    Route::get('/oauth2/auth',"OAuth2ProviderController@authorize");
+    Route::any('/oauth2/auth',"OAuth2ProviderController@authorize");
     Route::post('/oauth2/token',"OAuth2ProviderController@token");
 });
 

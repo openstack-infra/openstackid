@@ -2,16 +2,34 @@
 
 class OAuth2TokenEndpointTest extends TestCase {
 
+    public function testAuthCode(){
+        $params = array(
+            'client_id'        =>'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client',
+            'redirect_uri'     => 'https://developers.google.com/oauthplayground?test=1&test=2',
+            'response_type'    => 'code',
+            'scope'            => 'https://www.test.com/users/activities.read https://www.test.com/users/activities.write'
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+        $status   = $response->getStatusCode();
+        $content  = $response->getContent();
+    }
+
     public function testToken(){
 
         $params = array(
-            'code'          => '5wXwH623NLJ+gXz7BUk+zrUuVB1mN1vX',
+            'code'          => 'KSu6nBO2WCm66myvxcctxGM4niry6KuU',
             'redirect_uri'  => 'https://developers.google.com/oauthplayground',
             'grant_type'    => 'authorization_code',
         );
 
-        $client_id     = '1';
-        $client_secret = '44FuVlIL8qA8YISg';
+        $client_id     = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+        $client_secret = 'ITc/6Y5N7kOtGKhg';
+
         $response = $this->action("POST", "OAuth2ProviderController@token",
             $params,
             array(),

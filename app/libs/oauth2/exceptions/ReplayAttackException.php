@@ -7,8 +7,15 @@ use Exception;
 class ReplayAttackException extends Exception
 {
 
-    public function __construct($message = "")
+    private $auth_code;
+
+    public function getAuthCode(){
+        return $this->auth_code;
+    }
+
+    public function __construct($auth_code,$message = "")
     {
+        $this->auth_code = $auth_code;
         $message = "Possible Replay Attack : " . $message;
         parent::__construct($message, 0, null);
     }

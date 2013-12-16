@@ -89,7 +89,7 @@
                             @if ( in_array($scope->id,$selected_scopes))
                                 checked
                             @endif
-                            value="{{$scope->id}}"/>{{$scope->short_description}}&nbsp;<i class="icon-info-sign accordion-toggle" title="{{$scope->description}}"></i>
+                            value="{{$scope->id}}"/>{{$scope->name}}&nbsp;<i class="icon-info-sign accordion-toggle" title="{{$scope->description}}"></i>
                     </label>
                 </li>
             @endforeach

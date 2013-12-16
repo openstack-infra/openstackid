@@ -11,7 +11,7 @@ use utils\services\ISecurityPolicyCounterMeasure;
 
 class LockUserSecurityPolicy implements ISecurityPolicy
 {
-
+    private $counter_measure;
     /**
      * Check if current security policy is meet or not
      * @return boolean
@@ -43,7 +43,7 @@ class LockUserSecurityPolicy implements ISecurityPolicy
                     if (!is_null($user_identifier) && !empty($user_identifier))
                         $this->counter_measure->trigger(array('user_identifier' => $user_identifier));
                 }
-                    break;
+                break;
             }
         } catch (Exception $ex) {
             Log::error($ex);

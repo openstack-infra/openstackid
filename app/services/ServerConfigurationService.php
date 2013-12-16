@@ -3,11 +3,11 @@
 namespace services;
 
 use Exception;
-use openid\services\IServerConfigurationService;
+use openid\services\IServerConfigurationService as IOpenIdServerConfigurationService;
 use ServerConfiguration;
+use utils\services\IServerConfigurationService;
 
-
-class ServerConfigurationService implements IServerConfigurationService
+class ServerConfigurationService implements IOpenIdServerConfigurationService,IServerConfigurationService
 {
 
     const DefaultAssetsUrl = 'http://www.openstack.org/';
@@ -46,21 +46,31 @@ class ServerConfigurationService implements IServerConfigurationService
         $this->default_config_params["MaxFailed.LoginAttempts.2ShowCaptcha"] = 3;
         $this->default_config_params["Nonce.Lifetime"] = 360;
         $this->default_config_params["Assets.Url"] = 'http://www.openstack.org/';
-        $this->default_config_params["BlacklistSecurityPolicy.BannedIpLifeTimeSeconds"] = 21600;
+
+        $this->default_config_params["BannedIpLifeTimeSeconds"] = 21600;
         $this->default_config_params["BlacklistSecurityPolicy.MinutesWithoutExceptions"] = 5;
         $this->default_config_params["BlacklistSecurityPolicy.ReplayAttackExceptionInitialDelay"] = 10;
         $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidNonceAttempts"] = 10;
         $this->default_config_params["BlacklistSecurityPolicy.InvalidNonceInitialDelay"] = 10;
-        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidOpenIdMessageExceptionAttempts"] = 10;
-        $this->default_config_params["BlacklistSecurityPolicy.InvalidOpenIdMessageExceptionInitialDelay"] = 10;
-        $this->default_config_params["BlacklistSecurityPolicy.MaxOpenIdInvalidRealmExceptionAttempts"] = 10;
-        $this->default_config_params["BlacklistSecurityPolicy.OpenIdInvalidRealmExceptionInitialDelay"] = 10;
-        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidOpenIdMessageModeAttempts"] = 10;
-        $this->default_config_params["BlacklistSecurityPolicy.InvalidOpenIdMessageModeInitialDelay"] = 10;
-        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidOpenIdAuthenticationRequestModeAttempts"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidOpenIdMessageExceptionAttempts"]           = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.InvalidOpenIdMessageExceptionInitialDelay"]          = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxOpenIdInvalidRealmExceptionAttempts"]             = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.OpenIdInvalidRealmExceptionInitialDelay"]            = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidOpenIdMessageModeAttempts"]                = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.InvalidOpenIdMessageModeInitialDelay"]               = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidOpenIdAuthenticationRequestModeAttempts"]  = 10;
         $this->default_config_params["BlacklistSecurityPolicy.InvalidOpenIdAuthenticationRequestModeInitialDelay"] = 10;
-        $this->default_config_params["BlacklistSecurityPolicy.MaxAuthenticationExceptionAttempts"] = 10;
-        $this->default_config_params["BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay"] = 20;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxAuthenticationExceptionAttempts"]                 = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay"]                = 20;
+
+        $this->default_config_params["AuthorizationCodeRedeemPolicy.MinutesWithoutExceptions"]         = 5;
+        $this->default_config_params["AuthorizationCodeRedeemPolicy.MaxAuthCodeReplayAttackAttempts"]  = 3;
+        $this->default_config_params["AuthorizationCodeRedeemPolicy.AuthCodeReplayAttackInitialDelay"] = 10;
+
+        $this->default_config_params["AuthorizationCodeRedeemPolicy.MaxInvalidAuthorizationCodeAttempts"]  = 3;
+        $this->default_config_params["AuthorizationCodeRedeemPolicy.InvalidAuthorizationCodeInitialDelay"] = 10;
+
+
 
     }
 
