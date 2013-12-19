@@ -31,6 +31,6 @@ class LogService implements ILogService
 
     public function error_msg($msg)
     {
-        Log::warning($msg);
+        Log::error($msg);
     }
 }
