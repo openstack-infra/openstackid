@@ -7,3 +7,5 @@ composer.lock
 .idea/*
 
 .idea
+app/config/dev/database.php
+app/config/testing/database.php

@@ -1,13 +1,8 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/17/13
- * Time: 4:10 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\helpers;
+
+use openid\exceptions\InvalidTLDException;
 
 define('OpenIdUriHelper_TLDs',
     '/\.(ac|ad|ae|aero|af|ag|ai|al|am|an|ao|aq|ar|arpa|as|asia' .
@@ -365,7 +360,7 @@ class OpenIdUriHelper
         // it's not sane.
         preg_match(OpenIdUriHelper_TLDs, $parts['host'], $matches);
         if (!$matches) {
-            return false;
+            throw new InvalidTLDException(sprintf("current host %s",$parts['host']));
         }
         $tld = $matches[1];
 
