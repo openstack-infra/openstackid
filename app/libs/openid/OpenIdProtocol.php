@@ -62,8 +62,8 @@ class OpenIdProtocol implements IOpenIdProtocol
     const OpenIdProtocol_DHConsumerPublic = "dh_consumer_public";
     const OpenIdProtocol_ExpiresIn = "expires_in";
     const OpenIdProtocol_DHServerPublic = "dh_server_public";
-    const OpenIdProtocol_DHEncMacKey = "enc_mac_key ";
-    const OpenIdProtocol_MacKey = "mac_key ";
+    const OpenIdProtocol_DHEncMacKey = "enc_mac_key";
+    const OpenIdProtocol_MacKey = "mac_key";
     private static $OpenIDProtocol_SupportedAssocType = array(
         self::SignatureAlgorithmHMAC_SHA1,
         self::SignatureAlgorithmHMAC_SHA256
