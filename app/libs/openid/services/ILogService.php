@@ -13,5 +13,7 @@ interface ILogService
 
     public function warning_msg($msg);
 
+    public function error_msg($msg);
+
     public function info(Exception $exception);
 } 

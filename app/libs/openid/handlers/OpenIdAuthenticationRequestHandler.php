@@ -112,31 +112,31 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             $this->checkpoint_service->trackException($inv_assoc_type);
             $this->log->warning($inv_assoc_type);
             if(!is_null($this->current_request))
-                $this->log->error("current request: ".$this->current_request->toString());
+                $this->log->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse($inv_assoc_type->getMessage(), null, null, $this->current_request);
         } catch (OpenIdInvalidRealmException $inv_realm_ex) {
             $this->checkpoint_service->trackException($inv_realm_ex);
             $this->log->error($inv_realm_ex);
             if(!is_null($this->current_request))
-                $this->log->error("current request: ".$this->current_request->toString());
+                $this->log->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse($inv_realm_ex->getMessage(), null, null, $this->current_request);
         } catch (ReplayAttackException $replay_ex) {
             $this->checkpoint_service->trackException($replay_ex);
             $this->log->error($replay_ex);
             if(!is_null($this->current_request))
-                $this->log->error("current request: ".$this->current_request->toString());
+                $this->log->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse($replay_ex->getMessage(), null, null, $this->current_request);
         } catch (InvalidOpenIdMessageException $inv_msg_ex) {
             $this->checkpoint_service->trackException($inv_msg_ex);
             $this->log->error($inv_msg_ex);
             if(!is_null($this->current_request))
-                $this->log->error("current request: ".$this->current_request->toString());
+                $this->log->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse($inv_msg_ex->getMessage(), null, null, $this->current_request);
         } catch (Exception $ex) {
             $this->checkpoint_service->trackException($ex);
             $this->log->error($ex);
             if(!is_null($this->current_request))
-                $this->log->error("current request: ".$this->current_request->toString());
+                $this->log->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse("Server Error", null, null, $this->current_request);
         }
     }

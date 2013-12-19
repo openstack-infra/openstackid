@@ -28,4 +28,9 @@ class LogService implements ILogService
     {
         Log::warning($msg);
     }
+
+    public function error_msg($msg)
+    {
+        Log::warning($msg);
+    }
 }
