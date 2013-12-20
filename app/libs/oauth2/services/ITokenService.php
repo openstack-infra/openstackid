@@ -37,7 +37,7 @@ interface ITokenService {
 
     /**
      * @param $value
-     * @throws \oauth2\exceptions\InvalidAccessTokenException
+     * @return AccessToken
      */
     public function getAccessToken($value);
 

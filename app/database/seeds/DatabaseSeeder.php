@@ -13,8 +13,6 @@ class DatabaseSeeder extends Seeder {
 
         $this->call('OpenIdExtensionsSeeder');
         $this->call('ServerConfigurationSeeder');
-        $this->call('ApiSeeder');
-        $this->call('ApiScopeSeeder');
 	}
 
 }

@@ -16,8 +16,9 @@ use oauth2\OAuth2Protocol;
 use oauth2\requests\OAuth2Request;
 use oauth2\responses\OAuth2AccessTokenResponse;
 use oauth2\responses\OAuth2AuthorizationResponse;
-use oauth2\services\IClientService;
+
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
+use oauth2\services\IClientService;
 use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use ReflectionClass;
@@ -32,16 +33,14 @@ use utils\services\IAuthService;
 class AuthorizationCodeGrantType implements IGrantType
 {
 
-    private $client_service;
-    private $token_service;
+
     private $auth_service;
     private $auth_strategy;
     private $memento_service;
 
     public function __construct(IClientService $client_service, ITokenService $token_service, IAuthService $auth_service, IMementoOAuth2AuthenticationRequestService $memento_service, IOAuth2AuthenticationStrategy $auth_strategy)
     {
-        $this->client_service = $client_service;
-        $this->token_service = $token_service;
+        parent::__construct($client_service,$token_service);
         $this->auth_service = $auth_service;
         $this->memento_service = $memento_service;
         $this->auth_strategy = $auth_strategy;
@@ -143,33 +142,17 @@ class AuthorizationCodeGrantType implements IGrantType
         $class_name = $reflector->getName();
         if ($class_name == 'oauth2\requests\OAuth2AccessTokenRequest') {
 
-            //get client credentials from request..
-            list($current_client_id, $current_client_secret) = $this->client_service->getCurrentClientAuthInfo();
-
-            if (empty($current_client_id) || empty($current_client_secret))
-                throw new InvalidClientException;
-
-            //retrieve client from storage..
-            $current_client = $this->client_service->getClientById($current_client_id);
-
-            if (is_null($current_client))
-                throw new InvalidClientException;
-
-            if(!$current_client->isActive() || $current_client->isLocked()){
-                throw new UnAuthorizedClientException();
-            }
+            parent::completeFlow($request);
 
             //only confidential clients could use this grant type
-            if ($current_client->getClientType() !== IClient::ClientType_Confidential)
+            if ($this->current_client->getClientType() !== IClient::ClientType_Confidential)
                 throw new UnAuthorizedClientException();
 
-            //verify client credentials
-            if ($current_client->getClientSecret() !== $current_client_secret)
-                throw new UnAuthorizedClientException;
+
 
             $current_redirect_uri = $request->getRedirectUri();
             //verify redirect uri
-            if (!$current_client->isUriAllowed($current_redirect_uri))
+            if (!$this->current_client->isUriAllowed($current_redirect_uri))
                 throw new UriNotAllowedException();
 
             $code = $request->getCode();
@@ -191,7 +174,7 @@ class AuthorizationCodeGrantType implements IGrantType
             //ensure that the authorization code was issued to the authenticated
             //confidential client, or if the client is public, ensure that the
             //code was issued to "client_id" in the request
-            if ($client_id !== $current_client_id)
+            if ($client_id !== $this->current_client_id)
                 throw new UnAuthorizedClientException;
 
 
@@ -205,7 +188,7 @@ class AuthorizationCodeGrantType implements IGrantType
             $access_token = $this->token_service->createAccessToken($auth_code, $current_redirect_uri);
             //emits refresh token
             $refresh_token = null;
-            if ($current_client->use_refresh_token)
+            if ($this->current_client->use_refresh_token)
                 $refresh_token = $this->token_service->createRefreshToken($access_token);
 
             $response = new OAuth2AccessTokenResponse($access_token->getValue(), $access_token->getLifetime(), !is_null($refresh_token) ? $refresh_token->getValue() : null);
@@ -215,13 +198,8 @@ class AuthorizationCodeGrantType implements IGrantType
         throw new Exception('Invalid Request Type');
     }
 
-    public function getResponseType()
-    {
-        return OAuth2Protocol::OAuth2Protocol_ResponseType_Code;
-    }
-
     public function getType()
     {
-        // TODO: Implement getType() method.
+        return OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode;
     }
 }

@@ -16,7 +16,7 @@ class CreateOauth2ClientsTable extends Migration {
             $table->bigIncrements('id')->unsigned();
             $table->string('app_name',255);
             $table->text('app_description');
-            $table->string('app_logo',255);
+            $table->string('app_logo',255)->nullable();
             $table->string('client_id',255)->unique();
             $table->string('client_secret',255)->nullable();
             $table->smallInteger('client_type');

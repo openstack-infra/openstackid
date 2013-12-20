@@ -28,8 +28,10 @@ $app->redirectIfTrailingSlash();
 
 $env = $app->detectEnvironment(array(
 
-	'dev' => array('dev.openstackid.com'),
-
+    'local'      => array('dev.openstackid.com'),
+	'dev'        => array('openstackid.dev10.tipit.net','openstackid-dev.openstack.org'),
+    'staging'    => array(),
+    'production' => array(),
 ));
 
 /*
@@ -85,3 +87,4 @@ Auth::extend('custom', function($app) {
 */
 
 return $app;
+

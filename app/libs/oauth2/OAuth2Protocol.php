@@ -2,6 +2,7 @@
 
 namespace oauth2;
 
+use Exception;
 use oauth2\requests\OAuth2Request;
 use oauth2\endpoints\AuthorizationEndpoint;
 use oauth2\endpoints\TokenEndpoint;
@@ -14,18 +15,23 @@ use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\exceptions\OAuth2GenericException;
 use oauth2\exceptions\AccessDeniedException;
 use oauth2\exceptions\ExpiredAuthorizationCodeException;
-use Exception;
+use oauth2\exceptions\InvalidAccessTokenException;
+use oauth2\exceptions\InvalidAuthorizationCodeException;
+use oauth2\exceptions\ReplayAttackException;
+
 use oauth2\responses\OAuth2DirectErrorResponse;
 use oauth2\responses\OAuth2IndirectErrorResponse;
+
 use utils\services\ILogService;
 use oauth2\services\IClientService;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\ITokenService;
 use utils\services\IAuthService;
-use oauth2\strategies\IOAuth2AuthenticationStrategy;
-use oauth2\exceptions\InvalidAuthorizationCodeException;
-use oauth2\exceptions\ReplayAttackException;
 use utils\services\ICheckPointService;
+
+use oauth2\strategies\IOAuth2AuthenticationStrategy;
+
+
 
 /**
  * Class OAuth2Protocol
@@ -81,6 +87,7 @@ class OAuth2Protocol implements  IOAuth2Protocol{
     const OAuth2Protocol_ClientSecret                  = "client_secret";
 
     const OAuth2Protocol_AccessToken                   = "access_token";
+    const OAuth2Protocol_Token                         = "token";
     const OAuth2Protocol_TokenType                     = "token_type";
     const OAuth2Protocol_AccessToken_ExpiresIn         = "expires_in";
     const OAuth2Protocol_RefreshToken                  = "refresh_token";
@@ -88,6 +95,7 @@ class OAuth2Protocol implements  IOAuth2Protocol{
 
     const OAuth2Protocol_RedirectUri                   = "redirect_uri";
     const OAuth2Protocol_Scope                         = "scope";
+    const OAuth2Protocol_Audience                      = "audience";
     const OAuth2Protocol_State                         = "state";
     const OAuth2Protocol_GrantType                     = 'grant_type';
 
@@ -102,6 +110,8 @@ class OAuth2Protocol implements  IOAuth2Protocol{
     const OAuth2Protocol_Error_AccessDenied            = "access_denied";
     const OAuth2Protocol_Error_UnsupportedResponseType = "unsupported_response_type";
     const OAuth2Protocol_Error_InvalidScope            = "invalid_scope";
+    const OAuth2Protocol_Error_UnsupportedGrantType    = "unsupported_grant_type";
+    const OAuth2Protocol_Error_InvalidGrant            = "invalid_grant";
     const OAuth2Protocol_Error_ServerError             = "server_error";
     const OAuth2Protocol_Error_TemporallyUnavailable   = "temporally_unavailable";
 
@@ -274,6 +284,11 @@ class OAuth2Protocol implements  IOAuth2Protocol{
             $this->log_service->error($ex7);
             $this->checkpoint_service->trackException($ex7);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
+        }
+        catch(InvalidAccessTokenException $ex8){
+            $this->log_service->error($ex8);
+            $this->checkpoint_service->trackException($ex8);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidGrant);
         }
         catch(Exception $ex){
             $this->log_service->error($ex);
