@@ -7,7 +7,7 @@ use oauth2\OAuth2Protocol;
 
 /**
  * Class OAuth2AccessTokenResponse
- * Implementation of http://tools.ietf.org/html/rfc6749#section-4.1.4
+ * http://tools.ietf.org/html/rfc6749#section-4.1.4
  * @package oauth2\responses
  */
 class OAuth2AccessTokenResponse extends OAuth2DirectResponse {

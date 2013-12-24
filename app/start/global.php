@@ -11,9 +11,10 @@
 |
 */
 use openid\exceptions\InvalidOpenIdMessageException;
-use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
 use \utils\services\UtilsServiceCatalog;
+use oauth2\exceptions\InvalidOAuth2Request;
+
 ClassLoader::addDirectories(array(
 
     app_path() . '/commands',
@@ -77,6 +78,17 @@ App::error(function (InvalidOpenIdMessageException $exception, $code) {
     }
     return View::make('404');
 });
+
+App::error(function (InvalidOAuth2Request $exception, $code) {
+    $checkpoint_service = Registry::getInstance()->get(UtilsServiceCatalog::CheckPointService);
+    Log::error($exception);
+    if($checkpoint_service ){
+        $checkpoint_service->trackException($exception);
+    }
+    return View::make('404');
+});
+
+
 
 /*
 |--------------------------------------------------------------------------

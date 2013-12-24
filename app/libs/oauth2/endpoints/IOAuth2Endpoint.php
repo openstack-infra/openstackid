@@ -9,4 +9,4 @@ use oauth2\requests\OAuth2Request;
  */
 interface IOAuth2Endpoint {
     public function handle(OAuth2Request $request);
-} 
+}

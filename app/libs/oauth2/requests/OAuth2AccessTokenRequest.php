@@ -4,21 +4,24 @@ namespace oauth2\requests;
 
 use oauth2\OAuth2Protocol;
 
-class OAuth2AccessTokenRequest  extends OAuth2Request {
+/**
+ * Class OAuth2AccessTokenRequest
+ * http://tools.ietf.org/html/rfc6749#section-4.1.3
+ * @package oauth2\requests
+ */
+class OAuth2AccessTokenRequest extends OAuth2Request {
 
-    public function __construct(array $values)
+    private $msg;
+
+    public function __construct(OAuth2TokenRequest $msg)
     {
-        parent::__construct($values);
+        parent::__construct($msg->container);
+        $this->msg = $msg;
     }
 
     public function isValid()
     {
-        $grant_type = $this->getGrantType();
-
-        if(is_null($grant_type))
-            return false;
-
-        if(!array_key_exists($grant_type,OAuth2Protocol::$valid_grant_types))
+        if(!$this->msg->isValid())
             return false;
 
         $redirect_uri = $this->getRedirectUri();
@@ -34,10 +37,6 @@ class OAuth2AccessTokenRequest  extends OAuth2Request {
 
     public function getRedirectUri(){
         return isset($this[OAuth2Protocol::OAuth2Protocol_RedirectUri])?$this[OAuth2Protocol::OAuth2Protocol_RedirectUri]:null;
-    }
-
-    public function getGrantType(){
-        return isset($this[OAuth2Protocol::OAuth2Protocol_GrantType])?$this[OAuth2Protocol::OAuth2Protocol_GrantType]:null;
     }
 
     public function getCode(){

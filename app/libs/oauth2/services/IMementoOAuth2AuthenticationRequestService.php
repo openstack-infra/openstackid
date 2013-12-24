@@ -16,10 +16,6 @@ interface IMementoOAuth2AuthenticationRequestService {
      */
     public function getCurrentAuthorizationRequest();
 
-    /**
-     * @return OAuth2AccessTokenRequest
-     */
-    public function getCurrentAccessTokenRequest();
 
     public function clearCurrentRequest();
 } 

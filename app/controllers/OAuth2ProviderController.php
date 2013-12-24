@@ -2,7 +2,7 @@
 
 use oauth2\IOAuth2Protocol;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
-use oauth2\exceptions\InvalidAuthorizationRequestException;
+use oauth2\requests\OAuth2TokenRequest;
 use oauth2\strategies\OAuth2ResponseStrategyFactoryMethod;
 
 /**
@@ -42,8 +42,7 @@ class OAuth2ProviderController extends BaseController {
      * @return mixed
      */
     public function token(){
-        $request   = $this->memento_service->getCurrentAccessTokenRequest();
-        $response  = $this->oauth2_protocol->token($request);
+        $response  = $this->oauth2_protocol->token( $msg = new OAuth2TokenRequest(Input::all()));
         $reflector = new ReflectionClass($response);
         if ($reflector->isSubclassOf('oauth2\\responses\\OAuth2Response')) {
             $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($response);

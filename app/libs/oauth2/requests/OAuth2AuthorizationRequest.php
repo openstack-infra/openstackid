@@ -4,13 +4,17 @@ namespace oauth2\requests;
 
 use oauth2\OAuth2Protocol;
 
+/**
+ * Class OAuth2AuthorizationRequest
+ * http://tools.ietf.org/html/rfc6749#section-4.1.1
+ * @package oauth2\requests
+ */
 class OAuth2AuthorizationRequest extends OAuth2Request {
 
     public function __construct(array $values)
     {
         parent::__construct($values);
     }
-
 
     public static $params = array(
         OAuth2Protocol::OAuth2Protocol_ResponseType => OAuth2Protocol::OAuth2Protocol_ResponseType,

@@ -8,6 +8,8 @@ use oauth2\services\OAuth2Request;
 use oauth2\requests\OAuth2AuthorizationRequest;
 use Input;
 use Session;
+use oauth2\OAuth2Protocol;
+use oauth2\requests\OAuth2TokenRequest;
 
 class MementoOAuth2AuthenticationRequestService  implements IMementoOAuth2AuthenticationRequestService{
 
@@ -74,9 +76,5 @@ class MementoOAuth2AuthenticationRequestService  implements IMementoOAuth2Authen
         // TODO: Implement clearCurrentRequest() method.
     }
 
-    public function getCurrentAccessTokenRequest()
-    {
-        $msg = new OAuth2AccessTokenRequest(Input::all());
-        return $msg;
-    }
+
 }

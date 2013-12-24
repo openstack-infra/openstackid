@@ -11,6 +11,8 @@ use oauth2\exceptions\ScopeNotAllowedException;
 use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
+use oauth2\exceptions\InvalidOAuth2Request;
+
 use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
 use oauth2\requests\OAuth2Request;
@@ -23,6 +25,8 @@ use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use ReflectionClass;
 use utils\services\IAuthService;
+use oauth2\requests\OAuth2TokenRequest;
+use oauth2\requests\OAuth2AccessTokenRequest;
 
 /**
  * Class AuthorizationCodeGrantType
@@ -30,7 +34,7 @@ use utils\services\IAuthService;
  * http://tools.ietf.org/html/rfc6749#section-4.1
  * @package oauth2\grant_types
  */
-class AuthorizationCodeGrantType implements IGrantType
+class AuthorizationCodeGrantType extends AbstractGrantType
 {
 
 
@@ -52,7 +56,7 @@ class AuthorizationCodeGrantType implements IGrantType
         $class_name = $reflector->getName();
         return
             ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest' && $request->isValid()) ||
-            ($class_name == 'oauth2\requests\OAuth2AccessTokenRequest' && $request->isValid() && $request->getGrantType() == OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode);
+            ($class_name == 'oauth2\requests\OAuth2TokenRequest'         && $request->isValid() && $request->getGrantType() == $this->getType() );
     }
 
     /**
@@ -76,7 +80,7 @@ class AuthorizationCodeGrantType implements IGrantType
 
             $response_type = $request->getResponseType();
 
-            if ($response_type !== OAuth2Protocol::OAuth2Protocol_ResponseType_Code)
+            if ($response_type !== $this->getResponseType())
                 throw new UnsupportedResponseTypeException(sprintf("response_type %s", $response_type));
 
             $client = $this->client_service->getClientById($client_id);
@@ -123,7 +127,7 @@ class AuthorizationCodeGrantType implements IGrantType
                 $response->setState($state);
             return $response;
         }
-        throw new Exception('Invalid Request Type');
+        throw new InvalidOAuth2Request;
     }
 
     /** Implementation of http://tools.ietf.org/html/rfc6749#section-4.1.3
@@ -201,5 +205,15 @@ class AuthorizationCodeGrantType implements IGrantType
     public function getType()
     {
         return OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode;
+    }
+
+    public function getResponseType(){
+        return  OAuth2Protocol::OAuth2Protocol_ResponseType_Code;
+    }
+
+    public function buildTokenRequest(OAuth2TokenRequest $msg){
+        if($msg->getGrantType() !== $this->getType())
+            return null;
+         return new OAuth2AccessTokenRequest($msg);
     }
 }

@@ -3,28 +3,25 @@
 namespace oauth2\requests;
 
 use oauth2\OAuth2Protocol;
-use oauth2\grant_types\ValidateBearerTokenGrantType;
 
 /**
  * Class OAuth2AccessTokenValidationRequest
  * @package oauth2\requests
  */
 
-class OAuth2AccessTokenValidationRequest extends OAuth2Request{
+class OAuth2AccessTokenValidationRequest  extends OAuth2Request{
 
-    public function __construct(array $values)
+    private $msg;
+
+    public function __construct(OAuth2TokenRequest $msg)
     {
-        parent::__construct($values);
+        parent::__construct($msg->container);
+        $this->msg = $msg;
     }
 
     public function isValid()
     {
-        $grant_type = $this->getGrantType();
-
-        if(is_null($grant_type))
-            return false;
-
-        if($grant_type!==ValidateBearerTokenGrantType::OAuth2Protocol_GrantType_Extension_ValidateBearerToken)
+        if(!$this->msgisValid())
             return false;
 
         $token = $this->getToken();
@@ -33,10 +30,6 @@ class OAuth2AccessTokenValidationRequest extends OAuth2Request{
             return false;
 
         return true;
-    }
-
-    public function getGrantType(){
-        return isset($this[OAuth2Protocol::OAuth2Protocol_GrantType])?$this[OAuth2Protocol::OAuth2Protocol_GrantType]:null;
     }
 
     public function getToken(){

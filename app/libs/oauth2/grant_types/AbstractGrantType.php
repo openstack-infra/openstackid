@@ -32,9 +32,9 @@ abstract class AbstractGrantType implements IGrantType {
     public function completeFlow(OAuth2Request $request)
     {
         //get client credentials from request..
-        list($this->current_client_id, $this->$current_client_secret) = $this->client_service->getCurrentClientAuthInfo();
+        list($this->current_client_id, $this->current_client_secret) = $this->client_service->getCurrentClientAuthInfo();
 
-        if (empty($this->current_client_id) || empty($this->$current_client_secret))
+        if (empty($this->current_client_id) || empty($this->current_client_secret))
             throw new InvalidClientException;
 
         //retrieve client from storage..
