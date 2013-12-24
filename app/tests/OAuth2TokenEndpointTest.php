@@ -50,6 +50,7 @@ class OAuth2TokenEndpointTest extends TestCase
 
 
         try {
+
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
             $client_secret = 'ITc/6Y5N7kOtGKhg';
 
@@ -123,10 +124,10 @@ class OAuth2TokenEndpointTest extends TestCase
             $content = $response->getContent();
 
             $response = json_decode($content);
-            $new_access_token = $response->access_token;
+            $test_access_token = $response->access_token;
 
-            $this->assertTrue(!empty($new_access_token));
-            $this->assertTrue($new_access_token===$access_token);
+            $this->assertTrue(!empty($test_access_token));
+            $this->assertTrue($test_access_token === $access_token);
 
         } catch (Exception $ex) {
             throw $ex;

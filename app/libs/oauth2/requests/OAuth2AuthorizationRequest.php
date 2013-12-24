@@ -3,6 +3,7 @@
 namespace oauth2\requests;
 
 use oauth2\OAuth2Protocol;
+use oauth2\OAuth2Message;
 
 /**
  * Class OAuth2AuthorizationRequest
@@ -11,9 +12,9 @@ use oauth2\OAuth2Protocol;
  */
 class OAuth2AuthorizationRequest extends OAuth2Request {
 
-    public function __construct(array $values)
+    public function __construct(OAuth2Message $msg)
     {
-        parent::__construct($values);
+        parent::__construct($msg);
     }
 
     public static $params = array(
@@ -25,38 +26,37 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
     );
 
     public function getResponseType(){
-        return $this[OAuth2Protocol::OAuth2Protocol_ResponseType];
+        return $this->getParam(OAuth2Protocol::OAuth2Protocol_ResponseType);
     }
 
     public function getClientId(){
-        return $this[OAuth2Protocol::OAuth2Protocol_ClientId];
+        return $this->getParam(OAuth2Protocol::OAuth2Protocol_ClientId);
     }
 
     public function getRedirectUri(){
-        return $this[OAuth2Protocol::OAuth2Protocol_RedirectUri];
+        return $this->getParam(OAuth2Protocol::OAuth2Protocol_RedirectUri);
     }
 
     public function getScope(){
-        return $this[OAuth2Protocol::OAuth2Protocol_Scope];
+        return $this->getParam(OAuth2Protocol::OAuth2Protocol_Scope);
     }
 
-
     public function getState(){
-        return (isset($this[OAuth2Protocol::OAuth2Protocol_State]))? $this[OAuth2Protocol::OAuth2Protocol_State]:null;
+        return $this->getParam(OAuth2Protocol::OAuth2Protocol_State);
     }
 
     public function isValid()
     {
-        if(!isset($this[OAuth2Protocol::OAuth2Protocol_ResponseType]))
+        if(is_null($this->getResponseType()))
             return false;
 
-        if(!isset($this[OAuth2Protocol::OAuth2Protocol_ClientId]))
+        if(is_null($this->getClientId()))
             return false;
 
-        if(!isset($this[OAuth2Protocol::OAuth2Protocol_RedirectUri]))
+        if(is_null($this->getRedirectUri()))
             return false;
 
-        if(!isset($this[OAuth2Protocol::OAuth2Protocol_Scope]))
+        if(is_null($this->getScope()))
             return false;
 
         return true;

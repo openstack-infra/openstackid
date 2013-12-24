@@ -6,27 +6,26 @@ use Exception;
 use oauth2\exceptions\AccessDeniedException;
 use oauth2\exceptions\InvalidAuthorizationCodeException;
 use oauth2\exceptions\InvalidClientException;
+use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\OAuth2GenericException;
 use oauth2\exceptions\ScopeNotAllowedException;
 use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\exceptions\UnsupportedResponseTypeException;
-use oauth2\exceptions\UriNotAllowedException;
-use oauth2\exceptions\InvalidOAuth2Request;
 
+use oauth2\exceptions\UriNotAllowedException;
 use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
+use oauth2\requests\OAuth2AccessTokenRequest;
 use oauth2\requests\OAuth2Request;
 use oauth2\responses\OAuth2AccessTokenResponse;
-use oauth2\responses\OAuth2AuthorizationResponse;
 
-use oauth2\services\IMementoOAuth2AuthenticationRequestService;
+use oauth2\responses\OAuth2AuthorizationResponse;
 use oauth2\services\IClientService;
+use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use ReflectionClass;
 use utils\services\IAuthService;
-use oauth2\requests\OAuth2TokenRequest;
-use oauth2\requests\OAuth2AccessTokenRequest;
 
 /**
  * Class AuthorizationCodeGrantType
@@ -44,7 +43,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
 
     public function __construct(IClientService $client_service, ITokenService $token_service, IAuthService $auth_service, IMementoOAuth2AuthenticationRequestService $memento_service, IOAuth2AuthenticationStrategy $auth_strategy)
     {
-        parent::__construct($client_service,$token_service);
+        parent::__construct($client_service, $token_service);
         $this->auth_service = $auth_service;
         $this->memento_service = $memento_service;
         $this->auth_strategy = $auth_strategy;
@@ -56,7 +55,12 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         $class_name = $reflector->getName();
         return
             ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest' && $request->isValid()) ||
-            ($class_name == 'oauth2\requests\OAuth2TokenRequest'         && $request->isValid() && $request->getGrantType() == $this->getType() );
+            ($class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() === $this->getType());
+    }
+
+    public function getType()
+    {
+        return OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode;
     }
 
     /**
@@ -130,6 +134,11 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         throw new InvalidOAuth2Request;
     }
 
+    public function getResponseType()
+    {
+        return OAuth2Protocol::OAuth2Protocol_ResponseType_Code;
+    }
+
     /** Implementation of http://tools.ietf.org/html/rfc6749#section-4.1.3
      * @param OAuth2Request $request
      * @return OAuth2AccessTokenResponse
@@ -151,7 +160,6 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             //only confidential clients could use this grant type
             if ($this->current_client->getClientType() !== IClient::ClientType_Confidential)
                 throw new UnAuthorizedClientException();
-
 
 
             $current_redirect_uri = $request->getRedirectUri();
@@ -202,18 +210,15 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         throw new Exception('Invalid Request Type');
     }
 
-    public function getType()
+    public function buildTokenRequest(OAuth2Request $request)
     {
-        return OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode;
-    }
-
-    public function getResponseType(){
-        return  OAuth2Protocol::OAuth2Protocol_ResponseType_Code;
-    }
-
-    public function buildTokenRequest(OAuth2TokenRequest $msg){
-        if($msg->getGrantType() !== $this->getType())
-            return null;
-         return new OAuth2AccessTokenRequest($msg);
+        $reflector = new ReflectionClass($request);
+        $class_name = $reflector->getName();
+        if ($class_name == 'oauth2\requests\OAuth2TokenRequest') {
+            if ($request->getGrantType() !== $this->getType())
+                return null;
+            return new OAuth2AccessTokenRequest($request->getMessage());
+        }
+        return null;
     }
 }

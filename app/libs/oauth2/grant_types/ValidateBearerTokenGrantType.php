@@ -9,6 +9,7 @@ use oauth2\responses\OAuth2AccessTokenValidationResponse;
 use oauth2\services\IClientService;
 use oauth2\services\ITokenService;
 use ReflectionClass;
+use oauth2\OAuth2Message;
 
 /**
  * Class ValidateBearerTokenGrantType
@@ -28,7 +29,7 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
     {
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
-        return $class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() == $this->getType();
+        return $class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() === $this->getType();
     }
 
     public function getType()
@@ -61,11 +62,16 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
         return null;
     }
 
-    public function buildTokenRequest(OAuth2TokenRequest $msg)
+    public function buildTokenRequest(OAuth2Request $request)
     {
-        if ($msg->getGrantType() !== $this->getType())
-            return null;
-        return new OAuth2AccessTokenValidationRequest($msg);
+        $reflector = new ReflectionClass($request);
+        $class_name = $reflector->getName();
+        if ($class_name == 'oauth2\requests\OAuth2TokenRequest') {
+            if($request->getGrantType() !== $this->getType())
+                return null;
+            return new OAuth2AccessTokenValidationRequest($request->getMessage());
+        }
+        return null;
     }
 
 }

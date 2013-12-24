@@ -3,25 +3,22 @@
 namespace oauth2\requests;
 
 use oauth2\OAuth2Protocol;
-
+use oauth2\OAuth2Message;
 /**
  * Class OAuth2AccessTokenValidationRequest
  * @package oauth2\requests
  */
 
-class OAuth2AccessTokenValidationRequest  extends OAuth2Request{
+class OAuth2AccessTokenValidationRequest  extends OAuth2TokenRequest {
 
-    private $msg;
-
-    public function __construct(OAuth2TokenRequest $msg)
+    public function __construct(OAuth2Message $msg)
     {
-        parent::__construct($msg->container);
-        $this->msg = $msg;
+        parent::__construct($msg);
     }
 
     public function isValid()
     {
-        if(!$this->msgisValid())
+        if(!parent::isValid())
             return false;
 
         $token = $this->getToken();
@@ -33,6 +30,6 @@ class OAuth2AccessTokenValidationRequest  extends OAuth2Request{
     }
 
     public function getToken(){
-        return isset($this[OAuth2Protocol::OAuth2Protocol_Token])?$this[OAuth2Protocol::OAuth2Protocol_Token]:null;
+        return $this->getParam(OAuth2Protocol::OAuth2Protocol_Token);
     }
 }

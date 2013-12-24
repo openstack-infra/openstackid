@@ -1,7 +1,7 @@
 <?php
 namespace oauth2\requests;
 
-
+use oauth2\OAuth2Message;
 use oauth2\OAuth2Protocol;
 
 /**
@@ -11,9 +11,9 @@ use oauth2\OAuth2Protocol;
  */
 class OAuth2TokenRequest extends OAuth2Request {
 
-    public function __construct(array $values)
+    public function __construct(OAuth2Message $msg)
     {
-        parent::__construct($values);
+        parent::__construct($msg);
     }
 
     public function isValid()
@@ -27,6 +27,7 @@ class OAuth2TokenRequest extends OAuth2Request {
     }
 
     public function getGrantType(){
-        return isset($this[OAuth2Protocol::OAuth2Protocol_GrantType])?$this[OAuth2Protocol::OAuth2Protocol_GrantType]:null;
+
+        return $this->getParam(OAuth2Protocol::OAuth2Protocol_GrantType);
     }
 } 

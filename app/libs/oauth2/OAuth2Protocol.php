@@ -21,6 +21,7 @@ use oauth2\exceptions\UriNotAllowedException;
 
 use oauth2\requests\OAuth2Request;
 
+use oauth2\requests\OAuth2TokenRequest;
 use oauth2\responses\OAuth2DirectErrorResponse;
 use oauth2\responses\OAuth2IndirectErrorResponse;
 

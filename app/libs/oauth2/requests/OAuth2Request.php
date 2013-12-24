@@ -4,9 +4,26 @@ use oauth2\OAuth2Message;
 
 abstract class OAuth2Request  extends OAuth2Message {
 
-    public function __construct(array $values)
+    protected $message;
+
+    public function __construct(OAuth2Message $msg)
     {
-        parent::__construct($values);
+        $this->message = $msg;
+    }
+
+    public function getMessage(){
+        return $this->message;
+    }
+
+    public function getParam($param)
+    {
+        return $this->message->getParam($param);
+    }
+
+    public function toString()
+    {
+        $string = $this->message->toString();
+        return $string;
     }
 
     public abstract function isValid();
