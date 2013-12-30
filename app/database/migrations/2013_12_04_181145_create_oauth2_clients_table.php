@@ -25,6 +25,7 @@ class CreateOauth2ClientsTable extends Migration {
             $table->bigInteger("user_id")->unsigned();
             $table->index('user_id');
             $table->foreign('user_id')->references('id')->on('openid_users');
+
             $table->timestamps();
 
             $table->integer('max_auth_codes_issuance_qty')->default(0);

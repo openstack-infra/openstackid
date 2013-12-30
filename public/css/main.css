@@ -31,19 +31,23 @@
     margin-top: 20px;
 }
 
+select, input[type="text"]{
+    height: 30px !important;
+}
 
-input, textarea, .uneditable-input {
+#redirect_uri{
+    margin-bottom: 0px!important;
+}
+
+
+#dialog-form-register-new-app select, input, textarea, .uneditable-input {
     width: 350px;
 }
 
-textarea {
+#dialog-form-register-new-app textarea {
     height: auto;
 }
 
-select, input[type="text"]{
-    height: 30px !important;
-    margin-bottom: 0px!important;
-}
 
 .label-client-secret{
     font-size: 12px;

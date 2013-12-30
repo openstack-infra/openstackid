@@ -3,10 +3,10 @@
 namespace services\oauth2;
 
 use AccessToken as DBAccessToken;
+use DB;
 use oauth2\exceptions\InvalidAccessTokenException;
 use oauth2\exceptions\InvalidAuthorizationCodeException;
 use oauth2\exceptions\ReplayAttackException;
-use utils\exceptions\UnacquiredLockException;
 
 use oauth2\models\AccessToken;
 use oauth2\models\AuthorizationCode;
@@ -18,10 +18,11 @@ use oauth2\services\IClientService;
 use oauth2\services\ITokenService;
 use RefreshToken as DBRefreshToken;
 use services\IPHelper;
-use Zend\Crypt\Hash;
 
+use utils\exceptions\UnacquiredLockException;
 use utils\services\ILockManagerService;
-use DB;
+
+use Zend\Crypt\Hash;
 
 /**
  * Class TokenService
@@ -55,16 +56,20 @@ class TokenService implements ITokenService
         $hashed_value = Hash::compute('sha256', $value);
 
         $this->redis->hmset($hashed_value, array(
-            'value'        => $hashed_value,
-            'client_id'    => $code->getClientId(),
-            'scope'        => $code->getScope(),
+            'value' => $hashed_value,
+            'client_id' => $code->getClientId(),
+            'scope' => $code->getScope(),
             'redirect_uri' => $code->getRedirectUri(),
-            'issued'       => $code->getIssued(),
-            'lifetime'     => $code->getLifetime(),
-            'audience'     => ''
+            'issued' => $code->getIssued(),
+            'lifetime' => $code->getLifetime(),
+            'audience' => ''
         ));
 
+
         $this->redis->expire($hashed_value, $code->getLifetime());
+
+        //stores brand new auth code hash value on a set by client id...
+        $this->redis->sadd($client_id . '.acodes', $hashed_value);
 
         return $code;
     }
@@ -96,7 +101,7 @@ class TokenService implements ITokenService
                 'audience'
             ));
 
-            $code = AuthorizationCode::load($values[0], $values[1], $values[2],$values[6], $values[3], $values[4], $values[5]);
+            $code = AuthorizationCode::load($values[0], $values[1], $values[2], $values[6], $values[3], $values[4], $values[5]);
             return $code;
         } catch (UnacquiredLockException $ex1) {
             throw new ReplayAttackException($value, sprintf("auth_code %s ", $value));
@@ -132,6 +137,8 @@ class TokenService implements ITokenService
         $access_token_db->audience = $access_token->getAudience();
         $access_token_db->Save();
 
+        //stores brand new access token hash value on a set by client id...
+        $this->redis->sadd($client_id . '.atokens', $hashed_value);
         return $access_token;
     }
 
@@ -209,7 +216,7 @@ class TokenService implements ITokenService
                 'audience'
             ));
 
-            $code = AuthorizationCode::load($values[3], $values[1], $values[2],$values[7]);
+            $code = AuthorizationCode::load($values[3], $values[1], $values[2], $values[7]);
             $access_token = AccessToken::load($values[0], $code, $values[4], $values[5], $values[6], $values[7]);
         } catch (UnacquiredLockException $ex1) {
             throw new InvalidAccessTokenException("access token %s ", $value);
@@ -284,11 +291,6 @@ class TokenService implements ITokenService
 
     }
 
-    public function getRevokeToken($value)
-    {
-
-    }
-
     /**
      * Revokes all related tokens to a specific auth code
      * @param $auth_code Authorization Code
@@ -299,13 +301,41 @@ class TokenService implements ITokenService
         $auth_code_hashed_value = Hash::compute('sha256', $auth_code);
 
         DB::transaction(function () use ($auth_code_hashed_value) {
-            $db_access_tokens = DBAccessToken::where('associated_authorization_code','=',$auth_code_hashed_value)->get();
-            foreach($db_access_tokens as $db_access_token){
+            $db_access_tokens = DBAccessToken::where('associated_authorization_code', '=', $auth_code_hashed_value)->get();
+            foreach ($db_access_tokens as $db_access_token) {
                 $access_token_value = $db_access_token->value;
-                DBRefreshToken::where('associated_access_token','=',$access_token_value)->delete();
+                DBRefreshToken::where('associated_access_token', '=', $access_token_value)->delete();
                 $this->redis->del($access_token_value);
                 $db_access_token->delete();
             }
+        });
+    }
+
+    /**
+     * Revokes all related tokens to a specific client id
+     * @param $client_id
+     */
+    public function revokeClientRelatedTokens($client_id)
+    {
+        //get client auth codes
+        $auth_codes    = $this->redis->smembers($client_id . '.acodes');
+        //get client access tokens
+        $access_tokens = $this->redis->smembers($client_id . '.atokens');
+
+        DB::transaction(function () use ($client_id, $auth_codes, $access_tokens) {
+
+            foreach ($auth_codes as $auth_code) {
+                $this->redis->del($auth_code);
+            }
+            
+            foreach ($access_tokens as $access_token) {
+                DBAccessToken::where('value', '=', $access_token)->delete();
+                DBRefreshToken::where('associated_access_token', '=', $access_token)->delete();
+                $this->redis->del($access_token);
+            }
+            //delete client list (auth codes and access tokens)
+            $this->redis->del($client_id . '.acodes');
+            $this->redis->del($client_id . '.atokens');
         });
     }
 }

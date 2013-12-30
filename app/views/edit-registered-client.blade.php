@@ -155,27 +155,29 @@
         }
 
         $("body").on('click',".regenerate-client-secret",function(event){
-            var link = $(this).attr('href');
-            $.ajax(
-                {
-                    type: "GET",
-                    url: link,
-                    dataType: "json",
-                    timeout:60000,
-                    success: function (data,textStatus,jqXHR) {
-                        //load data...
-                        if(data.status==='OK'){
-                            $('#client_secret').text(data.new_secret);
+            if(confirm("Are you sure? Regenerating client secret would invalidate all current tokens")){
+                var link = $(this).attr('href');
+                $.ajax(
+                    {
+                        type: "GET",
+                        url: link,
+                        dataType: "json",
+                        timeout:60000,
+                        success: function (data,textStatus,jqXHR) {
+                            //load data...
+                            if(data.status==='OK'){
+                                $('#client_secret').text(data.new_secret);
+                            }
+                            else{
+                                alert('There was an error!');
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            alert( "Request failed: " + textStatus );
                         }
-                        else{
-                            alert('There was an error!');
-                        }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        alert( "Request failed: " + textStatus );
                     }
-                }
-            );
+                );
+            }
             event.preventDefault();
             return false;
         });

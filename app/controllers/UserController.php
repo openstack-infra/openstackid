@@ -194,13 +194,13 @@ class UserController extends BaseController
             }
             $params = array(
                 'show_fullname' => $user->getShowProfileFullName(),
-                'username' => $user->getFullName(),
-                'show_email' => $user->getShowProfileEmail(),
-                'email' => $user->getEmail(),
-                'identifier' => $user->getIdentifier(),
-                'show_pic' => $user->getShowProfilePic(),
-                'pic' => $user->getPic(),
-                'another_user' => $another_user,
+                'username'      => $user->getFullName(),
+                'show_email'    => $user->getShowProfileEmail(),
+                'email'         => $user->getEmail(),
+                'identifier'    => $user->getIdentifier(),
+                'show_pic'      => $user->getShowProfilePic(),
+                'pic'           => $user->getPic(),
+                'another_user'  => $another_user,
             );
             return View::make("identity", $params);
         } catch (Exception $ex) {
@@ -218,21 +218,21 @@ class UserController extends BaseController
 
     public function getProfile()
     {
-        $user = $this->auth_service->getCurrentUser();
-        $sites = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
+        $user    = $this->auth_service->getCurrentUser();
+        $sites   = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
         $actions = $user->getActions();
         $clients = $user->getClients();
 
         return View::make("profile", array(
-            "username" => $user->getFullName(),
-            "openid_url" => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
-            "identifier " => $user->getIdentifier(),
-            "sites" => $sites,
-            "show_pic" => $user->getShowProfilePic(),
+            "username"       => $user->getFullName(),
+            "openid_url"     => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
+            "identifier "    => $user->getIdentifier(),
+            "sites"          => $sites,
+            "show_pic"       => $user->getShowProfilePic(),
             "show_full_name" => $user->getShowProfileFullName(),
-            "show_email" => $user->getShowProfileEmail(),
-            'actions' => $actions,
-            'clients' => $clients,
+            "show_email"     => $user->getShowProfileEmail(),
+            'actions'        => $actions,
+            'clients'        => $clients,
         ));
     }
 
@@ -326,7 +326,22 @@ class UserController extends BaseController
                 $app_desc = trim($input['app_desc']);
                 $app_type = $input['app_type'];
                 $this->client_service->addClient($app_type, $user->getId(), $app_name, $app_desc, '');
-                return Response::json(array('status' => 'OK'));
+
+                $clients = $user->getClients();
+
+                $clients_response = array();
+
+                foreach($clients as $client){
+                    array_push($clients_response, array(
+                        'id'          => $client->id,
+                        'app_name'    => $client->app_name,
+                        'client_type' => $client->getFriendlyClientType(),
+                        'active'      => $client->active,
+                        'locked'      => $client->locked,
+                        'updated_at'  => $client->updated_at->format('Y-m-d H:i:s')
+                    ));
+                }
+                return Response::json(array('status' => 'OK','clients'=> $clients_response));
             }
 
             throw new Exception("invalid param!");
@@ -436,8 +451,9 @@ class UserController extends BaseController
             $validator = Validator::make($input, $rules);
             if ($validator->passes()) {
 
-                $id   = $input['id'];
-                $active      = $input['active'];
+                $id      = $input['id'];
+                $active  = $input['active'];
+
                 $this->client_service->activateClient($id,$active,$user->getId());
 
                 return Response::json(array('status' => 'OK'));

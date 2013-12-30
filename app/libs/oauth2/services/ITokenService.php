@@ -51,7 +51,6 @@ interface ITokenService {
 
     public function getRefreshToken($value);
 
-    public function getRevokeToken($value);
 
     /**
      * Revokes all related tokens to a specific auth code
@@ -59,4 +58,10 @@ interface ITokenService {
      * @return mixed
      */
     public function revokeAuthCodeRelatedTokens($auth_code);
+
+    /**
+     * Revokes all related tokens to a specific client id
+     * @param $client_id
+     */
+    public function revokeClientRelatedTokens($client_id);
 } 

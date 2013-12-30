@@ -86,7 +86,7 @@
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
-                <tbody>
+                <tbody id="body-registered-clients">
                 @foreach ($clients as $client)
                     <tr>
                         <td>{{ $client->app_name }}</td>
@@ -117,7 +117,7 @@
         </div>
     </div>
 
-    <div id="dialog-form" title="Register new Application">
+    <div id="dialog-form-register-new-app" title="Register new Application">
         <p style="font-size: 10px;">* You need to register your application to get the necessary credentials to call a Openstack API</p>
         <form>
             <fieldset>
@@ -183,8 +183,16 @@
         $("body").on('click',".add-client",function(event){
             var link = $(this).attr('href');
             event.preventDefault();
-            $( "#dialog-form" ).dialog( "open" );
+            $("#dialog-form-register-new-app").dialog( "open" );
             return false;
+        });
+
+        $("body").on('click',".del-client",function(event){
+            if(!confirm("Are you sure to delete this registered application?")){
+                event.preventDefault();
+                return false;
+            }
+            return true;
         });
 
 
@@ -213,16 +221,17 @@
 
 
 
-        $("#dialog-form").dialog({
+        $("#dialog-form-register-new-app").dialog({
             autoOpen: false,
             height: 450,
             width: 455,
             modal: true,
             buttons: {
                 "Register": function() {
-                    var app_name = $('#app-name','#dialog-form').val()
-                    var app_desc = $('#app-description','#dialog-form').val()
-                    var app_type = $('#app-type','#dialog-form').val()
+                    var app_name = $('#app-name','#dialog-form-register-new-app').val();
+                    var app_desc = $('#app-description','#dialog-form-register-new-app').val();
+                    var app_type = $('#app-type','#dialog-form-register-new-app').val();
+
                     var application = {};
                     application.app_name = app_name;
                     application.app_desc = app_desc;
@@ -239,6 +248,50 @@
                             timeout:60000,
                             success: function (data,textStatus,jqXHR) {
                                 //load data...
+                                if(data.status==='OK'){
+                                    var clients = data.clients;
+                                    var template = $('<tbody><tr><td class="app-name"></td><td class="client-type"></td><td class="client-active"><input type="checkbox" class="app-active-checkbox"></td><td class="client-locked"><input type="checkbox" disabled="disabled" class="app-locked-checkbox"></td><td class="client-modified"></td><td class="client-actions">&nbsp;<a class="btn edit-client" title="Edits a Registered Application">Edit</a>&nbsp;<a class="btn del-client" title="Deletes a Registered Application">Delete</a></td></tr></tbody>');
+                                    var directives = {
+                                        'tr':{
+                                            'client<-context':{
+                                                'td.app-name':'client.app_name',
+                                                'td.client-type':'client.client_type',
+                                                'td.client-modified':'client.updated_at',
+                                                '.app-active-checkbox@value':'client.id',
+                                                '.app-active-checkbox@checked':function(arg){
+                                                    var client_active = arg.item.active;
+                                                    return client_active===1?'true':'';
+                                                },
+                                                '.app-active-checkbox@id':function(arg){
+                                                    var client_id = arg.item.id;
+                                                    return 'app-active_'+client_id;
+                                                },
+                                                '.app-locked-checkbox@value':'client.id',
+                                                '.app-locked-checkbox@id':function(arg){
+                                                    var client_id = arg.item.id;
+                                                    return 'app-locked_'+client_id;
+                                                },
+                                                '.app-locked-checkbox@checked':function(arg){
+                                                    var client_locked = arg.item.locked;
+                                                    return client_locked===1?'true':'';
+                                                },
+                                                'a.edit-client@href':function(arg){
+                                                    var client_id = arg.item.id;
+                                                    var href = '{{ URL::action("UserController@getEditRegisteredClient",array("id"=>-1)) }}';
+                                                    return href.replace('-1',client_id);
+                                                },
+                                                'a.del-client@href':function(arg){
+                                                    var client_id = arg.item.id;
+                                                    var href = '{{ URL::action("UserController@getDeleteRegisteredClient",array("id"=>-1)) }}';
+                                                    return href.replace('-1',client_id);
+                                                }
+                                            }
+                                        }
+                                    };
+                                    var html = template.render(clients, directives);
+                                    $('#body-registered-clients').html(html.html());
+                                }
+
 
                             },
                             error: function (jqXHR, textStatus, errorThrown) {
