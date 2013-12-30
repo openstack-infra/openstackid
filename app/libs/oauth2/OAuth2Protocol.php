@@ -51,6 +51,7 @@ class OAuth2Protocol implements IOAuth2Protocol
     const OAuth2Protocol_GrantType_Implicit = 'implicit';
     const OAuth2Protocol_GrantType_ResourceOwner_Password = 'password';
     const OAuth2Protocol_GrantType_ClientCredentials = 'client_credentials';
+    const OAuth2Protocol_GrantType_RefreshToken      = 'refresh_token';
     const OAuth2Protocol_ResponseType_Code = 'code';
     const OAuth2Protocol_ResponseType_Token = 'token';
     const OAuth2Protocol_ResponseType = "response_type";

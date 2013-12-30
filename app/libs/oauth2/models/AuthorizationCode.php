@@ -22,7 +22,7 @@ class AuthorizationCode extends Token {
      */
     public static function create($client_id, $scope, $redirect_uri, $audience='', $lifetime = 600){
         $instance = new self();
-        $instance->value        = Rand::getString($instance->len,null,true);
+        $instance->value        = Rand::getString($instance->len, null, true);
         $instance->scope        = $scope;
         $instance->redirect_uri = $redirect_uri;
         $instance->client_id    = $client_id;

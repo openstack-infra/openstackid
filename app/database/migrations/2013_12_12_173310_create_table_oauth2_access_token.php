@@ -16,7 +16,7 @@ class CreateTableOauth2AccessToken extends Migration {
             $table->bigIncrements('id')->unsigned();
             $table->string('value',255)->unique();
             $table->string('from_ip',255);
-            $table->string('associated_authorization_code',255)->unique();
+            $table->string('associated_authorization_code',255)->nullable();
             $table->integer('lifetime');
             $table->text('scope');
             $table->text('audience');

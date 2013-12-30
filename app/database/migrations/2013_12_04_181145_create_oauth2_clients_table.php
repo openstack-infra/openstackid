@@ -38,6 +38,7 @@ class CreateOauth2ClientsTable extends Migration {
             $table->smallInteger('max_refresh_token_issuance_basis');
 
             $table->boolean('use_refresh_token')->default(true);
+            $table->boolean('rotate_refresh_token')->default(false);
         });
 	}
 

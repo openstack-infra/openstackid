@@ -20,8 +20,9 @@ class CreateOauth2RefreshTokenTable extends Migration {
             $table->integer('lifetime');
             $table->text('scope');
             $table->text('audience');
-            $table->timestamps();
             $table->bigInteger("client_id")->unsigned();
+            $table->boolean('void')->default(false);
+            $table->timestamps();
             $table->index('client_id');
             $table->foreign('client_id')->references('id')->on('oauth2_client');
         });

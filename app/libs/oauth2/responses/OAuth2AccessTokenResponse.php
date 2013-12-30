@@ -12,7 +12,7 @@ use oauth2\OAuth2Protocol;
  */
 class OAuth2AccessTokenResponse extends OAuth2DirectResponse {
 
-    public function __construct($access_token, $expires_in, $refresh_token=null)
+    public function __construct($access_token, $expires_in, $refresh_token=null, $scope=null)
     {
         // Successful Responses: A server receiving a valid request MUST send a
         // response with an HTTP status code of 200.
@@ -24,5 +24,8 @@ class OAuth2AccessTokenResponse extends OAuth2DirectResponse {
 
         if(!is_null($refresh_token) && !empty($refresh_token))
             $this[OAuth2Protocol::OAuth2Protocol_RefreshToken] = $refresh_token;
+
+        if(!is_null($scope) && !empty($scope))
+            $this[OAuth2Protocol::OAuth2Protocol_Scope] = $scope;
     }
 } 

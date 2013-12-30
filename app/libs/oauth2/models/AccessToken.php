@@ -23,7 +23,18 @@ class AccessToken extends Token {
         return $instance;
     }
 
-    public static function load($value,AuthorizationCode $auth_code, $issued,$lifetime = 3600, $from_ip='127.0.0.1',$audience=null){
+    public static function createFromRefreshToken(RefreshToken $refresh_token,$scope = null,  $lifetime = 3600){
+        $instance = new self();
+        $instance->value        = Rand::getString($instance->len,null,true);
+        $instance->scope        = $scope;
+        $instance->client_id    = $refresh_token->getClientId();
+        $instance->auth_code    = null;
+        $instance->audience     = $refresh_token->getAudience();
+        $instance->lifetime     = $lifetime;
+        return $instance;
+    }
+
+    public static function load($value, AuthorizationCode $auth_code, $issued,$lifetime = 3600, $from_ip = '127.0.0.1',$audience=null){
         $instance = new self();
         $instance->value        = $value;
         $instance->scope        = $auth_code->getScope();

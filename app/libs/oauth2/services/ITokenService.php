@@ -35,6 +35,13 @@ interface ITokenService {
      */
     public function createAccessToken(AuthorizationCode $auth_code,$redirect_uri=null);
 
+
+    /**
+     * @param RefreshToken $refresh_token
+     * @return AccessToken
+     */
+    public function createAccessTokenFromRefreshToken(RefreshToken $refresh_token, $scope=null);
+
     /**
      * @param $value
      * @return AccessToken
@@ -49,6 +56,10 @@ interface ITokenService {
      */
     public function createRefreshToken(AccessToken $access_token);
 
+    /**
+     * @param $value refresh token value
+     * @return RefreshToken
+     */
     public function getRefreshToken($value);
 
 
