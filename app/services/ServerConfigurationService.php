@@ -63,12 +63,15 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
         $this->default_config_params["BlacklistSecurityPolicy.MaxAuthenticationExceptionAttempts"]                 = 10;
         $this->default_config_params["BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay"]                = 20;
 
-        $this->default_config_params["AuthorizationCodeRedeemPolicy.MinutesWithoutExceptions"]         = 5;
-        $this->default_config_params["AuthorizationCodeRedeemPolicy.MaxAuthCodeReplayAttackAttempts"]  = 3;
-        $this->default_config_params["AuthorizationCodeRedeemPolicy.AuthCodeReplayAttackInitialDelay"] = 10;
 
-        $this->default_config_params["AuthorizationCodeRedeemPolicy.MaxInvalidAuthorizationCodeAttempts"]  = 3;
-        $this->default_config_params["AuthorizationCodeRedeemPolicy.InvalidAuthorizationCodeInitialDelay"] = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.OAuth2.MaxAuthCodeReplayAttackAttempts"]          = 3;
+        $this->default_config_params["BlacklistSecurityPolicy.OAuth2.AuthCodeReplayAttackInitialDelay"]         = 10;
+
+        $this->default_config_params["BlacklistSecurityPolicy.OAuth2.MaxInvalidAuthorizationCodeAttempts"]      = 3;
+        $this->default_config_params["BlacklistSecurityPolicy.OAuth2.InvalidAuthorizationCodeInitialDelay"]     = 10;
+
+        $this->default_config_params["BlacklistSecurityPolicy.OAuth2.MaxInvalidBearerTokenDisclosureAttempt"]   = 3;
+        $this->default_config_params["BlacklistSecurityPolicy.OAuth2.BearerTokenDisclosureAttemptInitialDelay"] = 10;
 
 
 

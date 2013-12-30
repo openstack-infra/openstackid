@@ -26,6 +26,7 @@ use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use ReflectionClass;
 use utils\services\IAuthService;
+use utils\services\ILogService;
 
 /**
  * Class AuthorizationCodeGrantType
@@ -41,12 +42,12 @@ class AuthorizationCodeGrantType extends AbstractGrantType
     private $auth_strategy;
     private $memento_service;
 
-    public function __construct(IClientService $client_service, ITokenService $token_service, IAuthService $auth_service, IMementoOAuth2AuthenticationRequestService $memento_service, IOAuth2AuthenticationStrategy $auth_strategy)
+    public function __construct(IClientService $client_service, ITokenService $token_service, IAuthService $auth_service, IMementoOAuth2AuthenticationRequestService $memento_service, IOAuth2AuthenticationStrategy $auth_strategy, ILogService $log_service)
     {
-        parent::__construct($client_service, $token_service);
-        $this->auth_service = $auth_service;
+        parent::__construct($client_service, $token_service,$log_service);
+        $this->auth_service    = $auth_service;
         $this->memento_service = $memento_service;
-        $this->auth_strategy = $auth_strategy;
+        $this->auth_strategy   = $auth_strategy;
     }
 
     public function canHandle(OAuth2Request $request)
@@ -55,7 +56,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         $class_name = $reflector->getName();
         return
             ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest' && $request->isValid()) ||
-            ($class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() === $this->getType());
+            ($class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid());
     }
 
     public function getType()
@@ -207,7 +208,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             return $response;
 
         }
-        throw new Exception('Invalid Request Type');
+        throw new InvalidOAuth2Request;
     }
 
     public function buildTokenRequest(OAuth2Request $request)

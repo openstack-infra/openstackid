@@ -6,17 +6,20 @@ use AccessToken as DBAccessToken;
 use oauth2\exceptions\InvalidAccessTokenException;
 use oauth2\exceptions\InvalidAuthorizationCodeException;
 use oauth2\exceptions\ReplayAttackException;
+use utils\exceptions\UnacquiredLockException;
+
 use oauth2\models\AccessToken;
 use oauth2\models\AuthorizationCode;
 use oauth2\models\RefreshToken;
 use oauth2\models\Token;
+
 use oauth2\services\Authorization;
 use oauth2\services\IClientService;
 use oauth2\services\ITokenService;
 use RefreshToken as DBRefreshToken;
 use services\IPHelper;
 use Zend\Crypt\Hash;
-use utils\exceptions\UnacquiredLockException;
+
 use utils\services\ILockManagerService;
 use DB;
 

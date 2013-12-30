@@ -7,10 +7,11 @@ use DateTime;
 use DB;
 use Exception;
 use Log;
-use utils\services\IServerConfigurationService;
 use UserExceptionTrail;
 use utils\exceptions\UnacquiredLockException;
 use utils\services\ILockManagerService;
+use utils\services\IServerConfigurationService;
+
 /**
  * Class BlacklistSecurityPolicy
  * implements check point security pattern
@@ -22,7 +23,7 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
 
     public function __construct(IServerConfigurationService $server_configuration_service, ILockManagerService $lock_manager_service)
     {
-        parent::__construct($server_configuration_service,$lock_manager_service);
+        parent::__construct($server_configuration_service, $lock_manager_service);
     }
 
     /**
@@ -156,8 +157,8 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
                 case 'oauth2\exceptions\ReplayAttackException':
                 {
 
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("AuthorizationCodeRedeemPolicy.MaxAuthCodeReplayAttackAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("AuthorizationCodeRedeemPolicy.AuthCodeReplayAttackInitialDelay"), $exception_class);
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.MaxAuthCodeReplayAttackAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.AuthCodeReplayAttackInitialDelay"), $exception_class);
 
                 }
                     break;
@@ -165,8 +166,15 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
                 case 'oauth2\exceptions\InvalidAuthorizationCodeException':
                 {
 
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("AuthorizationCodeRedeemPolicy.MaxInvalidAuthorizationCodeAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("AuthorizationCodeRedeemPolicy.InvalidAuthorizationCodeInitialDelay"), $exception_class);
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.MaxInvalidAuthorizationCodeAttempts"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.InvalidAuthorizationCodeInitialDelay"), $exception_class);
+
+                }
+                    break;
+                case 'oauth2\exceptions\BearerTokenDisclosureAttemptException':
+                {
+                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.MaxInvalidBearerTokenDisclosureAttempt"))
+                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.BearerTokenDisclosureAttemptInitialDelay"), $exception_class);
 
                 }
                     break;

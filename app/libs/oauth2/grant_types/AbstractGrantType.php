@@ -8,6 +8,7 @@ use oauth2\requests\OAuth2Request;
 
 use oauth2\exceptions\InvalidClientException;
 use oauth2\exceptions\UnAuthorizedClientException;
+use utils\services\ILogService;
 
 abstract class AbstractGrantType implements IGrantType {
 
@@ -17,11 +18,13 @@ abstract class AbstractGrantType implements IGrantType {
     protected $current_client_id;
     protected $current_client_secret;
     protected $current_client;
+    protected $log_service;
 
-    public function __construct(IClientService $client_service, ITokenService $token_service)
+    public function __construct(IClientService $client_service, ITokenService $token_service, ILogService $log_service)
     {
         $this->client_service = $client_service;
         $this->token_service  = $token_service;
+        $this->log_service    = $log_service;
     }
 
     /**

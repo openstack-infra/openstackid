@@ -162,16 +162,10 @@ class ServerConfigurationSeeder extends Seeder {
             )
         );
 
-        ServerConfiguration::create(
-            array(
-                'key'   => 'AuthorizationCodeRedeemPolicy.MinutesWithoutExceptions',
-                'value' => '5',
-            )
-        );
 
         ServerConfiguration::create(
             array(
-                'key'   => 'AuthorizationCodeRedeemPolicy.MaxAuthCodeReplayAttackAttempts',
+                'key'   => 'BlacklistSecurityPolicy.OAuth2.MaxAuthCodeReplayAttackAttempts',
                 'value' => '3',
             )
         );
@@ -179,21 +173,35 @@ class ServerConfigurationSeeder extends Seeder {
 
         ServerConfiguration::create(
             array(
-                'key'   => 'AuthorizationCodeRedeemPolicy.AuthCodeReplayAttackInitialDelay',
+                'key'   => 'BlacklistSecurityPolicy.OAuth2.AuthCodeReplayAttackInitialDelay',
                 'value' => '10',
             )
         );
 
         ServerConfiguration::create(
             array(
-                'key'   => 'AuthorizationCodeRedeemPolicy.MaxInvalidAuthorizationCodeAttempts',
+                'key'   => 'BlacklistSecurityPolicy.OAuth2.MaxInvalidAuthorizationCodeAttempts',
                 'value' => '3',
             )
         );
 
         ServerConfiguration::create(
             array(
-                'key'   => 'AuthorizationCodeRedeemPolicy.InvalidAuthorizationCodeInitialDelay',
+                'key'   => 'BlacklistSecurityPolicy.OAuth2.InvalidAuthorizationCodeInitialDelay',
+                'value' => '10',
+            )
+        );
+
+        ServerConfiguration::create(
+            array(
+                'key'   => 'BlacklistSecurityPolicy.OAuth2.MaxInvalidBearerTokenDisclosureAttempt',
+                'value' => '3',
+            )
+        );
+
+        ServerConfiguration::create(
+            array(
+                'key'   => 'BlacklistSecurityPolicy.OAuth2.BearerTokenDisclosureAttemptInitialDelay',
                 'value' => '10',
             )
         );

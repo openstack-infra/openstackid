@@ -15,7 +15,6 @@ class CreateOauth2Api extends Migration {
         {
             $table->bigIncrements('id')->unsigned();
             $table->string('name',255)->unique();
-            $table->string('endpoint_url',512);
             $table->string('logo',255)->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();
