@@ -24,6 +24,8 @@ use oauth2\services\IClientService;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
+use oauth2\services\IApiScopeService;
+
 use ReflectionClass;
 use utils\services\IAuthService;
 use utils\services\ILogService;
@@ -41,10 +43,12 @@ class AuthorizationCodeGrantType extends AbstractGrantType
     private $auth_service;
     private $auth_strategy;
     private $memento_service;
+    private $scope_service;
 
-    public function __construct(IClientService $client_service, ITokenService $token_service, IAuthService $auth_service, IMementoOAuth2AuthenticationRequestService $memento_service, IOAuth2AuthenticationStrategy $auth_strategy, ILogService $log_service)
+    public function __construct(IApiScopeService $scope_service ,IClientService $client_service, ITokenService $token_service, IAuthService $auth_service, IMementoOAuth2AuthenticationRequestService $memento_service, IOAuth2AuthenticationStrategy $auth_strategy, ILogService $log_service)
     {
         parent::__construct($client_service, $token_service,$log_service);
+        $this->scope_service   = $scope_service;
         $this->auth_service    = $auth_service;
         $this->memento_service = $memento_service;
         $this->auth_strategy   = $auth_strategy;
@@ -56,7 +60,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         $class_name = $reflector->getName();
         return
             ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest' && $request->isValid()) ||
-            ($class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid());
+            ($class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() === $this->getType());
     }
 
     public function getType()
@@ -64,16 +68,19 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         return OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode;
     }
 
-    /**
+    /** Implements first request processing for Authorization code (Authorization Request processing)
+     * http://tools.ietf.org/html/rfc6749#section-4.1.1 and
+     * http://tools.ietf.org/html/rfc6749#section-4.1.2
      * @param OAuth2Request $request
-     * @return OAuth2AuthorizationResponse
-     * @throws \oauth2\exceptions\ScopeNotAllowedException
+     * @return mixed|OAuth2AuthorizationResponse
      * @throws \oauth2\exceptions\InvalidClientException
      * @throws \oauth2\exceptions\UnsupportedResponseTypeException
-     * @throws \oauth2\exceptions\UriNotAllowedException
-     * @throws \oauth2\exceptions\UnAuthorizedClientException
      * @throws \oauth2\exceptions\AccessDeniedException
+     * @throws \oauth2\exceptions\ScopeNotAllowedException
      * @throws \oauth2\exceptions\OAuth2GenericException
+     * @throws \oauth2\exceptions\UnAuthorizedClientException
+     * @throws \oauth2\exceptions\UriNotAllowedException
+     * @throws \oauth2\exceptions\InvalidOAuth2Request
      */
     public function handle(OAuth2Request $request)
     {
@@ -119,13 +126,21 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             } else if ($authorization_response === IAuthService::AuthorizationResponse_DenyOnce) {
                 throw new AccessDeniedException;
             }
-            $response = new OAuth2AuthorizationResponse();
-            $token = $this->token_service->createAuthorizationCode($client_id, $scope, $redirect_uri);
+            $response  = new OAuth2AuthorizationResponse();
+            // build current audience ...
+            $audiences = $this->scope_service->getAudienceByScopeNames(explode(' ',$scope));
+            $audience  = '';
+            foreach($audiences as $resource_server_host => $ip){
+                $audience = $audience . $resource_server_host .' ';
+            }
+            $audience  = trim($audience);
 
-            if (is_null($token))
-                throw new OAuth2GenericException("Invalid Token");
+            $auth_code = $this->token_service->createAuthorizationCode($client_id, $scope, $audience, $redirect_uri);
 
-            $response->setAuthorizationCode($token->getValue());
+            if (is_null($auth_code))
+                throw new OAuth2GenericException("Invalid Auth Code");
+
+            $response->setAuthorizationCode($auth_code->getValue());
             $response->setReturnTo($redirect_uri);
             //if state is present, return it on response
             if (!is_null($state))
@@ -140,7 +155,10 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         return OAuth2Protocol::OAuth2Protocol_ResponseType_Code;
     }
 
-    /** Implementation of http://tools.ietf.org/html/rfc6749#section-4.1.3
+    /**
+     * Implements last request processing for Authorization code (Access Token Request processing)
+     * http://tools.ietf.org/html/rfc6749#section-4.1.3 and
+     * http://tools.ietf.org/html/rfc6749#section-4.1.4
      * @param OAuth2Request $request
      * @return OAuth2AccessTokenResponse
      * @throws \oauth2\exceptions\InvalidAuthorizationCodeException

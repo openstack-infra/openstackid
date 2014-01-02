@@ -5,15 +5,15 @@ class ApiSeeder extends Seeder {
     {
         DB::table('oauth2_api')->delete();
 
+        $resource_server = ResourceServer::first();
         Api::create(
             array(
-                'name'            => 'test api user activities',
-                'endpoint_url'    => 'https://www.test.com/users/activities',
-                'logo'            =>  null,
-                'active'          => 'true',
+                'name'               => 'test api user activities',
+                'logo'               =>  null,
+                'active'             =>  true,
+                'resource_server_id' => $resource_server->id
             )
         );
-
 
     }
 

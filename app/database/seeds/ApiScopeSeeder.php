@@ -6,7 +6,6 @@ class ApiScopeSeeder extends Seeder {
     {
         DB::table('oauth2_api_scope')->delete();
 
-
         $api = Api::where('name','=','test api user activities')->first();
 
         ApiScope::create(

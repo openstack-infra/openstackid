@@ -13,6 +13,14 @@ class DatabaseSeeder extends Seeder {
 
         $this->call('OpenIdExtensionsSeeder');
         $this->call('ServerConfigurationSeeder');
-	}
+
+        DB::table('oauth2_api_scope')->delete();
+        DB::table('oauth2_api')->delete();
+        DB::table('oauth2_resource_server')->delete();
+
+        $this->call('ResourceServerSeeder');
+        $this->call('ApiSeeder');
+        $this->call('ApiScopeSeeder');
+ 	}
 
 }

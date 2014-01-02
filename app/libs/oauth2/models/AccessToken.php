@@ -4,6 +4,11 @@ namespace oauth2\models;
 
 use Zend\Math\Rand;
 
+/**
+ * Class AccessToken
+ * http://tools.ietf.org/html/rfc6749#section-1.4
+ * @package oauth2\models
+ */
 class AccessToken extends Token {
 
     private $auth_code;
@@ -27,6 +32,7 @@ class AccessToken extends Token {
         $instance = new self();
         $instance->value        = Rand::getString($instance->len,null,true);
         $instance->scope        = $scope;
+        $instance->from_ip      = $refresh_token->getFromIp();
         $instance->client_id    = $refresh_token->getClientId();
         $instance->auth_code    = null;
         $instance->audience     = $refresh_token->getAudience();
@@ -34,17 +40,16 @@ class AccessToken extends Token {
         return $instance;
     }
 
-    public static function load($value, AuthorizationCode $auth_code, $issued,$lifetime = 3600, $from_ip = '127.0.0.1',$audience=null){
+    public static function load($value, AuthorizationCode $auth_code, $issued=null, $lifetime = 3600){
         $instance = new self();
         $instance->value        = $value;
         $instance->scope        = $auth_code->getScope();
         $instance->client_id    = $auth_code->getClientId();
         $instance->auth_code    = $auth_code->getValue();
         $instance->audience     = $auth_code->getAudience();
+        $instance->from_ip      = $auth_code->getFromIp();
         $instance->issued       = $issued;
         $instance->lifetime     = $lifetime;
-        $instance->from_ip      = $from_ip;
-        $instance->audience     = $audience;
         return $instance;
     }
 
@@ -57,8 +62,7 @@ class AccessToken extends Token {
         return '{}';
     }
 
-    public function fromJSON($json)
-    {
+    public function fromJSON($json){
 
     }
 } 

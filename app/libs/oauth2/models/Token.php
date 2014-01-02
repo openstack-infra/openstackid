@@ -2,6 +2,11 @@
 
 namespace oauth2\models;
 
+/**
+ * Class Token
+ * Defines the common behavior for all emitted tokens
+ * @package oauth2\models
+ */
 abstract class Token {
 
     protected $value;

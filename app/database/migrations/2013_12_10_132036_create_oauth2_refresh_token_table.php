@@ -16,7 +16,7 @@ class CreateOauth2RefreshTokenTable extends Migration {
             $table->bigIncrements('id')->unsigned();
             $table->string('value',255)->unique();
             $table->string('from_ip',255);
-            $table->string('associated_access_token',255)->unique();
+            $table->string('associated_access_token',255);
             $table->integer('lifetime');
             $table->text('scope');
             $table->text('audience');

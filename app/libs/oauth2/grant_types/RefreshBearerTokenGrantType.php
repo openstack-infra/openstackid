@@ -38,9 +38,14 @@ class RefreshBearerTokenGrantType extends AbstractGrantType {
     {
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
-        return $class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid();
+        return $class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() === $this->getType();
     }
 
+    /** Not implemented , there is no first process phase on this grant type
+     * @param OAuth2Request $request
+     * @return mixed|void
+     * @throws \Exception
+     */
     public function handle(OAuth2Request $request)
     {
         throw new Exception('Not Implemented!');
@@ -48,7 +53,8 @@ class RefreshBearerTokenGrantType extends AbstractGrantType {
 
 
 
-    /** Access Token issuance using a refresh token
+    /**
+     * Access Token issuance using a refresh token
      * The authorization server MUST:
      *
      *  o  require client authentication for confidential clients or for any
@@ -86,7 +92,7 @@ class RefreshBearerTokenGrantType extends AbstractGrantType {
             if($refresh_token->getClientId() !== $this->current_client->client_id)
                 throw new InvalidGrantTypeException(sprintf("refresh token %s does not belongs to client %s",$refresh_token_value,$this->current_client->client_id));
 
-            $access_token = $this->token_service->createAccessTokenFromRefreshToken($refresh_token,$scope);
+            $access_token = $this->token_service->createAccessTokenFromRefreshToken($refresh_token, $scope);
 
             $new_refresh_token = null;
             /*
@@ -98,10 +104,12 @@ class RefreshBearerTokenGrantType extends AbstractGrantType {
              * legitimate client, one of them will present an invalidated refresh
              * token, which will inform the authorization server of the breach.
              */
-            if($this->current_client->rotate_refresh_token)
+            if($this->current_client->rotate_refresh_token){
+                $this->token_service->invalidateRefreshToken($refresh_token_value);
                 $new_refresh_token = $this->token_service->createRefreshToken($access_token);
+            }
 
-            $response = new OAuth2AccessTokenResponse($access_token->getValue(), $access_token->getLifetime(), !is_null($new_refresh_token) ? $new_refresh_token->getValue() : null);
+            $response = new OAuth2AccessTokenResponse($access_token->getValue(), $access_token->getLifetime(), !is_null($new_refresh_token) ? $new_refresh_token->getValue() : $scope);
             return $response;
 
         }

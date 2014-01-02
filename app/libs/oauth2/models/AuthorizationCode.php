@@ -4,6 +4,11 @@ namespace oauth2\models;
 
 use Zend\Math\Rand;
 
+/**
+ * Class AuthorizationCode
+ * http://tools.ietf.org/html/rfc6749#section-1.3.1
+ * @package oauth2\models
+ */
 class AuthorizationCode extends Token {
 
     private $redirect_uri;
@@ -20,7 +25,7 @@ class AuthorizationCode extends Token {
      * @param int $lifetime
      * @return AuthorizationCode
      */
-    public static function create($client_id, $scope, $redirect_uri, $audience='', $lifetime = 600){
+    public static function create($client_id, $scope, $audience='' ,$redirect_uri = null, $lifetime = 600){
         $instance = new self();
         $instance->value        = Rand::getString($instance->len, null, true);
         $instance->scope        = $scope;
@@ -31,7 +36,7 @@ class AuthorizationCode extends Token {
         return $instance;
     }
 
-    public static function load($value, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600){
+    public static function load($value, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600, $from_ip = '127.0.0.1'){
         $instance = new self();
         $instance->value        = $value;
         $instance->scope        = $scope;
@@ -40,6 +45,7 @@ class AuthorizationCode extends Token {
         $instance->audience     = $audience;
         $instance->issued       = $issued;
         $instance->lifetime     = $lifetime;
+        $instance->from_ip      = $from_ip;
         return $instance;
     }
 

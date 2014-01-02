@@ -7,4 +7,9 @@ class Api  extends Eloquent {
     {
         return $this->hasMany('ApiScope','api_id');
     }
+
+    public function resource_server()
+    {
+        return $this->belongsTo('ResourceServer');
+    }
 } 

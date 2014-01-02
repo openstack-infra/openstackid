@@ -19,12 +19,21 @@ class TestSeeder extends Seeder {
         DB::table('oauth2_client_api_scope')->delete();
         DB::table('oauth2_api_scope')->delete();
         DB::table('oauth2_api')->delete();
+        DB::table('oauth2_resource_server')->delete();
         DB::table('oauth2_client_authorized_uri')->delete();
         DB::table('oauth2_client_api_scope')->delete();
         DB::table('oauth2_refresh_token')->delete();
         DB::table('oauth2_access_token')->delete();
         DB::table('oauth2_client')->delete();
         DB::table('openid_users')->delete();
+
+        ResourceServer::create(
+            array(
+                'friendly_name'   => 'test resource server',
+                'host'            => 'https://www.resource.test1.com',
+                'ip'              => '127.0.0.1'
+            )
+        );
 
         ServerConfiguration::create(
             array(
@@ -235,12 +244,15 @@ class TestSeeder extends Seeder {
             )
         );
 
+
+        $resource_server = ResourceServer::first();
+
         Api::create(
             array(
                 'name'            => 'test api user activities',
-                'endpoint_url'    => 'https://www.test.com/users/activities',
                 'logo'            =>  null,
-                'active'          => 'true',
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id
             )
         );
 
@@ -286,13 +298,15 @@ class TestSeeder extends Seeder {
 
         Client::create(
             array(
-                'app_name'            => 'oauth2_test_app',
-                'app_description'     => 'oauth2_test_app',
-                'app_logo'            => null,
-                'client_id'           => 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client',
-                'client_secret'       => 'ITc/6Y5N7kOtGKhg',
-                'client_type'         => IClient::ClientType_Confidential,
-                'user_id'             => $user->id
+                'app_name'             => 'oauth2_test_app',
+                'app_description'      => 'oauth2_test_app',
+                'app_logo'             => null,
+                'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client',
+                'client_secret'        => 'ITc/6Y5N7kOtGKhg',
+                'client_type'          => IClient::ClientType_Confidential,
+                'user_id'              => $user->id,
+                'rotate_refresh_token' => true,
+                'use_refresh_token'    => true
             )
         );
 

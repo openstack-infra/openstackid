@@ -22,6 +22,7 @@ use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
 use oauth2\grant_types\AuthorizationCodeGrantType;
 use oauth2\grant_types\ValidateBearerTokenGrantType;
+use oauth2\grant_types\RefreshBearerTokenGrantType;
 
 use oauth2\requests\OAuth2Request;
 use oauth2\responses\OAuth2DirectErrorResponse;
@@ -30,6 +31,8 @@ use oauth2\responses\OAuth2IndirectErrorResponse;
 use oauth2\services\IClientService;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\ITokenService;
+use oauth2\services\IApiScopeService;
+
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use utils\services\IAuthService;
 use utils\services\ICheckPointService;
@@ -112,22 +115,26 @@ class OAuth2Protocol implements IOAuth2Protocol
         IAuthService $auth_service,
         IMementoOAuth2AuthenticationRequestService $memento_service,
         IOAuth2AuthenticationStrategy $auth_strategy,
-        ICheckPointService $checkpoint_service)
+        ICheckPointService $checkpoint_service,
+        IApiScopeService $scope_service)
     {
 
         //todo: add dynamic creation logic (configure grants types from db)
 
-        $authorization_code_grant_type = new AuthorizationCodeGrantType($client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service);
+        $authorization_code_grant_type    = new AuthorizationCodeGrantType($scope_service,$client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service);
         $validate_bearer_token_grant_type = new ValidateBearerTokenGrantType($client_service, $token_service, $log_service);
-        $this->grant_types[$authorization_code_grant_type->getType()] = $authorization_code_grant_type;
-        $this->grant_types[$validate_bearer_token_grant_type->getType()] = $validate_bearer_token_grant_type;
+        $refresh_bearer_token_grant_type  = new RefreshBearerTokenGrantType($client_service,$token_service,$log_service);
 
-        $this->log_service = $log_service;
+        $this->grant_types[$authorization_code_grant_type->getType()]    = $authorization_code_grant_type;
+        $this->grant_types[$validate_bearer_token_grant_type->getType()] = $validate_bearer_token_grant_type;
+        $this->grant_types[$refresh_bearer_token_grant_type->getType()]  = $refresh_bearer_token_grant_type;
+
+        $this->log_service        = $log_service;
         $this->checkpoint_service = $checkpoint_service;
-        $this->client_service = $client_service;
+        $this->client_service     = $client_service;
 
         $this->authorize_endpoint = new AuthorizationEndpoint($this);
-        $this->token_endpoint = new TokenEndpoint($this);
+        $this->token_endpoint     = new TokenEndpoint($this);
     }
 
     /**

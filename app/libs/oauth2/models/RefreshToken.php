@@ -4,6 +4,11 @@ namespace oauth2\models;
 
 use Zend\Math\Rand;
 
+/**
+ * Class RefreshToken
+ * http://tools.ietf.org/html/rfc6749#section-1.5
+ * @package oauth2\models
+ */
 class RefreshToken extends Token {
 
     private $access_token;
@@ -22,6 +27,8 @@ class RefreshToken extends Token {
         $instance->scope        = $access_token->getScope();
         $instance->client_id    = $access_token->getClientId();
         $instance->access_token = $access_token->getValue();
+        $instance->audience     = $access_token->getAudience();
+        $instance->from_ip      = $instance->getFromIp();
         $instance->lifetime     = $lifetime;
         return $instance;
     }
@@ -32,6 +39,8 @@ class RefreshToken extends Token {
         $instance->scope        = $access_token->getScope();
         $instance->client_id    = $access_token->getClientId();
         $instance->access_token = $access_token->getValue();
+        $instance->audience     = $access_token->getAudience();
+        $instance->from_ip      = $access_token->getFromIp();
         $instance->lifetime     = $lifetime;
         return $instance;
     }

@@ -11,8 +11,9 @@ use oauth2\services\IClientService;
 use oauth2\exceptions\AllowedClientUriAlreadyExistsException;
 use Request;
 use utils\services\IAuthService;
+use utils\services\Registry;
 use Zend\Math\Rand;
-use oauth2\services\ITokenService;
+use oauth2\services\OAuth2ServiceCatalog;
 
 /**
  * Class ClientService
@@ -22,12 +23,10 @@ class ClientService implements IClientService
 {
 
     private $auth_service;
-    private $token_service;
 
-    public function __construct(IAuthService $auth_service, ITokenService $token_service)
+    public function __construct(IAuthService $auth_service)
     {
         $this->auth_service  = $auth_service;
-        $this->token_service = $token_service;
     }
 
     /**
@@ -153,7 +152,8 @@ class ClientService implements IClientService
         if (!is_null($client)) {
             $client->authorized_uris()->delete();
             $client->scopes()->detach();
-            $this->token_service->revokeClientRelatedTokens($client->client_id);
+            $token_service = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);
+            $token_service->revokeClientRelatedTokens($client->client_id);
             $client->delete();
         }
     }
@@ -171,7 +171,8 @@ class ClientService implements IClientService
             $client_secret = Rand::getString(16);
             $client->client_secret = $client_secret;
             $client->Save();
-            $this->token_service->revokeClientRelatedTokens($client->client_id);
+            $token_service = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);
+            $token_service->revokeClientRelatedTokens($client->client_id);
             return $client->client_secret;
         }
         return '';

@@ -12,4 +12,6 @@ interface IApiScopeService {
      * @return mixed
      */
     public function getAvailableScopes();
+
+    public function getAudienceByScopeNames(array $scopes_names);
 } 

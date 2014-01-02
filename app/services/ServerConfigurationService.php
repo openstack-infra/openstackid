@@ -74,6 +74,9 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
         $this->default_config_params["BlacklistSecurityPolicy.OAuth2.BearerTokenDisclosureAttemptInitialDelay"] = 10;
 
 
+        $this->default_config_params["OAuth2.AuthorizationCode.Lifetime"] = 600;
+        $this->default_config_params["OAuth2.AccessToken.Lifetime"]       = 3600;
+        $this->default_config_params["OAuth2.RefreshToken.Lifetime"]      = 3600;
 
     }
 
@@ -103,11 +106,15 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
                 $conf = ServerConfiguration::where('key', '=', $key)->first();
                 if ($conf)
                     $this->redis->setnx($key, $conf->value);
-                else if (isset($this->default_config_params[$key]))
+                else
+                if (isset($this->default_config_params[$key]))
                     $this->redis->setnx($key, $this->default_config_params[$key]);
-                else return null;
+                else
+                    return null;
             }
+
             $res = $this->redis->get($key);
+
         } catch (Exception $ex) {
             Log::error($ex);
             if (isset($this->default_config_params[$key])) {

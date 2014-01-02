@@ -102,14 +102,16 @@ class OAuth2TokenEndpointTest extends TestCase
 
             $content = $response->getContent();
 
-            $response = json_decode($content);
-            $access_token = $response->access_token;
+            $response      = json_decode($content);
+            $access_token  = $response->access_token;
+            $refresh_token = $response->refresh_token;
+
             $this->assertTrue(!empty($access_token));
+            $this->assertTrue(!empty($refresh_token));
 
             $params = array(
                 'token'      => $access_token,
                 'grant_type' =>  oauth2\grant_types\ValidateBearerTokenGrantType::OAuth2Protocol_GrantType_Extension_ValidateBearerToken,
-
             );
 
             $response = $this->action("POST", "OAuth2ProviderController@token",
@@ -128,6 +130,30 @@ class OAuth2TokenEndpointTest extends TestCase
 
             $this->assertTrue(!empty($test_access_token));
             $this->assertTrue($test_access_token === $access_token);
+
+            $params = array(
+                'refresh_token'  => $refresh_token,
+                'grant_type'     =>  OAuth2Protocol::OAuth2Protocol_GrantType_RefreshToken,
+            );
+
+            $response = $this->action("POST", "OAuth2ProviderController@token",
+                $params,
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+            $this->assertResponseStatus(200);
+
+            $response = $this->action("POST", "OAuth2ProviderController@token",
+                $params,
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+            $this->assertResponseStatus(400);
+
 
         } catch (Exception $ex) {
             throw $ex;

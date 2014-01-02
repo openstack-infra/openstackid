@@ -34,6 +34,6 @@ class TokenEndpoint implements IOAuth2Endpoint
                 return $grant->completeFlow($request);
             }
         }
-        throw new InvalidOAuth2Request;
+        throw new InvalidGrantTypeException;
     }
 }

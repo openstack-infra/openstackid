@@ -50,7 +50,7 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
 
                     try {
 
-                        $issued = $banned_ip->created_at;
+                        $issued  = $banned_ip->created_at;
                         $utc_now = gmdate("Y-m-d H:i:s", time());
                         $utc_now = DateTime::createFromFormat("Y-m-d H:i:s", $utc_now);
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace oauth2\grant_types;
 
 use oauth2\exceptions\InvalidOAuth2Request;
@@ -10,10 +11,10 @@ use oauth2\requests\OAuth2Request;
 use oauth2\responses\OAuth2AccessTokenValidationResponse;
 use oauth2\services\IClientService;
 use oauth2\services\ITokenService;
+use services\IPHelper;
 use utils\services\ILogService;
 
 use ReflectionClass;
-
 
 
 /**
@@ -34,7 +35,7 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
     {
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
-        return $class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid();
+        return $class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() === $this->getType();
     }
 
     public function getType()
@@ -42,6 +43,11 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
         return self::OAuth2Protocol_GrantType_Extension_ValidateBearerToken;
     }
 
+    /** Not implemented , there is no first process phase on this grant type
+     * @param OAuth2Request $request
+     * @return mixed|void
+     * @throws Exception
+     */
     public function handle(OAuth2Request $request)
     {
         throw new Exception('Not Implemented!');
@@ -57,6 +63,12 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
 
             try{
                 $access_token = $this->token_service->getAccessToken($token_value);
+
+                //checks is current ip belongs to any registered resource server
+                $current_ip   = IPHelper::getUserIp();
+                if(!$this->token_service->checkAccessTokenAudience($access_token,$current_ip))
+                    throw new BearerTokenDisclosureAttemptException(sprintf("Access Token %s was not emitted for ip %s",$token_value,$current_ip));
+
                 return new OAuth2AccessTokenValidationResponse($token_value, $access_token->getScope(), $access_token->getAudience(),$access_token->getClientId());
             }
             catch(InvalidAccessTokenException $ex1){

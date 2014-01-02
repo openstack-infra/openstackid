@@ -25,7 +25,6 @@ class CreateTableOauth2AccessToken extends Migration {
             $table->index('client_id');
             $table->foreign('client_id')->references('id')->on('oauth2_client');
         });
-
     }
 
 	/**
