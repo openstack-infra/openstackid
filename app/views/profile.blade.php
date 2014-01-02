@@ -75,7 +75,7 @@
             <legend><i class="icon-info-sign accordion-toggle" title="Users can keep track of their registered applications and manage them"></i>&nbsp;Registered Applications</legend>
             {{ HTML::link(URL::action("UserController@postAddRegisteredClient",null),'Register Application',array('class'=>'btn add-client','title'=>'Adds a Registered Application')) }}
             @if (count($clients)>0)
-            <table class="table table-hover table-condensed">
+            <table id='tclients' class="table table-hover table-condensed">
                 <thead>
                 <tr>
                     <th>Application Name</th>
@@ -199,12 +199,14 @@
         $("body").on('click',".app-active-checkbox",function(event){
 
             var client    = {};
-            client.id     = $(this).attr('value');
+            var client_id = $(this).attr('value');
+            var url       = '{{ URL::action("UserController@postActivateClient",array("id"=>-1)) }}'
+            url           = url.replace('-1',client_id);
             client.active = $(this).is(':checked');
             $.ajax(
                 {
                     type: "POST",
-                    url: '{{ URL::action("UserController@postActivateClient") }}',
+                    url: url,
                     data: JSON.stringify(client),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
@@ -218,7 +220,6 @@
                 }
             );
         });
-
 
 
         $("#dialog-form-register-new-app").dialog({
@@ -288,11 +289,14 @@
                                             }
                                         }
                                     };
-                                    var html = template.render(clients, directives);
-                                    $('#body-registered-clients').html(html.html());
+                                    var body = template.render(clients, directives);
+                                    var table = $('<table id="tclients" class="table table-hover table-condensed"><thead><tr><th>Application Name</th><th>Type</th><th>Is Active</th><th>Is Locked</th><th>Modified</th><th>&nbsp;</th></tr></thead>'+body.html()+'</table>');
+                                    $('#tclients','#clients').remove();
+                                    $('#clients').append(table);
                                 }
-
-
+                                else{
+                                    alert(data.msg);
+                                }
                             },
                             error: function (jqXHR, textStatus, errorThrown) {
                                 alert( "Request failed: " + textStatus );

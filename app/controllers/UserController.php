@@ -84,14 +84,20 @@ class UserController extends BaseController
             'getRegenerateClientSecret',
             'getDeleteClientAllowedUri',
             'postAddAllowedRedirectUri',
-            'getRegisteredClientUris')));
+            'getRegisteredClientUris',
+            'postActivateClient',
+            'postUseRefreshTokenClient',
+            'postRotateRefreshTokenPolicy')));
 
          $this->beforeFilter('ajax', array('only' => array(
              'postAddAllowedScope',
              'getRegenerateClientSecret',
              'getDeleteClientAllowedUri',
              'postAddAllowedRedirectUri',
-             'getRegisteredClientUris')));
+             'getRegisteredClientUris',
+             'postActivateClient',
+             'postUseRefreshTokenClient',
+             'postRotateRefreshTokenPolicy')));
 
     }
 
@@ -261,7 +267,7 @@ class UserController extends BaseController
             return View::make("404");
         }
 
-        $allowed_uris = $client->getClientRegisteredUris();
+        $allowed_uris    = $client->getClientRegisteredUris();
         $selected_scopes = $client->getClientScopes();
         $aux_scopes = array();
         foreach ($selected_scopes as $scope) {
@@ -310,7 +316,7 @@ class UserController extends BaseController
         try {
             $input = Input::All();
             $user = $this->auth_service->getCurrentUser();
-            // todo: check application unique name
+
             // Build the validation constraint set.
             $rules = array(
                 'app_name' => 'required',
@@ -325,6 +331,12 @@ class UserController extends BaseController
                 $app_name = trim($input['app_name']);
                 $app_desc = trim($input['app_desc']);
                 $app_type = $input['app_type'];
+
+                if($this->client_service->existClientAppName($app_name))
+                {
+                    throw new Exception("Application Name already exists!");
+                }
+
                 $this->client_service->addClient($app_type, $user->getId(), $app_name, $app_desc, '');
 
                 $clients = $user->getClients();
@@ -347,7 +359,7 @@ class UserController extends BaseController
             throw new Exception("invalid param!");
         } catch (Exception $ex) {
             Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
+            return Response::json(array('status' => 'ERROR', 'msg'=> $ex->getMessage()));
         }
     }
 
@@ -436,25 +448,73 @@ class UserController extends BaseController
         }
     }
 
-    public function postActivateClient(){
+    public function postActivateClient($id){
         try {
             $input = Input::All();
 
-            $user = $this->auth_service->getCurrentUser();
             // Build the validation constraint set.
             $rules = array(
-                'id'        => 'required',
-                'active'   => 'required',
+                'active'    => 'required',
             );
 
             // Create a new validator instance.
             $validator = Validator::make($input, $rules);
             if ($validator->passes()) {
 
-                $id      = $input['id'];
                 $active  = $input['active'];
 
-                $this->client_service->activateClient($id,$active,$user->getId());
+                $this->client_service->activateClient($id,$active);
+
+                return Response::json(array('status' => 'OK'));
+            }
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return Response::json(array('status' => 'ERROR'));
+        }
+    }
+
+    public function postUseRefreshTokenClient($id){
+        try {
+            $input = Input::All();
+
+            // Build the validation constraint set.
+            $rules = array(
+                'use_refresh_token'    => 'required'
+            );
+
+            // Create a new validator instance.
+            $validator = Validator::make($input, $rules);
+            if ($validator->passes()) {
+
+                $use_refresh_token  = $input['use_refresh_token'];
+
+                $this->client_service->setRefreshTokenUsage($id,$use_refresh_token);
+
+                return Response::json(array('status' => 'OK'));
+            }
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return Response::json(array('status' => 'ERROR'));
+        }
+    }
+
+    public function postRotateRefreshTokenPolicy($id){
+        try {
+            $input = Input::All();
+
+            // Build the validation constraint set.
+            $rules = array(
+                'rotate_refresh_token'    => 'required'
+            );
+
+            // Create a new validator instance.
+            $validator = Validator::make($input, $rules);
+
+            if ($validator->passes()) {
+
+                $rotate_refresh_token  = $input['rotate_refresh_token'];
+
+                $this->client_service->setRotateRefreshTokenPolicy($id,$rotate_refresh_token);
 
                 return Response::json(array('status' => 'OK'));
             }

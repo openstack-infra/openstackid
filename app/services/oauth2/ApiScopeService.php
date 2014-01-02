@@ -20,7 +20,17 @@ class ApiScopeService implements IApiScopeService {
      * @return mixed
      */
     public function getAvailableScopes(){
-        return ApiScope::where('active','=',true)->where('system','=',false)->get();
+         $scopes = ApiScope::with('api')
+            ->where('active','=',true)
+            ->where('system','=',false)
+            ->orderBy('api_id')->get();
+        $res = array();
+        foreach($scopes as $scope){
+            $api = $scope->api()->first();
+            if($api->active && $api->resource_server()->first()->active)
+                array_push($res,$scope);
+        }
+        return $res;
     }
 
     public function getAudienceByScopeNames(array $scopes_names){

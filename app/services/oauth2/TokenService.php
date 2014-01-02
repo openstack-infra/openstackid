@@ -385,7 +385,7 @@ class TokenService implements ITokenService
             throw new InvalidGrantTypeException(sprintf("refresh token %s does not exists!", $value));
 
         if ($refresh_token_db->void) {
-            throw new ReplayAttackException(sprintf("refresh token %s is void", $value));
+            throw new ReplayAttackException($value, sprintf("refresh token %s is void", $value));
         }
 
         //check is refresh token is stills alive... (ZERO is infinite lifetime)

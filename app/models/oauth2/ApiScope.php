@@ -33,6 +33,10 @@ class ApiScope extends Eloquent implements IApiScope {
 
     public function getApiName()
     {
-        return $this->api()->name;
+        return $this->api()->first()->name;
+    }
+
+    public function getApiDescription(){
+        return $this->api()->first()->description;
     }
 }

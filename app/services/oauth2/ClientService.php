@@ -192,11 +192,31 @@ class ClientService implements IClientService
         }
     }
 
-    public function activateClient($id,$active,$user_id){
+    public function activateClient($id,$active){
         $client = $this->getClientByIdentifier($id);
-        if(!is_null($client) && $client->getUserId()==$user_id){
+        if(!is_null($client)){
             $client->active = $active;
             $client->Save();
         }
+    }
+
+    public function setRefreshTokenUsage($id, $use_refresh_token){
+        $client = $this->getClientByIdentifier($id);
+        if(!is_null($client)){
+            $client->use_refresh_token = $use_refresh_token;
+            $client->Save();
+        }
+    }
+
+    public function setRotateRefreshTokenPolicy($id, $rotate_refresh_token){
+        $client = $this->getClientByIdentifier($id);
+        if(!is_null($client)){
+            $client->rotate_refresh_token = $rotate_refresh_token;
+            $client->Save();
+        }
+    }
+
+    public function existClientAppName($app_name){
+        return Client::where('app_name','=',$app_name)->count() > 0;
     }
 }

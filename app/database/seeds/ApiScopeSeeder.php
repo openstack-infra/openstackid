@@ -6,7 +6,8 @@ class ApiScopeSeeder extends Seeder {
     {
         DB::table('oauth2_api_scope')->delete();
 
-        $api = Api::where('name','=','test api user activities')->first();
+        $api = Api::where('name','=','api user activities')->first();
+        $api2 = Api::where('name','=','api echo-sign')->first();
 
         ApiScope::create(
             array(
@@ -32,6 +33,15 @@ class ApiScopeSeeder extends Seeder {
                 'short_description'  => 'User Activities Read/Write Access',
                 'description'        =>  'User Activities Read/Write Access',
                 'api_id'             => $api->id,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => 'https://www.echosign.com/users/activities.read.write',
+                'short_description'  => 'User Activities Read/Write Access',
+                'description'        =>  'User Activities Read/Write Access',
+                'api_id'             => $api2->id,
             )
         );
     }

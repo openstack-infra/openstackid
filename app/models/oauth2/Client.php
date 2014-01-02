@@ -53,7 +53,17 @@ class Client extends Eloquent implements IClient {
 
     public function getClientScopes()
     {
-        return $this->scopes()->get();
+        $scopes = $this->scopes()
+            ->with('api')
+            ->where('active','=',true)
+            ->where('system','=',false)
+            ->orderBy('api_id')->get();
+        $res = array();
+        foreach($scopes as $scope){
+            if($scope->api()->first()->resource_server()->first()->active && $scope->api()->first()->active)
+                array_push($res,$scope);
+        }
+        return $res;
     }
 
     public function getClientRegisteredUris()
@@ -67,7 +77,7 @@ class Client extends Eloquent implements IClient {
         $desired_scopes = explode(" ",$scope);
         foreach($desired_scopes as $desired_scope){
             $db_scope = $this->scopes()->where('name', '=', $desired_scope)->where('active', '=', true)->first();
-            if(is_null($db_scope)){
+            if(is_null($db_scope) || !$scope->api()->first()->active && !$scope->api()->first()->resource_server()->first()->active){
                 $res = false;
                 break;
             }

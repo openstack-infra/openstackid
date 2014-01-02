@@ -13,4 +13,5 @@ interface IApiScope {
     public function getDescription();
     public function isActive();
     public function getApiName();
+    public function getApiDescription();
 } 

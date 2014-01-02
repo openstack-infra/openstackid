@@ -40,6 +40,37 @@
                     {{ HTML::link(URL::action("UserController@getRegenerateClientSecret",array("id"=>$client->id)),'Regenerate',array('class'=>'btn regenerate-client-secret','title'=>'Regenerates Client Secret')) }}
                 </div>
             </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <label class="label-client-secret">Client Settings</label>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                <label class="checkbox">
+                    <input type="checkbox"
+                    @if ($client->use_refresh_token)
+                    checked
+                    @endif
+                    id="use-refresh-token">
+                    Use Refresh Tokens
+                    &nbsp;<i class="icon-info-sign accordion-toggle" title=""></i>
+                </label>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <label class="checkbox">
+                        <input type="checkbox"
+                        @if ($client->rotate_refresh_token)
+                        checked
+                        @endif
+                        id="use-rotate-refresh-token-policy">
+                        Use Rotate Refresh Token Policy
+                        &nbsp;<i class="icon-info-sign accordion-toggle" title=""></i>
+                    </label>
+                </div>
+            </div>
             @endif
         </div>
     </div>
@@ -81,19 +112,32 @@
     <h3><i class="icon-info-sign accordion-toggle" title="Application Allowed Scopes"></i>&nbsp;Application Allowed Scopes</h3>
     <div class="row-fluid">
         <div class="span12">
-            <ul class="unstyled list-inline">
+            <ul class="unstyled list-inline"><li>
+            <?php $last_api = ''; ?>
             @foreach ($scopes as $scope)
+                <?php $current_api = $scope->getApiName(); ?>
+                @if($last_api!=$current_api)
+                    @if($last_api!='')
+                        </ul><!--scopes-->
+                        </li><li>
+                    @endif
+                    <?php $last_api = $current_api;?>
+                        {{ $current_api }}&nbsp;<i class="icon-info-sign accordion-toggle" title="{{$scope->getApiDescription()}}"></i>
+                    <ul class="unstyled list-inline">
+
+                @endif
                 <li>
                     <label class="checkbox">
                             <input type="checkbox" class="scope-checkbox" id="scope[]"
                             @if ( in_array($scope->id,$selected_scopes))
                                 checked
                             @endif
-                            value="{{$scope->id}}"/>{{$scope->name}}&nbsp;<i class="icon-info-sign accordion-toggle" title="{{$scope->description}}"></i>
+                            value="{{$scope->id}}"/> {{$scope->name}}&nbsp;<i class="icon-info-sign accordion-toggle" title="{{$scope->description}}"></i>
                     </label>
                 </li>
             @endforeach
-            </ul>
+            </ul><!--scopes-->
+            </li></ul>
         </div>
     </div>
 </div>
@@ -250,10 +294,53 @@
             return false;
         });
 
+        $("body").on('click',"#use-refresh-token",function(event){
+            var param = {};
+            param.use_refresh_token  = $(this).is(':checked');
+            $.ajax(
+                {
+                    type: "POST",
+                    url: '{{URL::action("UserController@postUseRefreshTokenClient",array("id"=>$client->id))}}',
+                    data: JSON.stringify(param),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    timeout:60000,
+                    success: function (data,textStatus,jqXHR) {
+                        //load data...
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert( "Request failed: " + textStatus );
+                    }
+                }
+            );
+        });
+
+        $("body").on('click',"#use-rotate-refresh-token-policy",function(event){
+            var param = {};
+            param.rotate_refresh_token  = $(this).is(':checked');
+            $.ajax(
+                {
+                    type: "POST",
+                    url: '{{URL::action("UserController@postRotateRefreshTokenPolicy",array("id"=>$client->id))}}',
+                    data: JSON.stringify(param),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    timeout:60000,
+                    success: function (data,textStatus,jqXHR) {
+                        //load data...
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert( "Request failed: " + textStatus );
+                    }
+                }
+            );
+        });
+
+
         $("body").on('click',".scope-checkbox",function(event){
             var scope = {};
             scope.scope_id = $(this).attr('value');
-            scope.checked = $(this).is(':checked');
+            scope.checked  = $(this).is(':checked');
             $.ajax(
                 {
                     type: "POST",

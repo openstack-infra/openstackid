@@ -58,6 +58,34 @@ interface IClientService {
      */
     public function lockClient($client_id);
 
+    /**
+     * Activate/Deactivate given client
+     * @param $id
+     * @param $active
+     * @return mixed
+     */
+    public function activateClient($id, $active);
 
-    public function activateClient($id, $active,$user_id);
+    /**
+     * set/unset refresh token usage for a given client
+     * @param $id
+     * @param $use_refresh_token
+     * @return mixed
+     */
+    public function setRefreshTokenUsage($id, $use_refresh_token);
+
+    /**
+     * set/unset rotate refresh token policy for a given client
+     * @param $id
+     * @param $rotate_refresh_token
+     * @return mixed
+     */
+    public function setRotateRefreshTokenPolicy($id, $rotate_refresh_token);
+
+    /**
+     * Checks if an app name already exists or not
+     * @param $app_name
+     * @return boolean
+     */
+    public function existClientAppName($app_name);
 } 
