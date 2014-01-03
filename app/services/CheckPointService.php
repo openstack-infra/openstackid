@@ -46,6 +46,7 @@ class CheckPointService implements ICheckPointService
             $user_trail->from_ip = $remote_ip;
             $user_trail->exception_type = $class_name;
             $user_trail->Save();
+            Log::error(sprintf("* CheckPointService - exception : << %s >> - IP Address: %s",$ex->getMessage(),$remote_ip));
             //applying policies
             foreach ($this->policies as $policy) {
                 $policy->apply($ex);
