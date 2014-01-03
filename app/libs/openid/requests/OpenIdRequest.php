@@ -34,4 +34,10 @@ abstract class OpenIdRequest
     {
         return $this->message->getParam($param);
     }
+
+    public function toString()
+    {
+        $string = $this->message->toString();
+        return $string;
+    }
 }

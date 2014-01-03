@@ -7,6 +7,7 @@ use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
 use openid\services\Registry;
 use openid\services\ServiceCatalog;
+use Exception;
 
 class OpenIdAuthenticationRequest extends OpenIdRequest
 {
@@ -30,6 +31,7 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
 
     public function isValid()
     {
+        try{
         $return_to = $this->getReturnTo();
         $claimed_id = $this->getClaimedId();
         $identity = $this->getIdentity();
@@ -45,6 +47,12 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
         && !empty($identity)
         && $valid_id
         && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
+        }
+        catch(Exception $ex){
+            $log = Registry::getInstance()->get(ServiceCatalog::LogService);
+            $log->error($ex);
+            return false;
+        }
     }
 
     public function getReturnTo()

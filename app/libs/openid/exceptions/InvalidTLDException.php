@@ -4,12 +4,12 @@ namespace openid\exceptions;
 
 use Exception;
 
-class InvalidSessionTypeException extends Exception
+class InvalidTLDException extends Exception
 {
 
     public function __construct($message = "")
     {
-        $message = "Invalid Session Type: " . $message;
+        $message = "Invalid TDL: " . $message;
         parent::__construct($message, 0, null);
     }
 
