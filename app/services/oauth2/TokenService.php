@@ -121,16 +121,14 @@ class TokenService implements ITokenService
     }
 
     /**
-     * @param $auth_code
-     * @param $client_id
-     * @param $scope
+     * @param AuthorizationCode $auth_code
      * @param null $redirect_uri
-     * @return Token
+     * @return AccessToken
      */
     public function createAccessToken(AuthorizationCode $auth_code, $redirect_uri = null)
     {
         $access_token = AccessToken::create($auth_code, $this->configuration_service->getConfigValue('OAuth2.AccessToken.Lifetime'));
-        $value = $access_token->getValue();
+        $value        = $access_token->getValue();
         $hashed_value = Hash::compute('sha256', $value);
 
         $this->storesAccessTokenOnRedis($access_token);
@@ -143,6 +141,32 @@ class TokenService implements ITokenService
         $access_token_db->value                         = $hashed_value;
         $access_token_db->from_ip                       = IPHelper::getUserIp();
         $access_token_db->associated_authorization_code = Hash::compute('sha256', $access_token->getAuthCode());
+        $access_token_db->lifetime                      = $access_token->getLifetime();
+        $access_token_db->scope                         = $access_token->getScope();
+        $access_token_db->client_id                     = $client->getId();
+        $access_token_db->audience                      = $access_token->getAudience();
+        $access_token_db->Save();
+
+        //stores brand new access token hash value on a set by client id...
+        $this->redis->sadd($client_id . self::ClientAccessTokenPrefixList, $hashed_value);
+        return $access_token;
+    }
+
+    public function createAccessTokenFromParams($scope, $client_id, $audience){
+        $access_token = AccessToken::createFromParams($scope, $client_id, $audience, $this->configuration_service->getConfigValue('OAuth2.AccessToken.Lifetime'));
+        $value        = $access_token->getValue();
+        $hashed_value = Hash::compute('sha256', $value);
+
+        $this->storesAccessTokenOnRedis($access_token);
+
+        $client_id = $access_token->getClientId();
+        $client    = $this->client_service->getClientById($client_id);
+
+        //stores in DB
+        $access_token_db                                = new DBAccessToken;
+        $access_token_db->value                         = $hashed_value;
+        $access_token_db->from_ip                       = IPHelper::getUserIp();
+        $access_token_db->associated_authorization_code = null;
         $access_token_db->lifetime                      = $access_token->getLifetime();
         $access_token_db->scope                         = $access_token->getScope();
         $access_token_db->client_id                     = $client->getId();

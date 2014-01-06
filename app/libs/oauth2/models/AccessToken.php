@@ -28,6 +28,17 @@ class AccessToken extends Token {
         return $instance;
     }
 
+    public static function createFromParams($scope, $client_id, $audience,$lifetime){
+        $instance = new self();
+        $instance->value        = Rand::getString($instance->len,null,true);
+        $instance->scope        = $scope;
+        $instance->client_id    = $client_id;
+        $instance->auth_code    = null;
+        $instance->audience     = $audience;
+        $instance->lifetime     = $lifetime;
+        return $instance;
+    }
+
     public static function createFromRefreshToken(RefreshToken $refresh_token,$scope = null,  $lifetime = 3600){
         $instance = new self();
         $instance->value        = Rand::getString($instance->len,null,true);

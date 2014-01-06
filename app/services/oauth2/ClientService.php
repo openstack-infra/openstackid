@@ -22,6 +22,8 @@ use oauth2\services\OAuth2ServiceCatalog;
 class ClientService implements IClientService
 {
 
+    const PrintableNonWhitespaceCharactersUrl = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~.-_';
+
     private $auth_service;
 
     public function __construct(IAuthService $auth_service)
@@ -79,10 +81,10 @@ class ClientService implements IClientService
         $client = new Client;
         $client->app_name = $app_name;
         $client->app_logo = $app_logo;
-        $client->client_id = Rand::getString(32) . '.openstack.client';
+        $client->client_id = Rand::getString(32, self::PrintableNonWhitespaceCharactersUrl,true) . '.openstack.client';
         //only generates secret for confidential clients
         if($client_type==IClient::ClientType_Confidential)
-            $client->client_secret = Rand::getString(16);
+            $client->client_secret = Rand::getString(16, self::PrintableNonWhitespaceCharactersUrl,true);
         $client->client_type = $client_type;
         $client->user_id = $user_id;
         $client->active = true;
@@ -168,7 +170,7 @@ class ClientService implements IClientService
 
         $client = Client::find($id);
         if (!is_null($client)) {
-            $client_secret = Rand::getString(16);
+            $client_secret = Rand::getString(16, self::PrintableNonWhitespaceCharactersUrl,true);
             $client->client_secret = $client_secret;
             $client->Save();
             $token_service = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);

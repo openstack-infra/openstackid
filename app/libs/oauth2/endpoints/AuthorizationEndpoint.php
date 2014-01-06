@@ -10,6 +10,12 @@ use oauth2\exceptions\InvalidGrantTypeException;
 /**
  * Class AuthorizationEndpoint
  * Authorization Endpoint Implementation
+ * The authorization endpoint is used to interact with the resource
+ * owner and obtain an authorization grant.  The authorization server
+ * MUST first verify the identity of the resource owner.  The way in
+ * which the authorization server authenticates the resource owner
+ * (e.g., username and password login, session cookies) is beyond the
+ * scope of this specification.
  * http://tools.ietf.org/html/rfc6749#section-3.1
  * @package oauth2\endpoints
  */

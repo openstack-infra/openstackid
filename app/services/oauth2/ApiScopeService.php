@@ -46,5 +46,15 @@ class ApiScopeService implements IApiScopeService {
         return $audience;
     }
 
+    public function getStrAudienceByScopeNames(array $scopes_names){
+        $audiences = $this->getAudienceByScopeNames($scopes_names);
+        $audience  = '';
+        foreach($audiences as $resource_server_host => $ip){
+            $audience = $audience . $resource_server_host .' ';
+        }
+        $audience  = trim($audience);
+        return $audience;
+    }
+
 
 }

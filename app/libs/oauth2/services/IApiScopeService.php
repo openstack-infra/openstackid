@@ -14,4 +14,6 @@ interface IApiScopeService {
     public function getAvailableScopes();
 
     public function getAudienceByScopeNames(array $scopes_names);
+
+    public function getStrAudienceByScopeNames(array $scopes_names);
 } 

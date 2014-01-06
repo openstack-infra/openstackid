@@ -56,9 +56,6 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
         if(is_null($this->getRedirectUri()))
             return false;
 
-        if(is_null($this->getScope()))
-            return false;
-
         return true;
     }
 }

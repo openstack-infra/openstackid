@@ -64,7 +64,7 @@ class MementoOAuth2AuthenticationRequestService implements IMementoOAuth2Authent
                 }
             }
             if (count($oauth2_params) > 0) {
-                $msg = new OAuth2AuthorizationRequest($oauth2_params);
+                $msg = new OAuth2AuthorizationRequest(new OAuth2Message($oauth2_params));
             }
         }
         return $msg;

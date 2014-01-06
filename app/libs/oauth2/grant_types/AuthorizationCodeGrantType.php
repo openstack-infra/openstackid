@@ -33,13 +33,17 @@ use utils\services\ILogService;
 /**
  * Class AuthorizationCodeGrantType
  * Authorization Code Grant Implementation
+ *  The authorization code grant type is used to obtain both access
+ * tokens and refresh tokens and is optimized for confidential clients.
+ * Since this is a redirection-based flow, the client must be capable of
+ * interacting with the resource owner's user-agent (typically a web
+ * browser) and capable of receiving incoming requests (via redirection)
+ * from the authorization server.
  * http://tools.ietf.org/html/rfc6749#section-4.1
  * @package oauth2\grant_types
  */
 class AuthorizationCodeGrantType extends AbstractGrantType
 {
-
-
     private $auth_service;
     private $auth_strategy;
     private $memento_service;
@@ -59,7 +63,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
         return
-            ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest' && $request->isValid()) ||
+            ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest' && $request->isValid() && $request->getResponseType() === $this->getResponseType()) ||
             ($class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() === $this->getType());
     }
 
@@ -88,7 +92,8 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
         if ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest') {
-            $client_id = $request->getClientId();
+
+            $client_id    = $request->getClientId();
 
             $response_type = $request->getResponseType();
 
@@ -126,26 +131,14 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             } else if ($authorization_response === IAuthService::AuthorizationResponse_DenyOnce) {
                 throw new AccessDeniedException;
             }
-            $response  = new OAuth2AuthorizationResponse();
             // build current audience ...
-            $audiences = $this->scope_service->getAudienceByScopeNames(explode(' ',$scope));
-            $audience  = '';
-            foreach($audiences as $resource_server_host => $ip){
-                $audience = $audience . $resource_server_host .' ';
-            }
-            $audience  = trim($audience);
+            $audience  = $this->scope_service->getStrAudienceByScopeNames(explode(' ',$scope));
 
             $auth_code = $this->token_service->createAuthorizationCode($client_id, $scope, $audience, $redirect_uri);
 
             if (is_null($auth_code))
                 throw new OAuth2GenericException("Invalid Auth Code");
-
-            $response->setAuthorizationCode($auth_code->getValue());
-            $response->setReturnTo($redirect_uri);
-            //if state is present, return it on response
-            if (!is_null($state))
-                $response->setState($state);
-            return $response;
+            return new OAuth2AuthorizationResponse($redirect_uri, $auth_code->getValue(), $state);
         }
         throw new InvalidOAuth2Request;
     }

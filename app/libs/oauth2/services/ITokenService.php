@@ -38,6 +38,15 @@ interface ITokenService {
     public function createAccessToken(AuthorizationCode $auth_code,$redirect_uri=null);
 
 
+    /**
+     * @param $scope
+     * @param $client_id
+     * @param $audience
+     * @return mixed
+     */
+    public function createAccessTokenFromParams($scope, $client_id, $audience);
+
+
     /** Creates a new Access Token from a given refresh token, and invalidate former associated
      *  Access Token
      * @param RefreshToken $refresh_token

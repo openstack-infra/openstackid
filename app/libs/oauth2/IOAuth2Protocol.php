@@ -11,7 +11,7 @@ interface IOAuth2Protocol {
      * @param OAuth2Request $request
      * @return mixed
      */
-    public function authorize(OAuth2Request $request);
+    public function authorize(OAuth2Request $request = null);
 
     /**
      * Token Endpoint
@@ -19,7 +19,7 @@ interface IOAuth2Protocol {
      * @param OAuth2Request $request
      * @return mixed
      */
-    public function token(OAuth2Request $request);
+    public function token(OAuth2Request $request = null);
 
     /**
      * Get all available grant types set on the protocol

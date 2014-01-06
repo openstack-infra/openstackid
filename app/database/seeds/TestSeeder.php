@@ -310,17 +310,40 @@ class TestSeeder extends Seeder {
             )
         );
 
-        $client = Client::where('app_name','=','oauth2_test_app')->first();
+        Client::create(
+            array(
+                'app_name'             => 'oauth2_test_app_public',
+                'app_description'      => 'oauth2_test_app_public',
+                'app_logo'             => null,
+                'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client',
+                'client_secret'        => 'ITK/6Y5N7kOtGKhg',
+                'client_type'          => IClient::ClientType_Public,
+                'user_id'              => $user->id,
+                'rotate_refresh_token' => true,
+                'use_refresh_token'    => true
+            )
+        );
+
+        $client_confidential = Client::where('app_name','=','oauth2_test_app')->first();
+        $client_public       = Client::where('app_name','=','oauth2_test_app_public')->first();
         //attach scopes
         $scopes = ApiScope::get();
         foreach($scopes as $scope){
-            $client->scopes()->attach($scope->id);
+            $client_confidential->scopes()->attach($scope->id);
+            $client_public->scopes()->attach($scope->id);
         }
         //add uris
         ClientAuthorizedUri::create(
             array(
                 'uri'=>'https://www.test.com/oauth2',
-                'client_id'=>$client->id
+                'client_id'=>$client_confidential->id
+            )
+        );
+
+        ClientAuthorizedUri::create(
+            array(
+                'uri'=>'https://www.test.com/oauth2',
+                'client_id'=>$client_public->id
             )
         );
 

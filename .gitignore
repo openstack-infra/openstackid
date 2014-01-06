@@ -5,8 +5,8 @@ composer.lock
 .DS_Storeapp/storage
 /app/storage/*
 .idea/*
-app/config/dev/database.php
-app/config/testing/database.php
-app/config/local/database.php
-app/config/production/database.php
-app/config/staging/database.php
+app/config/dev/*
+app/config/testing/*
+app/config/local/*
+app/config/production/*
+app/config/staging/*

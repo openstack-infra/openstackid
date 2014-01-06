@@ -7,13 +7,23 @@ use utils\IHttpResponseStrategy;
 use Redirect;
 use Response;
 
-class IndirectResponseStrategy implements IHttpResponseStrategy
+/**
+ * Class IndirectResponseQueryStringStrategy
+ * Redirect and http response using a 302 adding params on query string
+ * @package strategies
+ */
+class IndirectResponseQueryStringStrategy implements IHttpResponseStrategy
 {
 
+    /**
+     * @param $response
+     * @return mixed
+     */
     public function handle($response)
     {
         $query_string = $response->getContent();
-        $return_to = $response->getReturnTo();
+        $return_to    = $response->getReturnTo();
+
         if (is_null($return_to) || empty($return_to)) {
             return \View::make('404');
         }

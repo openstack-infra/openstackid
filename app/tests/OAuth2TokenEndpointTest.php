@@ -37,9 +37,10 @@ class OAuth2TokenEndpointTest extends TestCase
             array(),
             array());
 
-        $status = $response->getStatusCode();
-        $url = $response->getTargetUrl();
+        $url     = $response->getTargetUrl();
         $content = $response->getContent();
+
+        $this->assertResponseStatus(302);
     }
 
     /** Get Token Test
@@ -468,5 +469,48 @@ class OAuth2TokenEndpointTest extends TestCase
         } catch (Exception $ex) {
             throw $ex;
         }
+    }
+
+    public function testImplicitFlow(){
+
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+
+        //do login and consent ...
+        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+
+        Auth::login($user);
+
+        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+
+        $params = array(
+            'client_id'     => $client_id,
+            'redirect_uri'  => 'https://www.test.com/oauth2',
+            'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
+            'scope'         => 'https://www.test.com/users/activities.read',
+            'state'         => '123456'
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+        $url     = $response->getTargetUrl();
+        // get auth code ...
+        $comps = @parse_url($url);
+        $fragment = $comps['fragment'];
+        $response = array();
+        parse_str($fragment, $response);
+
+        $this->assertTrue(isset($response['access_token']) && !empty($response['access_token']));
+        $this->assertTrue(isset($response['expires_in']));
+        $this->assertTrue(isset($response['scope']));
+        $this->assertTrue(isset($response['state']));
+        $this->assertTrue($response['state']==='123456');
+        $this->assertTrue(isset($response['token_type']));
+        $this->assertTrue($response['token_type']==='Bearer');
+
     }
 } 
