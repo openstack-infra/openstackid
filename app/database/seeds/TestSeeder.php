@@ -22,8 +22,8 @@ class TestSeeder extends Seeder {
         DB::table('oauth2_resource_server')->delete();
         DB::table('oauth2_client_authorized_uri')->delete();
         DB::table('oauth2_client_api_scope')->delete();
-        DB::table('oauth2_refresh_token')->delete();
         DB::table('oauth2_access_token')->delete();
+        DB::table('oauth2_refresh_token')->delete();
         DB::table('oauth2_client')->delete();
         DB::table('openid_users')->delete();
 

@@ -21,6 +21,7 @@ interface IOAuth2Protocol {
      */
     public function token(OAuth2Request $request = null);
 
+
     /**
      * Get all available grant types set on the protocol
      * @return mixed

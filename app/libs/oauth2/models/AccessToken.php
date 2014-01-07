@@ -13,6 +13,8 @@ class AccessToken extends Token {
 
     private $auth_code;
 
+    private $refresh_token;
+
     public function __construct(){
         parent::__construct(Token::DefaultByteLength);
     }
@@ -30,24 +32,26 @@ class AccessToken extends Token {
 
     public static function createFromParams($scope, $client_id, $audience,$lifetime){
         $instance = new self();
-        $instance->value        = Rand::getString($instance->len,null,true);
-        $instance->scope        = $scope;
-        $instance->client_id    = $client_id;
-        $instance->auth_code    = null;
-        $instance->audience     = $audience;
-        $instance->lifetime     = $lifetime;
+        $instance->value         = Rand::getString($instance->len,null,true);
+        $instance->scope         = $scope;
+        $instance->client_id     = $client_id;
+        $instance->auth_code     = null;
+        $instance->audience      = $audience;
+        $instance->refresh_token = null;
+        $instance->lifetime      = $lifetime;
         return $instance;
     }
 
     public static function createFromRefreshToken(RefreshToken $refresh_token,$scope = null,  $lifetime = 3600){
         $instance = new self();
-        $instance->value        = Rand::getString($instance->len,null,true);
-        $instance->scope        = $scope;
-        $instance->from_ip      = $refresh_token->getFromIp();
-        $instance->client_id    = $refresh_token->getClientId();
-        $instance->auth_code    = null;
-        $instance->audience     = $refresh_token->getAudience();
-        $instance->lifetime     = $lifetime;
+        $instance->value         = Rand::getString($instance->len,null,true);
+        $instance->scope         = $scope;
+        $instance->from_ip       = $refresh_token->getFromIp();
+        $instance->client_id     = $refresh_token->getClientId();
+        $instance->auth_code     = null;
+        $instance->refresh_token = $refresh_token;
+        $instance->audience      = $refresh_token->getAudience();
+        $instance->lifetime      = $lifetime;
         return $instance;
     }
 
@@ -66,6 +70,14 @@ class AccessToken extends Token {
 
     public function getAuthCode(){
         return $this->auth_code;
+    }
+
+    public function getRefreshToken(){
+        return $this->refresh_token;
+    }
+
+    public function setRefreshToken(RefreshToken $refresh_token){
+        $this->refresh_token = $refresh_token;;
     }
 
 

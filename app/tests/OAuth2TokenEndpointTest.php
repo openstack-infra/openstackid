@@ -48,8 +48,6 @@ class OAuth2TokenEndpointTest extends TestCase
      */
     public function testToken()
     {
-
-
         try {
 
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';

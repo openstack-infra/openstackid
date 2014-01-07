@@ -50,7 +50,7 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
      */
     public function handle(OAuth2Request $request)
     {
-        throw new Exception('Not Implemented!');
+        throw new InvalidOAuth2Request('Not Implemented!');
     }
 
     public function completeFlow(OAuth2Request $request)
@@ -81,7 +81,7 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
 
     public function getResponseType()
     {
-        return null;
+        throw new InvalidOAuth2Request('Not Implemented!');
     }
 
     public function buildTokenRequest(OAuth2Request $request)

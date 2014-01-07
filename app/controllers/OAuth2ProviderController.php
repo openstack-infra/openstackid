@@ -51,4 +51,18 @@ class OAuth2ProviderController extends BaseController {
         }
         return $response;
     }
+
+    /**
+     * Revoke Token HTTP Endpoint
+     * @return mixed
+     */
+    public function revoke(){
+        $response  = $this->oauth2_protocol->revoke(new OAuth2TokenRequest(new OAuth2Message(Input::all())));
+        $reflector = new ReflectionClass($response);
+        if ($reflector->isSubclassOf('oauth2\\responses\\OAuth2Response')) {
+            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($response);
+            return $strategy->handle($response);
+        }
+        return $response;
+    }
 } 

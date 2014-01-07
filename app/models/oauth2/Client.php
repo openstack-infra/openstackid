@@ -16,6 +16,17 @@ class Client extends Eloquent implements IClient {
         }
     }
 
+    public function access_tokens()
+    {
+        return $this->hasMany('AccessToken');
+    }
+
+    public function refresh_tokens()
+    {
+        return $this->hasMany('RefreshToken');
+    }
+
+
     public function user()
     {
         return $this->belongsTo('auth\OpenIdUser');

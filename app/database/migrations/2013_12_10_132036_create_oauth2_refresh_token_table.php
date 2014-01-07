@@ -16,13 +16,12 @@ class CreateOauth2RefreshTokenTable extends Migration {
             $table->bigIncrements('id')->unsigned();
             $table->string('value',255)->unique();
             $table->string('from_ip',255);
-            $table->string('associated_access_token',255);
             $table->integer('lifetime');
             $table->text('scope');
             $table->text('audience');
-            $table->bigInteger("client_id")->unsigned();
             $table->boolean('void')->default(false);
             $table->timestamps();
+            $table->bigInteger("client_id")->unsigned();
             $table->index('client_id');
             $table->foreign('client_id')->references('id')->on('oauth2_client');
         });
