@@ -58,29 +58,36 @@ interface ITokenService {
     /**
      * @param $value
      * @return AccessToken
+     * @throws \oauth2\exceptions\InvalidAccessTokenException
+     * @throws \oauth2\exceptions\InvalidGrantTypeException
      */
     public function getAccessToken($value);
 
     /**
-     * @param $value
-     * @param bool $already_hashed
-     * @return mixed
+     * Checks if current_ip has access rights on the given $access_token
+     * @param AccessToken $access_token
+     * @param $current_ip
+     * @return bool
      */
-    public function revokeAccessToken($value,$already_hashed = false);
+    public function checkAccessTokenAudience(AccessToken $access_token, $current_ip);
+
 
     /**
-     * @param $access_token
+     * Creates a new refresh token and associate it with given access token
+     * @param AccessToken $access_token
      * @return RefreshToken
      */
-    public function createRefreshToken(AccessToken $access_token);
+    public function createRefreshToken(AccessToken &$access_token);
 
     /**
+     * Get a refresh token by its value
      * @param  $value refresh token value
+     * @param $is_hashed
      * @return RefreshToken
      * @throws \oauth2\exceptions\ReplayAttackException
      * @throws \oauth2\exceptions\InvalidGrantTypeException
      */
-    public function getRefreshToken($value);
+    public function getRefreshToken($value, $is_hashed = false);
 
 
     /**
@@ -98,18 +105,37 @@ interface ITokenService {
 
 
     /**
-     * Marks refresh token as void
+     * Revokes a given access token and optionally , its associated refresh token
      * @param $value
-     * @return mixed
+     * @param bool $is_hashed
+     * @return bool
      */
-    public function invalidateRefreshToken($value);
+    public function revokeAccessToken($value, $is_hashed = false);
+
+    /**
+     * @param $value refresh_token value
+     * @param bool $is_hashed
+     * @return bool
+     */
+    public function clearAccessTokensForRefreshToken($value,$is_hashed = false);
+
+    /**
+     * Mark a given refresh token as void
+     * @param $value
+     * @param bool $is_hashed
+     * @return bool
+     */
+    public function invalidateRefreshToken($value, $is_hashed = false);
 
 
     /**
-     * Checks if current_ip has access rights on the given $access_token
-     * @param AccessToken $access_token
-     * @param $current_ip
-     * @return bool
+     * Revokes a give refresh token and all related access tokens
+     * @param $value
+     * @param bool $is_hashed
+     * @return mixed
      */
-    public function checkAccessTokenAudience(AccessToken $access_token, $current_ip);
+    public function revokeRefreshToken($value, $is_hashed = false);
+
+
+
 } 

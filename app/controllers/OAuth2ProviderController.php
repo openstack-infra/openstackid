@@ -5,6 +5,7 @@ use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\requests\OAuth2TokenRequest;
 use oauth2\strategies\OAuth2ResponseStrategyFactoryMethod;
 use oauth2\OAuth2Message;
+use oauth2\requests\OAuth2TokenRevocationRequest;
 
 /**
  * Class OAuth2ProviderController
@@ -44,6 +45,20 @@ class OAuth2ProviderController extends BaseController {
      */
     public function token(){
         $response  = $this->oauth2_protocol->token(new OAuth2TokenRequest(new OAuth2Message(Input::all())));
+        $reflector = new ReflectionClass($response);
+        if ($reflector->isSubclassOf('oauth2\\responses\\OAuth2Response')) {
+            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($response);
+            return $strategy->handle($response);
+        }
+        return $response;
+    }
+
+    /**
+     * Revoke Token HTTP Endpoint
+     * @return mixed
+     */
+    public function revoke(){
+        $response  = $this->oauth2_protocol->revoke(new OAuth2TokenRevocationRequest(new OAuth2Message(Input::all())));
         $reflector = new ReflectionClass($response);
         if ($reflector->isSubclassOf('oauth2\\responses\\OAuth2Response')) {
             $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($response);

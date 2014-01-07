@@ -9,6 +9,8 @@ use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
 use oauth2\services\IClientService;
 use oauth2\exceptions\AllowedClientUriAlreadyExistsException;
+use oauth2\exceptions\InvalidClientException;
+
 use Request;
 use utils\services\IAuthService;
 use utils\services\Registry;
@@ -22,7 +24,7 @@ use oauth2\services\OAuth2ServiceCatalog;
 class ClientService implements IClientService
 {
 
-    const PrintableNonWhitespaceCharactersUrl = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~.-_';
+    const PrintableNonWhitespaceCharactersUrl = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
 
     private $auth_service;
 
@@ -42,30 +44,41 @@ class ClientService implements IClientService
     }
 
     /**
-     *  Clients in possession of a client password MAY use the HTTP Basic
+     * Clients in possession of a client password MAY use the HTTP Basic
      * authentication scheme as defined in [RFC2617] to authenticate with
      * the authorization server
      * Alternatively, the authorization server MAY support including the
      * client credentials in the request-body using the following
      * parameters:
      * implementation of http://tools.ietf.org/html/rfc6749#section-2.3.1
+     * @throws InvalidClientException;
      * @return list
      */
     public function getCurrentClientAuthInfo()
     {
         //check first http basic auth header
         $auth_header = Request::header('Authorization');
+
         if (!is_null($auth_header) && !empty($auth_header)) {
-            $auth_header = trim($auth_header);
-            $auth_header = explode(' ', $auth_header);
+            $auth_header         = trim($auth_header);
+            $auth_header         = explode(' ', $auth_header);
+
+            if(!is_array($auth_header) || count($auth_header)<2)
+                throw new InvalidClientException;
+
             $auth_header_content = $auth_header[1];
             $auth_header_content = base64_decode($auth_header_content);
             $auth_header_content = explode(':', $auth_header_content);
+
+            if(!is_array($auth_header_content) || count($auth_header_content)!==2)
+                throw new InvalidClientException;
+
             //client_id:client_secret
             return array($auth_header_content[0], $auth_header_content[1]);
         }
-        $client_id = Input::get(OAuth2Protocol::OAuth2Protocol_ClientId, '');
-        $client_secret = Input::get(OAuth2Protocol::OAuth2Protocol_ClientSecret, '');
+        //if not get from http input
+        $client_id       = Input::get(OAuth2Protocol::OAuth2Protocol_ClientId, '');
+        $client_secret   = Input::get(OAuth2Protocol::OAuth2Protocol_ClientSecret, '');
         return array($client_id, $client_secret);
     }
 

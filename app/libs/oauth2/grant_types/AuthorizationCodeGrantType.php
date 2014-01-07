@@ -138,6 +138,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
 
             if (is_null($auth_code))
                 throw new OAuth2GenericException("Invalid Auth Code");
+
             return new OAuth2AuthorizationResponse($redirect_uri, $auth_code->getValue(), $state);
         }
         throw new InvalidOAuth2Request;
@@ -209,13 +210,9 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             if (!empty($redirect_uri) && $redirect_uri !== $current_redirect_uri)
                 throw new UriNotAllowedException();
 
-            $access_token = $this->token_service->createAccessToken($auth_code, $current_redirect_uri);
-            //emits refresh token
-            $refresh_token = null;
-            if ($this->current_client->use_refresh_token)
-                $refresh_token = $this->token_service->createRefreshToken($access_token);
-
-            $response = new OAuth2AccessTokenResponse($access_token->getValue(), $access_token->getLifetime(), !is_null($refresh_token) ? $refresh_token->getValue() : null);
+            $access_token  = $this->token_service->createAccessToken($auth_code, $current_redirect_uri);
+            $refresh_token = $access_token->getRefreshToken();
+            $response      = new OAuth2AccessTokenResponse($access_token->getValue(), $access_token->getLifetime(), !is_null($refresh_token) ? $refresh_token->getValue() : null);
             return $response;
 
         }

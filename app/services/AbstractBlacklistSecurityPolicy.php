@@ -7,6 +7,7 @@ use utils\services\IServerConfigurationService;
 use utils\services\ILockManagerService;
 use Log;
 use BannedIP;
+use DB;
 
 abstract class AbstractBlacklistSecurityPolicy implements ISecurityPolicy {
 

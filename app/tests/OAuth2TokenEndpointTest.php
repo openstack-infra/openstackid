@@ -48,8 +48,6 @@ class OAuth2TokenEndpointTest extends TestCase
      */
     public function testToken()
     {
-
-
         try {
 
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
@@ -110,50 +108,6 @@ class OAuth2TokenEndpointTest extends TestCase
             $this->assertTrue(!empty($access_token));
             $this->assertTrue(!empty($refresh_token));
 
-            $params = array(
-                'token'      => $access_token,
-                'grant_type' =>  oauth2\grant_types\ValidateBearerTokenGrantType::OAuth2Protocol_GrantType_Extension_ValidateBearerToken,
-            );
-
-            $response = $this->action("POST", "OAuth2ProviderController@token",
-                $params,
-                array(),
-                array(),
-                // Symfony interally prefixes headers with "HTTP", so
-                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
-
-            $this->assertResponseStatus(200);
-
-            $content = $response->getContent();
-
-            $response = json_decode($content);
-            $test_access_token = $response->access_token;
-
-            $this->assertTrue(!empty($test_access_token));
-            $this->assertTrue($test_access_token === $access_token);
-
-            $params = array(
-                'refresh_token'  => $refresh_token,
-                'grant_type'     =>  OAuth2Protocol::OAuth2Protocol_GrantType_RefreshToken,
-            );
-
-            $response = $this->action("POST", "OAuth2ProviderController@token",
-                $params,
-                array(),
-                array(),
-                // Symfony interally prefixes headers with "HTTP", so
-                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
-
-            $this->assertResponseStatus(200);
-
-            $response = $this->action("POST", "OAuth2ProviderController@token",
-                $params,
-                array(),
-                array(),
-                // Symfony interally prefixes headers with "HTTP", so
-                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
-
-            $this->assertResponseStatus(400);
 
 
         } catch (Exception $ex) {
@@ -193,7 +147,7 @@ class OAuth2TokenEndpointTest extends TestCase
                 array(),
                 array());
 
-            $status = $response->getStatusCode();
+            $status  = $response->getStatusCode();
             $url     = $response->getTargetUrl();
             $content = $response->getContent();
 
@@ -512,5 +466,233 @@ class OAuth2TokenEndpointTest extends TestCase
         $this->assertTrue(isset($response['token_type']));
         $this->assertTrue($response['token_type']==='Bearer');
 
+    }
+
+    public function testTokenRevocation(){
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+
+        //do login and consent ...
+        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+
+        Auth::login($user);
+
+        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+
+        $params = array(
+            'client_id'     => $client_id,
+            'redirect_uri'  => 'https://www.test.com/oauth2',
+            'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
+            'scope'         => 'https://www.test.com/users/activities.read',
+            'state'         => '123456'
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+        $url     = $response->getTargetUrl();
+        // get auth code ...
+        $comps = @parse_url($url);
+        $fragment = $comps['fragment'];
+        $response = array();
+        parse_str($fragment, $response);
+
+        $this->assertTrue(isset($response['access_token']) && !empty($response['access_token']));
+        $this->assertTrue(isset($response['expires_in']));
+        $this->assertTrue(isset($response['scope']));
+        $this->assertTrue(isset($response['state']));
+        $this->assertTrue($response['state']==='123456');
+        $this->assertTrue(isset($response['token_type']));
+        $this->assertTrue($response['token_type']==='Bearer');
+
+
+        $params = array(
+            OAuth2Protocol::OAuth2Protocol_Token => $response['access_token'],
+            OAuth2Protocol::OAuth2Protocol_TokenType_Hint =>OAuth2Protocol::OAuth2Protocol_AccessToken,
+            OAuth2Protocol::OAuth2Protocol_ClientId => $client_id
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@revoke",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(200);
+
+    }
+
+    public function testTokenRevocationInvalidClient(){
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+
+        //do login and consent ...
+        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+
+        Auth::login($user);
+
+        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+
+        $params = array(
+            'client_id'     => $client_id,
+            'redirect_uri'  => 'https://www.test.com/oauth2',
+            'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
+            'scope'         => 'https://www.test.com/users/activities.read',
+            'state'         => '123456'
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+        $url     = $response->getTargetUrl();
+        // get auth code ...
+        $comps = @parse_url($url);
+        $fragment = $comps['fragment'];
+        $response = array();
+        parse_str($fragment, $response);
+
+        $this->assertTrue(isset($response['access_token']) && !empty($response['access_token']));
+        $this->assertTrue(isset($response['expires_in']));
+        $this->assertTrue(isset($response['scope']));
+        $this->assertTrue(isset($response['state']));
+        $this->assertTrue($response['state']==='123456');
+        $this->assertTrue(isset($response['token_type']));
+        $this->assertTrue($response['token_type']==='Bearer');
+
+        //set another public client
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ2x.openstack.client';
+        $params = array(
+            OAuth2Protocol::OAuth2Protocol_Token => $response['access_token'],
+            OAuth2Protocol::OAuth2Protocol_TokenType_Hint =>OAuth2Protocol::OAuth2Protocol_AccessToken,
+            OAuth2Protocol::OAuth2Protocol_ClientId => $client_id
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@revoke",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(200);
+    }
+
+    public function testTokenRevocationInvalidHint(){
+
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+
+        //do login and consent ...
+        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+
+        Auth::login($user);
+
+        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+
+        $params = array(
+            'client_id'     => $client_id,
+            'redirect_uri'  => 'https://www.test.com/oauth2',
+            'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
+            'scope'         => 'https://www.test.com/users/activities.read',
+            'state'         => '123456'
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+        $url     = $response->getTargetUrl();
+        // get auth code ...
+        $comps = @parse_url($url);
+        $fragment = $comps['fragment'];
+        $response = array();
+        parse_str($fragment, $response);
+
+        $this->assertTrue(isset($response['access_token']) && !empty($response['access_token']));
+        $this->assertTrue(isset($response['expires_in']));
+        $this->assertTrue(isset($response['scope']));
+        $this->assertTrue(isset($response['state']));
+        $this->assertTrue($response['state']==='123456');
+        $this->assertTrue(isset($response['token_type']));
+        $this->assertTrue($response['token_type']==='Bearer');
+
+
+        $params = array(
+            OAuth2Protocol::OAuth2Protocol_Token => $response['access_token'],
+            OAuth2Protocol::OAuth2Protocol_TokenType_Hint =>OAuth2Protocol::OAuth2Protocol_RefreshToken,
+            OAuth2Protocol::OAuth2Protocol_ClientId => $client_id
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@revoke",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(200);
+
+    }
+
+    public function testTokenRevocationInvalidToken(){
+
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+
+        //do login and consent ...
+        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+
+        Auth::login($user);
+
+        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+
+        $params = array(
+            'client_id'     => $client_id,
+            'redirect_uri'  => 'https://www.test.com/oauth2',
+            'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
+            'scope'         => 'https://www.test.com/users/activities.read',
+            'state'         => '123456'
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+        $url     = $response->getTargetUrl();
+        // get auth code ...
+        $comps = @parse_url($url);
+        $fragment = $comps['fragment'];
+        $response = array();
+        parse_str($fragment, $response);
+
+        $this->assertTrue(isset($response['access_token']) && !empty($response['access_token']));
+        $this->assertTrue(isset($response['expires_in']));
+        $this->assertTrue(isset($response['scope']));
+        $this->assertTrue(isset($response['state']));
+        $this->assertTrue($response['state']==='123456');
+        $this->assertTrue(isset($response['token_type']));
+        $this->assertTrue($response['token_type']==='Bearer');
+
+
+        $params = array(
+            OAuth2Protocol::OAuth2Protocol_Token => '12345678910',
+            OAuth2Protocol::OAuth2Protocol_ClientId => $client_id
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@revoke",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(200);
     }
 } 

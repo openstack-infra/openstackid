@@ -38,6 +38,7 @@ Route::group(array("before" => "ssl"), function () {
 
     Route::any('/oauth2/auth',"OAuth2ProviderController@authorize");
     Route::post('/oauth2/token',"OAuth2ProviderController@token");
+    Route::post('/oauth2/revoke',"OAuth2ProviderController@revoke");
 });
 
 Route::group(array("before" => array("ssl", "auth")), function () {

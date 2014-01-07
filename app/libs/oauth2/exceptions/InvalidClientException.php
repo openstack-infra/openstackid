@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 12/3/13
- * Time: 4:43 PM
- */
 
 namespace oauth2\exceptions;
 use Exception;

@@ -22,8 +22,8 @@ class TestSeeder extends Seeder {
         DB::table('oauth2_resource_server')->delete();
         DB::table('oauth2_client_authorized_uri')->delete();
         DB::table('oauth2_client_api_scope')->delete();
-        DB::table('oauth2_refresh_token')->delete();
         DB::table('oauth2_access_token')->delete();
+        DB::table('oauth2_refresh_token')->delete();
         DB::table('oauth2_client')->delete();
         DB::table('openid_users')->delete();
 
@@ -316,11 +316,25 @@ class TestSeeder extends Seeder {
                 'app_description'      => 'oauth2_test_app_public',
                 'app_logo'             => null,
                 'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client',
-                'client_secret'        => 'ITK/6Y5N7kOtGKhg',
+                'client_secret'        => null,
                 'client_type'          => IClient::ClientType_Public,
                 'user_id'              => $user->id,
-                'rotate_refresh_token' => true,
-                'use_refresh_token'    => true
+                'rotate_refresh_token' => false,
+                'use_refresh_token'    => false
+            )
+        );
+
+        Client::create(
+            array(
+                'app_name'             => 'oauth2_test_app_public_2',
+                'app_description'      => 'oauth2_test_app_public_2',
+                'app_logo'             => null,
+                'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ2x.openstack.client',
+                'client_secret'        => null,
+                'client_type'          => IClient::ClientType_Public,
+                'user_id'              => $user->id,
+                'rotate_refresh_token' => false,
+                'use_refresh_token'    => false
             )
         );
 

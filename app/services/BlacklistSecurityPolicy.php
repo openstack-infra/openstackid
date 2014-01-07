@@ -20,10 +20,25 @@ use utils\services\IServerConfigurationService;
 class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
 {
 
+    private $exception_dictionary = array();
 
     public function __construct(IServerConfigurationService $server_configuration_service, ILockManagerService $lock_manager_service)
     {
         parent::__construct($server_configuration_service, $lock_manager_service);
+        // here we configure on which exceptions are we interested and the max occurrence attempts and initial delay on tar pit for
+        // offending IP address
+        $this->exception_dictionary = array(
+            'openid\exceptions\ReplayAttackException'                  => array(null,'BlacklistSecurityPolicy.ReplayAttackExceptionInitialDelay'),
+            'openid\exceptions\InvalidNonce'                           => array('BlacklistSecurityPolicy.MaxInvalidNonceAttempts','BlacklistSecurityPolicy.InvalidNonceInitialDelay'),
+            'openid\exceptions\InvalidOpenIdMessageException'          => array('BlacklistSecurityPolicy.MaxInvalidOpenIdMessageExceptionAttempts','BlacklistSecurityPolicy.InvalidOpenIdMessageExceptionInitialDelay'),
+            'openid\exceptions\OpenIdInvalidRealmException'            => array('BlacklistSecurityPolicy.MaxOpenIdInvalidRealmExceptionAttempts','BlacklistSecurityPolicy.OpenIdInvalidRealmExceptionInitialDelay'),
+            'openid\exceptions\InvalidOpenIdMessageMode'               => array('BlacklistSecurityPolicy.MaxInvalidOpenIdMessageModeAttempts','BlacklistSecurityPolicy.InvalidOpenIdMessageModeInitialDelay'),
+            'openid\exceptions\InvalidOpenIdAuthenticationRequestMode' => array('BlacklistSecurityPolicy.MaxInvalidOpenIdAuthenticationRequestModeAttempts','BlacklistSecurityPolicy.InvalidOpenIdAuthenticationRequestModeInitialDelay'),
+            'auth\exceptions\AuthenticationException'                  => array('BlacklistSecurityPolicy.MaxAuthenticationExceptionAttempts','BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay'),
+            'oauth2\exceptions\ReplayAttackException'                  => array(null,'BlacklistSecurityPolicy.OAuth2.AuthCodeReplayAttackInitialDelay'),
+            'oauth2\exceptions\InvalidAuthorizationCodeException'      => array('BlacklistSecurityPolicy.OAuth2.MaxInvalidAuthorizationCodeAttempts','BlacklistSecurityPolicy.OAuth2.InvalidAuthorizationCodeInitialDelay'),
+            'oauth2\exceptions\BearerTokenDisclosureAttemptException'  => array('BlacklistSecurityPolicy.OAuth2.MaxInvalidBearerTokenDisclosureAttempt','BlacklistSecurityPolicy.OAuth2.BearerTokenDisclosureAttemptInitialDelay'),
+        );
     }
 
     /**
@@ -103,86 +118,27 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
     public function apply(Exception $ex)
     {
         try {
-            $remote_ip = IPHelper::getUserIp();
+            $remote_ip       = IPHelper::getUserIp();
             $exception_class = get_class($ex);
             //check exception count by type on last "MinutesWithoutExceptions" minutes...
-            $exception_count = UserExceptionTrail::where('from_ip', '=', $remote_ip)
+            $exception_count = intval(UserExceptionTrail::where('from_ip', '=', $remote_ip)
                 ->where('exception_type', '=', $exception_class)
                 ->where('created_at', '>', DB::raw('( UTC_TIMESTAMP() - INTERVAL ' . $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MinutesWithoutExceptions") . ' MINUTE )'))
-                ->count();
-
-            switch ($exception_class) {
-                case 'openid\exceptions\ReplayAttackException':
-                {
-                    //on replay attack , ban ip..
-                    $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.ReplayAttackExceptionInitialDelay"), $exception_class);
-                }
-                    break;
-                case 'openid\exceptions\InvalidNonce':
-                {
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxInvalidNonceAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.InvalidNonceInitialDelay"), $exception_class);
-                }
-                    break;
-                case 'openid\exceptions\InvalidOpenIdMessageException':
-                {
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxInvalidOpenIdMessageExceptionAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.InvalidOpenIdMessageExceptionInitialDelay"), $exception_class);
-                }
-                    break;
-                case 'openid\exceptions\OpenIdInvalidRealmException':
-                {
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxOpenIdInvalidRealmExceptionAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OpenIdInvalidRealmExceptionInitialDelay"), $exception_class);
-                }
-                    break;
-                case 'openid\exceptions\InvalidOpenIdMessageMode':
-                {
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxInvalidOpenIdMessageModeAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.InvalidOpenIdMessageModeInitialDelay"), $exception_class);
-                }
-                    break;
-                case 'openid\exceptions\InvalidOpenIdAuthenticationRequestMode':
-                {
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxInvalidOpenIdAuthenticationRequestModeAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.InvalidOpenIdAuthenticationRequestModeInitialDelay"), $exception_class);
-                }
-                    break;
-                case 'auth\exceptions\AuthenticationException':
-                {
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MaxAuthenticationExceptionAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay"), $exception_class);
-                }
-                    break;
-                case 'oauth2\exceptions\ReplayAttackException':
-                {
-
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.MaxAuthCodeReplayAttackAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.AuthCodeReplayAttackInitialDelay"), $exception_class);
-
-                }
-                    break;
-
-                case 'oauth2\exceptions\InvalidAuthorizationCodeException':
-                {
-
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.MaxInvalidAuthorizationCodeAttempts"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.InvalidAuthorizationCodeInitialDelay"), $exception_class);
-
-                }
-                    break;
-                case 'oauth2\exceptions\BearerTokenDisclosureAttemptException':
-                {
-                    if ($exception_count >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.MaxInvalidBearerTokenDisclosureAttempt"))
-                        $this->createBannedIP($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.OAuth2.BearerTokenDisclosureAttemptInitialDelay"), $exception_class);
-
-                }
-                    break;
+                ->count());
+            if(array_key_exists($exception_class,$this->exception_dictionary)){
+                $params                   = $this->exception_dictionary[$exception_class];
+                $max_attempts             = !is_null($params[0]) && !empty($params[0])? intval($this->server_configuration_service->getConfigValue($params[0])):0;
+                $initial_delay_on_tar_pit = intval($this->server_configuration_service->getConfigValue($params[1]));
+                if ($exception_count >= $max_attempts)
+                    $this->createBannedIP($initial_delay_on_tar_pit, $exception_class);
             }
         } catch (Exception $ex) {
             Log::error($ex);
         }
     }
 
-
 }
+
+
+
+

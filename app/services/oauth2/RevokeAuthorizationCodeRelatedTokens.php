@@ -20,7 +20,7 @@ use utils\services\ISecurityPolicyCounterMeasure;
  * Class RevokeAuthorizationCodeRelatedTokens
  * @package services\oauth2
  */
-class RevokeAuthorizationCodeRelatedTokens implements ISecurityPolicyCounterMeasure{
+class RevokeAuthorizationCodeRelatedTokens implements ISecurityPolicyCounterMeasure {
 
     public function trigger(array $params = array())
     {

@@ -16,6 +16,14 @@ interface IClientService {
     public function getClientById($client_id);
 
     /**
+     * Clients in possession of a client password MAY use the HTTP Basic
+     * authentication scheme as defined in [RFC2617] to authenticate with
+     * the authorization server
+     * Alternatively, the authorization server MAY support including the
+     * client credentials in the request-body using the following
+     * parameters:
+     * implementation of http://tools.ietf.org/html/rfc6749#section-2.3.1
+     * @throws InvalidClientException;
      * @return list
      */
     public function getCurrentClientAuthInfo();

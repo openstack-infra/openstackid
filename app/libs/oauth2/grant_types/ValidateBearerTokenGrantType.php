@@ -50,7 +50,7 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
      */
     public function handle(OAuth2Request $request)
     {
-        throw new Exception('Not Implemented!');
+        throw new InvalidOAuth2Request('Not Implemented!');
     }
 
     public function completeFlow(OAuth2Request $request)
@@ -69,7 +69,7 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
                 if(!$this->token_service->checkAccessTokenAudience($access_token,$current_ip))
                     throw new BearerTokenDisclosureAttemptException(sprintf("Access Token %s was not emitted for ip %s",$token_value,$current_ip));
 
-                return new OAuth2AccessTokenValidationResponse($token_value, $access_token->getScope(), $access_token->getAudience(),$access_token->getClientId());
+                return new OAuth2AccessTokenValidationResponse($token_value, $access_token->getScope(), $access_token->getAudience(),$access_token->getClientId(),$access_token->getRemainingLifetime());
             }
             catch(InvalidAccessTokenException $ex1){
                 $this->log_service->error($ex1);
@@ -81,12 +81,12 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
 
     public function getResponseType()
     {
-        return null;
+        throw new InvalidOAuth2Request('Not Implemented!');
     }
 
     public function buildTokenRequest(OAuth2Request $request)
     {
-        $reflector = new ReflectionClass($request);
+        $reflector  = new ReflectionClass($request);
         $class_name = $reflector->getName();
         if ($class_name == 'oauth2\requests\OAuth2TokenRequest') {
             if($request->getGrantType() !== $this->getType())
