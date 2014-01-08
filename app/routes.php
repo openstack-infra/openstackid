@@ -35,10 +35,10 @@ Route::group(array("before" => "ssl"), function () {
     Route::get('/accounts/user/login/cancel', "UserController@cancelLogin");
 
     //oauth2 endpoint
-
     Route::any('/oauth2/auth',"OAuth2ProviderController@authorize");
     Route::post('/oauth2/token',"OAuth2ProviderController@token");
-    Route::post('/oauth2/revoke',"OAuth2ProviderController@revoke");
+    Route::post('/oauth2/token/revoke',"OAuth2ProviderController@revoke");
+    Route::post('/oauth2/token/introspection',"OAuth2ProviderController@introspection");
 });
 
 Route::group(array("before" => array("ssl", "auth")), function () {

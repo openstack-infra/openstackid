@@ -26,5 +26,7 @@ interface IClient {
     public function getUserId();
     public function isLocked();
     public function isActive();
+    public function isResourceServerClient();
+    public function getResourceServer();
 
 } 

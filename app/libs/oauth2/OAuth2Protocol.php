@@ -2,11 +2,15 @@
 
 namespace oauth2;
 
-use Exception;
+//endpoints
 use oauth2\endpoints\AuthorizationEndpoint;
 use oauth2\endpoints\RevocationEndpoint;
 use oauth2\endpoints\TokenEndpoint;
+use oauth2\endpoints\TokenIntrospectionEndpoint;
 use oauth2\endpoints\TokenRevocationEndpoint;
+
+//exceptions
+use Exception;
 use oauth2\exceptions\AccessDeniedException;
 use oauth2\exceptions\BearerTokenDisclosureAttemptException;
 use oauth2\exceptions\ExpiredAuthorizationCodeException;
@@ -20,29 +24,26 @@ use oauth2\exceptions\ReplayAttackException;
 use oauth2\exceptions\ScopeNotAllowedException;
 use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\exceptions\UnsupportedResponseTypeException;
+use oauth2\exceptions\UriNotAllowedException;
 
 //grant types
-use oauth2\exceptions\UriNotAllowedException;
 use oauth2\grant_types\AuthorizationCodeGrantType;
 use oauth2\grant_types\ImplicitGrantType;
 use oauth2\grant_types\RefreshBearerTokenGrantType;
 
-use oauth2\grant_types\ValidateBearerTokenGrantType;
 use oauth2\requests\OAuth2Request;
 
 use oauth2\responses\OAuth2DirectErrorResponse;
 use oauth2\responses\OAuth2IndirectErrorResponse;
 use oauth2\responses\OAuth2TokenRevocationResponse;
+
 use oauth2\services\IApiScopeService;
 use oauth2\services\IClientService;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
-
 use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use oauth2\strategies\OAuth2IndirectErrorResponseFactoryMethod;
 use utils\services\IAuthService;
-
-
 use utils\services\ICheckPointService;
 use utils\services\ILogService;
 
@@ -113,6 +114,7 @@ class OAuth2Protocol implements IOAuth2Protocol
     private $authorize_endpoint;
     private $token_endpoint;
     private $revoke_endpoint;
+    private $introspection_endpoint;
 
     //grant types
     private $grant_types = array();
@@ -128,26 +130,22 @@ class OAuth2Protocol implements IOAuth2Protocol
         IApiScopeService   $scope_service)
     {
 
-        //todo: add dynamic creation logic (configure grants types from db)
-
         $authorization_code_grant_type    = new AuthorizationCodeGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service);
         $implicit_grant_type              = new ImplicitGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service);
-        $validate_bearer_token_grant_type = new ValidateBearerTokenGrantType($client_service, $token_service, $log_service);
         $refresh_bearer_token_grant_type  = new RefreshBearerTokenGrantType($client_service, $token_service, $log_service);
-
 
         $this->grant_types[$authorization_code_grant_type->getType()] = $authorization_code_grant_type;
         $this->grant_types[$implicit_grant_type->getType()] = $implicit_grant_type;
-        $this->grant_types[$validate_bearer_token_grant_type->getType()] = $validate_bearer_token_grant_type;
         $this->grant_types[$refresh_bearer_token_grant_type->getType()] = $refresh_bearer_token_grant_type;
 
-        $this->log_service        = $log_service;
-        $this->checkpoint_service = $checkpoint_service;
-        $this->client_service     = $client_service;
+        $this->log_service                = $log_service;
+        $this->checkpoint_service         = $checkpoint_service;
+        $this->client_service             = $client_service;
 
-        $this->authorize_endpoint = new AuthorizationEndpoint($this);
-        $this->token_endpoint     = new TokenEndpoint($this);
-        $this->revoke_endpoint   = new TokenRevocationEndpoint($this,$client_service, $token_service, $log_service);
+        $this->authorize_endpoint         = new AuthorizationEndpoint($this);
+        $this->token_endpoint             = new TokenEndpoint($this);
+        $this->revoke_endpoint            = new TokenRevocationEndpoint($this,$client_service, $token_service, $log_service);
+        $this->introspection_endpoint     = new TokenIntrospectionEndpoint($this,$client_service, $token_service, $log_service);
     }
 
     /**
@@ -334,6 +332,36 @@ class OAuth2Protocol implements IOAuth2Protocol
             $this->checkpoint_service->trackException($ex);
             //simple say "OK" and be on our way ...
             return new OAuth2TokenRevocationResponse;
+        }
+    }
+
+    /**
+     * Introspection Token Endpoint
+     * http://tools.ietf.org/html/draft-richer-oauth-introspection-04
+     * @param OAuth2Request $request
+     * @return mixed
+     */
+    public function introspection(OAuth2Request $request = null){
+
+        try {
+            if (is_null($request) || !$request->isValid())
+                throw new InvalidOAuth2Request;
+            return $this->introspection_endpoint->handle($request);
+        }
+        catch(UnAuthorizedClientException $ex1){
+            $this->log_service->error($ex1);
+            $this->checkpoint_service->trackException($ex1);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(BearerTokenDisclosureAttemptException $ex2){
+            $this->log_service->error($ex2);
+            $this->checkpoint_service->trackException($ex2);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidGrant);
+        }
+        catch (Exception $ex) {
+            $this->log_service->error($ex);
+            $this->checkpoint_service->trackException($ex);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
         }
     }
 

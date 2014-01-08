@@ -9,7 +9,7 @@ use oauth2\OAuth2Message;
  * @package oauth2\requests
  */
 
-class OAuth2AccessTokenValidationRequest  extends OAuth2TokenRequest {
+class OAuth2AccessTokenValidationRequest  extends OAuth2Request {
 
     public function __construct(OAuth2Message $msg)
     {
@@ -18,9 +18,6 @@ class OAuth2AccessTokenValidationRequest  extends OAuth2TokenRequest {
 
     public function isValid()
     {
-        if(!parent::isValid())
-            return false;
-
         $token = $this->getToken();
 
         if(is_null($token))

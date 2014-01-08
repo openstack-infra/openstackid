@@ -8,4 +8,9 @@ class ResourceServer extends Eloquent {
     {
         return $this->hasMany('Api','resource_server_id');
     }
+
+    public function client(){
+        return $this->hasOne('Client');
+    }
+
 }
