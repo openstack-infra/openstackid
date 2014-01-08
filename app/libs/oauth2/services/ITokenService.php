@@ -8,6 +8,8 @@ use oauth2\models\RefreshToken;
 
 /**
  * Interface ITokenService
+ * Defines the interface for an OAuth2 Token Service
+ * Provides all Tokens related operations (create, get and revoke)
  * @package oauth2\services
  */
 interface ITokenService {
@@ -23,6 +25,7 @@ interface ITokenService {
 
 
     /**
+     * Retrieves a given Authorization Code
      * @param $value
      * @return AuthorizationCode
      * @throws \oauth2\exceptions\ReplayAttackException
@@ -39,6 +42,7 @@ interface ITokenService {
 
 
     /**
+     * Create a brand new Access Token by params
      * @param $scope
      * @param $client_id
      * @param $audience
@@ -56,6 +60,7 @@ interface ITokenService {
     public function createAccessTokenFromRefreshToken(RefreshToken $refresh_token, $scope=null);
 
     /**
+     * Retrieves a given Access Token
      * @param $value
      * @return AccessToken
      * @throws \oauth2\exceptions\InvalidAccessTokenException
@@ -105,7 +110,7 @@ interface ITokenService {
 
 
     /**
-     * Revokes a given access token and optionally , its associated refresh token
+     * Revokes a given access token
      * @param $value
      * @param bool $is_hashed
      * @return bool
@@ -135,7 +140,5 @@ interface ITokenService {
      * @return mixed
      */
     public function revokeRefreshToken($value, $is_hashed = false);
-
-
 
 } 

@@ -29,6 +29,15 @@ interface IOAuth2Protocol {
      */
     public function revoke(OAuth2Request $request = null);
 
+    /**
+     * Introspection Token Endpoint
+     * http://tools.ietf.org/html/draft-richer-oauth-introspection-04
+     * @param OAuth2Request $request
+     * @return mixed
+     */
+    public function introspection(OAuth2Request $request = null);
+
+
 
     /**
      * Get all available grant types set on the protocol

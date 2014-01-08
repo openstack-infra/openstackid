@@ -188,10 +188,9 @@ class OAuth2TokenEndpointTest extends TestCase
             //do token validation ....
             $params = array(
                 'token'      => $access_token,
-                'grant_type' =>  oauth2\grant_types\ValidateBearerTokenGrantType::OAuth2Protocol_GrantType_Extension_ValidateBearerToken,
             );
 
-            $response = $this->action("POST", "OAuth2ProviderController@token",
+            $response = $this->action("POST", "OAuth2ProviderController@introspection",
                 $params,
                 array(),
                 array(),

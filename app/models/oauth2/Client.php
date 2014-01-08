@@ -32,6 +32,11 @@ class Client extends Eloquent implements IClient {
         return $this->belongsTo('auth\OpenIdUser');
     }
 
+    public function resource_server()
+    {
+        return $this->belongsTo('ResourceServer');
+    }
+
     public function scopes()
     {
         return $this->belongsToMany('ApiScope','oauth2_client_api_scope','client_id','scope_id');
@@ -161,5 +166,16 @@ class Client extends Eloquent implements IClient {
     public function isActive()
     {
         return $this->active;
+    }
+
+    public function isResourceServerClient()
+    {
+        $id = $this->resource_server_id;
+        return !is_null($id);
+    }
+
+    public function getResourceServer()
+    {
+        return $this->resource_server()->first();
     }
 }

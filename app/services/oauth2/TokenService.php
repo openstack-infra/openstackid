@@ -32,6 +32,7 @@ use DateTime;
 
 /**
  * Class TokenService
+ * Provides all Tokens related operations (create, get and revoke)
  * @package services\oauth2
  */
 

@@ -4,6 +4,7 @@ namespace oauth2\endpoints;
 
 
 use oauth2\exceptions\InvalidGrantTypeException;
+use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\requests\OAuth2Request;
 use oauth2\IOAuth2Protocol;
 use oauth2\services\IClientService;
@@ -29,6 +30,6 @@ class TokenRevocationEndpoint implements IOAuth2Endpoint {
         {
             return $this->grant_type->completeFlow($request);
         }
-        throw new InvalidGrantTypeException;
+        throw new InvalidOAuth2Request;
     }
 }

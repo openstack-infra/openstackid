@@ -22,7 +22,8 @@ class CreateOauth2ClientsTable extends Migration {
             $table->smallInteger('client_type');
             $table->boolean('active')->default(true);
             $table->boolean('locked')->default(false);
-            $table->bigInteger("user_id")->unsigned();
+
+            $table->bigInteger("user_id")->unsigned()->nullable();
             $table->index('user_id');
             $table->foreign('user_id')->references('id')->on('openid_users');
 
