@@ -7,7 +7,7 @@ use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
 use oauth2\services\OAuth2ServiceCatalog;
 use utils\services\UtilsServiceCatalog;
-
+use services\oauth2\ResourceServer;
 class ServicesProvider extends ServiceProvider
 {
 
@@ -36,6 +36,9 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton("services\\oauth2\\AuthorizationCodeRedeemPolicy", 'services\\oauth2\\AuthorizationCodeRedeemPolicy');
 
         $this->app->singleton('services\\IUserActionService', 'services\\UserActionService');
+
+        $this->app->singleton('oauth2\\IResourceServerContext', 'services\\oauth2\\ResourceServerContext');
+
         $this->app->singleton(UtilsServiceCatalog::CheckPointService,
         function(){
             //set security policies
@@ -78,16 +81,19 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(OAuth2ServiceCatalog::TokenService, 'services\\oauth2\\TokenService');
         $this->app->singleton(OAuth2ServiceCatalog::ScopeService, 'services\\oauth2\\ApiScopeService');
         $this->app->singleton(OAuth2ServiceCatalog::ResourceServerService, 'services\\oauth2\\ResourceServerService');
+        $this->app->singleton(OAuth2ServiceCatalog::ApiService, 'services\\oauth2\\ApiService');
 
         Registry::getInstance()->set(OAuth2ServiceCatalog::MementoService, $this->app->make(OAuth2ServiceCatalog::MementoService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::TokenService, $this->app->make(OAuth2ServiceCatalog::TokenService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::ScopeService, $this->app->make(OAuth2ServiceCatalog::ScopeService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::ClientService, $this->app->make(OAuth2ServiceCatalog::ClientService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::ResourceServerService, $this->app->make(OAuth2ServiceCatalog::ResourceServerService));
+        Registry::getInstance()->set(OAuth2ServiceCatalog::ApiService, $this->app->make(OAuth2ServiceCatalog::ApiService));
     }
 
     public function register()
     {
+
         $this->app['serverconfigurationservice'] = $this->app->share(function ($app) {
             return new ServerConfigurationService();
         });
@@ -97,6 +103,7 @@ class ServicesProvider extends ServiceProvider
             $loader = \Illuminate\Foundation\AliasLoader::getInstance();
             $loader->alias('ServerConfigurationService', 'services\\Facades\\ServerConfigurationService');
         });
+
     }
 
 }

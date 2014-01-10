@@ -92,10 +92,11 @@ class Client extends Eloquent implements IClient {
         $res = true;
         $desired_scopes = explode(" ",$scope);
         foreach($desired_scopes as $desired_scope){
-            $db_scope = $this->scopes()->where('name', '=', $desired_scope)->where('active', '=', true)->first();
-            $api      = $db_scope->api()->first();
-            $resource_server = $api->resource_server()->first();
-            if(is_null($db_scope) || !$api->active || !$resource_server->active){
+            //check if desired scope belongs to application given scopes
+            $db_scope        = $this->scopes()->where('name', '=', $desired_scope)->where('active', '=', true)->first();
+            $api             = !is_null($db_scope)?$db_scope->api()->first():null;
+            $resource_server = !is_null($api) ? $api->resource_server()->first():null;
+            if(is_null($db_scope) ||(!is_null($api) && !$api->active) || (!is_null($resource_server) && !$resource_server->active)){
                 $res = false;
                 break;
             }

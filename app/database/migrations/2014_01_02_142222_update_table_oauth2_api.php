@@ -15,7 +15,11 @@ class UpdateTableOauth2Api extends Migration {
         {
             $table->bigInteger("resource_server_id")->unsigned();
             $table->index('resource_server_id');
-            $table->foreign('resource_server_id')->references('id')->on('oauth2_resource_server');
+            $table->foreign('resource_server_id')
+                ->references('id')
+                ->on('oauth2_resource_server')
+                ->onDelete('cascade')
+                ->onUpdate('no action');
         });
 	}
 

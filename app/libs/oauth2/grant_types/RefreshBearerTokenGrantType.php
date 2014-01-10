@@ -48,7 +48,7 @@ class RefreshBearerTokenGrantType extends AbstractGrantType {
      */
     public function handle(OAuth2Request $request)
     {
-        throw new Exception('Not Implemented!');
+        throw new InvalidOAuth2Request('not implemented!');
     }
 
 
@@ -123,7 +123,7 @@ class RefreshBearerTokenGrantType extends AbstractGrantType {
 
     public function getResponseType()
     {
-        return null;
+        throw new InvalidOAuth2Request('not implemented!');
     }
 
     public function buildTokenRequest(OAuth2Request $request)

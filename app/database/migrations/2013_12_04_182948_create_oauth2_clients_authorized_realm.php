@@ -13,7 +13,9 @@ class CreateOauth2ClientsAuthorizedRealm extends Migration {
 
             $table->bigInteger("client_id")->unsigned();
             $table->index('client_id');
-            $table->foreign('client_id')->references('id')->on('oauth2_client');
+            $table->foreign('client_id')->references('id')->on('oauth2_client')
+                ->onDelete('cascade')
+                ->onUpdate('no action');
 
             $table->timestamps();
         });

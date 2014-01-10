@@ -3,7 +3,7 @@
 namespace oauth2\models;
 
 use Zend\Math\Rand;
-
+use oauth2\OAuth2Protocol;
 /**
  * Class AccessToken
  * http://tools.ietf.org/html/rfc6749#section-1.4
@@ -16,12 +16,12 @@ class AccessToken extends Token {
     private $refresh_token;
 
     public function __construct(){
-        parent::__construct(Token::DefaultByteLength);
+        parent::__construct(72);
     }
 
     public static function create(AuthorizationCode $auth_code,  $lifetime = 3600){
         $instance = new self();
-        $instance->value        = Rand::getString($instance->len,null,true);
+        $instance->value        = Rand::getString($instance->len, OAuth2Protocol::VsChar, true);
         $instance->scope        = $auth_code->getScope();
         $instance->client_id    = $auth_code->getClientId();
         $instance->auth_code    = $auth_code->getValue();
@@ -32,7 +32,7 @@ class AccessToken extends Token {
 
     public static function createFromParams($scope, $client_id, $audience,$lifetime){
         $instance = new self();
-        $instance->value         = Rand::getString($instance->len,null,true);
+        $instance->value         = Rand::getString($instance->len,OAuth2Protocol::VsChar,true);
         $instance->scope         = $scope;
         $instance->client_id     = $client_id;
         $instance->auth_code     = null;
@@ -44,7 +44,7 @@ class AccessToken extends Token {
 
     public static function createFromRefreshToken(RefreshToken $refresh_token,$scope = null,  $lifetime = 3600){
         $instance = new self();
-        $instance->value         = Rand::getString($instance->len,null,true);
+        $instance->value         = Rand::getString($instance->len,OAuth2Protocol::VsChar,true);
         $instance->scope         = $scope;
         $instance->from_ip       = $refresh_token->getFromIp();
         $instance->client_id     = $refresh_token->getClientId();

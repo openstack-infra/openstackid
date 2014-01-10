@@ -10,7 +10,7 @@ use oauth2\OAuth2Message;
  * http://tools.ietf.org/html/rfc6749#section-4.1.3
  * @package oauth2\requests
  */
-class OAuth2AccessTokenRequest extends OAuth2TokenRequest
+class OAuth2AccessTokenRequestAuthCode extends OAuth2TokenRequest
 {
 
 

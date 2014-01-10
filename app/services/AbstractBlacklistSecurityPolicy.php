@@ -36,7 +36,7 @@ abstract class AbstractBlacklistSecurityPolicy implements ISecurityPolicy {
             //try to create on redis
             $success = $this->redis->setnx($remote_address, $initial_hits);
             if ($success) { // if we created the set expiration on redis
-                $this->redis->expire($remote_address, $this->server_configuration_service->getConfigValue("BannedIpLifeTimeSeconds"));
+                $this->redis->expire($remote_address, intval($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds")));
             }
 
             Log::warning(sprintf("AbstractBlacklistSecurityPolicy: Banning ip %s by Exception %s", $remote_address, $exception_type));
@@ -45,7 +45,7 @@ abstract class AbstractBlacklistSecurityPolicy implements ISecurityPolicy {
             DB::transaction(function () use($remote_address,$exception_type,$initial_hits) {
                 $banned_ip = BannedIP::where("ip", "=", $remote_address)->first();
                 if (!$banned_ip) {
-                    $banned_ip = new BannedIP();
+                    $banned_ip     = new BannedIP();
                     $banned_ip->ip = $remote_address;
                 }
                 $banned_ip->exception_type = $exception_type;

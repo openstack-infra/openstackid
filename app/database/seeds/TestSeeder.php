@@ -27,14 +27,6 @@ class TestSeeder extends Seeder {
         DB::table('openid_users')->delete();
         DB::table('oauth2_resource_server')->delete();
 
-        ResourceServer::create(
-            array(
-                'friendly_name'   => 'test resource server',
-                'host'            => 'https://www.resource.test1.com',
-                'ip'              => '127.0.0.1'
-            )
-        );
-
         ServerConfiguration::create(
             array(
                 'key'   => 'Private.Association.Lifetime',
@@ -244,48 +236,174 @@ class TestSeeder extends Seeder {
             )
         );
 
+        ResourceServer::create(
+            array(
+                'friendly_name'   => 'test resource server',
+                'host'            => 'dev.openstackid.com',
+                'ip'              => '127.0.0.1'
+            )
+        );
 
         $resource_server = ResourceServer::first();
 
+
+        //create api endpoints
+
         Api::create(
             array(
-                'name'            => 'test api user activities',
+                'name'            => 'create resource server',
                 'logo'            =>  null,
                 'active'          =>  true,
-                'resource_server_id' => $resource_server->id
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server',
+                'http_method'     => 'POST'
             )
         );
 
-        $api = Api::where('name','=','test api user activities')->first();
+        Api::create(
+            array(
+                'name'            => 'get resource server',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server/{id}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'resource server regenerate secret',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server/regenerate-client-secret/{id}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'resource server get page',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server/{page_nbr}/{page_size}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'resource server delete',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server/{id}',
+                'http_method'     => 'DELETE'
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'resource server update',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server',
+                'http_method'     => 'PUT'
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'resource server update status',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server/status/{id}/{active}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        $resource_server_api_create = Api::where('name','=','create resource server')->first();
+        $resource_server_api_get = Api::where('name','=','get resource server')->first();
+        $resource_server_api_get_page = Api::where('name','=','resource server get page')->first();
+        $resource_server_api_regenerate = Api::where('name','=','resource server regenerate secret')->first();
+        $resource_server_api_delete = Api::where('name','=','resource server delete')->first();
+        $resource_server_api_update = Api::where('name','=','resource server update')->first();
+        $resource_server_api_update_status = Api::where('name','=','resource server update status')->first();
+
+        $current_realm = Config::get('app.url');
+
+
+        // create api scopes
 
         ApiScope::create(
             array(
-                'name'               => 'https://www.test.com/users/activities.read',
-                'short_description'  => 'User Activities Read Access',
-                'description'        =>  'User Activities Read Access',
-                'api_id'             => $api->id,
+                'name'               => sprintf('%s/api/resource-server/read',$current_realm),
+                'short_description'  => 'Resource Server Read Access',
+                'description'        => 'Resource Server Read Access',
+                'api_id'             => $resource_server_api_get->id,
+            )
+        );
+
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/resource-server/read.page',$current_realm),
+                'short_description'  => 'Resource Server Page Read Access',
+                'description'        => 'Resource Server Page Read Access',
+                'api_id'             => $resource_server_api_get_page->id,
             )
         );
 
         ApiScope::create(
             array(
-                'name'               => 'https://www.test.com/users/activities.write',
-                'short_description'  => 'User Activities Write Access',
-                'description'        =>  'User Activities Write Access',
-                'api_id'             => $api->id,
+                'name'               => sprintf('%s/api/resource-server/write',$current_realm),
+                'short_description'  => 'Resource Server Write Access',
+                'description'        => 'Resource Server Write Access',
+                'api_id'             => $resource_server_api_create->id,
             )
         );
 
         ApiScope::create(
             array(
-                'name'               => 'https://www.test.com/users/activities.read.write',
-                'short_description'  => 'User Activities Read/Write Access',
-                'description'        =>  'User Activities Read/Write Access',
-                'api_id'             => $api->id,
+                'name'               => sprintf('%s/api/resource-server/delete',$current_realm),
+                'short_description'  => 'Resource Server Delete Access',
+                'description'        => 'Resource Server Delete Access',
+                'api_id'             => $resource_server_api_delete->id,
             )
         );
 
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/resource-server/update',$current_realm),
+                'short_description'  => 'Resource Server Update Access',
+                'description'        => 'Resource Server Update Access',
+                'api_id'             => $resource_server_api_update->id,
+            )
+        );
 
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/resource-server/update.status',$current_realm),
+                'short_description'  => 'Resource Server Update Status',
+                'description'        => 'Resource Server Update Status',
+                'api_id'             => $resource_server_api_update_status->id,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/resource-server/regenerate.secret',$current_realm),
+                'short_description'  => 'Resource Server Regenerate Client Secret',
+                'description'        => 'Resource Server Regenerate Client Secret',
+                'api_id'             => $resource_server_api_regenerate->id,
+            )
+        );
+
+        // create users and clients ...
         OpenIdUser::create(
             array(
                 'identifier'=>'sebastian.marcet',
@@ -374,8 +492,6 @@ class TestSeeder extends Seeder {
                 'client_id'=>$client_public->id
             )
         );
-
-
-
     }
 }
+

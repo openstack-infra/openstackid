@@ -1,6 +1,7 @@
 <?php
 
 use oauth2\services\IResourceServerService;
+use oauth2\IResourceServerContext;
 use utils\services\ILogService;
 
 /**
@@ -13,11 +14,13 @@ class ApiResourceServerController extends BaseController
      */
     private $resource_server_service;
     private $log_service;
+    private $resource_server_context;
 
-    public function __construct(IResourceServerService $resource_server_service, ILogService $log_service)
+    public function __construct(IResourceServerContext $resource_server_context, IResourceServerService $resource_server_service, ILogService $log_service)
     {
+        $this->resource_server_context = $resource_server_context;
         $this->resource_server_service = $resource_server_service;
-        $this->log_service = $log_service;
+        $this->log_service             = $log_service;
     }
 
     public function get($id)

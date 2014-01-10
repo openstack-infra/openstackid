@@ -15,7 +15,7 @@ use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
 use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
-use oauth2\requests\OAuth2AccessTokenRequest;
+use oauth2\requests\OAuth2AccessTokenRequestAuthCode;
 use oauth2\requests\OAuth2Request;
 use oauth2\responses\OAuth2AccessTokenResponse;
 
@@ -114,7 +114,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             //check requested scope
             $scope = $request->getScope();
             if (!$client->isScopeAllowed($scope))
-                throw new ScopeNotAllowedException(sprintf("redirect_to %s", $redirect_uri));
+                throw new ScopeNotAllowedException(sprintf("scope %s", $scope));
 
             $state = $request->getState();
             //check user logged
@@ -166,7 +166,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
     {
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
-        if ($class_name == 'oauth2\requests\OAuth2AccessTokenRequest') {
+        if ($class_name == 'oauth2\requests\OAuth2AccessTokenRequestAuthCode') {
 
             parent::completeFlow($request);
 
@@ -226,7 +226,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
         if ($class_name == 'oauth2\requests\OAuth2TokenRequest') {
             if ($request->getGrantType() !== $this->getType())
                 return null;
-            return new OAuth2AccessTokenRequest($request->getMessage());
+            return new OAuth2AccessTokenRequestAuthCode($request->getMessage());
         }
         return null;
     }

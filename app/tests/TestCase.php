@@ -14,12 +14,11 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase {
      * This will cause the tests to run quickly.
      *
      */
-    private function prepareForTests()
+    protected function prepareForTests()
     {
         Artisan::call('migrate');
         Mail::pretend(true);
         $this->seed('TestSeeder');
-        Route::enableFilters();
     }
 
 	/**

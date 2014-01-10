@@ -30,6 +30,7 @@ use oauth2\exceptions\UriNotAllowedException;
 use oauth2\grant_types\AuthorizationCodeGrantType;
 use oauth2\grant_types\ImplicitGrantType;
 use oauth2\grant_types\RefreshBearerTokenGrantType;
+use oauth2\grant_types\ClientCredentialsGrantType;
 
 use oauth2\requests\OAuth2Request;
 
@@ -92,6 +93,10 @@ class OAuth2Protocol implements IOAuth2Protocol
     const OAuth2Protocol_Error_TemporallyUnavailable = 'temporally_unavailable';
     //http://tools.ietf.org/html/rfc7009#section-2.2.1
     const OAuth2Protocol_Error_Unsupported_TokenType = ' unsupported_token_type';
+    //http://tools.ietf.org/html/rfc6750#section-3-1
+    const OAuth2Protocol_Error_InvalidToken = 'invalid_token';
+    const OAuth2Protocol_Error_InsufficientScope = 'insufficient_scope';
+
     public static $valid_responses_types = array(
         self::OAuth2Protocol_ResponseType_Code => self::OAuth2Protocol_ResponseType_Code,
         self::OAuth2Protocol_ResponseType_Token => self::OAuth2Protocol_ResponseType_Token
@@ -104,6 +109,12 @@ class OAuth2Protocol implements IOAuth2Protocol
         self::OAuth2Protocol_State => self::OAuth2Protocol_State
     );
 
+
+    /**
+     * http://tools.ietf.org/html/rfc6749#appendix-A
+     * VSCHAR     = %x20-7E
+     */
+    const VsChar = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz*-.:_|~';
 
     //services
     private $log_service;
@@ -133,10 +144,13 @@ class OAuth2Protocol implements IOAuth2Protocol
         $authorization_code_grant_type    = new AuthorizationCodeGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service);
         $implicit_grant_type              = new ImplicitGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service);
         $refresh_bearer_token_grant_type  = new RefreshBearerTokenGrantType($client_service, $token_service, $log_service);
+        $client_credential_grant_type     = new ClientCredentialsGrantType($scope_service,$client_service, $token_service, $log_service);
 
-        $this->grant_types[$authorization_code_grant_type->getType()] = $authorization_code_grant_type;
-        $this->grant_types[$implicit_grant_type->getType()] = $implicit_grant_type;
+        $this->grant_types[$authorization_code_grant_type->getType()]   = $authorization_code_grant_type;
+        $this->grant_types[$implicit_grant_type->getType()]             = $implicit_grant_type;
         $this->grant_types[$refresh_bearer_token_grant_type->getType()] = $refresh_bearer_token_grant_type;
+        $this->grant_types[$client_credential_grant_type->getType()]    = $client_credential_grant_type;
+
 
         $this->log_service                = $log_service;
         $this->checkpoint_service         = $checkpoint_service;
@@ -307,7 +321,13 @@ class OAuth2Protocol implements IOAuth2Protocol
             $this->log_service->error($ex10);
             $this->checkpoint_service->trackException($ex10);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidGrant);
-        } catch (Exception $ex) {
+        }
+        catch(ScopeNotAllowedException $ex11){
+            $this->log_service->error($ex11);
+            $this->checkpoint_service->trackException($ex11);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
+        }
+        catch (Exception $ex) {
             $this->log_service->error($ex);
             $this->checkpoint_service->trackException($ex);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_ServerError);

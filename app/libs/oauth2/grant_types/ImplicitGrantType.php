@@ -84,9 +84,16 @@ class ImplicitGrantType extends AbstractGrantType
         return OAuth2Protocol::OAuth2Protocol_ResponseType_Token;
     }
 
-    /** defines entry point for first request processing
+    /**
      * @param OAuth2Request $request
-     * @return mixed
+     * @return mixed|OAuth2AccessTokenFragmentResponse
+     * @throws \oauth2\exceptions\InvalidClientException
+     * @throws \oauth2\exceptions\UnsupportedResponseTypeException
+     * @throws \oauth2\exceptions\AccessDeniedException
+     * @throws \oauth2\exceptions\ScopeNotAllowedException
+     * @throws \oauth2\exceptions\InvalidOAuth2Request
+     * @throws \oauth2\exceptions\UnAuthorizedClientException
+     * @throws \oauth2\exceptions\UriNotAllowedException
      */
     public function handle(OAuth2Request $request)
     {
@@ -106,6 +113,7 @@ class ImplicitGrantType extends AbstractGrantType
                 throw new InvalidClientException(sprintf("client_id %s", $client_id));
 
             //check client type
+            // only public clients could use this grant type
             if ($client->getClientType() !== IClient::ClientType_Public)
                 throw new UnAuthorizedClientException();
 
@@ -118,7 +126,7 @@ class ImplicitGrantType extends AbstractGrantType
             $scope = $request->getScope();
 
             if (is_null($scope) || empty($scope) || !$client->isScopeAllowed($scope))
-                throw new ScopeNotAllowedException(sprintf("redirect_to %s", $redirect_uri));
+                throw new ScopeNotAllowedException(sprintf("scope %s", $scope));
 
             $state = $request->getState();
             //check user logged
@@ -146,6 +154,10 @@ class ImplicitGrantType extends AbstractGrantType
         throw new InvalidOAuth2Request;
     }
 
+    public function completeFlow(OAuth2Request $request){
+        throw new InvalidOAuth2Request('not implemented!');
+    }
+
     /**
      * get grant type
      * @return mixed
@@ -161,6 +173,6 @@ class ImplicitGrantType extends AbstractGrantType
      */
     public function buildTokenRequest(OAuth2Request $request)
     {
-        throw new \Exception('not implemented!!');
+        throw new InvalidOAuth2Request('not implemented!');
     }
 }

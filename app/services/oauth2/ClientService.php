@@ -25,7 +25,7 @@ use Zend\Math\Rand;
 class ClientService implements IClientService
 {
 
-    const PrintableNonWhitespaceCharactersUrl = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+
     private $auth_service;
 
     public function __construct(IAuthService $auth_service)
@@ -79,10 +79,10 @@ class ClientService implements IClientService
             $instance = new Client;
             $instance->app_name = $app_name;
             $instance->app_logo = $app_logo;
-            $instance->client_id = Rand::getString(32, self::PrintableNonWhitespaceCharactersUrl, true) . '.openstack.client';
+            $instance->client_id = Rand::getString(32, OAuth2Protocol::VsChar, true) . '.openstack.client';
             //only generates secret for confidential clients
             if ($client_type == IClient::ClientType_Confidential)
-                $instance->client_secret = Rand::getString(16, self::PrintableNonWhitespaceCharactersUrl, true);
+                $instance->client_secret = Rand::getString(16, OAuth2Protocol::VsChar, true);
             $instance->client_type = $client_type;
             $instance->user_id = $user_id;
             $instance->active = true;
@@ -169,7 +169,7 @@ class ClientService implements IClientService
         DB::transaction(function () use ($id, &$new_secret) {
             $client = Client::find($id);
             if (!is_null($client)) {
-                $client_secret = Rand::getString(16, self::PrintableNonWhitespaceCharactersUrl, true);
+                $client_secret = Rand::getString(16, OAuth2Protocol::VsChar, true);
                 $client->client_secret = $client_secret;
                 $client->Save();
                 $token_service = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);

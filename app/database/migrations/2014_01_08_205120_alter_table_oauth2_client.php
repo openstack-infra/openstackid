@@ -13,9 +13,12 @@ class AlterTableOauth2Client extends Migration {
 	{
         Schema::table('oauth2_client', function($table)
         {
+            // a client could or could not belong to a resource server
             $table->bigInteger("resource_server_id")->unsigned()->nullable();
             $table->index('resource_server_id');
-            $table->foreign('resource_server_id')->references('id')->on('oauth2_resource_server');
+            $table->foreign('resource_server_id')
+                ->references('id')
+                ->on('oauth2_resource_server');
         });
 	}
 

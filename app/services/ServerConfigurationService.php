@@ -47,7 +47,7 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
         $this->default_config_params["Nonce.Lifetime"] = 360;
         $this->default_config_params["Assets.Url"] = 'http://www.openstack.org/';
 
-        $this->default_config_params["BannedIpLifeTimeSeconds"] = 21600;
+        $this->default_config_params["BlacklistSecurityPolicy.BannedIpLifeTimeSeconds"] = 21600;
         $this->default_config_params["BlacklistSecurityPolicy.MinutesWithoutExceptions"] = 5;
         $this->default_config_params["BlacklistSecurityPolicy.ReplayAttackExceptionInitialDelay"] = 10;
         $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidNonceAttempts"] = 10;
@@ -76,7 +76,8 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
 
         $this->default_config_params["OAuth2.AuthorizationCode.Lifetime"] = 600;
         $this->default_config_params["OAuth2.AccessToken.Lifetime"]       = 3600;
-        $this->default_config_params["OAuth2.RefreshToken.Lifetime"]      = 3600;
+        //infinite by default
+        $this->default_config_params["OAuth2.RefreshToken.Lifetime"]      = 0;
 
     }
 
