@@ -41,6 +41,23 @@ Route::group(array("before" => "ssl"), function () {
     Route::post('/oauth2/token/introspection',"OAuth2ProviderController@introspection");
 });
 
+// Route group for API
+Route::group(array('prefix' => 'api/v1', 'before' => 'ssl'), function()
+{
+    //resource server api
+    Route::group(array('prefix' => 'resource-server'), function(){
+
+        Route::post('/',"ApiResourceServerController@create");
+        Route::get('/regenerate-client-secret/{id}',"ApiResourceServerController@regenerateClientSecret");
+        Route::get('/{id}',"ApiResourceServerController@get");
+        Route::get('/{page_nbr}/{page_size}',"ApiResourceServerController@getByPage");
+        Route::delete('/{id}',"ApiResourceServerController@delete");
+        Route::put('/',"ApiResourceServerController@update");
+        Route::get('/status/{id}/{active}',"ApiResourceServerController@updateStatus");
+    });
+
+});
+
 Route::group(array("before" => array("ssl", "auth")), function () {
     Route::get('/accounts/user/consent', "UserController@getConsent");
     Route::post('/accounts/user/consent', "UserController@postConsent");

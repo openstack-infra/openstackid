@@ -19,6 +19,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase {
         Artisan::call('migrate');
         Mail::pretend(true);
         $this->seed('TestSeeder');
+        Route::enableFilters();
     }
 
 	/**

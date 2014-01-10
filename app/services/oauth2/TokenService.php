@@ -552,8 +552,11 @@ class TokenService implements ITokenService
 
         DB::transaction(function () use ($client_id, $auth_codes, $access_tokens) {
 
-            $this->redis->del($auth_codes);
-            $this->redis->del($access_tokens);
+            if(count($auth_codes)>0)
+                $this->redis->del($auth_codes);
+
+            if(count($access_tokens)>0)
+                $this->redis->del($access_tokens);
 
             DBAccessToken::where('client_id','=',$client_id)->delete();
             DBRefreshToken::where('client_id','=',$client_id)->delete();

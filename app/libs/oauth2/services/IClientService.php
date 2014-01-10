@@ -29,6 +29,16 @@ interface IClientService {
     public function getCurrentClientAuthInfo();
 
     public function getClientByIdentifier($id);
+
+    /**
+     * Creates a new client
+     * @param $client_type
+     * @param $user_id
+     * @param $app_name
+     * @param $app_description
+     * @param string $app_logo
+     * @return IClient
+     */
     public function addClient($client_type, $user_id, $app_name, $app_description, $app_logo='');
     public function addClientScope($id,$scope_id);
     public function deleteClientScope($id,$scope_id);
