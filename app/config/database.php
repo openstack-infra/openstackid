@@ -97,12 +97,21 @@ return array(
 	*/
 
 	'redis' => array(
-
-		'cluster' => true,
+        /**
+         * http://laravel.com/docs/redis
+         * The cluster option will tell the Laravel Redis client to perform client-side sharding
+         * across your Redis nodes, allowing you to pool nodes and create
+         * a large amount of available RAM. However, note that client-side sharding does not handle
+         * failover; therefore, is primarily suited for cached data that is available from another
+         * primary data store.
+         */
+        'cluster' => false,
 
 		'default' => array(
 			'host'     => '127.0.0.1',
 			'port'     => 6379,
+            'database' => 0,
+            'password' => ''
 		),
 
 	),

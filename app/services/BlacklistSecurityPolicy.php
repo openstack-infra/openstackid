@@ -72,7 +72,7 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
                         //get time lived on seconds
                         $time_lived_seconds = abs($utc_now->getTimestamp() - $issued->getTimestamp());
 
-                        if ($time_lived_seconds >= $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds")) {
+                        if ($time_lived_seconds >= intval($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds"))) {
                             //void banned ip
                             $banned_ip->delete();
                         } else {
@@ -82,7 +82,7 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
                             $success = $this->redis->setnx($banned_ip->ip, $banned_ip->hits);
                             if ($success) {
                                 //set remaining time to live
-                                $this->redis->expire($remote_address, ($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds") - $time_lived_seconds));
+                                $this->redis->expire($remote_address, intval($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds") - $time_lived_seconds));
                             }
                             $res = false;
                             //release lock

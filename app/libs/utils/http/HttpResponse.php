@@ -13,7 +13,7 @@ abstract class HttpResponse extends HttpMessage
 
     public function __construct($http_code, $content_type)
     {
-        $this->http_code = $http_code;
+        $this->http_code    = $http_code;
         $this->content_type = $content_type;
     }
 

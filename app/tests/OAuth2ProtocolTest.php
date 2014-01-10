@@ -5,10 +5,16 @@ use oauth2\OAuth2Protocol;
 use utils\services\IAuthService;
 
 /**
- * Class OAuth2TokenEndpointTest
+ * Class OAuth2ProtocolTest
  */
-class OAuth2TokenEndpointTest extends TestCase
+class OAuth2ProtocolTest extends TestCase
 {
+
+    protected function prepareForTests()
+    {
+        parent::prepareForTests();
+        //Route::enableFilters();
+    }
 
     /**
      * Get Auth Code Test
@@ -693,5 +699,39 @@ class OAuth2TokenEndpointTest extends TestCase
             array());
 
         $this->assertResponseStatus(200);
+    }
+
+    public function testClientCredentialsFlow(){
+        try {
+
+            $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+            $client_secret = 'ITc/6Y5N7kOtGKhg';
+
+            //do get auth token...
+            $params = array(
+               OAuth2Protocol::OAuth2Protocol_GrantType => OAuth2Protocol::OAuth2Protocol_GrantType_ClientCredentials,
+               OAuth2Protocol::OAuth2Protocol_Scope => 'https://www.test.com/users/activities.read'
+            );
+
+            $response = $this->action("POST", "OAuth2ProviderController@token",
+                $params,
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+            $this->assertResponseStatus(200);
+
+            $content  = $response->getContent();
+
+            $response = json_decode($content);
+
+            $this->assertTrue(!empty($response->access_token));
+
+        }
+        catch (Exception $ex) {
+            throw $ex;
+        }
+
     }
 } 

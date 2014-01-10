@@ -30,7 +30,7 @@ class TestSeeder extends Seeder {
         ResourceServer::create(
             array(
                 'friendly_name'   => 'test resource server',
-                'host'            => 'https://www.resource.test1.com',
+                'host'            => 'dev.openstackid.com',
                 'ip'              => '127.0.0.1'
             )
         );
@@ -249,21 +249,37 @@ class TestSeeder extends Seeder {
 
         Api::create(
             array(
-                'name'            => 'test api user activities',
+                'name'            => 'create resource server',
                 'logo'            =>  null,
                 'active'          =>  true,
-                'resource_server_id' => $resource_server->id
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server',
+                'http_method'     => 'POST'
             )
         );
 
-        $api = Api::where('name','=','test api user activities')->first();
+        Api::create(
+            array(
+                'name'            => 'get resource server',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server/{id}',
+                'http_method'     => 'GET'
+            )
+        );
+
+
+
+        $resource_server_api_create = Api::where('name','=','create resource server')->first();
+        $resource_server_api_get = Api::where('name','=','get resource server')->first();
 
         ApiScope::create(
             array(
                 'name'               => 'https://www.test.com/users/activities.read',
                 'short_description'  => 'User Activities Read Access',
                 'description'        =>  'User Activities Read Access',
-                'api_id'             => $api->id,
+                'api_id'             => $resource_server_api_create->id,
             )
         );
 
@@ -272,7 +288,7 @@ class TestSeeder extends Seeder {
                 'name'               => 'https://www.test.com/users/activities.write',
                 'short_description'  => 'User Activities Write Access',
                 'description'        =>  'User Activities Write Access',
-                'api_id'             => $api->id,
+                'api_id'             => $resource_server_api_create->id,
             )
         );
 
@@ -281,10 +297,29 @@ class TestSeeder extends Seeder {
                 'name'               => 'https://www.test.com/users/activities.read.write',
                 'short_description'  => 'User Activities Read/Write Access',
                 'description'        =>  'User Activities Read/Write Access',
-                'api_id'             => $api->id,
+                'api_id'             => $resource_server_api_create->id,
             )
         );
 
+        $current_realm = Config::get('app.url');
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/resource-server/read',$current_realm),
+                'short_description'  => 'Resource Server Read Access',
+                'description'        => 'Resource Server Read Access',
+                'api_id'             => $resource_server_api_get->id,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/resource-server/write',$current_realm),
+                'short_description'  => 'Resource Server Write Access',
+                'description'        => 'Resource Server Write Access',
+                'api_id'             => $resource_server_api_create->id,
+            )
+        );
 
         OpenIdUser::create(
             array(
@@ -374,8 +409,5 @@ class TestSeeder extends Seeder {
                 'client_id'=>$client_public->id
             )
         );
-
-
-
     }
 }

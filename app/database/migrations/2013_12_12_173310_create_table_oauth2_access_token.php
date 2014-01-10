@@ -24,11 +24,17 @@ class CreateTableOauth2AccessToken extends Migration {
 
             $table->bigInteger("client_id")->unsigned();
             $table->index('client_id');
-            $table->foreign('client_id')->references('id')->on('oauth2_client');
+            $table->foreign('client_id')->references('id')->on('oauth2_client')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');;
 
             $table->bigInteger("refresh_token_id")->unsigned()->nullable();
             $table->index('refresh_token_id');
-            $table->foreign('refresh_token_id')->references('id')->on('oauth2_refresh_token');
+            $table->foreign('refresh_token_id')
+                ->references('id')
+                ->on('oauth2_refresh_token')
+                ->onDelete('cascade')
+                ->onUpdate('no action');;
         });
     }
 

@@ -3,7 +3,7 @@
 namespace oauth2\models;
 
 use Zend\Math\Rand;
-
+use oauth2\OAuth2Protocol;
 /**
  * Class AuthorizationCode
  * http://tools.ietf.org/html/rfc6749#section-1.3.1
@@ -15,7 +15,7 @@ class AuthorizationCode extends Token {
 
 
     public function __construct(){
-        parent::__construct(Token::DefaultByteLength);
+        parent::__construct(64);
     }
 
     /**
@@ -27,7 +27,7 @@ class AuthorizationCode extends Token {
      */
     public static function create($client_id, $scope, $audience='' ,$redirect_uri = null, $lifetime = 600){
         $instance = new self();
-        $instance->value        = Rand::getString($instance->len, null, true);
+        $instance->value        = Rand::getString($instance->len, OAuth2Protocol::VsChar, true);
         $instance->scope        = $scope;
         $instance->redirect_uri = $redirect_uri;
         $instance->client_id    = $client_id;

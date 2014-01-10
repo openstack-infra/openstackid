@@ -21,7 +21,8 @@ class CreateOauth2ApiScope extends Migration {
             $table->boolean('default')->default(false);
             $table->boolean('system')->default(false);
             $table->timestamps();
-            $table->bigInteger("api_id")->unsigned();
+            //an scope may or not may have an api associated with it
+            $table->bigInteger("api_id")->unsigned()->nullable();
             $table->index('api_id');
             $table->foreign('api_id')->references('id')->on('oauth2_api');
         });

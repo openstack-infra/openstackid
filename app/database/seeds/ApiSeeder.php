@@ -9,19 +9,12 @@ class ApiSeeder extends Seeder {
 
         Api::create(
             array(
-                'name'               => 'api user activities',
+                'name'               => 'get resource server api',
                 'logo'               =>  null,
                 'active'             =>  true,
-                'resource_server_id' => $resource_server->id
-            )
-        );
-
-        Api::create(
-            array(
-                'name'               => 'api echo-sign',
-                'logo'               =>  null,
-                'active'             =>  true,
-                'resource_server_id' => $resource_server->id
+                'resource_server_id' => $resource_server->id,
+                'route'              => '/api/v1/resource-server/{id}',
+                'http_method'        => 'GET'
             )
         );
 

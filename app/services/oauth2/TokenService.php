@@ -41,6 +41,16 @@ class TokenService implements ITokenService
     const ClientAccessTokenPrefixList = '.atokens';
     const ClientAuthCodePrefixList    = '.acodes';
 
+    const ClientAuthCodeQty          = '.acodes.qty';
+    const ClientAuthCodeQtyLifetime  = 86400;
+
+    const ClientAccessTokensQty      = '.atokens.qty';
+    const ClientAccessTokensQtyLifetime = 86400;
+
+    const ClientRefreshTokensQty = '.rtokens.qty';
+    const ClientRefreshTokensQtyLifetime = 86400;
+
+
     //services
     private $redis;
     private $client_service;
@@ -85,6 +95,14 @@ class TokenService implements ITokenService
 
         //stores brand new auth code hash value on a set by client id...
         $this->redis->sadd($client_id . self::ClientAuthCodePrefixList, $hashed_value);
+
+        if($this->redis->setnx($client_id . self::ClientAuthCodeQty,1)){
+            $this->redis->expire($client_id . self::ClientAuthCodeQty, self::ClientAuthCodeQtyLifetime);
+        }
+        else{
+            $this->redis->incr($client_id . self::ClientAuthCodeQty);
+        }
+
 
         return $code;
     }
@@ -162,10 +180,17 @@ class TokenService implements ITokenService
 
             //stores brand new access token hash value on a set by client id...
             $this->redis->sadd($client_id . self::ClientAccessTokenPrefixList, $hashed_value);
+
+            if($this->redis->setnx($client_id . self::ClientAccessTokensQty,1)){
+                $this->redis->expire($client_id . self::ClientAccessTokensQty, self::ClientAccessTokensQtyLifetime);
+            }
+            else{
+                $this->redis->incr($client_id . self::ClientAccessTokensQty);
+            }
+
         });
 
         return $access_token;
-
     }
 
     public function createAccessTokenFromParams($scope, $client_id, $audience)
@@ -193,8 +218,18 @@ class TokenService implements ITokenService
         $access_token_db->client()->associate($client);
         $access_token_db->Save();
 
+
+
         //stores brand new access token hash value on a set by client id...
         $this->redis->sadd($client_id . self::ClientAccessTokenPrefixList, $hashed_value);
+
+        if($this->redis->setnx($client_id . self::ClientAccessTokensQty,1)){
+            $this->redis->expire($client_id . self::ClientAccessTokensQty, self::ClientAccessTokensQtyLifetime);
+        }
+        else{
+            $this->redis->incr($client_id . self::ClientAccessTokensQty);
+        }
+
         return $access_token;
     }
 
@@ -261,6 +296,12 @@ class TokenService implements ITokenService
             //stores brand new access token hash value on a set by client id...
             $this->redis->sadd($client_id . self::ClientAccessTokenPrefixList, $hashed_value);
 
+            if($this->redis->setnx($client_id . self::ClientAccessTokensQty,1)){
+                $this->redis->expire($client_id . self::ClientAccessTokensQty, self::ClientAccessTokensQtyLifetime);
+            }
+            else{
+                $this->redis->incr($client_id . self::ClientAccessTokensQty);
+            }
         });
         return $access_token;
     }
@@ -443,6 +484,13 @@ class TokenService implements ITokenService
         $access_token_db->Save();
 
         $access_token->setRefreshToken($refresh_token);
+
+        if($this->redis->setnx($client_id . self::ClientRefreshTokensQty,1)){
+            $this->redis->expire($client_id . self::ClientRefreshTokensQty, self::ClientRefreshTokensQtyLifetime);
+        }
+        else{
+            $this->redis->incr($client_id . self::ClientRefreshTokensQty);
+        }
 
         return $refresh_token;
     }
