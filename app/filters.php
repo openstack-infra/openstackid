@@ -165,3 +165,5 @@ Route::filter('user.owns.client.policy',function($route, $request, $protocol ='h
     }
 });
 
+// filter to protect an api endpoint with oauth2
+Route::filter('oauth2.protected.endpoint','OAuth2BearerAccessTokenRequestValidator');

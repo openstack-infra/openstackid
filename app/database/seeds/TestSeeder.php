@@ -249,14 +249,17 @@ class TestSeeder extends Seeder {
 
         Api::create(
             array(
-                'name'            => 'test api user activities',
+                'name'            => 'create resource server',
                 'logo'            =>  null,
                 'active'          =>  true,
-                'resource_server_id' => $resource_server->id
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/resource-server',
+                'http_method'     => 'POST'
             )
         );
 
-        $api = Api::where('name','=','test api user activities')->first();
+
+        $api = Api::where('name','=','create resource server')->first();
 
         ApiScope::create(
             array(

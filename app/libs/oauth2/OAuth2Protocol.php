@@ -92,6 +92,10 @@ class OAuth2Protocol implements IOAuth2Protocol
     const OAuth2Protocol_Error_TemporallyUnavailable = 'temporally_unavailable';
     //http://tools.ietf.org/html/rfc7009#section-2.2.1
     const OAuth2Protocol_Error_Unsupported_TokenType = ' unsupported_token_type';
+    //http://tools.ietf.org/html/rfc6750#section-3-1
+    const OAuth2Protocol_Error_InvalidToken = 'invalid_token';
+    const OAuth2Protocol_Error_InsufficientScope = 'insufficient_scope';
+
     public static $valid_responses_types = array(
         self::OAuth2Protocol_ResponseType_Code => self::OAuth2Protocol_ResponseType_Code,
         self::OAuth2Protocol_ResponseType_Token => self::OAuth2Protocol_ResponseType_Token
