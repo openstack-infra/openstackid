@@ -143,7 +143,7 @@ class ImplicitGrantType extends AbstractGrantType
             } else if ($authorization_response === IAuthService::AuthorizationResponse_DenyOnce) {
                 throw new AccessDeniedException;
             }
-
+            $this->auth_service->clearUserAuthorizationResponse();
             // build current audience ...
             $audience     = $this->scope_service->getStrAudienceByScopeNames(explode(' ',$scope));
             //build access token

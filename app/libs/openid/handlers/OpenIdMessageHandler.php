@@ -1,21 +1,12 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/14/13
- * Time: 5:41 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\handlers;
 
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdMessage;
-use openid\services\OpenIdServiceCatalog;
 use utils\services\ILogService;
-use utils\services\Registry;
-use utils\services\UtilsServiceCatalog;
+use utils\services\ICheckPointService;
 
 /**
  * Class OpenIdMessageHandler
@@ -28,14 +19,14 @@ abstract class OpenIdMessageHandler
 
     protected $successor;
     protected $current_request;
-    protected $log;
+    protected $log_service;
     protected $checkpoint_service;
 
-    public function __construct($successor, ILogService $log)
+    public function __construct($successor, ILogService $log_service, ICheckPointService $checkpoint_service)
     {
         $this->successor = $successor;
-        $this->log = $log;
-        $this->checkpoint_service = Registry::getInstance()->get(UtilsServiceCatalog::CheckPointService);
+        $this->log_service = $log_service;
+        $this->checkpoint_service = $checkpoint_service;
     }
 
     /**
@@ -53,8 +44,8 @@ abstract class OpenIdMessageHandler
         } else if (isset($this->successor) && !is_null($this->successor)) {
             return $this->successor->HandleMessage($message);
         }
-        $this->log->warning_msg(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
-        $ex  = new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
+        $this->log_service->warning_msg(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
+        $ex = new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
         $this->checkpoint_service->trackException($ex);
         throw $ex;
     }

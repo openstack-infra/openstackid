@@ -4,22 +4,24 @@ namespace services;
 
 use Exception;
 use Log;
+use utils\services\ICacheService;
+use utils\services\ISecurityPolicyCounterMeasure;
 
-class DelayCounterMeasure implements \utils\services\ISecurityPolicyCounterMeasure
+class DelayCounterMeasure implements ISecurityPolicyCounterMeasure
 {
-    private $redis;
+    private $cache_service;
 
-    public function __construct(){
-        $this->redis = \RedisLV4::connection();
+    public function __construct(ICacheService $cache_service){
+        $this->cache_service = $cache_service;
     }
 
     public function trigger(array $params = array())
     {
         try {
             $remote_address = IPHelper::getUserIp();
-            if ($this->redis->exists($remote_address)) {
+            if ($this->cache_service->exists($remote_address)) {
                 Log::warning(sprintf("DelayCounterMeasure: attempt from banned ip %s",$remote_address));
-                $hits = $this->redis->get($remote_address);
+                $hits = intval($this->cache_service->getSingleValue($remote_address));
                 sleep(2 ^ $hits);
             }
         } catch (Exception $ex) {

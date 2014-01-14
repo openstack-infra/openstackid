@@ -2,10 +2,11 @@
 
 namespace services;
 
-use auth\OpenIdUser;
+use auth\User;
 use Log;
 use openid\services\IUserService;
 use Exception;
+use DB;
 
 class UserService implements IUserService
 {
@@ -13,9 +14,9 @@ class UserService implements IUserService
     public function associateUser($id, $proposed_username)
     {
         try {
-            $user = OpenIdUser::where('id', '=', $id)->first();
+            $user = User::where('id', '=', $id)->first();
             if (!is_null($user)) {
-                \DB::transaction(function () use ($id, $proposed_username) {
+                DB::transaction(function () use ($id, $proposed_username) {
                     $done = false;
                     $fragment_nbr = 1;
                     $aux_proposed_username = $proposed_username;
@@ -45,10 +46,10 @@ class UserService implements IUserService
     public function updateLastLoginDate($identifier)
     {
         try {
-            $user = OpenIdUser::where('id', '=', $identifier)->first();
+            $user = User::where('id', '=', $identifier)->first();
             if (!is_null($user)) {
-                \DB::transaction(function () use ($identifier) {
-                    \DB::table('openid_users')->where('id', '=', $identifier)->update(array('last_login_date' => gmdate("Y-m-d H:i:s", time())));
+                DB::transaction(function () use ($identifier) {
+                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('last_login_date' => gmdate("Y-m-d H:i:s", time())));
                 });
             }
         } catch (Exception $ex) {
@@ -59,12 +60,12 @@ class UserService implements IUserService
     public function updateFailedLoginAttempts($identifier)
     {
         try {
-            $user = OpenIdUser::where('id', '=', $identifier)->first();
+            $user = User::where('id', '=', $identifier)->first();
             if (!is_null($user)) {
                 $attempts = $user->login_failed_attempt;
                 ++$attempts;
-                \DB::transaction(function () use ($identifier, $attempts) {
-                    \DB::table('openid_users')->where('id', '=', $identifier)->update(array('login_failed_attempt' => $attempts));
+                DB::transaction(function () use ($identifier, $attempts) {
+                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('login_failed_attempt' => $attempts));
                 });
             }
         } catch (Exception $ex) {
@@ -75,10 +76,10 @@ class UserService implements IUserService
     public function lockUser($identifier)
     {
         try {
-            $user = OpenIdUser::where('id', '=', $identifier)->first();
+            $user = User::where('id', '=', $identifier)->first();
             if (!is_null($user)) {
-                \DB::transaction(function () use ($identifier) {
-                    \DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => 1));
+                DB::transaction(function () use ($identifier) {
+                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => 1));
                 });
                 Log::warning(sprintf("User %d locked ", $identifier));
             }
@@ -89,10 +90,10 @@ class UserService implements IUserService
 
     public function unlockUser($identifier)
     {
-        $user = OpenIdUser::where('id', '=', $identifier)->first();
+        $user = User::where('id', '=', $identifier)->first();
         if (!is_null($user)) {
-            \DB::transaction(function () use ($identifier) {
-                \DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => 0));
+            DB::transaction(function () use ($identifier) {
+                DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => 0));
             });
         }
     }
@@ -100,10 +101,10 @@ class UserService implements IUserService
     public function activateUser($identifier)
     {
         try {
-            $user = OpenIdUser::where('id', '=', $identifier)->first();
+            $user = User::where('id', '=', $identifier)->first();
             if (!is_null($user)) {
-                \DB::transaction(function () use ($identifier) {
-                    \DB::table('openid_users')->where('id', '=', $identifier)->update(array('active' => 1));
+                DB::transaction(function () use ($identifier) {
+                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('active' => 1));
                 });
             }
         } catch (Exception $ex) {
@@ -114,10 +115,10 @@ class UserService implements IUserService
     public function deActivateUser($identifier)
     {
         try {
-            $user = OpenIdUser::where('id', '=', $identifier)->first();
+            $user = User::where('id', '=', $identifier)->first();
             if (!is_null($user)) {
-                \DB::transaction(function () use ($identifier) {
-                    \DB::table('openid_users')->where('id', '=', $identifier)->update(array('active' => 0));
+                DB::transaction(function () use ($identifier) {
+                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('active' => 0));
                 });
             }
         } catch (Exception $ex) {
@@ -128,7 +129,7 @@ class UserService implements IUserService
     public function saveProfileInfo($identifier, $show_pic, $show_full_name, $show_email)
     {
         try {
-            $user = OpenIdUser::where('id', '=', $identifier)->first();
+            $user = User::where('id', '=', $identifier)->first();
             if (!is_null($user)) {
                 $user->public_profile_show_photo = $show_pic;
                 $user->public_profile_show_fullname = $show_full_name;

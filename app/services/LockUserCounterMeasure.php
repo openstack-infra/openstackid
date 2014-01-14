@@ -2,7 +2,7 @@
 
 namespace services;
 
-use auth\OpenIdUser;
+use auth\User;
 use Exception;
 use Log;
 use openid\services\OpenIdServiceCatalog;
@@ -21,7 +21,7 @@ class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
             $server_configuration = Registry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
             $user_service         = Registry::getInstance()->get(OpenIdServiceCatalog::UserService);
 
-            $user = OpenIdUser::where('external_id', '=', $user_identifier)->first();
+            $user = User::where('external_id', '=', $user_identifier)->first();
             if(is_null($user))
                 return;
             //apply lock policy

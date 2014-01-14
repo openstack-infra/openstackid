@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/28/13
- * Time: 6:57 PM
- */
 
 namespace openid\handlers\strategies\implementations;
 
@@ -28,14 +22,14 @@ class SessionAssociationUnencryptedStrategy implements ISessionAssociationStrate
     private $association_service;
     private $server_configuration_service;
     private $current_request;
-    private $log;
+    private $log_service;
 
     public function __construct(OpenIdAssociationSessionRequest $request)
     {
-        $this->current_request = $request;
-        $this->association_service = Registry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
-        $this->server_configuration_service = Registry::getInstance()->get(OpenIdServiceCatalog:: ServerConfigurationService);
-        $this->log = Registry::getInstance()->get(UtilsServiceCatalog:: LogService);
+        $this->current_request               = $request;
+        $this->association_service           = Registry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
+        $this->server_configuration_service  = Registry::getInstance()->get(OpenIdServiceCatalog:: ServerConfigurationService);
+        $this->log_service                   = Registry::getInstance()->get(UtilsServiceCatalog:: LogService);
     }
 
     /**
@@ -52,22 +46,22 @@ class SessionAssociationUnencryptedStrategy implements ISessionAssociationStrate
 
             $assoc_handle = AssocHandleGenerator::generate();
 
-            $expires_in = $this->server_configuration_service->getSessionAssociationLifetime();
+            $expires_in = $this->server_configuration_service->getConfigValue("Session.Association.Lifetime");
+
             $response = new OpenIdUnencryptedAssociationSessionResponse($assoc_handle, $session_type, $assoc_type, $expires_in, $HMAC_secret_handle);
             $issued = gmdate("Y-m-d H:i:s", time());
             $this->association_service->addAssociation($assoc_handle, $HMAC_secret_handle, $assoc_type, $expires_in, $issued, IAssociation::TypeSession, null);
 
         } catch (InvalidDHParam $exDH) {
             $response = new OpenIdDirectGenericErrorResponse($exDH->getMessage());
-            $this->log->error($exDH);
+            $this->log_service->error($exDH);
         } catch (InvalidArgumentException $exDH1) {
             $response = new OpenIdDirectGenericErrorResponse($exDH1->getMessage());
-            $this->log->error($exDH1);
+            $this->log_service->error($exDH1);
 
         } catch (RuntimeException $exDH2) {
             $response = new OpenIdDirectGenericErrorResponse($exDH2->getMessage());
-            $this->log->error($exDH2);
-
+            $this->log_service->error($exDH2);
         }
         return $response;
     }

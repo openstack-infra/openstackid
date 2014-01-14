@@ -18,22 +18,32 @@ use openid\responses\OpenIdDirectGenericErrorResponse;
 use openid\services\IAssociationService;
 use openid\services\INonceService;
 use utils\services\ILogService;
+use utils\services\ICheckPointService;
 
+/**
+ * Class OpenIdCheckAuthenticationRequestHandler
+ * Implements http://openid.net/specs/openid-authentication-2_0.html#check_auth
+ * Verifying Directly with the OpenID Provider
+ * To have the signature verification performed by the OP, the Relying Party sends a direct request to the OP.
+ * To verify the signature, the OP uses a private association that was generated when it issued
+ * the positive assertion.
+ * @package openid\handlers
+ */
 class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
 {
-
 
     private $association_service;
     private $nonce_service;
 
     public function __construct(IAssociationService $association_service,
                                 INonceService $nonce_service,
-                                ILogService $log,
+                                ILogService $log_service,
+                                ICheckPointService $checkpoint_service,
                                 $successor)
     {
-        parent::__construct($successor, $log);
+        parent::__construct($successor, $log_service, $checkpoint_service);
         $this->association_service = $association_service;
-        $this->nonce_service = $nonce_service;
+        $this->nonce_service =   $nonce_service;
     }
 
     protected function internalHandle(OpenIdMessage $message)
@@ -44,9 +54,7 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
 
             if (!$this->current_request->isValid())
                 throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidOpenIdCheckAuthenticationRequestMessage);
-            $claimed_nonce = new OpenIdNonce($this->current_request->getNonce());
 
-            $this->nonce_service->lockNonce($claimed_nonce);
 
             /**
              *  For verifying signatures an OP MUST only use private associations and MUST NOT
@@ -60,14 +68,17 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
              */
 
             $claimed_assoc = $this->current_request->getAssocHandle();
-            $stored_assoc = $this->association_service->getAssociation($claimed_assoc);
+            $claimed_realm = $this->current_request->getRealm();
+            $stored_assoc  = $this->association_service->getAssociation($claimed_assoc, $claimed_realm);
 
             if (is_null($stored_assoc) || $stored_assoc->getType() != IAssociation::TypePrivate)
                 throw new InvalidAssociationTypeException(OpenIdErrorMessages::InvalidAssociationTypeMessage);
 
+            $claimed_nonce = new OpenIdNonce($this->current_request->getNonce());
 
-            $claimed_realm = $this->current_request->getRealm();
-            $claimed_sig = $this->current_request->getSig();
+            $this->nonce_service->lockNonce($claimed_nonce);
+
+            $claimed_sig               = $this->current_request->getSig();
             $claimed_invalidate_handle = $this->current_request->getInvalidateHandle();
 
             if (!is_null($claimed_invalidate_handle) && !empty($claimed_invalidate_handle)) {
@@ -82,46 +93,42 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
             $res = OpenIdSignatureBuilder::verify($this->current_request, $stored_assoc->getMacFunction(), $stored_assoc->getSecret(), $claimed_sig);
             //delete association
             $this->association_service->deleteAssociation($claimed_assoc);
-            $is_valid = 'false';
-            if ($res) {
-                //assertion is valid
-                $is_valid = 'true';
-            }
+            $is_valid = $res ? 'true':'false';
             return new OpenIdCheckAuthenticationResponse($is_valid, $claimed_invalidate_handle);
 
         } catch (InvalidAssociationTypeException $inv_assoc_ex) {
             $this->checkpoint_service->trackException($inv_assoc_ex);
-            $this->log->warning($inv_assoc_ex);
+            $this->log_service->warning($inv_assoc_ex);
             $response = new OpenIdDirectGenericErrorResponse($inv_assoc_ex->getMessage());
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return $response;
         } catch (ReplayAttackException $replay_ex) {
             $this->checkpoint_service->trackException($replay_ex);
-            $this->log->warning($replay_ex);
+            $this->log_service->warning($replay_ex);
             $response = new OpenIdDirectGenericErrorResponse($replay_ex->getMessage());
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return $response;
         } catch (InvalidNonce $inv_nonce_ex) {
             $this->checkpoint_service->trackException($inv_nonce_ex);
-            $this->log->error($inv_nonce_ex);
+            $this->log_service->error($inv_nonce_ex);
             $response = new OpenIdDirectGenericErrorResponse($inv_nonce_ex->getMessage());
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return $response;
         } catch (InvalidOpenIdMessageException $inv_msg_ex) {
             $this->checkpoint_service->trackException($inv_msg_ex);
-            $this->log->error($inv_msg_ex);
+            $this->log_service->error($inv_msg_ex);
             $response = new OpenIdDirectGenericErrorResponse($inv_msg_ex->getMessage());
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return $response;
         } catch (Exception $ex) {
             $this->checkpoint_service->trackException($ex);
-            $this->log->error($ex);
+            $this->log_service->error($ex);
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdDirectGenericErrorResponse("Server Error");
         }
     }
@@ -131,6 +138,4 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
         $res = OpenIdCheckAuthenticationRequest::IsOpenIdCheckAuthenticationRequest($message);
         return $res;
     }
-
-
 }

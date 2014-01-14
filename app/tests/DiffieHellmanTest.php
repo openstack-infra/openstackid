@@ -6,12 +6,12 @@ use openid\OpenIdProtocol;
 use openid\requests\OpenIdDHAssociationSessionRequest;
 use Zend\Crypt\PublicKey\DiffieHellman;
 
+/**
+ * Class DiffieHellmanTest
+ */
 class DiffieHellmanTest extends TestCase
 {
 
-    /**
-     *
-     */
     public function testDefaultDHParams()
     {
         $g = OpenIdDHAssociationSessionRequest::DH_G;
@@ -32,45 +32,5 @@ class DiffieHellmanTest extends TestCase
         $handler = AssocHandleGenerator::generate(32);
         $this->assertTrue(strlen($handler) == 32);
     }
-
-    public function testAssociationMessage()
-    {
-
-        $g = pack('H*', OpenIdDHAssociationSessionRequest::DH_G);
-        $g = OpenIdCryptoHelper::convert($g, DiffieHellman::FORMAT_BINARY, DiffieHellman::FORMAT_NUMBER);
-        $p = pack('H*', OpenIdDHAssociationSessionRequest::DH_P);
-        $p = OpenIdCryptoHelper::convert($p, DiffieHellman::FORMAT_BINARY, DiffieHellman::FORMAT_NUMBER);
-        $dh = new DiffieHellman($p, $g);
-        $dh->generateKeys();
-
-        $rp_public_key = $dh->getPublicKey(DiffieHellman::FORMAT_BTWOC);
-        $dh->computeSecretKey($rp_public_key, DiffieHellman::FORMAT_BTWOC);
-        $rp_public_key = base64_encode($rp_public_key);
-        $shared_secret = $dh->getSharedSecretKey();
-
-        $params = array(
-            "openid.ns" => "http://specs.openid.net/auth/2.0",
-            "openid.assoc_type" => OpenIdProtocol::SignatureAlgorithmHMAC_SHA256,
-            "openid.dh_consumer_public" => $rp_public_key,
-            "openid.mode" => 'associate',
-            "openid.session_type" => OpenIdProtocol::AssociationSessionTypeDHSHA256,
-        );
-
-
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
-        $body = $response->getContent();
-        $lines = explode("\n", $body);
-        $params = array();
-        foreach ($lines as $line) {
-            if (empty($line)) continue;
-            $param = explode(":", $line, 2);
-            $params[$param[0]] = $param[1];
-        }
-        $this->assertResponseStatus(200);
-        $this->assertTrue(isset($params[OpenIdProtocol::OpenIDProtocol_NS]) && $params[OpenIdProtocol::OpenIDProtocol_NS] == OpenIdProtocol::OpenID2MessageType);
-        $this->assertTrue(isset($params[OpenIdProtocol::OpenIDProtocol_AssocType]) && $params[OpenIdProtocol::OpenIDProtocol_AssocType] == OpenIdProtocol::SignatureAlgorithmHMAC_SHA256);
-        $this->assertTrue(isset($params[OpenIdProtocol::OpenIDProtocol_SessionType]) && $params[OpenIdProtocol::OpenIDProtocol_SessionType] == OpenIdProtocol::AssociationSessionTypeDHSHA256);
-    }
-
 
 } 

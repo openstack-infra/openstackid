@@ -72,4 +72,16 @@ class OpenIdAssociation extends Eloquent implements IAssociation
     {
         // TODO: Implement setRealm() method.
     }
+
+    public function getRemainingLifetime()
+    {
+        $created_at = new DateTime($this->issued);
+        $created_at->add(new DateInterval('PT' . $this->lifetime . 'S'));
+        $now        = new DateTime(gmdate("Y-m-d H:i:s", time()));
+        //check validity...
+        if ($now > $created_at)
+            return -1;
+        $seconds = abs($created_at->getTimestamp() - $now->getTimestamp());;
+        return $seconds;
+    }
 }

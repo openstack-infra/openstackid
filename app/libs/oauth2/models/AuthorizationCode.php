@@ -2,6 +2,7 @@
 
 namespace oauth2\models;
 
+use services\IPHelper;
 use Zend\Math\Rand;
 use oauth2\OAuth2Protocol;
 /**
@@ -33,10 +34,12 @@ class AuthorizationCode extends Token {
         $instance->client_id    = $client_id;
         $instance->lifetime     = $lifetime;
         $instance->audience     = $audience;
+        $instance->is_hashed    = false;
+        $instance->from_ip      = IPHelper::getUserIp();
         return $instance;
     }
 
-    public static function load($value, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600, $from_ip = '127.0.0.1'){
+    public static function load($value, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600, $from_ip = '127.0.0.1',$is_hashed = false){
         $instance = new self();
         $instance->value        = $value;
         $instance->scope        = $scope;
@@ -46,6 +49,7 @@ class AuthorizationCode extends Token {
         $instance->issued       = $issued;
         $instance->lifetime     = $lifetime;
         $instance->from_ip      = $from_ip;
+        $instance->is_hashed    = $is_hashed;
         return $instance;
     }
 

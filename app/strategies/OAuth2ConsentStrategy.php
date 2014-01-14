@@ -45,8 +45,7 @@ class OAuth2ConsentStrategy implements  IConsentStrategy {
         $data['redirect_to']      = $request->getRedirectUri();
 
         $app_logo                 = $client->getApplicationLogo();
-        if(is_null($app_logo) || empty($app_logo))
-            $app_logo = asset('img/oauth2.default.logo.png');
+
         $data['app_logo']         = $app_logo;
         $data['app_description']  = $client->getApplicationDescription();
         $data['dev_info_email']   = $client->getDeveloperEmail();
