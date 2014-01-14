@@ -148,7 +148,9 @@ class ImplicitGrantType extends AbstractGrantType
             $audience     = $this->scope_service->getStrAudienceByScopeNames(explode(' ',$scope));
             //build access token
             $access_token = $this->token_service->createAccessTokenFromParams($scope, $client_id, $audience);
-
+            //clear saved data ...
+            $this->memento_service->clearCurrentRequest();
+            $this->auth_service->clearUserAuthorizationResponse();
             return new OAuth2AccessTokenFragmentResponse($redirect_uri, $access_token->getValue(), $access_token->getLifetime(), $scope, $state);
         }
         throw new InvalidOAuth2Request;

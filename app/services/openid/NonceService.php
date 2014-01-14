@@ -10,17 +10,19 @@ use openid\model\OpenIdNonce;
 use openid\services\INonceService;
 use utils\exceptions\UnacquiredLockException;
 use utils\services\ILockManagerService;
-
+use utils\services\ICacheService;
 
 class NonceService implements INonceService
 {
 
-    private $redis;
 
-    public function __construct(ILockManagerService $lock_manager_service)
+    private $cache_service;
+    private $lock_manager_service;
+
+    public function __construct(ILockManagerService $lock_manager_service,ICacheService $cache_service)
     {
-        $this->redis = \RedisLV4::connection();
         $this->lock_manager_service = $lock_manager_service;
+        $this->cache_service        = $cache_service;
     }
 
     /**
@@ -67,15 +69,15 @@ class NonceService implements INonceService
         $key = $raw_nonce . $signature;
 
         try {
-            if ($this->redis->exists($key) == 0)
-                throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyUsed, $nonce));
-            $old_realm = $this->redis->get($key);
+            if (!$this->cache_service->exists($key))
+                throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyUsed, $nonce->getRawFormat()));
+            $old_realm = $this->cache_service->getSingleValue($key);
             if ($realm != $old_realm) {
                 throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyEmittedForAnotherRealm, $realm));
             }
-            $this->redis->del($key);
+            $this->cache_service->delete($key);
         } catch (ReplayAttackException $ex) {
-            $this->redis->del($key);
+            $this->cache_service->delete($key);
             throw $ex;
         }
     }
@@ -90,7 +92,7 @@ class NonceService implements INonceService
         try {
             $raw_nonce = $nonce->getRawFormat();
             $lifetime = \ServerConfigurationService::getConfigValue("Nonce.Lifetime");
-            $this->redis->setex($raw_nonce . $signature, $lifetime, $realm);
+            $this->cache_service->setSingleValue($raw_nonce . $signature, $realm, $lifetime );
         } catch (Exception $ex) {
             Log::error($ex);
         }

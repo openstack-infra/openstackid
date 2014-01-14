@@ -1,23 +1,17 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 11/13/13
- * Time: 12:32 PM
- */
 
 namespace auth\exceptions;
 
 use Exception;
 
-class AuthenticationInvalidPasswordAttemptException extends Exception
+class AuthenticationLockedUserLoginAttempt extends Exception
 {
 
     private $identifier;
 
     public function __construct($identifier,$message = "")
     {
-        $message = "Invalid Password Attempt: " . $message;
+        $message = "Locked User Login Attempt : " . $message;
         $this->identifier = $identifier;
         parent::__construct($message, 0, null);
     }

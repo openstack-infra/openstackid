@@ -113,12 +113,12 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
         'Illuminate\Redis\RedisServiceProvider',
-        'openid\OpenIdServiceProvider',
         'auth\AuthenticationServiceProvider',
         'services\ServicesProvider',
         'strategies\StrategyProvider',
+        'oauth2\OAuth2ServiceProvider',
+        'openid\OpenIdServiceProvider',
         'Greggilbert\Recaptcha\RecaptchaServiceProvider',
-        'oauth2\OAuth2ServiceProvider'
 	),
 
 	/*

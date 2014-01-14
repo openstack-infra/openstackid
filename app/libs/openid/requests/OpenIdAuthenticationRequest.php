@@ -34,21 +34,21 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
     public function isValid()
     {
         try{
-        $return_to = $this->getReturnTo();
-        $claimed_id = $this->getClaimedId();
-        $identity = $this->getIdentity();
-        $mode = $this->getMode();
-        $realm = $this->getRealm();
-        $valid_realm = OpenIdUriHelper::checkRealm($realm, $return_to);
-        $valid_id = $this->isValidIdentifier($claimed_id, $identity);
+            $return_to   = $this->getReturnTo();
+            $claimed_id  = $this->getClaimedId();
+            $identity    = $this->getIdentity();
+            $mode        = $this->getMode();
+            $realm       = $this->getRealm();
+            $valid_realm = OpenIdUriHelper::checkRealm($realm, $return_to);
+            $valid_id    = $this->isValidIdentifier($claimed_id, $identity);
 
-        return !empty($return_to)
-        && !empty($realm)
-        && $valid_realm
-        && !empty($claimed_id)
-        && !empty($identity)
-        && $valid_id
-        && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
+            return !empty($return_to)
+            && !empty($realm)
+            && $valid_realm
+            && !empty($claimed_id)
+            && !empty($identity)
+            && $valid_id
+            && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
         }
         catch(Exception $ex){
             $log = Registry::getInstance()->get(UtilsServiceCatalog::LogService);

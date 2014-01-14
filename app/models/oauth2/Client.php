@@ -29,7 +29,7 @@ class Client extends Eloquent implements IClient {
 
     public function user()
     {
-        return $this->belongsTo('auth\OpenIdUser');
+        return $this->belongsTo('auth\User');
     }
 
     public function resource_server()
@@ -134,7 +134,10 @@ class Client extends Eloquent implements IClient {
 
     public function getApplicationLogo()
     {
-        return $this->app_logo;
+        $app_logo = $this->app_logo;
+        if(is_null($app_logo) || empty($app_logo))
+            $app_logo = asset('img/oauth2.default.logo.png');
+        return $app_logo;
     }
 
     public function getApplicationDescription()

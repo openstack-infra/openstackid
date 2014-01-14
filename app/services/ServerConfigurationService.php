@@ -5,6 +5,7 @@ namespace services;
 use Exception;
 use openid\services\IServerConfigurationService as IOpenIdServerConfigurationService;
 use ServerConfiguration;
+use utils\services\ICacheService;
 use utils\services\IServerConfigurationService;
 
 class ServerConfigurationService implements IOpenIdServerConfigurationService,IServerConfigurationService
@@ -16,28 +17,15 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
     const DefaultMaxFailedLoginAttempts = 10;
     const DefaultMaxFailedLoginAttempts2ShowCaptcha = 3;
     const DefaultNonceLifetime = 360;
-    private $private_association_lifetime;
-    private $session_association_lifetime;
-    private $max_failed_login_attempts;
-    private $max_failed_login_attempts_2_show_captcha;
-    private $nonce_lifetime;
-    private $assets_url;
-    private $redis;
+
     private $default_config_params;
 
-    public function __construct()
+    private $cache_service;
+
+    public function __construct(ICacheService $cache_service)
     {
-        //todo: remove all specific methods per key and use getConfigValue
-        $this->private_association_lifetime = null;
-        $this->session_association_lifetime = null;
-        $this->max_failed_login_attempts = null;
-        $this->max_failed_login_attempts_2_show_captcha = null;
-        $this->nonce_lifetime = null;
-        $this->assets_url = null;
 
-
-        $this->redis = \RedisLV4::connection();
-
+        $this->cache_service         = $cache_service;
         //default config values
         $this->default_config_params = array();
         $this->default_config_params["Private.Association.Lifetime"] = 240;
@@ -62,6 +50,8 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
         $this->default_config_params["BlacklistSecurityPolicy.InvalidOpenIdAuthenticationRequestModeInitialDelay"] = 10;
         $this->default_config_params["BlacklistSecurityPolicy.MaxAuthenticationExceptionAttempts"]                 = 10;
         $this->default_config_params["BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay"]                = 20;
+        $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidAssociationAttempts"]                      = 10;
+        $this->default_config_params["BlacklistSecurityPolicy.InvalidAssociationInitialDelay"]                     = 20;
 
 
         $this->default_config_params["BlacklistSecurityPolicy.OAuth2.MaxAuthCodeReplayAttackAttempts"]          = 3;
@@ -93,8 +83,8 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
         return $url;
     }
 
-       /**
-     * get config value from redis and if not in redis check for it on table server_configuration
+     /**
+     * get config value from cache and if not in cache check for it on table server_configuration
      * @param $key
      * @return mixed
      */
@@ -103,25 +93,24 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
         $res = null;
         try {
 
-            if (!$this->redis->exists($key)) {
-                $conf = ServerConfiguration::where('key', '=', $key)->first();
-                if ($conf)
-                    $this->redis->setnx($key, $conf->value);
+            if (!$this->cache_service->exists($key)) {
+
+                if (!is_null($conf = ServerConfiguration::where('key', '=', $key)->first()))
+                    $this->cache_service->addSingleValue($key, $conf->value);
                 else
                 if (isset($this->default_config_params[$key]))
-                    $this->redis->setnx($key, $this->default_config_params[$key]);
+                    $this->cache_service->addSingleValue($key, $this->default_config_params[$key]);
                 else
                     return null;
             }
 
-            $res = $this->redis->get($key);
+            $res = $this->cache_service->getSingleValue($key);
 
         } catch (Exception $ex) {
             Log::error($ex);
             if (isset($this->default_config_params[$key])) {
                 $res = $this->default_config_params[$key];
             }
-
         }
         return $res;
     }

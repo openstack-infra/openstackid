@@ -18,7 +18,7 @@ class MementoOAuth2AuthenticationRequestService implements IMementoOAuth2Authent
      */
     public function saveCurrentAuthorizationRequest()
     {
-        $input = Input::all();
+        $input         = Input::all();
         $oauth2_params = array();
         foreach ($input as $key => $value) {
             if (array_key_exists($key, OAuth2AuthorizationRequest::$params) === true) {
@@ -72,7 +72,21 @@ class MementoOAuth2AuthenticationRequestService implements IMementoOAuth2Authent
 
     public function clearCurrentRequest()
     {
-        // TODO: Implement clearCurrentRequest() method.
+        $old_data      = Input::old();
+        $oauth2_params = array();
+
+        foreach ($old_data as $key => $value) {
+            if (array_key_exists($key, OAuth2AuthorizationRequest::$params) === true){
+                array_push($oauth2_params, $key);
+            }
+        }
+
+        if (count($oauth2_params) > 0) {
+            foreach ($oauth2_params as $oauth2_param) {
+                Session::forget($oauth2_param);
+                Session::remove($oauth2_param);
+            }
+        }
     }
 
 

@@ -48,10 +48,15 @@ class AuthService implements IAuthService
     {
         if (Session::has("openid.authorization.response")) {
             $value = Session::get("openid.authorization.response");
-            Session::remove('openid.authorization.response');
             return $value;
         }
         return IAuthService::AuthorizationResponse_None;
+    }
+
+    public function clearUserAuthorizationResponse(){
+        if (Session::has("openid.authorization.response")) {
+            Session::remove("openid.authorization.response");
+        }
     }
 
     public function setUserAuthorizationResponse($auth_response)
@@ -62,13 +67,13 @@ class AuthService implements IAuthService
 
     public function getUserByOpenId($openid)
     {
-        $user = OpenIdUser::where('identifier', '=', $openid)->first();
+        $user = User::where('identifier', '=', $openid)->first();
         return $user;
     }
 
     public function getUserByUsername($username)
     {
-        $user = OpenIdUser::where('external_id', '=', $username)->first();
+        $user = User::where('external_id', '=', $username)->first();
         return $user;
     }
 }

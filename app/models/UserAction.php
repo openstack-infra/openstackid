@@ -7,6 +7,6 @@ class UserAction extends Eloquent
 
     public function user()
     {
-        return $this->belongsTo("OpenIdUser");
+        return $this->belongsTo("User");
     }
 }

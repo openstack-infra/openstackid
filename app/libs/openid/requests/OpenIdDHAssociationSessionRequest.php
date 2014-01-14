@@ -36,7 +36,7 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest
     public static function IsOpenIdDHAssociationSessionRequest(OpenIdMessage $message)
     {
         if (OpenIdAssociationSessionRequest::IsOpenIdAssociationSessionRequest($message)) {
-            $session_type = $message->getParam(OpenIdProtocol::OpenIDProtocol_AssocType);
+            $session_type = $message->getParam(OpenIdProtocol::OpenIDProtocol_SessionType);
             if ($session_type == OpenIdProtocol::AssociationSessionTypeDHSHA1 || $session_type == OpenIdProtocol::AssociationSessionTypeDHSHA256)
                 return true;
         }

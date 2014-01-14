@@ -25,7 +25,7 @@ class OpenIdTrustedSite extends Eloquent implements ITrustedSite
 
     public function getData()
     {
-        $res = $this->data;
+        $res = is_null($this->data)?'[]':$this->data;
         return json_decode($res);
     }
 
@@ -36,7 +36,7 @@ class OpenIdTrustedSite extends Eloquent implements ITrustedSite
 
     public function user()
     {
-        return $this->belongsTo('auth\OpenIdUser');
+        return $this->belongsTo('auth\User');
     }
 
     public function getAuthorizationPolicy()

@@ -41,6 +41,7 @@ class RefreshToken extends Token {
         $instance->audience     = $access_token->getAudience();
         $instance->from_ip      = IPHelper::getUserIp();
         $instance->lifetime     = $lifetime;
+        $instance->is_hashed    = false;
         return $instance;
     }
 
@@ -52,6 +53,7 @@ class RefreshToken extends Token {
         $instance->audience     = $params['audience'];
         $instance->from_ip      = $params['from_ip'];
         $instance->issued       = $params['issued'];
+        $instance->is_hashed    = isset($params['is_hashed'])?$params['is_hashed']:false;
         $instance->lifetime     = $lifetime;
         return $instance;
     }

@@ -18,7 +18,10 @@ Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()
         Sign in to <b>{{ $realm }}</b> using your openstackid
     </legend>
     <p>A site identifying itself as <b>{{ $realm }}</b></p>
-    <p>has asked us for confirmation that <a href="{{ str_replace("%23","#",$openid_url) }}">{{ str_replace("%23","#",$openid_url) }}</a> is your identity URL</p>
+    <p>has asked us for confirmation that <a href="{{ str_replace("%23","#",$openid_url) }}" target='_blank'>{{ str_replace("%23","#",$openid_url) }}</a> is your identity URL</p>
+    @foreach ($views as $view)
+    {{ $view}}
+    @endforeach
     <div>
         <label class="radio">
             {{ Form::radio('trust[]', 'AllowOnce','true',array('id'=>'allow_once','class'=>'input-block-level')) }}
@@ -41,9 +44,7 @@ Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()
     {{ Form::button('Cancel',array('id'=>'cancel_authorization','class'=>'btn cancel_authorization')) }}
     </fieldset>
     {{ Form::close() }}
-    @foreach ($views as $view)
-    {{ $view}}
-    @endforeach
+
 </div>
 @stop
 
@@ -60,3 +61,5 @@ Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()
     });
 </script>
 @stop
+
+

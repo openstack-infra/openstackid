@@ -9,8 +9,9 @@ use openid\model\IOpenIdUser;
 use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
 use oauth2\models\IOAuth2User;
+use Eloquent;
 
-class OpenIdUser extends \Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
+class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
 {
 
     protected $table = 'openid_users';

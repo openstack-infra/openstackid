@@ -33,7 +33,7 @@ use utils\services\ILogService;
 /**
  * Class AuthorizationCodeGrantType
  * Authorization Code Grant Implementation
- *  The authorization code grant type is used to obtain both access
+ * The authorization code grant type is used to obtain both access
  * tokens and refresh tokens and is optimized for confidential clients.
  * Since this is a redirection-based flow, the client must be capable of
  * interacting with the resource owner's user-agent (typically a web
@@ -131,6 +131,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             } else if ($authorization_response === IAuthService::AuthorizationResponse_DenyOnce) {
                 throw new AccessDeniedException;
             }
+
             // build current audience ...
             $audience  = $this->scope_service->getStrAudienceByScopeNames(explode(' ',$scope));
 
@@ -138,8 +139,10 @@ class AuthorizationCodeGrantType extends AbstractGrantType
 
             if (is_null($auth_code))
                 throw new OAuth2GenericException("Invalid Auth Code");
-
-            return new OAuth2AuthorizationResponse($redirect_uri, $auth_code->getValue(), $state);
+            // clear save data ...
+            $this->auth_service->clearUserAuthorizationResponse();
+            $this->memento_service->clearCurrentRequest();
+            return new OAuth2AuthorizationResponse($redirect_uri, $auth_code->getValue() , $scope, $state);
         }
         throw new InvalidOAuth2Request;
     }

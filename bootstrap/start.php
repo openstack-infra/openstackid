@@ -69,7 +69,7 @@ use auth\CustomAuthProvider;
 
 Auth::extend('custom', function($app) {
     return new Guard(
-        new CustomAuthProvider(),
+        new CustomAuthProvider($app->app->make('auth\\IAuthenticationExtensionService')),
         App::make('session.store')
     );
 });

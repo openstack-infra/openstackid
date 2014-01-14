@@ -22,11 +22,13 @@ abstract class Token
     protected $scope;
     protected $audience;
     protected $from_ip;
+    protected $is_hashed;
 
     public function __construct($len = self::DefaultByteLength)
     {
-        $this->len = $len;
-        $this->issued = gmdate("Y-m-d H:i:s", time());
+        $this->len       = $len;
+        $this->is_hashed = false;
+        $this->issued    = gmdate("Y-m-d H:i:s", time());
     }
 
     public function getIssued()
@@ -78,7 +80,12 @@ abstract class Token
         return $seconds;
     }
 
+    public function isHashed(){
+        return $this->is_hashed;
+    }
+
     public abstract function toJSON();
+
 
     public abstract function fromJSON($json);
 } 
