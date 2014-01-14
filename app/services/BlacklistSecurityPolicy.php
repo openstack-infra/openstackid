@@ -34,6 +34,7 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
             'openid\exceptions\OpenIdInvalidRealmException'            => array('BlacklistSecurityPolicy.MaxOpenIdInvalidRealmExceptionAttempts','BlacklistSecurityPolicy.OpenIdInvalidRealmExceptionInitialDelay'),
             'openid\exceptions\InvalidOpenIdMessageMode'               => array('BlacklistSecurityPolicy.MaxInvalidOpenIdMessageModeAttempts','BlacklistSecurityPolicy.InvalidOpenIdMessageModeInitialDelay'),
             'openid\exceptions\InvalidOpenIdAuthenticationRequestMode' => array('BlacklistSecurityPolicy.MaxInvalidOpenIdAuthenticationRequestModeAttempts','BlacklistSecurityPolicy.InvalidOpenIdAuthenticationRequestModeInitialDelay'),
+            'openid\exceptions\InvalidAssociation'                     => array('BlacklistSecurityPolicy.MaxInvalidAssociationAttempts','BlacklistSecurityPolicy.InvalidAssociationInitialDelay'),
             'auth\exceptions\AuthenticationException'                  => array('BlacklistSecurityPolicy.MaxAuthenticationExceptionAttempts','BlacklistSecurityPolicy.AuthenticationExceptionInitialDelay'),
             'oauth2\exceptions\ReplayAttackException'                  => array(null,'BlacklistSecurityPolicy.OAuth2.AuthCodeReplayAttackInitialDelay'),
             'oauth2\exceptions\InvalidAuthorizationCodeException'      => array('BlacklistSecurityPolicy.OAuth2.MaxInvalidAuthorizationCodeAttempts','BlacklistSecurityPolicy.OAuth2.InvalidAuthorizationCodeInitialDelay'),

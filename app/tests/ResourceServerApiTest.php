@@ -2,6 +2,10 @@
 
 use oauth2\OAuth2Protocol;
 
+/**
+ * Class ResourceServerApiTest
+ * Test Suite for OAuth2 Protected Resource Server Api
+ */
 class ResourceServerApiTest extends TestCase {
 
     private $access_token;
@@ -16,7 +20,6 @@ class ResourceServerApiTest extends TestCase {
         $this->current_realm = Config::get('app.url');
         $this->client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
         $this->client_secret = 'ITc/6Y5N7kOtGKhg';
-
 
         $scope = array(
             sprintf('%s/api/resource-server/read',$this->current_realm),
@@ -33,6 +36,8 @@ class ResourceServerApiTest extends TestCase {
             OAuth2Protocol::OAuth2Protocol_GrantType => OAuth2Protocol::OAuth2Protocol_GrantType_ClientCredentials,
             OAuth2Protocol::OAuth2Protocol_Scope => implode(' ',$scope)
         );
+
+        //get access token for api ...
 
         $response = $this->action("POST", "OAuth2ProviderController@token",
             $params,

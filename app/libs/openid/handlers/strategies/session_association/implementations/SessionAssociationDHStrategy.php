@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/28/13
- * Time: 6:23 PM
- */
 
 namespace openid\handlers\strategies\implementations;
 
@@ -78,7 +72,6 @@ class SessionAssociationDHStrategy implements ISessionAssociationStrategy
         } catch (RuntimeException $exDH2) {
             $response = new OpenIdDirectGenericErrorResponse($exDH2->getMessage());
             $this->log->error($exDH2);
-
         }
         return $response;
     }

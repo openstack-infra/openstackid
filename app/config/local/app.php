@@ -26,7 +26,7 @@ return array(
 	|
 	*/
 
-	'url' => 'http://localhost',
+	'url' => 'https://dev.openstackid.com/',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -113,10 +113,11 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
         'Illuminate\Redis\RedisServiceProvider',
-        'openid\OpenIdServiceProvider',
         'auth\AuthenticationServiceProvider',
         'services\ServicesProvider',
         'strategies\StrategyProvider',
+        'oauth2\OAuth2ServiceProvider',
+        'openid\OpenIdServiceProvider',
         'Greggilbert\Recaptcha\RecaptchaServiceProvider',
 	),
 

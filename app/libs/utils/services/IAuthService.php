@@ -31,6 +31,8 @@ interface IAuthService
 
     public function setUserAuthorizationResponse($auth_response);
 
+    public function clearUserAuthorizationResponse();
+
     public function logout();
 
     public function getUserByOpenId($openid);

@@ -30,7 +30,7 @@ abstract class OpenIdExtension
     protected $name;
     protected $description;
     protected $view;
-    protected $log;
+    protected $log_service;
 
     /**
      * @param $name
@@ -44,7 +44,7 @@ abstract class OpenIdExtension
         $this->name = $name;
         $this->view = $view;
         $this->description = $description;
-        $this->log = Registry::getInstance()->get(UtilsServiceCatalog::LogService);
+        $this->log_service = Registry::getInstance()->get(UtilsServiceCatalog::LogService);
     }
 
     public function getNamespace()

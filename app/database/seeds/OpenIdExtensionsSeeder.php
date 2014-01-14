@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/25/13
- * Time: 1:34 PM
- */
 
 class OpenIdExtensionsSeeder extends Seeder {
 
@@ -31,6 +25,18 @@ class OpenIdExtensionsSeeder extends Seeder {
                 'extension_class' => 'openid\extensions\implementations\OpenIdSREGExtension',
                 'description'     => 'OpenID Simple Registation is an extension to the OpenID Authentication protocol that allows for very light-weight profile exchange. It is designed to pass eight commonly requested pieces of information when an End User goes to register a new account with a web service',
                 'view_name'       => 'extensions.sreg',
+            )
+        );
+
+
+        ServerExtension::create(
+            array(
+                'name'            => 'OAUTH2',
+                'namespace'       => 'http://specs.openid.net/extensions/oauth/2.0',
+                'active'          => true,
+                'extension_class' => 'openid\extensions\implementations\OpenIdOAuth2Extension',
+                'description'     => 'The OpenID OAuth2 Extension describes how to make the OpenID Authentication and OAuth2 Core specifications work well togethe',
+                'view_name'       => 'extensions.oauth2',
             )
         );
     }

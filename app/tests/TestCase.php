@@ -2,10 +2,13 @@
 
 class TestCase extends Illuminate\Foundation\Testing\TestCase {
 
+    private $redis;
+
     public function setUp()
     {
         parent::setUp(); // Don't forget this!
-
+        $this->redis = \RedisLV4::connection();
+        $this->redis->flushall();
         $this->prepareForTests();
     }
 

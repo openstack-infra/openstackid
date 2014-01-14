@@ -68,7 +68,7 @@ class NonceService implements INonceService
 
         try {
             if ($this->redis->exists($key) == 0)
-                throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyUsed, $nonce));
+                throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyUsed, $nonce->getRawFormat()));
             $old_realm = $this->redis->get($key);
             if ($realm != $old_realm) {
                 throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackNonceAlreadyEmittedForAnotherRealm, $realm));

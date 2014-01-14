@@ -2,7 +2,7 @@
 
 use oauth2\models\IClient;
 use auth\OpenIdUser;
-
+use utils\services\IAuthService;
 /**
  * Class OAuth2ApplicationSeeder
  * This seeder is only for testing purposes
@@ -14,6 +14,8 @@ class TestSeeder extends Seeder {
 
         Eloquent::unguard();
 
+        DB::table('banned_ips')->delete();
+        DB::table('user_exceptions_trail')->delete();
         DB::table('server_configuration')->delete();
         DB::table('server_extensions')->delete();
         DB::table('oauth2_client_api_scope')->delete();
@@ -24,6 +26,8 @@ class TestSeeder extends Seeder {
         DB::table('oauth2_access_token')->delete();
         DB::table('oauth2_refresh_token')->delete();
         DB::table('oauth2_client')->delete();
+        DB::table('openid_trusted_sites')->delete();
+        DB::table('openid_associations')->delete();
         DB::table('openid_users')->delete();
         DB::table('oauth2_resource_server')->delete();
 
@@ -236,6 +240,17 @@ class TestSeeder extends Seeder {
             )
         );
 
+        ServerExtension::create(
+            array(
+                'name'            => 'OAUTH2',
+                'namespace'       => 'http://specs.openid.net/extensions/oauth/2.0',
+                'active'          => true,
+                'extension_class' => 'openid\extensions\implementations\OpenIdOAuth2Extension',
+                'description'     => 'The OpenID OAuth2 Extension describes how to make the OpenID Authentication and OAuth2 Core specifications work well togethe',
+                'view_name'       => 'extensions.oauth2',
+            )
+        );
+
         ResourceServer::create(
             array(
                 'friendly_name'   => 'test resource server',
@@ -413,6 +428,14 @@ class TestSeeder extends Seeder {
         );
 
         $user = OpenIdUser::where('external_id','=','smarcet@gmail.com')->first();
+
+        OpenIdTrustedSite::create(
+            array(
+                'user_id'=>$user->id,
+                'realm'=>'https://www.test.com/',
+                'policy'=>IAuthService::AuthorizationResponse_AllowForever
+            )
+        );
 
         Client::create(
             array(

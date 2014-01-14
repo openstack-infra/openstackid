@@ -4,9 +4,14 @@ namespace openid\services;
 
 use openid\model\IAssociation;
 
+/**
+ * Interface IAssociationService
+ * @package openid\services
+ */
 interface IAssociationService
 {
-    /**
+    /** gets a given association by handle, and if association exists and its type is private, then lock it
+     *  to prevent subsequent usage ( private association could be used once)
      * @param $handle
      * @param null $realm
      * @return null|IAssociation
@@ -22,8 +27,9 @@ interface IAssociationService
      * @param $lifetime
      * @param $issued
      * @param $type
-     * @param $realm
-     * @return mixed
+     * @param null $realm
+     * @return IAssociation
+     * @throws \openid\exceptions\ReplayAttackException
      */
     public function addAssociation($handle, $secret, $mac_function, $lifetime, $issued, $type, $realm);
 

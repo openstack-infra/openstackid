@@ -131,6 +131,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             } else if ($authorization_response === IAuthService::AuthorizationResponse_DenyOnce) {
                 throw new AccessDeniedException;
             }
+            $this->auth_service->clearUserAuthorizationResponse();
             // build current audience ...
             $audience  = $this->scope_service->getStrAudienceByScopeNames(explode(' ',$scope));
 
@@ -139,7 +140,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             if (is_null($auth_code))
                 throw new OAuth2GenericException("Invalid Auth Code");
 
-            return new OAuth2AuthorizationResponse($redirect_uri, $auth_code->getValue(), $state);
+            return new OAuth2AuthorizationResponse($redirect_uri, $auth_code->getValue() , $scope, $state);
         }
         throw new InvalidOAuth2Request;
     }

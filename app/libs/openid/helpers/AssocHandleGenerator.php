@@ -14,7 +14,7 @@ use Zend\Math\Rand;
 class AssocHandleGenerator
 {
 
-    const PrintableNonWhitespaceCharacters = '!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
+    const PrintableNonWhitespaceCharacters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-_~';
 
     /**
      * @param int $len

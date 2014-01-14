@@ -59,7 +59,7 @@ class OpenIdCryptoHelper
         } else if ($func == OpenIdProtocol::SignatureAlgorithmHMAC_SHA256) {
             $macLen = 32; /* 256 bit */
         } else {
-            return false;
+            $macLen = 20;/* 160 bit */
         }
         $bytes = self::randomBytes($macLen);
         return $bytes;

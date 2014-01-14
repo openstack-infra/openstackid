@@ -6,6 +6,7 @@ use utils\services\IAuthService;
 
 /**
  * Class OAuth2ProtocolTest
+ * Test Suite for OAuth2 Protocol
  */
 class OAuth2ProtocolTest extends TestCase
 {

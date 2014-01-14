@@ -30,6 +30,7 @@ use openid\services\IServerExtensionsService;
 use openid\services\ITrustedSitesService;
 use utils\services\IAuthService;
 use utils\services\ILogService;
+use utils\services\ICheckPointService;
 
 /**
  * Class OpenIdAuthenticationRequestHandler
@@ -61,9 +62,10 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                                 IServerConfigurationService $server_configuration_service,
                                 INonceService $nonce_service,
                                 ILogService $log,
+                                ICheckPointService $checkpoint_service,
                                 $successor)
     {
-        parent::__construct($successor, $log);
+        parent::__construct($successor, $log,$checkpoint_service);
         $this->auth_service                 = $authService;
         $this->memento_service              = $memento_service;
         $this->auth_strategy                = $auth_strategy;
@@ -110,33 +112,33 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             }
         } catch (InvalidAssociationTypeException $inv_assoc_type) {
             $this->checkpoint_service->trackException($inv_assoc_type);
-            $this->log->warning($inv_assoc_type);
+            $this->log_service->warning($inv_assoc_type);
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse($inv_assoc_type->getMessage(), null, null, $this->current_request);
         } catch (OpenIdInvalidRealmException $inv_realm_ex) {
             $this->checkpoint_service->trackException($inv_realm_ex);
-            $this->log->error($inv_realm_ex);
+            $this->log_service->error($inv_realm_ex);
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse($inv_realm_ex->getMessage(), null, null, $this->current_request);
         } catch (ReplayAttackException $replay_ex) {
             $this->checkpoint_service->trackException($replay_ex);
-            $this->log->error($replay_ex);
+            $this->log_service->error($replay_ex);
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse($replay_ex->getMessage(), null, null, $this->current_request);
         } catch (InvalidOpenIdMessageException $inv_msg_ex) {
             $this->checkpoint_service->trackException($inv_msg_ex);
-            $this->log->error($inv_msg_ex);
+            $this->log_service->error($inv_msg_ex);
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse($inv_msg_ex->getMessage(), null, null, $this->current_request);
         } catch (Exception $ex) {
             $this->checkpoint_service->trackException($ex);
-            $this->log->error($ex);
+            $this->log_service->error($ex);
             if(!is_null($this->current_request))
-                $this->log->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->error_msg("current request: ".$this->current_request->toString());
             return new OpenIdIndirectGenericErrorResponse("Server Error", null, null, $this->current_request);
         }
     }
@@ -147,66 +149,64 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
      */
     private function doSetupMode()
     {
-        if (!$this->auth_service->isUserLogged()) {
+
+        if (!$this->auth_service->isUserLogged())
             return $this->doLogin();
-        } else {
-            //user already logged
-            $currentUser = $this->auth_service->getCurrentUser();
-            if (!$this->current_request->isIdentitySelectByOP()) {
-                $current_claimed_id = $this->current_request->getClaimedId();
-                $current_identity = $this->current_request->getIdentity();
 
-                // check is claimed identity match with current one
-                // if not logs out and do re login
-                $current_user = $this->auth_service->getCurrentUser();
+        //user already logged
+        $currentUser = $this->auth_service->getCurrentUser();
 
-                if (is_null($current_user))
-                    throw new \Exception("User not set!");
+        if (!$this->current_request->isIdentitySelectByOP()) {
 
-                $current_owned_identity = $this->server_configuration_service->getUserIdentityEndpointURL($current_user->getIdentifier());
+        $current_claimed_id = $this->current_request->getClaimedId();
+        $current_identity   = $this->current_request->getIdentity();
+        // check is claimed identity match with current one
+        // if not logs out and do re login
+        $current_user = $this->auth_service->getCurrentUser();
+        if (is_null($current_user))
+            throw new Exception("User not set!");
 
-                if ($current_claimed_id != $current_owned_identity && $current_identity != $current_owned_identity) {
-                    $this->log->warning_msg(sprintf(OpenIdErrorMessages::AlreadyExistSessionMessage, $current_owned_identity, $current_identity));
-                    $this->auth_service->logout();
-                    return $this->doLogin();
-                }
+            $current_owned_identity = $this->server_configuration_service->getUserIdentityEndpointURL($current_user->getIdentifier());
+
+            if ($current_claimed_id != $current_owned_identity && $current_identity != $current_owned_identity) {
+                $this->log_service->warning_msg(sprintf(OpenIdErrorMessages::AlreadyExistSessionMessage, $current_owned_identity, $current_identity));
+                $this->auth_service->logout();
+                return $this->doLogin();
             }
+        }
 
-            $authorization_response = $this->auth_service->getUserAuthorizationResponse();
+        $authorization_response = $this->auth_service->getUserAuthorizationResponse();
+        if ($authorization_response !== IAuthService::AuthorizationResponse_None)
+            return $this->checkAuthorizationResponse($authorization_response);
 
-            if ($authorization_response == IAuthService::AuthorizationResponse_None) {
-                $this->current_request_context->cleanTrustedData();
-                foreach ($this->extensions as $ext) {
-                    $data = $ext->getTrustedData($this->current_request);
-                    $this->current_request_context->setTrustedData($data);
+        // $authorization_response is none ...
+        $this->current_request_context->cleanTrustedData();
+        foreach ($this->extensions as $ext) {
+            $data = $ext->getTrustedData($this->current_request);
+            $this->current_request_context->setTrustedData($data);
+        }
+
+        $requested_data = $this->current_request_context->getTrustedData();
+        $sites          = $this->trusted_sites_service->getTrustedSites($currentUser, $this->current_request->getRealm(), $requested_data);
+        //check trusted sites
+        if (is_null($sites) || count($sites) === 0)
+            return $this->doConsentProcess();
+        //there are trusted sites ... check the former authorization decision
+        $site   = $sites[0];
+        $policy = $site->getAuthorizationPolicy();
+        switch ($policy) {
+                case IAuthService::AuthorizationResponse_AllowForever:
+                {
+                    return $this->doAssertion();
                 }
-                $requested_data = $this->current_request_context->getTrustedData();
-                $sites = $this->trusted_sites_service->getTrustedSites($currentUser, $this->current_request->getRealm(), $requested_data);
-
-                if (!is_null($sites) && count($sites) > 0) {
-                    $site   = $sites[0];
-                    $policy = $site->getAuthorizationPolicy();
-                    switch ($policy) {
-                        case IAuthService::AuthorizationResponse_AllowForever:
-                        {
-                            return $this->doAssertion();
-                        }
-                        break;
-                        case IAuthService::AuthorizationResponse_DenyForever:
-                            // black listed site
-                            return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $site->getRealm()), null, null, $this->current_request);
-                            break;
-                        default:
-                            throw new \Exception("Invalid Realm Policy");
-                            break;
-                    }
-                } else {
-                    return $this->doConsentProcess();
-                }
-
-            } else {
-                return $this->checkAuthorizationResponse($authorization_response);
-            }
+                break;
+                case IAuthService::AuthorizationResponse_DenyForever:
+                    // black listed site
+                    return new OpenIdIndirectGenericErrorResponse(sprintf(OpenIdErrorMessages::RealmNotAllowedByUserMessage, $site->getRealm()), null, null, $this->current_request);
+                break;
+                default:
+                    throw new Exception("Invalid Realm Policy");
+                break;
         }
     }
 
@@ -246,33 +246,30 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         $context->addSignParam(OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity));
 
         $op_endpoint = $this->server_configuration_service->getOPEndpointURL();
-        $identity = $this->server_configuration_service->getUserIdentityEndpointURL($currentUser->getIdentifier());
-        $nonce = $this->nonce_service->generateNonce();
-        $realm = $this->current_request->getRealm();
-        $response = new OpenIdPositiveAssertionResponse($op_endpoint, $identity, $identity, $this->current_request->getReturnTo(), $nonce->getRawFormat(), $realm);
+        $identity    = $this->server_configuration_service->getUserIdentityEndpointURL($currentUser->getIdentifier());
+        $nonce       = $this->nonce_service->generateNonce();
+        $realm       = $this->current_request->getRealm();
 
+        $response    = new OpenIdPositiveAssertionResponse($op_endpoint, $identity, $identity, $this->current_request->getReturnTo(), $nonce->getRawFormat(), $realm);
 
         foreach ($this->extensions as $ext) {
             $ext->prepareResponse($this->current_request, $response, $context);
         }
 
         //check former assoc handle...
-        $assoc_handle = $this->current_request->getAssocHandle();
-        $association = $this->association_service->getAssociation($assoc_handle);
 
-        if (empty($assoc_handle) || is_null($association)) {
+        if (is_null($assoc_handle = $this->current_request->getAssocHandle()) || is_null($association = $this->association_service->getAssociation($assoc_handle))) {
             // if not present or if it already void then enter on dumb mode
             $new_secret = OpenIdCryptoHelper::generateSecret(OpenIdProtocol::SignatureAlgorithmHMAC_SHA256);
             $new_handle = AssocHandleGenerator::generate();
             $lifetime = $this->server_configuration_service->getConfigValue("Private.Association.Lifetime");
             $issued = gmdate("Y-m-d H:i:s", time());
             //create private association ...
-            $this->association_service->addAssociation($new_handle, $new_secret, OpenIdProtocol::SignatureAlgorithmHMAC_SHA256, $lifetime, $issued, IAssociation::TypePrivate, $realm);
+            $association = $this->association_service->addAssociation($new_handle, $new_secret, OpenIdProtocol::SignatureAlgorithmHMAC_SHA256, $lifetime, $issued, IAssociation::TypePrivate, $realm);
             $response->setAssocHandle($new_handle);
             if (!empty($assoc_handle)) {
                 $response->setInvalidateHandle($assoc_handle);
             }
-            $association = $this->association_service->getAssociation($new_handle);
         } else {
             if ($association->getType() != IAssociation::TypeSession)
                 throw new InvalidAssociationTypeException(OpenIdErrorMessages::InvalidAssociationTypeMessage);
@@ -288,7 +285,9 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
          * so associate $nonce with signature and realm
          */
         $this->nonce_service->associateNonce($nonce, $response->getSig(), $realm);
+        //do cleaning ...
         $this->memento_service->clearCurrentRequest();
+        $this->auth_service->clearUserAuthorizationResponse();
         return $response;
     }
 
