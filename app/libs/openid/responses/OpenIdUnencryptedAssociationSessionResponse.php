@@ -23,6 +23,6 @@ class OpenIdUnencryptedAssociationSessionResponse extends OpenIdAssociationSessi
     public function __construct($assoc_handle, $session_type, $assoc_type, $expires_in, $secret)
     {
         parent::__construct($assoc_handle, $session_type, $assoc_type, $expires_in);
-        $this[OpenIdProtocol::OpenIdProtocol_MacKey] = base64_decode($secret);
+        $this[OpenIdProtocol::OpenIdProtocol_MacKey] = base64_encode($secret);
     }
 } 

@@ -33,7 +33,7 @@ class CustomAuthProvider implements UserProviderInterface
     {
         try {
             //here we do the manuel join between 2 DB, (openid and SS db)
-            $user = OpenIdUser::where('external_id', '=', $identifier)->first();
+            $user = User::where('external_id', '=', $identifier)->first();
             $member = Member::where('Email', '=', $identifier)->first();
             if (!is_null($member) && !is_null($user)) {
                 $user->setMember($member);
@@ -62,7 +62,7 @@ class CustomAuthProvider implements UserProviderInterface
 
             $identifier = $credentials['username'];
             $password   = $credentials['password'];
-            $user       = OpenIdUser::where('external_id', '=', $identifier)->first();
+            $user       = User::where('external_id', '=', $identifier)->first();
 
             //check user status...
             if (!is_null($user) && ($user->lock || !$user->active)){
@@ -83,12 +83,12 @@ class CustomAuthProvider implements UserProviderInterface
             //if user does not exists, then create it
             if (is_null($user)) {
                 //create user
-                $user = new OpenIdUser();
+                $user = new User();
                 $user->external_id = $member->Email;
                 $user->identifier  = $member->Email;
                 $user->last_login_date = gmdate("Y-m-d H:i:s", time());
                 $user->Save();
-                $user = OpenIdUser::where('external_id', '=', $identifier)->first();
+                $user = User::where('external_id', '=', $identifier)->first();
             }
 
             $user_service = Registry::getInstance()->get(OpenIdServiceCatalog::UserService);
@@ -107,7 +107,7 @@ class CustomAuthProvider implements UserProviderInterface
             $user->Save();
 
             //reload user...
-            $user = OpenIdUser::where('external_id', '=', $identifier)->first();
+            $user = User::where('external_id', '=', $identifier)->first();
             $user->setMember($member);
 
             //check if we have a current openid message
@@ -153,7 +153,7 @@ class CustomAuthProvider implements UserProviderInterface
         try {
             $identifier = $credentials['username'];
             $password = $credentials['password'];
-            $user = OpenIdUser::where('external_id', '=', $identifier)->first();
+            $user = User::where('external_id', '=', $identifier)->first();
 
             if (is_null($user) || $user->lock || !$user->active)
                 return false;

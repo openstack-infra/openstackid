@@ -5,15 +5,16 @@ namespace services\oauth2;
 use Exception;
 use DB;
 use Log;
+use utils\services\ICacheService;
 use utils\services\IServerConfigurationService;
 use services\AbstractBlacklistSecurityPolicy;
 use utils\services\ILockManagerService;
 
 class AuthorizationCodeRedeemPolicy extends AbstractBlacklistSecurityPolicy {
 
-    public function __construct(IServerConfigurationService $server_configuration_service, ILockManagerService $lock_manager_service)
+    public function __construct(IServerConfigurationService $server_configuration_service, ILockManagerService $lock_manager_service, ICacheService $cache_service)
     {
-        parent::__construct($server_configuration_service,$lock_manager_service);
+        parent::__construct($server_configuration_service,$lock_manager_service,$cache_service);
     }
 
     /**

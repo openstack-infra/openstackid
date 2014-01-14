@@ -1,11 +1,12 @@
 <?php
 
-use auth\OpenIdUser;
+use auth\User;
 use oauth2\OAuth2Protocol;
 use utils\services\IAuthService;
 
 /**
  * Class OAuth2ProtocolTest
+ * Test Suite for OAuth2 Protocol
  */
 class OAuth2ProtocolTest extends TestCase
 {
@@ -34,7 +35,7 @@ class OAuth2ProtocolTest extends TestCase
             'scope' =>   sprintf('%s/api/resource-server/read',$this->current_realm),
         );
 
-        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
         Auth::login($user);
 
@@ -69,7 +70,7 @@ class OAuth2ProtocolTest extends TestCase
                 'scope' =>   sprintf('%s/api/resource-server/read',$this->current_realm),
             );
 
-            $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+            $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
             Auth::login($user);
 
@@ -135,7 +136,7 @@ class OAuth2ProtocolTest extends TestCase
             $client_secret = 'ITc/6Y5N7kOtGKhg';
 
             //do login and consent ...
-            $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+            $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
             Auth::login($user);
 
@@ -232,7 +233,7 @@ class OAuth2ProtocolTest extends TestCase
             $client_secret = 'ITc/6Y5N7kOtGKhg';
 
             //do login and consent ...
-            $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+            $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
             Auth::login($user);
 
@@ -333,7 +334,7 @@ class OAuth2ProtocolTest extends TestCase
             $client_secret = 'ITc/6Y5N7kOtGKhg';
 
             //do login and consent ...
-            $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+            $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
             Auth::login($user);
 
@@ -438,7 +439,7 @@ class OAuth2ProtocolTest extends TestCase
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         //do login and consent ...
-        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
         Auth::login($user);
 
@@ -480,7 +481,7 @@ class OAuth2ProtocolTest extends TestCase
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         //do login and consent ...
-        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
         Auth::login($user);
 
@@ -537,7 +538,7 @@ class OAuth2ProtocolTest extends TestCase
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         //do login and consent ...
-        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
         Auth::login($user);
 
@@ -595,7 +596,7 @@ class OAuth2ProtocolTest extends TestCase
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         //do login and consent ...
-        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
         Auth::login($user);
 
@@ -653,7 +654,7 @@ class OAuth2ProtocolTest extends TestCase
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         //do login and consent ...
-        $user = OpenIdUser::where('external_id', '=', 'smarcet@gmail.com')->first();
+        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
 
         Auth::login($user);
 

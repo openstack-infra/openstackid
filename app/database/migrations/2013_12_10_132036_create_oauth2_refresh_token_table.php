@@ -14,7 +14,7 @@ class CreateOauth2RefreshTokenTable extends Migration {
         Schema::create('oauth2_refresh_token', function($table)
         {
             $table->bigIncrements('id')->unsigned();
-            $table->string('value',255)->unique();
+            $table->text('value',255)->unique();
             $table->string('from_ip',255);
             $table->integer('lifetime');
             $table->text('scope');

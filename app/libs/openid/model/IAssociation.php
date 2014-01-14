@@ -34,4 +34,6 @@ interface IAssociation
 
     public function IsExpired();
 
+    public function getRemainingLifetime();
+
 }

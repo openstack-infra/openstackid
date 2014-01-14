@@ -2,6 +2,7 @@
 
 namespace openid\extensions\implementations;
 
+use Exception;
 use openid\extensions\OpenIdExtension;
 use openid\OpenIdProtocol;
 use openid\requests\contexts\PartialView;
@@ -9,10 +10,8 @@ use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
-use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
 use utils\services\UtilsServiceCatalog;
-
 
 /**
  * Class OpenIdAXExtension
@@ -59,8 +58,8 @@ class OpenIdAXExtension extends OpenIdExtension
             }
             $partial_view = new PartialView($this->view, array("attributes" => $data));
             $context->addPartialView($partial_view);
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
     }
 
@@ -96,8 +95,8 @@ class OpenIdAXExtension extends OpenIdExtension
                     $response->addParam(self::param(self::Value) . "." . $attr, $user->getLanguage());
                 }
             }
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
     }
 
@@ -122,8 +121,8 @@ class OpenIdAXExtension extends OpenIdExtension
                     array_push($data, $attr);
                 }
             }
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
         return $data;
     }

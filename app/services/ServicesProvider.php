@@ -13,6 +13,19 @@ class ServicesProvider extends ServiceProvider
 
     public function boot()
     {
+
+        $this->app->singleton(UtilsServiceCatalog::CacheService, 'services\\RedisCacheService');
+
+        $this->app['serverconfigurationservice'] = $this->app->share(function ($app) {
+            return new ServerConfigurationService($this->app->make(UtilsServiceCatalog::CacheService));
+        });
+
+        // Shortcut so developers don't need to add an Alias in app/config/app.php
+        $this->app->booting(function () {
+            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
+            $loader->alias('ServerConfigurationService', 'services\\Facades\\ServerConfigurationService');
+        });
+
         //register on boot bc we rely on Illuminate\Redis\ServiceProvider\RedisServiceProvider
         $this->app->singleton(OpenIdServiceCatalog::MementoService, 'services\\MementoRequestService');
         $this->app->singleton(OpenIdServiceCatalog::AuthenticationStrategy, 'services\\AuthenticationStrategy');
@@ -25,6 +38,7 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(UtilsServiceCatalog::LogService, 'services\\LogService');
         $this->app->singleton(UtilsServiceCatalog::LockManagerService, 'services\\LockManagerService');
         $this->app->singleton(UtilsServiceCatalog::ServerConfigurationService, 'services\\ServerConfigurationService');
+
 
         $this->app->singleton("services\\DelayCounterMeasure", 'services\\DelayCounterMeasure');
         $this->app->singleton("services\\LockUserCounterMeasure", 'services\\LockUserCounterMeasure');
@@ -63,6 +77,7 @@ class ServicesProvider extends ServiceProvider
             return $checkpoint_service;
         });
 
+        Registry::getInstance()->set(UtilsServiceCatalog::CheckPointService, $this->app->make(UtilsServiceCatalog::CheckPointService));
         Registry::getInstance()->set(OpenIdServiceCatalog::MementoService, $this->app->make(OpenIdServiceCatalog::MementoService));
         Registry::getInstance()->set(OpenIdServiceCatalog::AuthenticationStrategy, $this->app->make(OpenIdServiceCatalog::AuthenticationStrategy));
         Registry::getInstance()->set(OpenIdServiceCatalog::ServerExtensionsService, $this->app->make(OpenIdServiceCatalog::ServerExtensionsService));
@@ -75,6 +90,7 @@ class ServicesProvider extends ServiceProvider
         Registry::getInstance()->set(UtilsServiceCatalog::LogService, $this->app->make(UtilsServiceCatalog::LogService));
         Registry::getInstance()->set(UtilsServiceCatalog::CheckPointService, $this->app->make(UtilsServiceCatalog::CheckPointService));
         Registry::getInstance()->set(UtilsServiceCatalog::ServerConfigurationService, $this->app->make(UtilsServiceCatalog::ServerConfigurationService));
+        Registry::getInstance()->set(UtilsServiceCatalog::CacheService, $this->app->make(UtilsServiceCatalog::CacheService));
 
         $this->app->singleton(OAuth2ServiceCatalog::MementoService, 'services\\oauth2\\MementoOAuth2AuthenticationRequestService');
         $this->app->singleton(OAuth2ServiceCatalog::ClientService, 'services\\oauth2\\ClientService');
@@ -94,15 +110,7 @@ class ServicesProvider extends ServiceProvider
     public function register()
     {
 
-        $this->app['serverconfigurationservice'] = $this->app->share(function ($app) {
-            return new ServerConfigurationService();
-        });
 
-        // Shortcut so developers don't need to add an Alias in app/config/app.php
-        $this->app->booting(function () {
-            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-            $loader->alias('ServerConfigurationService', 'services\\Facades\\ServerConfigurationService');
-        });
 
     }
 

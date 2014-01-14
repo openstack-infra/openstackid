@@ -22,7 +22,7 @@
                     <img src="{{$app_logo}}" border="0"/>
                 </div>
                 <div class="span10">
-                    <h2>{{$app_name}}&nbsp;<i data-content="Developer Email: <a href='#'>{{$dev_info_email}}</a>.<br> Clicking 'Accept' will redirect you to: <a href='#'>{{$redirect_to}}</a>" class="icon-info-sign info" title="Developer Info"></i></h2>
+                    <h2>{{$app_name}}&nbsp;<i data-content="Developer Email: <a href='mailto:{{$dev_info_email}}'>{{$dev_info_email}}</a>.<br> Clicking 'Accept' will redirect you to: <a href='{{$redirect_to}}' target="_blank">{{$redirect_to}}</a>" class="icon-info-sign info" title="Developer Info"></i></h2>
                 </div>
             </div>
             <legend>This app would like to:</legend>
@@ -49,6 +49,17 @@
     $(document).ready(function() {
 
         $('.icon-info-sign').popover({html:true});
+
+        $(':not(#anything)').on('click', function (e) {
+            $('.icon-info-sign').each(function () {
+                //the 'is' for buttons that trigger popups
+                //the 'has' for icons and other elements within a button that triggers a popup
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                    $(this).popover('hide');
+                    return;
+                }
+            });
+        });
 
         $("body").on('click',"#cancel-authorization",function(event){
             $form = $('#authorization_form');

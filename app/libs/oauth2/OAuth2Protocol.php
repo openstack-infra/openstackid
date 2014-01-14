@@ -114,7 +114,7 @@ class OAuth2Protocol implements IOAuth2Protocol
      * http://tools.ietf.org/html/rfc6749#appendix-A
      * VSCHAR     = %x20-7E
      */
-    const VsChar = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz*-.:_|~';
+    const VsChar = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-_~';
 
     //services
     private $log_service;

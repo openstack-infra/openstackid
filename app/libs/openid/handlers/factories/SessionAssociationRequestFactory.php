@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/28/13
- * Time: 6:17 PM
- */
 
 namespace openid\handlers\factories;
 
@@ -20,9 +14,9 @@ class SessionAssociationRequestFactory
 
     public static function buildRequest(OpenIdMessage $message)
     {
-        if (OpenIdDHAssociationSessionRequest::IsOpenIdAssociationSessionRequest($message))
+        if (OpenIdDHAssociationSessionRequest::IsOpenIdDHAssociationSessionRequest($message))
             return new OpenIdDHAssociationSessionRequest($message);
-        return OpenIdAssociationSessionRequest($message);
+        return new OpenIdAssociationSessionRequest($message);
     }
 
     /**
@@ -31,7 +25,7 @@ class SessionAssociationRequestFactory
      */
     public static function buildSessionAssociationStrategy(OpenIdMessage $message)
     {
-        if (OpenIdDHAssociationSessionRequest::IsOpenIdAssociationSessionRequest($message))
+        if (OpenIdDHAssociationSessionRequest::IsOpenIdDHAssociationSessionRequest($message))
             return new SessionAssociationDHStrategy(new OpenIdDHAssociationSessionRequest($message));
         if (OpenIdAssociationSessionRequest::IsOpenIdAssociationSessionRequest($message))
             return new SessionAssociationUnencryptedStrategy(new OpenIdAssociationSessionRequest($message));

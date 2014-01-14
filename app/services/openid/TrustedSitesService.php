@@ -8,29 +8,30 @@ use openid\services\ITrustedSitesService;
 use OpenIdTrustedSite;
 use utils\services\IAuthService;
 use utils\services\ILogService;
+use Exception;
 
 class TrustedSitesService implements ITrustedSitesService
 {
-    private $log;
+    private $log_service;
 
-    public function __construct(ILogService $log)
+    public function __construct(ILogService $log_service)
     {
-        $this->log = $log;
+        $this->log_service = $log_service;
     }
 
     public function addTrustedSite(IOpenIdUser $user, $realm, $policy, $data = array())
     {
         $res = false;
         try {
-            $site = new OpenIdTrustedSite;
-            $site->realm = $realm;
-            $site->policy = $policy;
+            $site          = new OpenIdTrustedSite;
+            $site->realm   = $realm;
+            $site->policy  = $policy;
             $site->user_id = $user->getId();
-            $site->data = json_encode($data);
+            $site->data    = json_encode($data);
             $site->Save();
             $res = true;
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
         return $res;
     }
@@ -40,8 +41,8 @@ class TrustedSitesService implements ITrustedSitesService
         try {
             $site = OpenIdTrustedSite::where("id", "=", $id)->first();
             if (!is_null($site)) $site->delete();
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
     }
 
@@ -72,8 +73,8 @@ class TrustedSitesService implements ITrustedSitesService
             }
             $sites = $query->get();
 
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
 
         $res = array();
@@ -136,8 +137,8 @@ class TrustedSitesService implements ITrustedSitesService
         $sites = null;
         try {
             $sites = OpenIdTrustedSite::where("user_id", "=", $user->getId())->get();
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
         return $sites;
     }

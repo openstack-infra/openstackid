@@ -1,17 +1,16 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 12/3/13
- * Time: 10:25 AM
- */
 
 namespace oauth2;
 
 use Illuminate\Support\ServiceProvider;
+use utils\services\Registry;
 
 class OAuth2ServiceProvider  extends ServiceProvider
 {
+    public function boot()
+    {
+        Registry::getInstance()->set('oauth2\IOAuth2Protocol', $this->app->make('oauth2\IOAuth2Protocol'));
+    }
 
     public function register()
     {

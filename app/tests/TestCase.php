@@ -2,14 +2,22 @@
 
 class TestCase extends Illuminate\Foundation\Testing\TestCase {
 
+    private $redis;
+
+    public function __construct(){
+
+    }
+
     public function setUp()
     {
         parent::setUp(); // Don't forget this!
-
+        $this->redis = \RedisLV4::connection();
+        $this->redis->flushall();
         $this->prepareForTests();
     }
 
-    /**
+
+     /**
      * Migrates the database and set the mailer to 'pretend'.
      * This will cause the tests to run quickly.
      *

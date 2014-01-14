@@ -9,4 +9,5 @@ class UtilsServiceCatalog {
     const AuthenticationService      = 'utils\\services\\IAuthService';
     const LockManagerService         = 'utils\\services\\ILockManagerService';
     const ServerConfigurationService = 'utils\\services\\IServerConfigurationService';
+    const CacheService               = 'utils\\services\\ICacheService';
 } 

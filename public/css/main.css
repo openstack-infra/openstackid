@@ -69,3 +69,16 @@ select, input[type="text"]{
 #redirect_uri{
     width: 500px;
 }
+
+.popover-content{
+    font-size: 12px;
+}
+
+.popover {
+    width: auto;
+    max-width: 800px;
+}
+
+.info{
+    cursor: pointer;
+}
