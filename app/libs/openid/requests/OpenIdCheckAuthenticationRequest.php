@@ -24,14 +24,16 @@ class OpenIdCheckAuthenticationRequest extends OpenIdAuthenticationRequest
 
     public function isValid()
     {
-        $mode = $this->getMode();
-        $claimed_assoc = $this->getAssocHandle();
-        $claimed_nonce = $this->getNonce();
-        $claimed_sig = $this->getSig();
+        $mode                = $this->getMode();
+        $claimed_assoc       = $this->getAssocHandle();
+        $claimed_nonce       = $this->getNonce();
+        $claimed_sig         = $this->getSig();
         $claimed_op_endpoint = $this->getOPEndpoint();
-        $claimed_identity = $this->getClaimedId();
-        $claimed_realm = $this->getRealm();
-        $claimed_returnTo = $this->getReturnTo();
+        $claimed_identity    = $this->getClaimedId();
+        $claimed_realm       = $this->getRealm();
+        $claimed_returnTo    = $this->getReturnTo();
+        $signed              = $this->getSigned();
+
         $server_configuration_service = Registry::getInstance()->get("openid\\services\\IServerConfigurationService");
         if (
             !is_null($mode) && !empty($mode) && $mode == OpenIdProtocol::CheckAuthenticationMode
@@ -39,6 +41,7 @@ class OpenIdCheckAuthenticationRequest extends OpenIdAuthenticationRequest
             && !is_null($claimed_realm) && !empty($claimed_realm) && OpenIdUriHelper::checkRealm($claimed_realm, $claimed_returnTo)
             && !is_null($claimed_assoc) && !empty($claimed_assoc)
             && !is_null($claimed_sig) && !empty($claimed_sig)
+            && !is_null($signed) && !empty($signed)
             && !is_null($claimed_nonce) && !empty($claimed_nonce)
             && !is_null($claimed_op_endpoint) && !empty($claimed_op_endpoint) && $server_configuration_service->getOPEndpointURL() == $claimed_op_endpoint
             && !is_null($claimed_identity) && !empty($claimed_identity) && OpenIdUriHelper::isValidUrl($claimed_identity)

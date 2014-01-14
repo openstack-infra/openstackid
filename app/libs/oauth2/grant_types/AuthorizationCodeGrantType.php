@@ -139,7 +139,7 @@ class AuthorizationCodeGrantType extends AbstractGrantType
             if (is_null($auth_code))
                 throw new OAuth2GenericException("Invalid Auth Code");
 
-            return new OAuth2AuthorizationResponse($redirect_uri, $auth_code->getValue(), $state);
+            return new OAuth2AuthorizationResponse($redirect_uri, $auth_code->getValue() , $scope, $state);
         }
         throw new InvalidOAuth2Request;
     }

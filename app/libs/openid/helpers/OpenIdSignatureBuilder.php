@@ -29,6 +29,7 @@ class OpenIdSignatureBuilder
         $res = false;
         $signed = $request->getSigned();
         $claimed_signed = explode(',', $signed);
+        ksort($claimed_signed);
         $data = '';
         foreach ($claimed_signed as $key) {
             $key_php = str_ireplace('.', '_', $key);

@@ -236,6 +236,17 @@ class TestSeeder extends Seeder {
             )
         );
 
+        ServerExtension::create(
+            array(
+                'name'            => 'OAUTH2',
+                'namespace'       => 'http://specs.openid.net/extensions/oauth/2.0',
+                'active'          => true,
+                'extension_class' => 'openid\extensions\implementations\OpenIdOAuth2Extension',
+                'description'     => 'The OpenID OAuth2 Extension describes how to make the OpenID Authentication and OAuth2 Core specifications work well togethe',
+                'view_name'       => 'extensions.oauth2',
+            )
+        );
+
         ResourceServer::create(
             array(
                 'friendly_name'   => 'test resource server',

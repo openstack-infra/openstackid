@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/16/13
- * Time: 2:42 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\extensions\implementations;
 
@@ -19,6 +12,7 @@ use openid\responses\OpenIdResponse;
 use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
 use utils\services\UtilsServiceCatalog;
+use Exception;
 
 /**
  * Class OpenIdSREGExtension
@@ -81,8 +75,8 @@ class OpenIdSREGExtension extends OpenIdExtension
 
             $partial_view = new PartialView($this->view, $view_data);
             $context->addPartialView($partial_view);
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
     }
 
@@ -116,8 +110,8 @@ class OpenIdSREGExtension extends OpenIdExtension
                     $response->addParam(self::param($attr), $user->getLanguage());
                 }
             }
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
     }
 
@@ -144,8 +138,8 @@ class OpenIdSREGExtension extends OpenIdExtension
                     array_push($data, $key);
                 }
             }
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
         }
         return $data;
     }

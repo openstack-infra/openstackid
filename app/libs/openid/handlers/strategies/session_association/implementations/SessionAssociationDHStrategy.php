@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/28/13
- * Time: 6:23 PM
- */
 
 namespace openid\handlers\strategies\implementations;
 

@@ -9,7 +9,18 @@ use openid\services\OpenIdServiceCatalog;
 use openid\XRDS\XRDSDocumentBuilder;
 use openid\XRDS\XRDSService;
 use utils\services\Registry;
-use utils\services\UtilsServiceCatalog;
+//services
+use utils\services\ILogService;
+use openid\services\IMementoOpenIdRequestService;
+use openid\handlers\IOpenIdAuthenticationStrategy;
+use openid\services\IServerExtensionsService;
+use openid\services\IAssociationService;
+use openid\services\ITrustedSitesService;
+use openid\services\IServerConfigurationService;
+use openid\services\INonceService;
+use utils\services\IAuthService;
+use utils\services\ICheckPointService;
+
 
 /**
  * Class OpenIdProtocol
@@ -111,25 +122,26 @@ class OpenIdProtocol implements IOpenIdProtocol
         self::OpenIdProtocol_DHEncMacKey => self::OpenIdProtocol_DHEncMacKey,
         self::OpenIdProtocol_MacKey => self::OpenIdProtocol_MacKey,
     );
+
     private $request_handlers;
 
-    public function __construct()
+
+    public function __construct(
+                                IAuthService $auth_service,
+                                IMementoOpenIdRequestService $memento_request_service,
+                                IOpenIdAuthenticationStrategy $auth_strategy,
+                                IServerExtensionsService $server_extension_service,
+                                IAssociationService $association_service,
+                                ITrustedSitesService $trusted_sites_service,
+                                IServerConfigurationService $server_config_service,
+                                INonceService $nonce_service,
+                                ILogService $log_service,
+                                ICheckPointService $checkpoint_service)
     {
         //create chain of responsibility
-
-        $auth_service = Registry::getInstance()->get(UtilsServiceCatalog::AuthenticationService);
-        $memento_request_service = Registry::getInstance()->get(OpenIdServiceCatalog::MementoService);
-        $auth_strategy = Registry::getInstance()->get(OpenIdServiceCatalog::AuthenticationStrategy);
-        $server_extension_service = Registry::getInstance()->get(OpenIdServiceCatalog::ServerExtensionsService);
-        $association_service = Registry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
-        $trusted_sites_service = Registry::getInstance()->get(OpenIdServiceCatalog::TrustedSitesService);
-        $server_config_service = Registry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
-        $nonce_service = Registry::getInstance()->get(OpenIdServiceCatalog::NonceService);
-        $log = Registry::getInstance()->get(UtilsServiceCatalog::LogService);
-
-        $check_auth = new OpenIdCheckAuthenticationRequestHandler($association_service, $nonce_service, $log, null);
-        $session_assoc = new OpenIdSessionAssociationRequestHandler($log, $check_auth);
-        $this->request_handlers = new OpenIdAuthenticationRequestHandler($auth_service, $memento_request_service, $auth_strategy, $server_extension_service, $association_service, $trusted_sites_service, $server_config_service, $nonce_service, $log, $session_assoc);
+        $check_auth             = new OpenIdCheckAuthenticationRequestHandler($association_service, $nonce_service, $log_service,$checkpoint_service,  null);
+        $session_assoc          = new OpenIdSessionAssociationRequestHandler($log_service,$checkpoint_service, $check_auth);
+        $this->request_handlers = new OpenIdAuthenticationRequestHandler($auth_service, $memento_request_service, $auth_strategy, $server_extension_service, $association_service, $trusted_sites_service, $server_config_service, $nonce_service, $log_service,$checkpoint_service, $session_assoc);
     }
 
     public static function isAssocTypeSupported($assoc_type)
@@ -154,7 +166,7 @@ class OpenIdProtocol implements IOpenIdProtocol
 
     public static function param($param, $separator = '.')
     {
-        return self::OpenIdPrefix . $separator . self::$protocol_definition[$param];
+        return self::OpenIdPrefix . $separator . $param ;
     }
 
     public function getXRDSDiscovery($mode, $canonical_id = null)

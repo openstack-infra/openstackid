@@ -48,7 +48,6 @@ class AuthService implements IAuthService
     {
         if (Session::has("openid.authorization.response")) {
             $value = Session::get("openid.authorization.response");
-            Session::remove('openid.authorization.response');
             return $value;
         }
         return IAuthService::AuthorizationResponse_None;

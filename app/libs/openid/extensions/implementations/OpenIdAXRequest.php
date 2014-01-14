@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 11/4/13
- * Time: 10:45 AM
- */
 
 namespace openid\extensions\implementations;
 
@@ -36,41 +30,38 @@ class OpenIdAXRequest extends OpenIdRequest
      */
     public function isValid()
     {
-        try {
-            //check identifier
-            if (isset($this->message[OpenIdAXExtension::paramNamespace('_')])
-                && $this->message[OpenIdAXExtension::paramNamespace('_')] == OpenIdAXExtension::NamespaceUrl
-            ) {
 
-                //check required fields
+        //check identifier
+        if (isset($this->message[OpenIdAXExtension::paramNamespace('_')])
+            && $this->message[OpenIdAXExtension::paramNamespace('_')] == OpenIdAXExtension::NamespaceUrl
+        ) {
 
-                if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::Mode, '_')])
-                    || $this->message[OpenIdAXExtension::param(OpenIdAXExtension::Mode, '_')] != OpenIdAXExtension::FetchRequest
-                )
-                    throw new InvalidOpenIdMessageException(OpenIdErrorMessages::AXInvalidModeMessage);
+            //check required fields
 
-                if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::RequiredAttributes, '_')]))
-                    throw new InvalidOpenIdMessageException(OpenIdErrorMessages::AXInvalidRequiredAttributesMessage);
+            if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::Mode, '_')])
+                || $this->message[OpenIdAXExtension::param(OpenIdAXExtension::Mode, '_')] != OpenIdAXExtension::FetchRequest
+            )
+                throw new InvalidOpenIdMessageException(OpenIdErrorMessages::AXInvalidModeMessage);
 
-                //get attributes
-                $attributes = $this->message[OpenIdAXExtension::param(OpenIdAXExtension::RequiredAttributes, '_')];
-                $attributes = explode(",", $attributes);
+            if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::RequiredAttributes, '_')]))
+                throw new InvalidOpenIdMessageException(OpenIdErrorMessages::AXInvalidRequiredAttributesMessage);
 
-                foreach ($attributes as $attr) {
-                    $attr = trim($attr);
-                    if (!isset(OpenIdAXExtension::$available_properties[$attr]))
-                        continue;
-                    if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::Type, '_') . "_" . $attr]))
-                        throw new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::AXInvalidNamespaceMessage, $attr));
-                    $ns = $this->message[OpenIdAXExtension::param(OpenIdAXExtension::Type, "_") . "_" . $attr];
-                    if ($ns != OpenIdAXExtension::$available_properties[$attr])
-                        throw new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::AXInvalidNamespaceMessage, $attr));
-                    array_push($this->attributes, $attr);
-                }
-                return true;
+            //get attributes
+            $attributes = $this->message[OpenIdAXExtension::param(OpenIdAXExtension::RequiredAttributes, '_')];
+            $attributes = explode(",", $attributes);
+
+            foreach ($attributes as $attr) {
+                $attr = trim($attr);
+                if (!isset(OpenIdAXExtension::$available_properties[$attr]))
+                    continue;
+                if (!isset($this->message[OpenIdAXExtension::param(OpenIdAXExtension::Type, '_') . "_" . $attr]))
+                    throw new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::AXInvalidNamespaceMessage, $attr));
+                $ns = $this->message[OpenIdAXExtension::param(OpenIdAXExtension::Type, "_") . "_" . $attr];
+                if ($ns != OpenIdAXExtension::$available_properties[$attr])
+                    throw new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::AXInvalidNamespaceMessage, $attr));
+                array_push($this->attributes, $attr);
             }
-        } catch (\Exception $ex) {
-            $this->log->error($ex);
+            return true;
         }
         return false;
     }
