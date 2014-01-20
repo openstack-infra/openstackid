@@ -26,10 +26,10 @@ class OpenIdConsentStrategy implements IConsentStrategy
 
     public function __construct(IMementoOpenIdRequestService $memento_service, IAuthService $auth_service, IServerConfigurationService $server_configuration_service, IUserActionService $user_action_service)
     {
-        $this->memento_service = $memento_service;
-        $this->auth_service = $auth_service;
+        $this->memento_service              = $memento_service;
+        $this->auth_service                 = $auth_service;
         $this->server_configuration_service = $server_configuration_service;
-        $this->user_action_service = $user_action_service;
+        $this->user_action_service          = $user_action_service;
     }
 
     public function getConsent()
@@ -44,16 +44,12 @@ class OpenIdConsentStrategy implements IConsentStrategy
         if (is_null($context))
             throw new InvalidRequestContextException();
         $partial_views = $context->getPartials();
-        $data = array();
-        $views = array();
-        foreach ($partial_views as $partial) {
-            $views[$partial->getName()] = View::make($partial->getName(), $partial->getData());
-        }
-        $request = $this->memento_service->getCurrentRequest();
-        $user = $this->auth_service->getCurrentUser();
-        $data['realm'] = $request->getParam(OpenIdProtocol::OpenIDProtocol_Realm);
+        $data               = array();
+        $request            = $this->memento_service->getCurrentRequest();
+        $user               = $this->auth_service->getCurrentUser();
+        $data['realm']      = $request->getParam(OpenIdProtocol::OpenIDProtocol_Realm);
         $data['openid_url'] = $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier());
-        $data['views'] = $views;
+        $data['views']      = $partial_views;
         return $data;
     }
 

@@ -82,7 +82,7 @@ class ClientService implements IClientService
             $instance->client_id = Rand::getString(32, OAuth2Protocol::VsChar, true) . '.openstack.client';
             //only generates secret for confidential clients
             if ($client_type == IClient::ClientType_Confidential)
-                $instance->client_secret = Rand::getString(16, OAuth2Protocol::VsChar, true);
+                $instance->client_secret = Rand::getString(24, OAuth2Protocol::VsChar, true);
             $instance->client_type = $client_type;
             $instance->user_id = $user_id;
             $instance->active = true;
@@ -169,7 +169,7 @@ class ClientService implements IClientService
         DB::transaction(function () use ($id, &$new_secret) {
             $client = Client::find($id);
             if (!is_null($client)) {
-                $client_secret = Rand::getString(16, OAuth2Protocol::VsChar, true);
+                $client_secret = Rand::getString(24, OAuth2Protocol::VsChar, true);
                 $client->client_secret = $client_secret;
                 $client->Save();
                 $token_service = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);

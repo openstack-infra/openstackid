@@ -29,7 +29,5 @@
     {{ HTML::script('js/jquery.validate.min.js')}}
     {{ HTML::script('js/additional-methods.min.js')}}
     @yield('scripts')
-    @yield('subscripts')
 </body>
-
 </html>

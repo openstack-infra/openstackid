@@ -19,8 +19,8 @@ Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()
     </legend>
     <p>A site identifying itself as <b>{{ $realm }}</b></p>
     <p>has asked us for confirmation that <a href="{{ str_replace("%23","#",$openid_url) }}" target='_blank'>{{ str_replace("%23","#",$openid_url) }}</a> is your identity URL</p>
-    @foreach ($views as $view)
-    {{ $view}}
+    @foreach ($views as $partial)
+        @include($partial->getName(),$partial->getData())
     @endforeach
     <div>
         <label class="radio">

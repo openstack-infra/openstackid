@@ -10,7 +10,7 @@ class CreateTrustedSitesTable extends Migration {
         {
             $table->bigIncrements('id')->unsigned();
             $table->string('realm',1024);
-            $table->string('data',5000)->nullable();
+            $table->text('data')->nullable();
             $table->string('policy',255);
             $table->bigInteger("user_id")->unsigned();
         });

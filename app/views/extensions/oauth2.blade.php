@@ -28,7 +28,8 @@
 </div>
 @endif
 
-@section('subscripts')
+@section('scripts')
+@parent
 <script type="application/javascript">
     $(document).ready(function() {
 

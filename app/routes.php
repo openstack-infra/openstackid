@@ -58,8 +58,10 @@ Route::group(array("before" => array("ssl", "auth")), function () {
     Route::get('/accounts/user/profile/clients/redirect_uri/delete/{id}/{uri_id}','UserController@getDeleteClientAllowedUri');
     Route::post('/accounts/user/profile/clients/scope/add/{id}','UserController@postAddAllowedScope');
     Route::post('/accounts/user/profile/clients/activate/{id}','UserController@postActivateClient');
-    Route::post('/accounts/user/profile/clients/use/refresh_token/{id}','UserController@postUseRefreshTokenClient');
-    Route::post('/accounts/user/profile/clients/rotate/refresh_token/{id}','UserController@postRotateRefreshTokenPolicy');
+    Route::post('/accounts/user/profile/clients/token/use/refresh_token/{id}','UserController@postUseRefreshTokenClient');
+    Route::post('/accounts/user/profile/clients/token/rotate/refresh_token/{id}','UserController@postRotateRefreshTokenPolicy');
+    Route::get('/accounts/user/profile/clients/token/revoke/{value}/{hint}','UserController@getRevokeToken');
+    Route::get('/accounts/user/profile/clients/token/access_tokens/{client_id}','UserController@getAccessTokens');
 });
 
 

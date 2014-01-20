@@ -108,6 +108,10 @@ interface ITokenService {
      */
     public function revokeClientRelatedTokens($client_id);
 
+    public function getAccessTokenByClient($client_id);
+    
+    public function getRefreshTokenByClient($client_id);
+
 
     /**
      * Revokes a given access token

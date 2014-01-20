@@ -8,6 +8,8 @@ interface IApiScopeService {
      */
     public function getScopesByName(array $scopes_names);
 
+    public function getFriendlyScopesByName(array $scopes_names);
+
     /** get all active scopes
      * @return mixed
      */

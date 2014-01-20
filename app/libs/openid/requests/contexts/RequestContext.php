@@ -11,7 +11,7 @@ class RequestContext
     public function __construct()
     {
         $this->partial_views = array();
-        $this->trusted_data = array();
+        $this->trusted_data  = array();
     }
 
     public function addPartialView(PartialView $partial_view)

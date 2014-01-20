@@ -4,6 +4,7 @@ namespace services\oauth2;
 
 use oauth2\services\IApiScopeService;
 use ApiScope;
+use DB;
 
 class ApiScopeService implements IApiScopeService {
 
@@ -14,6 +15,11 @@ class ApiScopeService implements IApiScopeService {
     public function getScopesByName(array $scopes_names)
     {
         return ApiScope::where('active','=',true)->whereIn('name',$scopes_names)->get();
+    }
+
+    public function getFriendlyScopesByName(array $scopes_names){
+
+        return DB::table('oauth2_api_scope')->where('active','=',true)->whereIn('name',$scopes_names)->lists('short_description');
     }
 
     /** get all active scopes
