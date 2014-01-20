@@ -359,12 +359,8 @@ class TokenService implements ITokenService
                 $lock_name = 'lock.get.accesstoken.' . $hashed_value;
                 $this->lock_manager_service->acquireLock($lock_name);
 
-                //check lifetime...
-                $lifetime   = $access_token_db->lifetime;
-                $created_at = $access_token_db->created_at;
-                $created_at->add(new DateInterval('PT' . $lifetime . 'S'));
-                $now        = new DateTime(gmdate("Y-m-d H:i:s", time()));
-                if ($now > $created_at) {
+
+                if ($access_token_db->isVoid()){
                     //invalid one ...
                     $access_token_db->delete();
                     throw new InvalidGrantTypeException(sprintf('Access token %s is expired!', $value));
@@ -496,14 +492,8 @@ class TokenService implements ITokenService
         }
 
         //check is refresh token is stills alive... (ZERO is infinite lifetime)
-        if ($refresh_token_db->lifetime !== 0) {
-            $created_at = $refresh_token_db->created_at;
-            $created_at->add(new DateInterval('PT' . $refresh_token_db->lifetime . 'S'));
-            $now = new DateTime(gmdate("Y-m-d H:i:s", time()));
-            //check validity...
-            if ($now > $created_at)
-                throw new InvalidGrantTypeException(sprintf("Refresh token %s is expired!", $value));
-        }
+        if($refresh_token_db->isVoid())
+            throw new InvalidGrantTypeException(sprintf("Refresh token %s is expired!", $value));
 
         $client        = $refresh_token_db->client()->first();
 
@@ -589,13 +579,14 @@ class TokenService implements ITokenService
         $access_tokens = $this->cache_service->getSet($client_id . self::ClientAccessTokenPrefixList);
 
         DB::transaction(function () use ($client_id, $auth_codes, $access_tokens) {
-
+            $client = $this->client_service->getClientById($client_id);
+            if(is_null($client)) return;
+            //revoke on cache
             $this->cache_service->deleteArray($auth_codes);
             $this->cache_service->deleteArray($access_tokens);
-
-            DBAccessToken::where('client_id','=',$client_id)->delete();
-            DBRefreshToken::where('client_id','=',$client_id)->delete();
-
+            //revoke on db
+            $client->access_tokens()->delete();
+            $client->refresh_tokens()->delete();
             //delete client list (auth codes and access tokens)
             $this->cache_service->delete($client_id . self::ClientAuthCodePrefixList);
             $this->cache_service->delete($client_id . self::ClientAccessTokenPrefixList);
@@ -641,11 +632,12 @@ class TokenService implements ITokenService
     public function clearAccessTokensForRefreshToken($value, $is_hashed = false){
 
         $hashed_value = !$is_hashed?Hash::compute('sha256', $value):$value;
-
-        DB::transaction(function () use ($hashed_value) {
+        $res = false;
+        DB::transaction(function () use ($hashed_value, &$res) {
             $refresh_token_db = DBRefreshToken::where('value','=',$hashed_value)->first();
             if(!is_null($refresh_token_db)){
                 $access_tokens_db = DBAccessToken::where('refresh_token_id','=',$refresh_token_db->id)->get();
+                if(!count($access_tokens_db)) $res = true;
                 foreach($access_tokens_db as $access_token_db){
                     $res = $this->cache_service->delete($access_token_db->value);
                     $client = $access_token_db->client()->first();
@@ -654,7 +646,27 @@ class TokenService implements ITokenService
                 }
             }
         });
+        return $res;
     }
 
+    public function getAccessTokenByClient($client_id){
+        $client        = $this->client_service->getClientById($client_id);
+        $res           = array();
+        $access_tokens = $client->access_tokens()->get();
+        foreach($access_tokens as $access_token){
+            if(!$access_token->isVoid()) array_push($res,$access_token);
+        }
+        return $res;
+    }
+
+    public function getRefreshTokenByClient($client_id){
+        $client = $this->client_service->getClientById($client_id);
+        $res           = array();
+        $refresh_tokens = $client->refresh_tokens()->where('void','=',false)->get();
+        foreach($refresh_tokens as $refresh_token){
+            if(!$refresh_token->isVoid()) array_push($res,$refresh_token);
+        }
+        return $res;
+    }
 }
 

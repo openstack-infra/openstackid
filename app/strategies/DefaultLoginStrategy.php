@@ -7,6 +7,7 @@ use services\IPHelper;
 use services\IUserActionService;
 use utils\services\IAuthService;
 use View;
+use URL;
 
 class DefaultLoginStrategy implements ILoginStrategy
 {
@@ -33,7 +34,9 @@ class DefaultLoginStrategy implements ILoginStrategy
         $user = $this->auth_service->getCurrentUser();
         $identifier = $user->getIdentifier();
         $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(), IUserActionService::LoginAction);
-        return Redirect::action("UserController@getIdentity", array("identifier" => $identifier));
+        $default_url = URL::action("UserController@getIdentity", array("identifier" => $identifier));
+        return Redirect::intended($default_url);
+
     }
 
     public function  cancelLogin()

@@ -15,8 +15,8 @@ class HomeController extends BaseController
     {
         //This field contains a semicolon-separated list of representation schemes
         //which will be accepted in the response to this request.
-        $accept = Request::header('Accept');
-        $accept_values = explode(",", $accept);
+        $accept          = Request::header('Accept');
+        $accept_values   = explode(",", $accept);
         if (in_array(XRDSDocumentBuilder::ContentType, $accept_values))
             return $this->discovery->idp();
         if (Auth::guest())

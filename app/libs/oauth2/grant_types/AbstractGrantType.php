@@ -53,12 +53,12 @@ abstract class AbstractGrantType implements IGrantType
             throw new InvalidClientException;
 
         if (!$this->current_client->isActive() || $this->current_client->isLocked()) {
-            throw new UnAuthorizedClientException();
+            throw new UnAuthorizedClientException(sprintf('client id %s',$this->current_client_id));
         }
 
         //verify client credentials (only for confidential clients )
         if ($this->current_client->getClientType() == IClient::ClientType_Confidential && $this->current_client->getClientSecret() !== $this->current_client_secret)
-            throw new UnAuthorizedClientException;
+            throw new UnAuthorizedClientException(sprintf('client id %s',$this->current_client_id));
 
     }
 } 

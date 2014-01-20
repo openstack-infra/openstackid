@@ -10,7 +10,7 @@
     <div class="row-fluid">
         <div class="span12">
             Hello, {{{ $username }}}.
-            <a class="btn btn-small" href="{{ URL::action("UserController@logout") }}"">logout</a>
+            <a class="btn btn-small" href="{{ URL::action("UserController@logout") }}">logout</a>
             <div>Your OPENID: <a href="{{ str_replace("%23","#",$openid_url) }}">{{ str_replace("%23","#",$openid_url) }}</a></div>
         </div>
     </div>
