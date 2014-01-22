@@ -1,0 +1,8 @@
+Verified+2: Jenkins
+Approved+1: sebastian marcet <smarcet@gmail.com>
+Code-Review+2: sebastian marcet <smarcet@gmail.com>
+Submitted-by: Jenkins
+Submitted-at: Wed, 22 Jan 2014 04:42:04 +0000
+Reviewed-on: https://review.openstack.org/67959
+Project: openstack-infra/openstackid
+Branch: refs/heads/master
