@@ -83,7 +83,7 @@ class ResourceServerApiTest extends TestCase {
 
         $content         = $response->getContent();
         $list = json_decode($content);
-
+        $this->assertTrue(isset($list->total_items) && intval($list->total_items)>0);
         $this->assertResponseStatus(200);
     }
 

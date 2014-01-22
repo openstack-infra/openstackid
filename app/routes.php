@@ -82,4 +82,13 @@ Route::group(array('prefix' => 'api/v1', 'before' => 'ssl|oauth2.protected.endpo
         Route::put('/',"ApiResourceServerController@update");
         Route::get('/status/{id}/{active}',"ApiResourceServerController@updateStatus");
     });
+
+    Route::group(array('prefix' => 'api-endpoints'), function(){
+        Route::get('/{id}',"ApiEndpointsController@get");
+        Route::get('/{page_nbr}/{page_size}',"ApiEndpointsController@getByPage");
+        Route::delete('/{id}',"ApiEndpointsController@delete");
+        Route::post('/',"ApiEndpointsController@create");
+        Route::put('/',"ApiEndpointsController@update");
+        Route::get('/status/{id}/{active}',"ApiEndpointsController@updateStatus");
+    });
 });

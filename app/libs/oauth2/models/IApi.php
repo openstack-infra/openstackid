@@ -22,4 +22,15 @@ interface IApi {
     public function getScope();
 
     public function isActive();
+
+    public function setName($name);
+
+    public function setRoute($route);
+
+    public function setHttpMethod($http_method);
+
+    public function setDescription($description);
+
+    public function setStatus($active);
+
 } 

@@ -46,8 +46,8 @@ class OAuth2BearerAccessTokenRequestValidator {
             $api       = $this->api_service->getApiByUrlAndMethod($url, $method);
             $realm     = $request->getHost();
 
-            //api endpoint must be registered on db
-            if(is_null($api)){
+            //api endpoint must be registered on db and active
+            if(is_null($api) || !$api->isActive()){
                 throw new OAuth2ResourceServerException(400,OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest,'API endpoint does not exits!');
             }
 

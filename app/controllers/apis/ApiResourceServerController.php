@@ -7,20 +7,17 @@ use utils\services\ILogService;
 /**
  * Class ApiResourceServerController
  */
-class ApiResourceServerController extends BaseController
+class ApiResourceServerController extends OAuth2ProtectedController
 {
     /**
      * @var IResourceServerService $resource_service
      */
     private $resource_server_service;
-    private $log_service;
-    private $resource_server_context;
 
     public function __construct(IResourceServerContext $resource_server_context, IResourceServerService $resource_server_service, ILogService $log_service)
     {
-        $this->resource_server_context = $resource_server_context;
+        parent::__construct($resource_server_context,$log_service);
         $this->resource_server_service = $resource_server_service;
-        $this->log_service             = $log_service;
     }
 
     public function get($id)
@@ -28,27 +25,18 @@ class ApiResourceServerController extends BaseController
         try {
             $resource_server = $this->resource_server_service->get($id);
             if (is_null($resource_server)) {
-                return Response::json(array(
-                    'error' => 'resource server not found'
-                ), 404);
+                return $this->error404(array('error' => 'resource server not found'));
+            }
 
-            } else {
-                $data    = $resource_server->toArray();
-                $client = $resource_server->getClient();
-                if(!is_null($client)){
+            $data    = $resource_server->toArray();
+            $client  = $resource_server->getClient();
+            if(!is_null($client)){
                     $data['client_id']     = $client->getClientId();
                     $data['client_secret'] = $client->getClientSecret();
-                }
-                return Response::json(
-                    $data,
-                    200);
             }
+            return $this->ok($data);
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
-            return Response::json(
-                array(
-                    'error' => 'server error'
-                ), 500);
+            return $this->error500($ex);
         }
     }
 
@@ -60,17 +48,12 @@ class ApiResourceServerController extends BaseController
             foreach ($list->getItems() as $rs) {
                 array_push($items, $rs->toArray());
             }
-            return Response::json(
-                array(
-                    'page' => $items,
-                    'total_items' => $list->getTotal()
-                ), 200);
+            return $this->ok( array(
+                'page' => $items,
+                'total_items' => $list->getTotal()
+            ));
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
-            return Response::json(
-                array(
-                    'error' => 'server error'
-                ), 500);
+            return $this->error500($ex);
         }
     }
 
@@ -80,19 +63,17 @@ class ApiResourceServerController extends BaseController
             $new_resource_server = Input::all();
 
             $rules = array(
-                'host' => 'required|max:255',
-                'ip' => 'required|max:16',
+                'host'          => 'required|max:255',
+                'ip'            => 'required|ip|max:16',
                 'friendly_name' => 'required|max:512',
-                'active' => 'required',
+                'active'        => 'required',
             );
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($new_resource_server, $rules);
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return Response::json(
-                    array(
-                        'error' => $messages), 400);
+                return $this->error400(array('error' => $messages));
             }
 
             $new_resource_server_model = $this->resource_server_service->addResourceServer($new_resource_server['host'],
@@ -100,17 +81,9 @@ class ApiResourceServerController extends BaseController
                 $new_resource_server['friendly_name'],
                 $new_resource_server['active']);
 
-            return Response::json(
-                array(
-                    'resource_server_id' => $new_resource_server_model->id
-                )
-                , 200);
+            return $this->ok(array('resource_server_id' => $new_resource_server_model->id));
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
-            return Response::json(
-                array(
-                    'error' => 'server error'
-                ), 500);
+            return $this->error500($ex);
         }
     }
 
@@ -118,13 +91,9 @@ class ApiResourceServerController extends BaseController
     {
         try {
             $res = $this->resource_server_service->delete($id);
-            return Response::json('ok',$res?200:404);
+            return $res?Response::json('ok',200):$this->error404(array('error'=>'operation failed'));
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
-            return Response::json(
-                array(
-                    'error' => 'server error'
-                ), 500);
+            return $this->error500($ex);
         }
     }
 
@@ -132,13 +101,9 @@ class ApiResourceServerController extends BaseController
     {
         try {
             $res = $this->resource_server_service->regenerateResourceServerClientSecret($id);
-            return Response::json(array('new_secret'=>$res),$res?200:404);
+            return !is_null($res)?Response::json(array('new_secret'=>$res),200):$this->error404(array('error'=>'operation failed'));
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
-            return Response::json(
-                array(
-                    'error' => 'server error'
-                ), 500);
+            return $this->error500($ex);
         }
     }
 
@@ -149,9 +114,9 @@ class ApiResourceServerController extends BaseController
             $values = Input::all();
 
             $rules = array(
-                'id' => 'required',
-                'host' => 'required|max:255',
-                'ip' => 'required|max:16',
+                'id'            => 'required|integer',
+                'host'          => 'required|max:255',
+                'ip'            => 'required|ip|max:16',
                 'friendly_name' => 'required|max:512',
             );
             // Creates a Validator instance and validates the data.
@@ -159,41 +124,34 @@ class ApiResourceServerController extends BaseController
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return Response::json(
-                    array(
-                        'error' => $messages), 400);
+                return $this->error400(array('error' => $messages));
             }
 
             $rs = $this->resource_server_service->get($values['id']);
+            if(is_null($rs)){
+                return $this->error404(array('error'=>'resource server not found'));
+            }
 
             $rs->setFriendlyName($values['friendly_name']);
             $rs->setHost($values['host']);
             $rs->setIp($values['ip']);
 
-            $this->resource_server_service->save($rs);
+            $res = $this->resource_server_service->save($rs);
 
-            return Response::json('ok',200);
+            return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
 
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
-            return Response::json(
-                array(
-                    'error' => 'server error'
-                ), 500);
+            return $this->error500($ex);
         }
     }
 
     public function updateStatus($id, $active){
         try {
             $active = is_string($active)?( strtoupper(trim($active))==='TRUE'?true:false ):$active;
-            $this->resource_server_service->setStatus($id,$active);
-            return Response::json('ok',200);
+            $res = $this->resource_server_service->setStatus($id,$active);
+            return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
-            return Response::json(
-                array(
-                    'error' => 'server error'
-                ), 500);
+            return $this->error500($ex);
         }
     }
 

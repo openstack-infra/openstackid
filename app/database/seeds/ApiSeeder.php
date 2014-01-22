@@ -8,6 +8,8 @@ class ApiSeeder extends Seeder {
         $resource_server = ResourceServer::first();
         //create api endpoints
 
+        //resource server api
+
         Api::create(
             array(
                 'name'            => 'create resource server',
@@ -84,6 +86,79 @@ class ApiSeeder extends Seeder {
                 'http_method'     => 'GET'
             )
         );
+
+
+
+
+        // endpoints api
+
+        Api::create(
+            array(
+                'name'            => 'get endpoint',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/api-endpoints/{id}',
+                'http_method'     => 'GET'
+            )
+        );
+
+
+        Api::create(
+            array(
+                'name'            => 'delete endpoint',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/api-endpoints/{id}',
+                'http_method'     => 'DELETE'
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'create endpoint',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/api-endpoints',
+                'http_method'     => 'POST'
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'update endpoint',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/api-endpoints',
+                'http_method'     => 'PUT'
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'update endpoint status',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/api-endpoints/status/{id}/{active}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'endpoint get page',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+                'route'           => '/api/v1/api-endpoints/{page_nbr}/{page_size}',
+                'http_method'     => 'GET'
+            )
+        );
+
 
     }
 

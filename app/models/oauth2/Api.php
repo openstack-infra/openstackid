@@ -63,4 +63,29 @@ class Api  extends Eloquent implements IApi {
     public function getHttpMethod(){
         return $this->http_method;
     }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function setRoute($route)
+    {
+        $this->route = $route;
+    }
+
+    public function setHttpMethod($http_method)
+    {
+        $this->http_method = $http_method;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function setStatus($active)
+    {
+        $this->active = $active;
+    }
 }

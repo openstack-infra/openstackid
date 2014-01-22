@@ -10,10 +10,11 @@ interface IApiScopeService {
 
     public function getFriendlyScopesByName(array $scopes_names);
 
-    /** get all active scopes
-     * @return mixed
+    /**
+     * @param bool $system
+     * @return array|mixed
      */
-    public function getAvailableScopes();
+    public function getAvailableScopes($system=false);
 
     public function getAudienceByScopeNames(array $scopes_names);
 
