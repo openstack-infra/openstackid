@@ -1,13 +1,14 @@
 {
-	"name": "laravel/laravel",
-	"description": "The Laravel Framework.",
-	"keywords": ["framework", "laravel"],
+	"name": "openstackid",
+	"description": "OpenstackId Idp",
+	"keywords": ["openstackid", "openstack","openid","oauth2"],
 	"license": "MIT",
 	"require": {
-		"laravel/framework": "4.0.*",
+        "php": ">=5.4.0",
+     	"laravel/framework": "4.0.*",
         "phpunit/phpunit": "3.7.*",
         "zendframework/zend-crypt":"2.2.*",
-        "greggilbert/recaptcha": "dev-master"
+        "greggilbert/recaptcha": "1.0.*"
 	},
 	"autoload": {
 		"classmap": [
@@ -40,5 +41,6 @@
 	"config": {
 		"preferred-install": "dist"
 	},
-	"minimum-stability": "dev"
+    "prefer-stable": true,
+	"minimum-stability": "stable"
 }

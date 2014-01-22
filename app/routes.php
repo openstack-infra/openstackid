@@ -62,6 +62,7 @@ Route::group(array("before" => array("ssl", "auth")), function () {
     Route::post('/accounts/user/profile/clients/token/rotate/refresh_token/{id}','UserController@postRotateRefreshTokenPolicy');
     Route::get('/accounts/user/profile/clients/token/revoke/{value}/{hint}','UserController@getRevokeToken');
     Route::get('/accounts/user/profile/clients/token/access_tokens/{client_id}','UserController@getAccessTokens');
+    Route::get('/accounts/user/profile/clients/token/refresh_tokens/{client_id}','UserController@getRefreshTokens');
 });
 
 

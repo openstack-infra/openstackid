@@ -118,7 +118,7 @@ class UserController extends BaseController
     {
         try {
             $max_login_attempts_2_show_captcha = $this->server_configuration_service->getConfigValue("MaxFailed.LoginAttempts.2ShowCaptcha");
-            $data           = Input::all();
+            $data = Input::all();
             $login_attempts = intval(Input::get('login_attempts'));
             // Build the validation constraint set.
             $rules = array(
@@ -276,30 +276,30 @@ class UserController extends BaseController
         foreach ($selected_scopes as $scope) {
             array_push($aux_scopes, $scope->id);
         }
-        $scopes         = $this->scope_service->getAvailableScopes();
+        $scopes = $this->scope_service->getAvailableScopes();
 
-        $access_tokens  = $this->token_service->getAccessTokenByClient($client->client_id);
+        $access_tokens = $this->token_service->getAccessTokenByClient($client->client_id);
 
-        foreach($access_tokens as $token){
-            $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ',$token->scope));
-            $token->setFriendlyScopes(implode(',',$friendly_scopes));
+        foreach ($access_tokens as $token) {
+            $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ', $token->scope));
+            $token->setFriendlyScopes(implode(',', $friendly_scopes));
         }
 
         $refresh_tokens = $this->token_service->getRefreshTokenByClient($client->client_id);
 
-        foreach($refresh_tokens as $token){
-            $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ',$token->scope));
-            $token->setFriendlyScopes(implode(',',$friendly_scopes));
+        foreach ($refresh_tokens as $token) {
+            $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ', $token->scope));
+            $token->setFriendlyScopes(implode(',', $friendly_scopes));
         }
 
         return View::make("oauth2.profile.edit-client",
             array(
                 'client' => $client,
-                'allowed_uris'    => $allowed_uris,
+                'allowed_uris' => $allowed_uris,
                 'selected_scopes' => $aux_scopes,
-                'scopes'          => $scopes,
-                'access_tokens'   => $access_tokens,
-                'refresh_tokens'  => $refresh_tokens,
+                'scopes' => $scopes,
+                'access_tokens' => $access_tokens,
+                'refresh_tokens' => $refresh_tokens,
             ));
     }
 
@@ -560,26 +560,52 @@ class UserController extends BaseController
             }
 
             return $res ? Response::json(array('status' => 'OK')) : Response::json(array('status' => 'ERROR'));
-        }
-        catch (Exception $ex) {
+        } catch (Exception $ex) {
             Log::error($ex);
             return Response::json(array('status' => 'ERROR'));
         }
     }
 
-    public function getAccessTokens($client_id){
-
-        $access_tokens  = $this->token_service->getAccessTokenByClient($client_id);
-        $res = array();
-        foreach($access_tokens as $token){
-            $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ',$token->scope));
-            array_push($res,array(
-                'value'    => $token->value,
-                'scope'    => implode(',',$friendly_scopes),
-                'lifetime' => $token->getRemainingLifetime(),
-                'issued'   => $token->created_at->format('Y-m-d H:i:s')
-            ));
+    public function getAccessTokens($client_id)
+    {
+        try {
+            $access_tokens = $this->token_service->getAccessTokenByClient($client_id);
+            $res = array();
+            foreach ($access_tokens as $token) {
+                $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ', $token->scope));
+                array_push($res, array(
+                    'value' => $token->value,
+                    'scope' => implode(',', $friendly_scopes),
+                    'lifetime' => $token->getRemainingLifetime(),
+                    'issued' => $token->created_at->format('Y-m-d H:i:s')
+                ));
+            }
+            return Response::json(array('status' => 'OK', 'access_tokens' => $res));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return Response::json(array('status' => 'ERROR'));
         }
-        return Response::json(array('status' => 'OK','access_tokens'=>$res));
+    }
+
+    public function getRefreshTokens($client_id)
+    {
+
+        try {
+            $refresh_tokens = $this->token_service->getRefreshTokenByClient($client_id);
+            $res = array();
+            foreach ($refresh_tokens as $token) {
+                $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ', $token->scope));
+                array_push($res, array(
+                    'value'    => $token->value,
+                    'scope'    => implode(',', $friendly_scopes),
+                    'lifetime' => $token->getRemainingLifetime(),
+                    'issued'   => $token->created_at->format('Y-m-d H:i:s')
+                ));
+            }
+            return Response::json(array('status' => 'OK', 'refresh_tokens' => $res));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return Response::json(array('status' => 'ERROR'));
+        }
     }
 }

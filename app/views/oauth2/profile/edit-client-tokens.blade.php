@@ -11,10 +11,7 @@
         </div>
     </div>
 
-    <table id='table-access-tokens' class="table table-hover table-condensed"
-    @if (!count($access_tokens))
-    style='display:none';
-    @endif
+    <table id='table-access-tokens' class="table table-hover table-condensed">
         <thead>
         <tr>
             <th><i class="icon-info-sign accordion-toggle" title="Time is on UTC"></i>&nbsp;Issued</th>
@@ -45,27 +42,24 @@
            <strong>There are not any Refresh Tokens granted for this application</strong>
         </div>
     </div>
-    <table id='table-refresh-tokens' class="table table-hover table-condensed"
-    @if (!count($refresh_tokens))
-    style='display:none';
-    @endif
+    <table id='table-refresh-tokens' class="table table-hover table-condensed">
         <thead>
         <tr>
             <th><i class="icon-info-sign accordion-toggle" title="Time is on UTC"></i>&nbsp;Issued</th>
             <th>Scopes</th>
-            <th><i class="icon-info-sign accordion-toggle" title="Time is on UTC"></i>&nbsp;Remaining Lifetime</th>
+            <th><i class="icon-info-sign accordion-toggle" title="Lifetime is on seconds"></i>&nbsp;Remaining Lifetime</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="body-refresh-tokens">
         @foreach ($refresh_tokens as $refresh_token)
         <tr id="{{ $refresh_token->value }}">
             <td>{{ $refresh_token->created_at }}</td>
             <td>{{ $refresh_token->getFriendlyScopes() }}</td>
             @if($refresh_token->getRemainingLifetime()===0)
-            <td>Not Expire</td>
+                <td>Not Expire</td>
             @else
-            <td>{{ $refresh_token->getRemainingLifetime() }}</td>
+                <td>{{ $refresh_token->getRemainingLifetime() }}</td>
             @endif
             <td>{{ HTML::link(URL::action("UserController@getRevokeToken",array("value"=>$refresh_token->value,'hint'=>'refresh-token')),'Revoke',array('class'=>'btn revoke-token revoke-refresh-token','title'=>'Revoke Refresh Token','data-value'=>$refresh_token->value,'data-hint'=>'refresh-token')) }}</td>
         </tr>
@@ -78,7 +72,7 @@
 @parent
 <script type="application/javascript">
 
-    function refreshAccessTokenList(){
+    function updateAccessTokenList(){
         //reload access tokens
         $.ajax(
             {
@@ -127,16 +121,79 @@
             });
     }
 
+    function updateRefreshTokenList(){
+        //reload access tokens
+        $.ajax(
+            {
+                type: "GET",
+                url:'{{ URL::action("UserController@getRefreshTokens",array("client_id"=>$client->client_id))}}' ,
+                dataType: "json",
+                timeout:60000,
+                success: function (data,textStatus,jqXHR) {
+                    //load data...
+                    if(data.status==='OK'){
+                        if(data.refresh_tokens.length===0){
+                            $('#table-refresh-tokens').hide();
+                            $('#info-refresh-tokens').show();
+                        }
+                        else{
+                            $('#info-refresh-tokens').hide();
+                            $('#table-refresh-tokens').show();
+                            var template   = $('<tbody><tr><td class="issued"></td><td class="scope"></td><td class="lifetime"></td><td><a title="Revoke Refresh Token" class="btn revoke-token revoke-refresh-token" data-hint="refresh-token">Revoke</a></td></tr></tbody>');
+                            var directives = {
+                                'tr':{
+                                    'token<-context':{
+                                        '@id'        :'token.value',
+                                        'td.issued'  :'token.issued',
+                                        'td.scope'   :'token.scope',
+                                        'td.lifetime':function(arg){
+                                            var token_lifetime = arg.item.lifetime;
+                                            return token_lifetime===0?'Not Expire':token_lifetime;
+                                        },
+                                        'a@href':function(arg){
+                                            var token_value = arg.item.value;
+                                            var href = '{{ URL::action("UserController@getRevokeToken",array("value"=>-1,"hint"=>"refresh-token")) }}';
+                                            return href.replace('-1',token_value);
+                                        },
+                                        'a@data-value' :'token.value'
+                                    }
+                                }
+                            };
+                            var html = template.render(data.refresh_tokens, directives);
+                            $('#body-refresh-tokens').html(html.html());
+                            updateAccessTokenList();
+                        }
+                    }
+                    else{
+                        alert('There was an error!');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert( "Request failed: " + textStatus );
+                }
+            });
+    }
+
     $(document).ready(function() {
 
-        if($('#table-access-tokens').length===0)
+        if($('#table-access-tokens tr').length===1){
             $('#info-access-tokens').show();
+            $('#table-access-tokens').hide();
+        }
 
-        if($('#table-refresh-tokens').length===0)
+        if($('#table-refresh-tokens tr').length===1){
             $('#info-refresh-tokens').show();
+            $('#table-refresh-tokens').hide();
+        }
+
+        $("body").on('click','.refresh-refresh-tokens',function(event){
+            updateRefreshTokenList();
+            event.preventDefault();
+            return false;
+        });
 
         $("body").on('click','.refresh-access-tokens',function(event){
-            refreshAccessTokenList();
+            updateAccessTokenList();
             event.preventDefault();
             return false;
         });
@@ -165,11 +222,11 @@
                                 row.remove();
                                 var row_qty = $('#'+table_id+' tr').length;
                                 if(row_qty===1){ //only we have the header ...
-                                    $('#'+table_id).remove();
+                                    $('#'+table_id).hide();
                                     $('#'+info_id).show();
                                 }
                                 if(hint=='refresh-token'){
-                                    refreshAccessTokenList();
+                                    updateAccessTokenList();
                                 }
                             }
                             else{
