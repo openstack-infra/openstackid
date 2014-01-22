@@ -1,6 +1,6 @@
 <?php
 
-use oauth2\services\IApiService;
+use oauth2\services\IApiEndpointService;
 use oauth2\services\ITokenService;
 use oauth2\BearerAccessTokenAuthorizationHeaderParser;
 use oauth2\OAuth2Protocol;
@@ -18,14 +18,14 @@ use oauth2\IResourceServerContext;
  */
 class OAuth2BearerAccessTokenRequestValidator {
 
-    private $api_service;
+    private $api_endpoint_service;
     private $token_service;
     private $log_service;
     private $checkpoint_service;
     private $resource_server_context;
 
-    public function __construct(IResourceServerContext $resource_server_context,IApiService $api_service, ITokenService $token_service, ILogService $log_service, ICheckPointService $checkpoint_service){
-        $this->api_service             = $api_service;
+    public function __construct(IResourceServerContext $resource_server_context,IApiEndpointService $api_endpoint_service, ITokenService $token_service, ILogService $log_service, ICheckPointService $checkpoint_service){
+        $this->api_endpoint_service    = $api_endpoint_service;
         $this->token_service           = $token_service;
         $this->log_service             = $log_service;
         $this->checkpoint_service      = $checkpoint_service;
@@ -43,11 +43,11 @@ class OAuth2BearerAccessTokenRequestValidator {
 
             $url       = $route->getPath();
             $method    = $request->getMethod();
-            $api       = $this->api_service->getApiByUrlAndMethod($url, $method);
+            $endpoint  = $this->api_endpoint_service->getApiEndpointByUrlAndMethod($url, $method);
             $realm     = $request->getHost();
 
-            //api endpoint must be registered on db
-            if(is_null($api)){
+            //api endpoint must be registered on db and active
+            if(is_null($endpoint) || !$endpoint->isActive()){
                 throw new OAuth2ResourceServerException(400,OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest,'API endpoint does not exits!');
             }
 
@@ -76,12 +76,12 @@ class OAuth2BearerAccessTokenRequestValidator {
                 throw new OAuth2ResourceServerException(401,OAuth2Protocol::OAuth2Protocol_Error_InvalidToken,'access token audience does not match');
 
             //check scopes
-            $endpoint_scopes = explode(' ',$api->getScope());
-            $token_scopes = explode(' ',$access_token->getScope());
+            $endpoint_scopes = explode(' ',$endpoint->getScope());
+            $token_scopes    = explode(' ',$access_token->getScope());
             //check token available scopes vs. endpoint scopes
-            if (count(array_diff($endpoint_scopes, $token_scopes)) !== 0)
+            if (count(array_intersect($endpoint_scopes, $token_scopes)) === 0)
             {
-                $this->log_service->error_msg(sprintf('access token scopes (%s) does not allow to access to api url %s , needed scopes %s',$access_token->getScope(),$url,$api->getScope()));
+                $this->log_service->error_msg(sprintf('access token scopes (%s) does not allow to access to api url %s , needed scopes %s',$access_token->getScope(),$url,implode(' OR ',$endpoint_scopes) ));
 
                 throw new OAuth2ResourceServerException(403,OAuth2Protocol::OAuth2Protocol_Error_InsufficientScope,
                     'the request requires higher privileges than provided by the access token',

@@ -91,8 +91,8 @@ class CustomAuthProvider implements UserProviderInterface
                 if (is_null($user)) {
                     //create user
                     $user = new User();
-                    $user->external_id = $member->Email;
-                    $user->identifier  = $member->Email;
+                    $user->external_id     = $member->Email;
+                    $user->identifier      = $member->Email;
                     $user->last_login_date = gmdate("Y-m-d H:i:s", time());
                     $user->Save();
                     $user = User::where('external_id', '=', $identifier)->first();

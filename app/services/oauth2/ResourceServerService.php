@@ -36,18 +36,18 @@ class ResourceServerService implements IResourceServerService {
      */
     public function save(IResourceServer $resource_server)
     {
-        $resource_server->Save();
+        return $resource_server->Save();
     }
 
     /**
      * sets resource server status (active/deactivated)
      * @param $resource_server_id id of resource server
      * @param bool $status status (active/non active)
-     * @return void
+     * @return bool
      */
     public function setStatus($resource_server_id, $status)
     {
-        ResourceServer::find($resource_server_id)->update(array('active'=>$status));
+        return ResourceServer::find($resource_server_id)->update(array('active'=>$status));
     }
 
     /**
@@ -120,7 +120,7 @@ class ResourceServerService implements IResourceServerService {
      * @return bool
      */
     public function regenerateResourceServerClientSecret($resource_server_id){
-        $res = '';
+        $res = null;
         DB::transaction(function () use ($resource_server_id,&$res) {
             $resource_server = ResourceServer::find($resource_server_id);
             if(!is_null($resource_server)){

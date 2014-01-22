@@ -15,6 +15,7 @@ class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
 {
 
     protected $table = 'openid_users';
+
     private $member;
 
     public function trusted_sites()
