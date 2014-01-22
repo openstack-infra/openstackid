@@ -15,6 +15,7 @@ class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
 {
 
     protected $table = 'openid_users';
+
     private $member;
 
     public function trusted_sites()
@@ -188,15 +189,18 @@ class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
         if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
+        $url     = asset('img/generic-profile-photo.png');
 
         $photoId = $this->member->PhotoID;
+
         if (!is_null($photoId) && is_numeric($photoId) && $photoId > 0) {
-            $photo = MemberPhoto::where('ID', '=', $photoId)->first();
-            $server_configuration_service = Registry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
-            $url = $server_configuration_service->getConfigValue("Assets.Url").$photo->Filename;
-            return $url;
+            $photo                            = MemberPhoto::where('ID', '=', $photoId)->first();
+            if(!is_null($photo)){
+                $server_configuration_service = Registry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
+                $url                          = $server_configuration_service->getConfigValue("Assets.Url").$photo->Filename;
+            }
         }
-        return '';
+        return $url;
     }
 
     public function getClients()

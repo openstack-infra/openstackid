@@ -21,7 +21,8 @@
             "app/libs",
             "app/services",
             "app/strategies",
-            "app/filters"
+            "app/filters",
+            "app/validators"
 		]
 	},
 	"scripts": {

@@ -9,5 +9,6 @@ class OAuth2ServiceCatalog {
     const ClientService         = 'oauth2\\services\\IClientService';
     const ScopeService          = 'oauth2\\services\\IApiScopeService';
     const ResourceServerService = 'oauth2\\services\\IResourceServerService';
-    const ApiService = 'oauth2\\services\\IApiService';
+    const ApiService            = 'oauth2\\services\\IApiService';
+    const ApiEndpointService    = 'oauth2\\services\\IApiEndpointService';
 }

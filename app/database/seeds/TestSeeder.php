@@ -19,6 +19,8 @@ class TestSeeder extends Seeder {
         DB::table('server_configuration')->delete();
         DB::table('server_extensions')->delete();
         DB::table('oauth2_client_api_scope')->delete();
+        DB::table('oauth2_api_endpoint_api_scope')->delete();
+        DB::table('oauth2_api_endpoint')->delete();
         DB::table('oauth2_api_scope')->delete();
         DB::table('oauth2_api')->delete();
         DB::table('oauth2_client_authorized_uri')->delete();
@@ -261,161 +263,579 @@ class TestSeeder extends Seeder {
         $resource_server = ResourceServer::first();
 
 
-        //create api endpoints
+      // create api
 
         Api::create(
             array(
-                'name'            => 'create resource server',
+                'name'            => 'resource server',
                 'logo'            =>  null,
                 'active'          =>  true,
                 'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server',
-                'http_method'     => 'POST'
             )
         );
 
         Api::create(
             array(
-                'name'            => 'get resource server',
+                'name'            => 'api',
                 'logo'            =>  null,
                 'active'          =>  true,
                 'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/{id}',
-                'http_method'     => 'GET'
             )
         );
 
         Api::create(
             array(
-                'name'            => 'resource server regenerate secret',
+                'name'            => 'api endpoint',
                 'logo'            =>  null,
                 'active'          =>  true,
                 'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/regenerate-client-secret/{id}',
-                'http_method'     => 'GET'
             )
         );
 
-        Api::create(
-            array(
-                'name'            => 'resource server get page',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/{page_nbr}/{page_size}',
-                'http_method'     => 'GET'
-            )
-        );
+        //create scopes
 
-        Api::create(
-            array(
-                'name'            => 'resource server delete',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/{id}',
-                'http_method'     => 'DELETE'
-            )
-        );
-
-        Api::create(
-            array(
-                'name'            => 'resource server update',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server',
-                'http_method'     => 'PUT'
-            )
-        );
-
-        Api::create(
-            array(
-                'name'            => 'resource server update status',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/status/{id}/{active}',
-                'http_method'     => 'GET'
-            )
-        );
-
-        $resource_server_api_create = Api::where('name','=','create resource server')->first();
-        $resource_server_api_get = Api::where('name','=','get resource server')->first();
-        $resource_server_api_get_page = Api::where('name','=','resource server get page')->first();
-        $resource_server_api_regenerate = Api::where('name','=','resource server regenerate secret')->first();
-        $resource_server_api_delete = Api::where('name','=','resource server delete')->first();
-        $resource_server_api_update = Api::where('name','=','resource server update')->first();
-        $resource_server_api_update_status = Api::where('name','=','resource server update status')->first();
 
         $current_realm = Config::get('app.url');
 
+
+        $resource_server_api        = Api::where('name','=','resource server')->first();
+        $api_api                    = Api::where('name','=','api')->first();
+        $api_api_endpoint           = Api::where('name','=','api endpoint')->first();
 
         // create api scopes
 
         ApiScope::create(
             array(
-                'name'               => sprintf('%s/api/resource-server/read',$current_realm),
+                'name'               => sprintf('%s/resource-server/read',$current_realm),
                 'short_description'  => 'Resource Server Read Access',
                 'description'        => 'Resource Server Read Access',
-                'api_id'             => $resource_server_api_get->id,
+                'api_id'             => $resource_server_api->id,
+                'system'             => true,
             )
         );
 
-
         ApiScope::create(
             array(
-                'name'               => sprintf('%s/api/resource-server/read.page',$current_realm),
+                'name'               => sprintf('%s/resource-server/read.page',$current_realm),
                 'short_description'  => 'Resource Server Page Read Access',
                 'description'        => 'Resource Server Page Read Access',
-                'api_id'             => $resource_server_api_get_page->id,
+                'api_id'             => $resource_server_api->id,
+                'system'             => true,
             )
         );
 
         ApiScope::create(
             array(
-                'name'               => sprintf('%s/api/resource-server/write',$current_realm),
+                'name'               => sprintf('%s/resource-server/write',$current_realm),
                 'short_description'  => 'Resource Server Write Access',
                 'description'        => 'Resource Server Write Access',
-                'api_id'             => $resource_server_api_create->id,
+                'api_id'             => $resource_server_api->id,
+                'system'             => true,
             )
         );
 
         ApiScope::create(
             array(
-                'name'               => sprintf('%s/api/resource-server/delete',$current_realm),
+                'name'               => sprintf('%s/resource-server/delete',$current_realm),
                 'short_description'  => 'Resource Server Delete Access',
                 'description'        => 'Resource Server Delete Access',
-                'api_id'             => $resource_server_api_delete->id,
+                'api_id'             => $resource_server_api->id,
+                'system'             => true,
             )
         );
 
         ApiScope::create(
             array(
-                'name'               => sprintf('%s/api/resource-server/update',$current_realm),
+                'name'               => sprintf('%s/resource-server/update',$current_realm),
                 'short_description'  => 'Resource Server Update Access',
                 'description'        => 'Resource Server Update Access',
-                'api_id'             => $resource_server_api_update->id,
+                'api_id'             => $resource_server_api->id,
+                'system'             => true,
             )
         );
 
         ApiScope::create(
             array(
-                'name'               => sprintf('%s/api/resource-server/update.status',$current_realm),
+                'name'               => sprintf('%s/resource-server/update.status',$current_realm),
                 'short_description'  => 'Resource Server Update Status',
                 'description'        => 'Resource Server Update Status',
-                'api_id'             => $resource_server_api_update_status->id,
+                'api_id'             => $resource_server_api->id,
+                'system'             => true,
             )
         );
 
         ApiScope::create(
             array(
-                'name'               => sprintf('%s/api/resource-server/regenerate.secret',$current_realm),
+                'name'               => sprintf('%s/resource-server/regenerate.secret',$current_realm),
                 'short_description'  => 'Resource Server Regenerate Client Secret',
                 'description'        => 'Resource Server Regenerate Client Secret',
-                'api_id'             => $resource_server_api_regenerate->id,
+                'api_id'             => $resource_server_api->id,
+                'system'             => true,
             )
         );
+
+        // api scopes
+
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/read',$current_realm),
+                'short_description'  => 'Get Api',
+                'description'        => 'Get Api',
+                'api_id'             => $api_api->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/delete',$current_realm),
+                'short_description'  => 'Deletes Api',
+                'description'        => 'Deletes Api',
+                'api_id'             => $api_api->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/write',$current_realm),
+                'short_description'  => 'Create Api',
+                'description'        => 'Create Api',
+                'api_id'             => $api_api->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/update',$current_realm),
+                'short_description'  => 'Update Api',
+                'description'        => 'Update Api',
+                'api_id'             => $api_api->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/update.status',$current_realm),
+                'short_description'  => 'Update Api Status',
+                'description'        => 'Update Api Status',
+                'api_id'             => $api_api->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api/read.page',$current_realm),
+                'short_description'  => 'Get Api By Page',
+                'description'        => 'Get Api By Page',
+                'api_id'             => $api_api->id,
+                'system'             => false,
+            )
+        );
+
+
+        // api endpoint scopes
+
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-endpoint/read',$current_realm),
+                'short_description'  => 'Get Api Endpoint',
+                'description'        => 'Get Api Endpoint',
+                'api_id'             => $api_api_endpoint->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-endpoint/delete',$current_realm),
+                'short_description'  => 'Deletes Api Endpoint',
+                'description'        => 'Deletes Api Endpoint',
+                'api_id'             => $api_api_endpoint->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-endpoint/write',$current_realm),
+                'short_description'  => 'Create Api Endpoint',
+                'description'        => 'Create Api Endpoint',
+                'api_id'             => $api_api_endpoint->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-endpoint/update',$current_realm),
+                'short_description'  => 'Update Api Endpoint',
+                'description'        => 'Update Api Endpoint',
+                'api_id'             => $api_api_endpoint->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-endpoint/update.status',$current_realm),
+                'short_description'  => 'Update Api Endpoint Status',
+                'description'        => 'Update Api Endpoint Status',
+                'api_id'             => $api_api_endpoint->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-endpoint/read.page',$current_realm),
+                'short_description'  => 'Get Api Endpoints By Page',
+                'description'        => 'Get Api Endpoints By Page',
+                'api_id'             => $api_api_endpoint->id,
+                'system'             => false,
+            )
+        );
+
+        //non system ones
+
+        ApiScope::create(
+            array(
+                'name'               =>  'email',
+                'short_description'  => 'This scope value requests access to the email and email_verified Claims. ',
+                'description'        => 'This scope value requests access to the email and email_verified Claims. ',
+                'system'             => false,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               =>  'profile',
+                'short_description'  => 'This scope value requests access to the End-Users default profile Claims',
+                'description'        => 'This scope value requests access to the End-Users default profile Claims',
+                'system'             => false,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               =>  'Address',
+                'short_description'  => 'This scope value requests access to the address Claim.',
+                'description'        => 'This scope value requests access to the address Claim.',
+                'system'             => false,
+            )
+        );
+
+        //create endpoints
+
+        $resource_server_api        = Api::where('name','=','resource server')->first();
+        $api_api                    = Api::where('name','=','api')->first();
+        $api_api_endpoint           = Api::where('name','=','api endpoint')->first();
+
+        //resource server
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'create resource server',
+                'active'          =>  true,
+                'api_id'          => $resource_server_api->id,
+                'route'           => '/api/v1/resource-server',
+                'http_method'     => 'POST'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'get resource server',
+                'active'          =>  true,
+                'api_id'          => $resource_server_api->id,
+                'route'           => '/api/v1/resource-server/{id}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'resource server regenerate secret',
+                'active'          =>  true,
+                'api_id'          => $resource_server_api->id,
+                'route'           => '/api/v1/resource-server/regenerate-client-secret/{id}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'resource server get page',
+                'active'          =>  true,
+                'api_id'          => $resource_server_api->id,
+                'route'           => '/api/v1/resource-server/{page_nbr}/{page_size}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'resource server delete',
+                'active'          =>  true,
+                'api_id'          => $resource_server_api->id,
+                'route'           => '/api/v1/resource-server/{id}',
+                'http_method'     => 'DELETE'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'resource server update',
+                'active'          =>  true,
+                'api_id'          => $resource_server_api->id,
+                'route'           => '/api/v1/resource-server',
+                'http_method'     => 'PUT'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'resource server update status',
+                'active'          =>  true,
+                'api_id'          => $resource_server_api->id,
+                'route'           => '/api/v1/resource-server/status/{id}/{active}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        // endpoints api endpoint
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'get api endpoint',
+                'active'          =>  true,
+                'api_id'          => $api_api_endpoint->id,
+                'route'           => '/api/v1/api-endpoint/{id}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'delete api endpoint',
+                'active'          =>  true,
+                'api_id'          => $api_api_endpoint->id,
+                'route'           => '/api/v1/api-endpoint/{id}',
+                'http_method'     => 'DELETE'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'create api endpoint',
+                'active'          =>  true,
+                'api_id'          => $api_api_endpoint->id,
+                'route'           => '/api/v1/api-endpoint',
+                'http_method'     => 'POST'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'update api endpoint',
+                'active'          =>  true,
+                'api_id'          => $api_api_endpoint->id,
+                'route'           => '/api/v1/api-endpoint',
+                'http_method'     => 'PUT'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'update api endpoint status',
+                'active'          =>  true,
+                'api_id'          => $api_api_endpoint->id,
+                'route'           => '/api/v1/api-endpoint/status/{id}/{active}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'api endpoint get page',
+                'active'          =>  true,
+                'api_id'          => $api_api_endpoint->id,
+                'route'           => '/api/v1/api-endpoint/{page_nbr}/{page_size}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        // endpoints api
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'get api',
+                'active'          =>  true,
+                'api_id'          => $api_api->id,
+                'route'           => '/api/v1/api/{id}',
+                'http_method'     => 'GET'
+            )
+        );
+
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'delete api',
+                'active'          =>  true,
+                'api_id'          => $api_api->id,
+                'route'           => '/api/v1/api/{id}',
+                'http_method'     => 'DELETE'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'create api',
+                'active'          =>  true,
+                'api_id'          => $api_api->id,
+                'route'           => '/api/v1/api',
+                'http_method'     => 'POST'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'update api',
+                'active'          =>  true,
+                'api_id'          => $api_api->id,
+                'route'           => '/api/v1/api',
+                'http_method'     => 'PUT'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'update api status',
+                'active'          =>  true,
+                'api_id'          => $api_api->id,
+                'route'           => '/api/v1/api/status/{id}/{active}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'api get page',
+                'active'          =>  true,
+                'api_id'          => $api_api->id,
+                'route'           => '/api/v1/api/{page_nbr}/{page_size}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        //attach scopes to endpoints
+
+        //resource server api scopes
+
+        $resource_server_read_scope               = ApiScope::where('name','=',sprintf('%s/resource-server/read',$current_realm))->first();
+        $resource_server_write_scope              = ApiScope::where('name','=',sprintf('%s/resource-server/write',$current_realm))->first();
+        $resource_server_read_page_scope          = ApiScope::where('name','=',sprintf('%s/resource-server/read.page',$current_realm))->first();
+        $resource_server_regenerate_secret_scope  = ApiScope::where('name','=',sprintf('%s/resource-server/regenerate.secret',$current_realm))->first();
+        $resource_server_delete_scope             = ApiScope::where('name','=',sprintf('%s/resource-server/delete',$current_realm))->first();
+        $resource_server_update_scope             = ApiScope::where('name','=',sprintf('%s/resource-server/update',$current_realm))->first();
+        $resource_server_update_status_scope      = ApiScope::where('name','=',sprintf('%s/resource-server/update.status',$current_realm))->first();
+
+        // create needs write access
+        $resource_server_api_create = ApiEndpoint::where('name','=','create resource server')->first();
+        $resource_server_api_create->scopes()->attach($resource_server_write_scope->id);
+
+        //get needs read access
+        $resource_server_api_get = ApiEndpoint::where('name','=','get resource server')->first();
+        $resource_server_api_get->scopes()->attach($resource_server_read_scope->id);
+
+        // get page needs read access or read page access
+        $resource_server_api_get_page = ApiEndpoint::where('name','=','resource server get page')->first();
+        $resource_server_api_get_page->scopes()->attach($resource_server_read_scope->id);
+        $resource_server_api_get_page->scopes()->attach($resource_server_read_page_scope->id);
+
+        //regenerate secret needs write access or specific access
+        $resource_server_api_regenerate = ApiEndpoint::where('name','=','resource server regenerate secret')->first();
+        $resource_server_api_regenerate->scopes()->attach($resource_server_write_scope->id);
+        $resource_server_api_regenerate->scopes()->attach($resource_server_regenerate_secret_scope->id);
+
+        //deletes needs delete access
+        $resource_server_api_delete = ApiEndpoint::where('name','=','resource server delete')->first();
+        $resource_server_api_delete->scopes()->attach($resource_server_delete_scope->id);
+
+        //update needs update access
+        $resource_server_api_update = ApiEndpoint::where('name','=','resource server update')->first();
+        $resource_server_api_update->scopes()->attach($resource_server_update_scope->id);
+
+        //update status needs update access or specific access
+        $resource_server_api_update_status = ApiEndpoint::where('name','=','resource server update status')->first();
+        $resource_server_api_update_status->scopes()->attach($resource_server_update_scope->id);
+        $resource_server_api_update_status->scopes()->attach($resource_server_update_status_scope->id);
+
+
+        //endpoint api scopes
+
+        $api_read_scope               = ApiScope::where('name','=',sprintf('%s/api/read',$current_realm))->first();
+        $api_write_scope              = ApiScope::where('name','=',sprintf('%s/api/write',$current_realm))->first();
+        $api_read_page_scope          = ApiScope::where('name','=',sprintf('%s/api/read.page',$current_realm))->first();
+        $api_delete_scope             = ApiScope::where('name','=',sprintf('%s/api/delete',$current_realm))->first();
+        $api_update_scope             = ApiScope::where('name','=',sprintf('%s/api/update',$current_realm))->first();
+        $api_update_status_scope      = ApiScope::where('name','=',sprintf('%s/api/update.status',$current_realm))->first();
+
+        $endpoint_api_get                  = ApiEndpoint::where('name','=','get api')->first();
+        $endpoint_api_get->scopes()->attach($api_read_scope->id);
+
+        $endpoint_api_get_page             = ApiEndpoint::where('name','=','api get page')->first();
+        $endpoint_api_get_page->scopes()->attach($api_read_scope->id);
+        $endpoint_api_get_page->scopes()->attach($api_read_page_scope->id);
+
+        $endpoint_api_delete               = ApiEndpoint::where('name','=','delete api')->first();
+        $endpoint_api_delete->scopes()->attach($api_delete_scope->id);
+
+        $endpoint_api_create               = ApiEndpoint::where('name','=','create api')->first();
+        $endpoint_api_create->scopes()->attach($api_write_scope->id);
+
+        $endpoint_api_update               = ApiEndpoint::where('name','=','update api')->first();
+        $endpoint_api_update->scopes()->attach($api_update_scope->id);
+
+        $endpoint_api_update_status        = ApiEndpoint::where('name','=','update api status')->first();
+        $endpoint_api_update_status->scopes()->attach($api_update_scope->id);
+        $endpoint_api_update_status->scopes()->attach($api_update_status_scope->id);
+
+
+        //endpoint api endpoint scopes
+
+        $api_endpoint_read_scope               = ApiScope::where('name','=',sprintf('%s/api-endpoint/read',$current_realm))->first();
+        $api_endpoint_write_scope              = ApiScope::where('name','=',sprintf('%s/api-endpoint/write',$current_realm))->first();
+        $api_endpoint_read_page_scope          = ApiScope::where('name','=',sprintf('%s/api-endpoint/read.page',$current_realm))->first();
+        $api_endpoint_delete_scope             = ApiScope::where('name','=',sprintf('%s/api-endpoint/delete',$current_realm))->first();
+        $api_endpoint_update_scope             = ApiScope::where('name','=',sprintf('%s/api-endpoint/update',$current_realm))->first();
+        $api_endpoint_update_status_scope      = ApiScope::where('name','=',sprintf('%s/api-endpoint/update.status',$current_realm))->first();
+
+        $endpoint_api_endpoint_get                  = ApiEndpoint::where('name','=','get api endpoint')->first();
+        $endpoint_api_endpoint_get->scopes()->attach($api_endpoint_read_scope->id);
+
+        $endpoint_api_endpoint_get_page             = ApiEndpoint::where('name','=','api endpoint get page')->first();
+        $endpoint_api_endpoint_get_page->scopes()->attach($api_endpoint_read_scope->id);
+        $endpoint_api_endpoint_get_page->scopes()->attach($api_endpoint_read_page_scope->id);
+
+        $endpoint_api_endpoint_delete               = ApiEndpoint::where('name','=','delete api endpoint')->first();
+        $endpoint_api_endpoint_delete->scopes()->attach($api_endpoint_delete_scope->id);
+
+        $endpoint_api_endpoint_create               = ApiEndpoint::where('name','=','create api endpoint')->first();
+        $endpoint_api_endpoint_create->scopes()->attach($api_endpoint_write_scope->id);
+
+        $endpoint_api_endpoint_update       = ApiEndpoint::where('name','=','update api endpoint')->first();
+        $endpoint_api_endpoint_update->scopes()->attach($api_endpoint_update_scope->id);
+
+        $endpoint_api_endpoint_update_status        = ApiEndpoint::where('name','=','update api endpoint status')->first();
+        $endpoint_api_endpoint_update_status->scopes()->attach($api_endpoint_update_scope->id);
+        $endpoint_api_endpoint_update_status->scopes()->attach($api_endpoint_update_status_scope->id);
+
 
         // create users and clients ...
         User::create(

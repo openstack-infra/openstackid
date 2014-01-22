@@ -2,8 +2,7 @@
 
 class MemberPhoto extends Eloquent
 {
-
     protected $table = 'File';
-    protected $connection = 'mysql_external';
-
-} 
+    //external os members db (SS)
+    protected $connection = 'os_members';
+}

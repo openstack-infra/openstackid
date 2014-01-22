@@ -94,5 +94,8 @@ return array(
 	*/
 
 	'attributes' => array(),
+    //custom messages
+    "boolean" => "The :attribute must be a boolean.",
+    "text" => "The :attribute may only contain text.",
 
 );

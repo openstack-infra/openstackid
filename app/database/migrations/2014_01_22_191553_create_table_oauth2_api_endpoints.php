@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 
-class CreateOauth2ApiScope extends Migration {
+class CreateTableOauth2ApiEndpoints extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -11,19 +11,18 @@ class CreateOauth2ApiScope extends Migration {
 	 */
 	public function up()
 	{
-        Schema::create('oauth2_api_scope', function($table)
+        Schema::create('oauth2_api_endpoint', function($table)
         {
             $table->bigIncrements('id')->unsigned();
-            $table->string('name',512);
-            $table->string('short_description',512);
-            $table->text('description');
             $table->boolean('active')->default(true);
-            $table->boolean('default')->default(false);
-            $table->boolean('system')->default(false);
+            $table->text('description')->nullable();
+            $table->string('name',255)->unique();
             $table->timestamps();
-            //an scope may or not may have an api associated with it
-            $table->bigInteger("api_id")->unsigned()->nullable();
+            $table->text("route");
+            $table->enum('http_method', array('GET', 'HEAD','POST','PUT','DELETE','TRACE','CONNECT','OPTIONS'));
+            $table->bigInteger("api_id")->unsigned();
             $table->index('api_id');
+
             $table->foreign('api_id')
                 ->references('id')
                 ->on('oauth2_api')
@@ -39,11 +38,12 @@ class CreateOauth2ApiScope extends Migration {
 	 */
 	public function down()
 	{
-        Schema::table('oauth2_api_scope', function($table)
+        Schema::table('oauth2_api_endpoints', function($table)
         {
             $table->dropForeign('api_id');
         });
-        Schema::dropIfExists('oauth2_api_scope');
+
+        Schema::dropIfExists('oauth2_api_endpoints');
 	}
 
 }

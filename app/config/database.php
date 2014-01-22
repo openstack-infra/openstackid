@@ -26,7 +26,7 @@ return array(
 	|
 	*/
 
-	'default' => 'mysql',
+	'default' => 'openstackid',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -45,9 +45,8 @@ return array(
 	*/
 
 	'connections' => array(
-
-
-		'mysql' => array(
+        //primary DB
+		'openstackid' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
 			'database'  => 'database',
@@ -57,9 +56,8 @@ return array(
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',
 		),
-
-
-        'mysql_external' => array(
+        //secondary DB (OS Membership)
+        'os_members' => array(
             'driver'    => 'mysql',
             'host'      => 'localhost',
             'database'  => 'database',
@@ -69,8 +67,7 @@ return array(
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
         ),
-
-	),
+    ),
 
 	/*
 	|--------------------------------------------------------------------------

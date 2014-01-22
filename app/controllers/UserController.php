@@ -270,9 +270,9 @@ class UserController extends BaseController
             return View::make("404");
         }
 
-        $allowed_uris = $client->getClientRegisteredUris();
+        $allowed_uris    = $client->getClientRegisteredUris();
         $selected_scopes = $client->getClientScopes();
-        $aux_scopes = array();
+        $aux_scopes      = array();
         foreach ($selected_scopes as $scope) {
             array_push($aux_scopes, $scope->id);
         }

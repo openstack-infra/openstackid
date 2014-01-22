@@ -12,16 +12,17 @@
 */
 use openid\exceptions\InvalidOpenIdMessageException;
 use utils\services\Registry;
-use \utils\services\UtilsServiceCatalog;
+use utils\services\UtilsServiceCatalog;
 use oauth2\exceptions\InvalidOAuth2Request;
+use Monolog\Logger;
+use Monolog\Handler\NativeMailerHandler;
+
 
 ClassLoader::addDirectories(array(
-
     app_path() . '/commands',
     app_path() . '/controllers',
     app_path() . '/models',
     app_path() . '/database/seeds',
-
 ));
 
 /*
@@ -37,13 +38,14 @@ ClassLoader::addDirectories(array(
 
 $logFile = 'log-' . php_sapi_name() . '.txt';
 
-Log::useDailyFiles(storage_path() . '/logs/' . $logFile);
-$admin_email = 'sebastian@tipit.net';
-$from = 'noreply@openstack.org';
-$subject = 'openstackid error';
-$mono_log = Log::getMonolog();
+Log::useDailyFiles(storage_path() . '/logs/' . $logFile,$days = 0, $level = 'debug');
 
-$handler = new Monolog\Handler\NativeMailerHandler($admin_email, $subject, $from);
+$to          = Config::get('log.to_email');
+$from        = Config::get('log.from_email');
+$subject     = 'openstackid error';
+$mono_log    = Log::getMonolog();
+
+$handler = new NativeMailerHandler($to, $subject, $from,$level = Logger::WARNING);
 $mono_log->pushHandler($handler);
 
 /*
@@ -117,3 +119,4 @@ App::down(function () {
 */
 
 require app_path() . '/filters.php';
+require_once 'validators.php';

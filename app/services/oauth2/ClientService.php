@@ -67,7 +67,7 @@ class ClientService implements IClientService
             return array($auth_header_content[0], $auth_header_content[1]);
         }
         //if not get from http input
-        $client_id = Input::get(OAuth2Protocol::OAuth2Protocol_ClientId, '');
+        $client_id     = Input::get(OAuth2Protocol::OAuth2Protocol_ClientId, '');
         $client_secret = Input::get(OAuth2Protocol::OAuth2Protocol_ClientSecret, '');
         return array($client_id, $client_secret);
     }

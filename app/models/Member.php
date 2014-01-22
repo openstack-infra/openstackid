@@ -6,7 +6,8 @@ class Member extends Eloquent
 {
 
     protected $table = 'Member';
-    protected $connection = 'mysql_external';
+    //external os members db (SS)
+    protected $connection = 'os_members';
 
     public function checkPassword($password)
     {

@@ -1,7 +1,6 @@
 <?php
 
 use oauth2\models\IResourceServer;
-use oauth2\models\IClient;
 
 class ResourceServer extends Eloquent implements IResourceServer {
 

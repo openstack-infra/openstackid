@@ -61,7 +61,6 @@ select, input[type="text"]{
 }
 
 .alert-error{
-    max-width: 50%;
     margin-top: 5px;
     margin-bottom: 5px;
 }
@@ -81,4 +80,8 @@ select, input[type="text"]{
 
 .info{
     cursor: pointer;
+}
+
+.email-row{
+    margin-top: 5px;
 }

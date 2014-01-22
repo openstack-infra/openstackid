@@ -16,6 +16,11 @@ class Api  extends Eloquent implements IApi {
         return $this->belongsTo('ResourceServer');
     }
 
+    public function endpoints()
+    {
+        return $this->hasMany('ApiEndpoint','api_id');
+    }
+
     /**
      * @return \oauth2\models\IResourceServer
      */
@@ -34,10 +39,6 @@ class Api  extends Eloquent implements IApi {
         return $this->logo;
     }
 
-    public function getRoute()
-    {
-        return $this->route;
-    }
 
     public function getDescription()
     {
@@ -60,7 +61,21 @@ class Api  extends Eloquent implements IApi {
         return $this->active;
     }
 
-    public function getHttpMethod(){
-        return $this->http_method;
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function setStatus($active)
+    {
+        $this->active = $active;
     }
 }
