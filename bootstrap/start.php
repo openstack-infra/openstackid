@@ -28,8 +28,8 @@ $app->redirectIfTrailingSlash();
 
 $env = $app->detectEnvironment(array(
 
-    'local'      => array('dev.openstackid.com'),
-	'dev'        => array('openstackid.dev10.tipit.net','openstackid-dev.openstack.org'),
+    'local'      => array(),
+	'dev'        => array(),
     'staging'    => array(),
     'production' => array(),
 ));

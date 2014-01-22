@@ -7,7 +7,7 @@
                 <span id="client_id">{{ $client->client_id }}</span>
             </div>
         </div>
-        @if($client->client_type === oauth2\models\IClient::ClientType_Confidential)
+        @if($client->client_type == oauth2\models\IClient::ClientType_Confidential)
         <div class="row-fluid">
             <div class="span12">
                 <label for="client_secret" class="label-client-secret">Client Secret</label>

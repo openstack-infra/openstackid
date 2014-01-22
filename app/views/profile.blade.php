@@ -260,7 +260,7 @@
                                                 'td.client-modified':'client.updated_at',
                                                 '.app-active-checkbox@value':'client.id',
                                                 '.app-active-checkbox@checked':function(arg){
-                                                    var client_active = arg.item.active;
+                                                    var client_active = parseInt(arg.item.active);
                                                     return client_active===1?'true':'';
                                                 },
                                                 '.app-active-checkbox@id':function(arg){
@@ -273,7 +273,7 @@
                                                     return 'app-locked_'+client_id;
                                                 },
                                                 '.app-locked-checkbox@checked':function(arg){
-                                                    var client_locked = arg.item.locked;
+                                                    var client_locked = parseInt(arg.item.locked);
                                                     return client_locked===1?'true':'';
                                                 },
                                                 'a.edit-client@href':function(arg){

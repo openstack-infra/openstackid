@@ -10,3 +10,7 @@ app/config/testing/*
 app/config/local/*
 app/config/production/*
 app/config/staging/*
+app/config/packages/greggilbert/recaptcha/dev/*
+app/config/packages/greggilbert/recaptcha/local/*
+app/config/packages/greggilbert/recaptcha/production/*
+app/config/packages/greggilbert/recaptcha/staging/*
