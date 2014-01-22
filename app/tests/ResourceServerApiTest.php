@@ -22,13 +22,10 @@ class ResourceServerApiTest extends TestCase {
         $this->client_secret = 'ITc/6Y5N7kOtGKhg';
 
         $scope = array(
-            sprintf('%s/api/resource-server/read',$this->current_realm),
-            sprintf('%s/api/resource-server/read.page',$this->current_realm),
-            sprintf('%s/api/resource-server/write',$this->current_realm),
-            sprintf('%s/api/resource-server/delete',$this->current_realm),
-            sprintf('%s/api/resource-server/update',$this->current_realm),
-            sprintf('%s/api/resource-server/update.status',$this->current_realm),
-            sprintf('%s/api/resource-server/regenerate.secret',$this->current_realm),
+            sprintf('%s/resource-server/read',$this->current_realm),
+            sprintf('%s/resource-server/write',$this->current_realm),
+            sprintf('%s/resource-server/delete',$this->current_realm),
+            sprintf('%s/resource-server/update',$this->current_realm),
         );
 
         //do get auth token...
@@ -72,7 +69,6 @@ class ResourceServerApiTest extends TestCase {
         $this->assertTrue($response_resource_server->id === $resource_server->id);
     }
 
-
     public function testGetByPage(){
 
         $response = $this->action("GET", "ApiResourceServerController@getByPage",
@@ -83,7 +79,7 @@ class ResourceServerApiTest extends TestCase {
 
         $content         = $response->getContent();
         $list = json_decode($content);
-
+        $this->assertTrue(isset($list->total_items) && intval($list->total_items)>0);
         $this->assertResponseStatus(200);
     }
 
@@ -104,6 +100,8 @@ class ResourceServerApiTest extends TestCase {
 
         $content = $response->getContent();
         $json_response = json_decode($content);
+        $this->assertTrue(isset($json_response->resource_server_id));
+        $this->assertTrue(!empty($json_response->resource_server_id));
         $this->assertResponseStatus(200);
     }
 
@@ -209,6 +207,38 @@ class ResourceServerApiTest extends TestCase {
         $this->assertResponseStatus(404);
 
         $this->assertTrue($json_response->error==='resource server not found');
+    }
+
+    public function testDeleteExistingOne(){
+
+        $resource_server = ResourceServer::where('host','=','dev.openstackid.com')->first();
+
+        $new_id = $resource_server->id;
+
+        $response = $this->action("DELETE", "ApiResourceServerController@delete",$parameters = array('id' => $new_id),
+            array(),
+            array(),
+            array("HTTP_Authorization" => " Bearer " .$this->access_token));
+
+        $content = $response->getContent();
+
+        $json_response = json_decode($content);
+
+        $this->assertTrue($json_response==='ok');
+
+        $this->assertResponseStatus(200);
+
+
+        $response = $this->action("GET", "ApiResourceServerController@get",$parameters = array('id' => $new_id),
+            array(),
+            array(),
+            array("HTTP_Authorization" => " Bearer " .$this->access_token));
+
+        $content = $response->getContent();
+        $json_response = json_decode($content);
+        $this->assertResponseStatus(400);
+        $this->assertTrue(isset($json_response->error));
+        $this->assertTrue($json_response->error==='invalid_request');
     }
 
     public function testUpdate(){

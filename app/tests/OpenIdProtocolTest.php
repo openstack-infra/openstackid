@@ -452,13 +452,13 @@ class OpenIdProtocolTest extends TestCase
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
 
         $scope = array(
-            sprintf('%s/api/resource-server/read',$this->current_realm),
-            sprintf('%s/api/resource-server/read.page',$this->current_realm),
-            sprintf('%s/api/resource-server/write',$this->current_realm),
-            sprintf('%s/api/resource-server/delete',$this->current_realm),
-            sprintf('%s/api/resource-server/update',$this->current_realm),
-            sprintf('%s/api/resource-server/update.status',$this->current_realm),
-            sprintf('%s/api/resource-server/regenerate.secret',$this->current_realm),
+            sprintf('%s/resource-server/read',$this->current_realm),
+            sprintf('%s/resource-server/read.page',$this->current_realm),
+            sprintf('%s/resource-server/write',$this->current_realm),
+            sprintf('%s/resource-server/delete',$this->current_realm),
+            sprintf('%s/resource-server/update',$this->current_realm),
+            sprintf('%s/resource-server/update.status',$this->current_realm),
+            sprintf('%s/resource-server/regenerate.secret',$this->current_realm),
         );
 
         $params = array(
@@ -536,13 +536,13 @@ class OpenIdProtocolTest extends TestCase
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $scope = array(
-            sprintf('%s/api/resource-server/read',$this->current_realm),
-            sprintf('%s/api/resource-server/read.page',$this->current_realm),
-            sprintf('%s/api/resource-server/write',$this->current_realm),
-            sprintf('%s/api/resource-server/delete',$this->current_realm),
-            sprintf('%s/api/resource-server/update',$this->current_realm),
-            sprintf('%s/api/resource-server/update.status',$this->current_realm),
-            sprintf('%s/api/resource-server/regenerate.secret',$this->current_realm),
+            sprintf('%s/resource-server/read',$this->current_realm),
+            sprintf('%s/resource-server/read.page',$this->current_realm),
+            sprintf('%s/resource-server/write',$this->current_realm),
+            sprintf('%s/resource-server/delete',$this->current_realm),
+            sprintf('%s/resource-server/update',$this->current_realm),
+            sprintf('%s/resource-server/update.status',$this->current_realm),
+            sprintf('%s/resource-server/regenerate.secret',$this->current_realm),
         );
 
         $params = array(
@@ -617,13 +617,13 @@ class OpenIdProtocolTest extends TestCase
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $scope = array(
-            sprintf('%s/api/resource-server/read',$this->current_realm),
-            sprintf('%s/api/resource-server/read.page',$this->current_realm),
-            sprintf('%s/api/resource-server/write',$this->current_realm),
-            sprintf('%s/api/resource-server/delete',$this->current_realm),
-            sprintf('%s/api/resource-server/update',$this->current_realm),
-            sprintf('%s/api/resource-server/update.status',$this->current_realm),
-            sprintf('%s/api/resource-server/regenerate.secret',$this->current_realm),
+            sprintf('%s/resource-server/read',$this->current_realm),
+            sprintf('%s/resource-server/read.page',$this->current_realm),
+            sprintf('%s/resource-server/write',$this->current_realm),
+            sprintf('%s/resource-server/delete',$this->current_realm),
+            sprintf('%s/resource-server/update',$this->current_realm),
+            sprintf('%s/resource-server/update.status',$this->current_realm),
+            sprintf('%s/resource-server/regenerate.secret',$this->current_realm),
         );
 
         $params = array(
@@ -698,13 +698,13 @@ class OpenIdProtocolTest extends TestCase
         Auth::login($user);
 
         $scope = array(
-            sprintf('%s/api/resource-server/read',$this->current_realm),
-            sprintf('%s/api/resource-server/read.page',$this->current_realm),
-            sprintf('%s/api/resource-server/write',$this->current_realm),
-            sprintf('%s/api/resource-server/delete',$this->current_realm),
-            sprintf('%s/api/resource-server/update',$this->current_realm),
-            sprintf('%s/api/resource-server/update.status',$this->current_realm),
-            sprintf('%s/api/resource-server/regenerate.secret',$this->current_realm),
+            sprintf('%s/resource-server/read',$this->current_realm),
+            sprintf('%s/resource-server/read.page',$this->current_realm),
+            sprintf('%s/resource-server/write',$this->current_realm),
+            sprintf('%s/resource-server/delete',$this->current_realm),
+            sprintf('%s/resource-server/update',$this->current_realm),
+            sprintf('%s/resource-server/update.status',$this->current_realm),
+            sprintf('%s/resource-server/regenerate.secret',$this->current_realm),
         );
 
         $params = array(

@@ -98,6 +98,7 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(OAuth2ServiceCatalog::ScopeService, 'services\\oauth2\\ApiScopeService');
         $this->app->singleton(OAuth2ServiceCatalog::ResourceServerService, 'services\\oauth2\\ResourceServerService');
         $this->app->singleton(OAuth2ServiceCatalog::ApiService, 'services\\oauth2\\ApiService');
+        $this->app->singleton(OAuth2ServiceCatalog::ApiEndpointService, 'services\\oauth2\\ApiEndpointService');
 
         Registry::getInstance()->set(OAuth2ServiceCatalog::MementoService, $this->app->make(OAuth2ServiceCatalog::MementoService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::TokenService, $this->app->make(OAuth2ServiceCatalog::TokenService));
@@ -105,6 +106,7 @@ class ServicesProvider extends ServiceProvider
         Registry::getInstance()->set(OAuth2ServiceCatalog::ClientService, $this->app->make(OAuth2ServiceCatalog::ClientService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::ResourceServerService, $this->app->make(OAuth2ServiceCatalog::ResourceServerService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::ApiService, $this->app->make(OAuth2ServiceCatalog::ApiService));
+        Registry::getInstance()->set(OAuth2ServiceCatalog::ApiEndpointService, $this->app->make(OAuth2ServiceCatalog::ApiEndpointService));
     }
 
     public function register()

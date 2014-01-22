@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"require": {
         "php": ">=5.4.0",
-     	"laravel/framework": "4.0.*",
+     	"laravel/framework": "4.1.*",
         "phpunit/phpunit": "3.7.*",
         "zendframework/zend-crypt":"2.2.*",
         "greggilbert/recaptcha": "1.0.*"
@@ -21,7 +21,8 @@
             "app/libs",
             "app/services",
             "app/strategies",
-            "app/filters"
+            "app/filters",
+            "app/validators"
 		]
 	},
 	"scripts": {

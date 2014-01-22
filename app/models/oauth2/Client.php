@@ -72,7 +72,6 @@ class Client extends Eloquent implements IClient {
         $scopes = $this->scopes()
             ->with('api')
             ->where('active','=',true)
-            ->where('system','=',false)
             ->orderBy('api_id')->get();
         $res = array();
         foreach($scopes as $scope){

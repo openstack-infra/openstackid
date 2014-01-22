@@ -17,11 +17,19 @@ class CreateOauth2ClientApiScope extends Migration {
 
             $table->bigInteger("client_id")->unsigned();
             $table->index('client_id');
-            $table->foreign('client_id')->references('id')->on('oauth2_client');
+            $table->foreign('client_id')
+                  ->references('id')
+                  ->on('oauth2_client')
+                  ->onDelete('cascade')
+                  ->onUpdate('no action'); ;
 
             $table->bigInteger("scope_id")->unsigned();
             $table->index('scope_id');
-            $table->foreign('scope_id')->references('id')->on('oauth2_api_scope');
+            $table->foreign('scope_id')
+                  ->references('id')
+                  ->on('oauth2_api_scope')
+                  ->onDelete('cascade')
+                  ->onUpdate('no action');;
         });
 	}
 

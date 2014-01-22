@@ -32,7 +32,7 @@ class OAuth2ProtocolTest extends TestCase
             'client_id' => $client_id,
             'redirect_uri' => 'https://www.test.com/oauth2',
             'response_type' => 'code',
-            'scope' =>   sprintf('%s/api/resource-server/read',$this->current_realm),
+            'scope' =>   sprintf('%s/resource-server/read',$this->current_realm),
         );
 
         $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
@@ -67,7 +67,7 @@ class OAuth2ProtocolTest extends TestCase
                 'client_id' => $client_id,
                 'redirect_uri' => 'https://www.test.com/oauth2',
                 'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
-                'scope' =>   sprintf('%s/api/resource-server/read',$this->current_realm),
+                'scope' =>   sprintf('%s/resource-server/read',$this->current_realm),
             );
 
             $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
@@ -148,7 +148,7 @@ class OAuth2ProtocolTest extends TestCase
                 'client_id' => $client_id,
                 'redirect_uri' => 'https://www.test.com/oauth2',
                 'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
-                'scope' =>   sprintf('%s/api/resource-server/read',$this->current_realm),
+                'scope' =>   sprintf('%s/resource-server/read',$this->current_realm),
             );
 
             $response = $this->action("POST", "OAuth2ProviderController@authorize",
@@ -245,7 +245,7 @@ class OAuth2ProtocolTest extends TestCase
                 'client_id' => $client_id,
                 'redirect_uri' => 'https://www.test.com/oauth2',
                 'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
-                'scope' =>   sprintf('%s/api/resource-server/read',$this->current_realm),
+                'scope' =>   sprintf('%s/resource-server/read',$this->current_realm),
             );
 
             $response = $this->action("POST", "OAuth2ProviderController@authorize",
@@ -346,7 +346,7 @@ class OAuth2ProtocolTest extends TestCase
                 'client_id' => $client_id,
                 'redirect_uri' => 'https://www.test.com/oauth2',
                 'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
-                'scope' =>   sprintf('%s/api/resource-server/read',$this->current_realm),
+                'scope' =>   sprintf('%s/resource-server/read',$this->current_realm),
             );
 
             $response = $this->action("POST", "OAuth2ProviderController@authorize",
@@ -449,7 +449,7 @@ class OAuth2ProtocolTest extends TestCase
             'client_id'     => $client_id,
             'redirect_uri'  => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
-            'scope'         => sprintf('%s/api/resource-server/read',$this->current_realm),
+            'scope'         => sprintf('%s/resource-server/read',$this->current_realm),
             'state'         => '123456'
         );
 
@@ -491,7 +491,7 @@ class OAuth2ProtocolTest extends TestCase
             'client_id'     => $client_id,
             'redirect_uri'  => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
-            'scope'         => sprintf('%s/api/resource-server/read',$this->current_realm),
+            'scope'         => sprintf('%s/resource-server/read',$this->current_realm),
             'state'         => '123456'
         );
 
@@ -548,7 +548,7 @@ class OAuth2ProtocolTest extends TestCase
             'client_id'     => $client_id,
             'redirect_uri'  => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
-            'scope'         =>   sprintf('%s/api/resource-server/read',$this->current_realm),
+            'scope'         =>   sprintf('%s/resource-server/read',$this->current_realm),
             'state'         => '123456'
         );
 
@@ -606,7 +606,7 @@ class OAuth2ProtocolTest extends TestCase
             'client_id'     => $client_id,
             'redirect_uri'  => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
-            'scope'         =>  sprintf('%s/api/resource-server/read',$this->current_realm),
+            'scope'         =>  sprintf('%s/resource-server/read',$this->current_realm),
             'state'         => '123456'
         );
 
@@ -664,7 +664,7 @@ class OAuth2ProtocolTest extends TestCase
             'client_id'     => $client_id,
             'redirect_uri'  => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
-            'scope'         =>   sprintf('%s/api/resource-server/read',$this->current_realm),
+            'scope'         =>   sprintf('%s/resource-server/read',$this->current_realm),
             'state'         => '123456'
         );
 
@@ -714,7 +714,7 @@ class OAuth2ProtocolTest extends TestCase
             //do get auth token...
             $params = array(
                OAuth2Protocol::OAuth2Protocol_GrantType => OAuth2Protocol::OAuth2Protocol_GrantType_ClientCredentials,
-               OAuth2Protocol::OAuth2Protocol_Scope =>   sprintf('%s/api/resource-server/read',$this->current_realm),
+               OAuth2Protocol::OAuth2Protocol_Scope =>   sprintf('%s/resource-server/read',$this->current_realm),
             );
 
             $response = $this->action("POST", "OAuth2ProviderController@token",

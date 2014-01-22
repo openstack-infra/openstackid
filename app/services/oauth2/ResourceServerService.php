@@ -10,6 +10,7 @@ use oauth2\services\IResourceServerService;
 use oauth2\services\IClientService;
 use ResourceServer;
 use DB;
+use \oauth2\exceptions\InvalidResourceServer;
 
 class ResourceServerService implements IResourceServerService {
 
@@ -31,23 +32,47 @@ class ResourceServerService implements IResourceServerService {
     }
 
     /**
+     * @param $id
+     * @param array $params
+     * @return bool
+     * @throws \oauth2\exceptions\InvalidResourceServer
+     */
+    public function update($id, array $params){
+
+        $resource_server = ResourceServer::find($id);
+        if(is_null($resource_server))
+            throw new InvalidResourceServer(sprintf('resource server id %s does not exists!',$id));
+
+        $allowed_update_params = array('host','ip','active','friendly_name');
+        foreach($allowed_update_params as $param){
+            if(array_key_exists($param,$params)){
+                $resource_server->{$param} = $params[$param];
+            }
+        }
+        return $this->save($resource_server);
+    }
+
+    /**
      * @param IResourceServer $resource_server
-     * @return void
+     * @return bool
      */
     public function save(IResourceServer $resource_server)
     {
-        $resource_server->Save();
+        if(!$resource_server->exists() || count($resource_server->getDirty())>0){
+            return $resource_server->Save();
+        }
+        return false;
     }
 
     /**
      * sets resource server status (active/deactivated)
      * @param $resource_server_id id of resource server
      * @param bool $status status (active/non active)
-     * @return void
+     * @return bool
      */
     public function setStatus($resource_server_id, $status)
     {
-        ResourceServer::find($resource_server_id)->update(array('active'=>$status));
+        return ResourceServer::find($resource_server_id)->update(array('active'=>$status));
     }
 
     /**
@@ -120,7 +145,7 @@ class ResourceServerService implements IResourceServerService {
      * @return bool
      */
     public function regenerateResourceServerClientSecret($resource_server_id){
-        $res = '';
+        $res = null;
         DB::transaction(function () use ($resource_server_id,&$res) {
             $resource_server = ResourceServer::find($resource_server_id);
             if(!is_null($resource_server)){

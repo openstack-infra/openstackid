@@ -13,7 +13,6 @@
 
 $app = new Illuminate\Foundation\Application;
 
-$app->redirectIfTrailingSlash();
 
 /*
 |--------------------------------------------------------------------------
@@ -25,7 +24,12 @@ $app->redirectIfTrailingSlash();
 | given environment, then we will automatically detect it for you.
 |
 */
-
+/**
+ * REMARK UPGRADE FROM 4.0.* to 4.1.*
+ * For security reasons, URL domains may no longer be used to detect your application environment.
+ * These values are easily spoofable and allow attackers to modify the environment for a request.
+ * You should convert your environment detection to use machine host names (hostname command on Mac & Ubuntu).
+ */
 $env = $app->detectEnvironment(array(
 
     'local'      => array(),

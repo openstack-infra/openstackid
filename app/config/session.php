@@ -31,6 +31,8 @@ return array(
 
 	'lifetime' => 120,
 
+    'expire_on_close' => false,
+
 	/*
 	|--------------------------------------------------------------------------
 	| Session File Location
@@ -121,5 +123,7 @@ return array(
 	*/
 
 	'domain' => null,
+
+
 
 );

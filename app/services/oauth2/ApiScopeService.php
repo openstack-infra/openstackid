@@ -22,18 +22,22 @@ class ApiScopeService implements IApiScopeService {
         return DB::table('oauth2_api_scope')->where('active','=',true)->whereIn('name',$scopes_names)->lists('short_description');
     }
 
-    /** get all active scopes
-     * @return mixed
+    /**
+     * @param bool $system
+     * @return array|mixed
      */
-    public function getAvailableScopes(){
+    public function getAvailableScopes($system=false){
+
          $scopes = ApiScope::with('api')
             ->where('active','=',true)
-            ->where('system','=',false)
+            ->where('system','=',$system)
             ->orderBy('api_id')->get();
+
         $res = array();
+
         foreach($scopes as $scope){
             $api = $scope->api()->first();
-            if($api->active && $api->resource_server()->first()->active)
+            if(is_null($api) ||($api->active && $api->resource_server()->first()->active))
                 array_push($res,$scope);
         }
         return $res;
@@ -61,6 +65,5 @@ class ApiScopeService implements IApiScopeService {
         $audience  = trim($audience);
         return $audience;
     }
-
 
 }

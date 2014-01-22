@@ -11,6 +11,14 @@
 |
 */
 
+Route::pattern('id', '[0-9]+');
+Route::pattern('active', '(true|false|1|0)');
+Route::pattern('scope_id', '[0-9]+');
+Route::pattern('page_nbr', '[0-9]+');
+Route::pattern('page_size', '[0-9]+');
+Route::pattern('client_id', '[0-9A-Za-z\.\-\_\~]+');
+
+
 Route::group(array("before" => "ssl"), function () {
 
     Route::get('/', "HomeController@index");
@@ -81,5 +89,25 @@ Route::group(array('prefix' => 'api/v1', 'before' => 'ssl|oauth2.protected.endpo
         Route::delete('/{id}',"ApiResourceServerController@delete");
         Route::put('/',"ApiResourceServerController@update");
         Route::get('/status/{id}/{active}',"ApiResourceServerController@updateStatus");
+    });
+
+    Route::group(array('prefix' => 'api'), function(){
+        Route::get('/{id}',"ApiController@get");
+        Route::get('/{page_nbr}/{page_size}',"ApiController@getByPage");
+        Route::delete('/{id}',"ApiController@delete");
+        Route::post('/',"ApiController@create");
+        Route::put('/',"ApiController@update");
+        Route::get('/status/{id}/{active}',"ApiController@updateStatus");
+    });
+
+    Route::group(array('prefix' => 'api-endpoint'), function(){
+        Route::get('/{id}',"ApiEndpointController@get");
+        Route::get('/{page_nbr}/{page_size}',"ApiEndpointController@getByPage");
+        Route::post('/',"ApiEndpointController@create");
+        Route::put('/',"ApiEndpointController@update");
+        Route::delete('/{id}',"ApiEndpointController@delete");
+        Route::get('/status/{id}/{active}',"ApiEndpointController@updateStatus");
+        Route::get('/scope/add/{id}/{scope_id}',"ApiEndpointController@addRequiredScope");
+        Route::get('/scope/remove/{id}/{scope_id}',"ApiEndpointController@removeRequiredScope");
     });
 });

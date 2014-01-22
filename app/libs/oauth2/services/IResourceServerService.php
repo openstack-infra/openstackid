@@ -18,9 +18,17 @@ interface IResourceServerService {
 
     /**
      * @param IResourceServer $resource_server
-     * @return void
+     * @return bool
      */
     public function save(IResourceServer $resource_server);
+
+    /**
+     * @param $id
+     * @param array $params
+     * @return bool
+     * @throws \oauth2\exceptions\InvalidResourceServer
+     */
+    public function update($id, array $params);
 
     /**
      * sets resource server status (active/deactivated)

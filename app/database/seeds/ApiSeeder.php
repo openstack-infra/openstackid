@@ -6,82 +6,26 @@ class ApiSeeder extends Seeder {
         DB::table('oauth2_api')->delete();
 
         $resource_server = ResourceServer::first();
-        //create api endpoints
 
         Api::create(
             array(
-                'name'            => 'create resource server',
-                'logo'            =>  null,
-                'active'          =>  true,
+                'name'               => 'resource server',
+                'logo'               =>  null,
+                'active'             =>  true,
+                'Description'        => 'Resource Server CRUD operations',
                 'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server',
-                'http_method'     => 'POST'
+                'logo'               => asset('img/apis/server.png')
             )
         );
 
         Api::create(
             array(
-                'name'            => 'get resource server',
+                'name'            => 'api',
                 'logo'            =>  null,
                 'active'          =>  true,
+                'Description'     => 'Api CRUD operations',
                 'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/{id}',
-                'http_method'     => 'GET'
-            )
-        );
-
-        Api::create(
-            array(
-                'name'            => 'resource server regenerate secret',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/regenerate-client-secret/{id}',
-                'http_method'     => 'GET'
-            )
-        );
-
-        Api::create(
-            array(
-                'name'            => 'resource server get page',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/{page_nbr}/{page_size}',
-                'http_method'     => 'GET'
-            )
-        );
-
-        Api::create(
-            array(
-                'name'            => 'resource server delete',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/{id}',
-                'http_method'     => 'DELETE'
-            )
-        );
-
-        Api::create(
-            array(
-                'name'            => 'resource server update',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server',
-                'http_method'     => 'PUT'
-            )
-        );
-
-        Api::create(
-            array(
-                'name'            => 'resource server update status',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'resource_server_id' => $resource_server->id,
-                'route'           => '/api/v1/resource-server/status/{id}/{active}',
-                'http_method'     => 'GET'
+                'logo'               => asset('img/apis/server.png')
             )
         );
 

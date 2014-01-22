@@ -26,7 +26,7 @@ return array(
 	|
 	*/
 
-	'default' => 'mysql',
+	'default' => 'openstackid',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -45,9 +45,8 @@ return array(
 	*/
 
 	'connections' => array(
-
-
-		'mysql' => array(
+        //primary DB
+		'openstackid' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
 			'database'  => 'database',
@@ -57,9 +56,8 @@ return array(
 			'collation' => 'utf8_unicode_ci',
 			'prefix'    => '',
 		),
-
-
-        'mysql_external' => array(
+        //secondary DB (OS Membership)
+        'os_members' => array(
             'driver'    => 'mysql',
             'host'      => 'localhost',
             'database'  => 'database',
@@ -69,8 +67,7 @@ return array(
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
         ),
-
-	),
+    ),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -96,24 +93,15 @@ return array(
 	|
 	*/
 
-	'redis' => array(
-        /**
-         * http://laravel.com/docs/redis
-         * The cluster option will tell the Laravel Redis client to perform client-side sharding
-         * across your Redis nodes, allowing you to pool nodes and create
-         * a large amount of available RAM. However, note that client-side sharding does not handle
-         * failover; therefore, is primarily suited for cached data that is available from another
-         * primary data store.
-         */
+    'redis' => array(
+
         'cluster' => false,
 
-		'default' => array(
-			'host'     => '127.0.0.1',
-			'port'     => 6379,
+        'default' => array(
+            'host' => '127.0.0.1',
+            'port' => 6379,
             'database' => 0,
-            'password' => ''
-		),
+        ),
 
-	),
-
+    ),
 );

@@ -13,13 +13,16 @@ interface IApi {
 
     public function getLogo();
 
-    public function getRoute();
-
-    public function getHttpMethod();
-
     public function getDescription();
 
     public function getScope();
 
     public function isActive();
+
+    public function setName($name);
+
+    public function setDescription($description);
+
+    public function setStatus($active);
+
 } 

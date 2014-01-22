@@ -94,5 +94,10 @@ return array(
 	*/
 
 	'attributes' => array(),
-
+    //custom messages
+    'boolean'    => "The :attribute must be a boolean.",
+    'text'       => "The :attribute may only contain text.",
+    'httpmethod' => "The :attribute must be one of the following values 'GET', 'HEAD','POST','PUT','DELETE','TRACE','CONNECT' OR 'OPTIONS'.",
+    'route'      => "The :attribute may be a valid http route.",
+    'host'      => "The :attribute may be a valid host name.",
 );

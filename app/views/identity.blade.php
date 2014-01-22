@@ -19,7 +19,7 @@
                 </div>
                 @endif
                 @if( $show_email )
-                    <div class="row">
+                    <div class="row email-row">
                         <div class="span4">
                              <i class="icon-envelope"></i>
                             <a href="mailto:{{ $email }}">{{ $email }}</a>
@@ -47,7 +47,7 @@
             </div>
             @endif
             @if( $show_email )
-            <div class="row">
+            <div class="row email-row">
                 <div class="span4">
                     <i class="icon-envelope"></i>
                     <a href="mailto:{{ $email }}">{{ $email }}</a>
