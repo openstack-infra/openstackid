@@ -1,0 +1,9 @@
+Approved+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Jenkins
+Approved+1: sebastian marcet <smarcet@gmail.com>
+Code-Review+2: sebastian marcet <smarcet@gmail.com>
+Submitted-by: Jenkins
+Submitted-at: Fri, 24 Jan 2014 23:18:49 +0000
+Reviewed-on: https://review.openstack.org/68458
+Project: openstack-infra/openstackid
+Branch: refs/heads/master
