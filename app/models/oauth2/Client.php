@@ -71,12 +71,17 @@ class Client extends Eloquent implements IClient {
     {
         $scopes = $this->scopes()
             ->with('api')
+            ->with('api.resource_server')
             ->where('active','=',true)
             ->orderBy('api_id')->get();
+
         $res = array();
-        foreach($scopes as $scope){
-            if($scope->api()->first()->resource_server()->first()->active && $scope->api()->first()->active)
-                array_push($res,$scope);
+
+        foreach($scopes as $db_scope){
+            $api             = !is_null($db_scope)?$db_scope->api()->first():null;
+            $resource_server = !is_null($api) ? $api->resource_server()->first():null;
+            if(!is_null($resource_server) && $resource_server->active && !is_null($api) && $api->active)
+                array_push($res,$db_scope);
         }
         return $res;
     }

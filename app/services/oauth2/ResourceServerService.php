@@ -66,13 +66,13 @@ class ResourceServerService implements IResourceServerService {
 
     /**
      * sets resource server status (active/deactivated)
-     * @param $resource_server_id id of resource server
+     * @param $id id of resource server
      * @param bool $status status (active/non active)
      * @return bool
      */
-    public function setStatus($resource_server_id, $status)
+    public function setStatus($id, $status)
     {
-        return ResourceServer::find($resource_server_id)->update(array('active'=>$status));
+        return ResourceServer::find($id)->update(array('active'=>$status));
     }
 
     /**
@@ -80,11 +80,11 @@ class ResourceServerService implements IResourceServerService {
      * @param $resource_server_id id of resource server
      * @return bool
      */
-    public function delete($resource_server_id)
+    public function delete($id)
     {
         $res = false;
-        DB::transaction(function () use ($resource_server_id,&$res) {
-            $resource_server = ResourceServer::find($resource_server_id);
+        DB::transaction(function () use ($id,&$res) {
+            $resource_server = ResourceServer::find($id);
             if(!is_null($resource_server)){
                 $client = $resource_server->client()->first();
                 if(!is_null($client)){
@@ -99,12 +99,12 @@ class ResourceServerService implements IResourceServerService {
 
     /**
      * get a resource server by id
-     * @param $resource_server_id id of resource server
+     * @param $id id of resource server
      * @return IResourceServer
      */
-    public function get($resource_server_id)
+    public function get($id)
     {
-        return ResourceServer::find($resource_server_id);
+        return ResourceServer::find($id);
     }
 
     /** Creates a new resource server instance
@@ -114,7 +114,7 @@ class ResourceServerService implements IResourceServerService {
      * @param bool $active
      * @return IResourceServer
      */
-    public function addResourceServer($host, $ip, $friendly_name, $active)
+    public function add($host, $ip, $friendly_name, $active)
     {
         $instance = null;
         if(is_string($active)){
@@ -141,13 +141,13 @@ class ResourceServerService implements IResourceServerService {
     }
 
     /**
-     * @param $resource_server_id
+     * @param $id
      * @return bool
      */
-    public function regenerateResourceServerClientSecret($resource_server_id){
+    public function regenerateClientSecret($id){
         $res = null;
-        DB::transaction(function () use ($resource_server_id,&$res) {
-            $resource_server = ResourceServer::find($resource_server_id);
+        DB::transaction(function () use ($id,&$res) {
+            $resource_server = ResourceServer::find($id);
             if(!is_null($resource_server)){
                 $client = $resource_server->client()->first();
                 if(!is_null($client)){

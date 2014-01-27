@@ -1,22 +1,21 @@
 <?php
 
 use oauth2\services\IResourceServerService;
-use oauth2\IResourceServerContext;
 use utils\services\ILogService;
 use oauth2\exceptions\InvalidResourceServer;
 /**
  * Class ApiResourceServerController
  */
-class ApiResourceServerController extends OAuth2ProtectedController implements IRESTController
+class ApiResourceServerController extends JsonController implements IRESTController
 {
     /**
      * @var IResourceServerService $resource_service
      */
     private $resource_server_service;
 
-    public function __construct(IResourceServerContext $resource_server_context, IResourceServerService $resource_server_service, ILogService $log_service)
+    public function __construct(IResourceServerService $resource_server_service, ILogService $log_service)
     {
-        parent::__construct($resource_server_context,$log_service);
+        parent::__construct($log_service);
         $this->resource_server_service = $resource_server_service;
     }
 
@@ -28,7 +27,10 @@ class ApiResourceServerController extends OAuth2ProtectedController implements I
                 return $this->error404(array('error' => 'resource server not found'));
             }
 
-            $data    = $resource_server->toArray();
+            $data         = $resource_server->toArray();
+            $apis         = $resource_server->apis()->get(array('id','name'));
+            $data['apis'] = $apis->toArray();
+
             $client  = $resource_server->getClient();
             if(!is_null($client)){
                     $data['client_id']     = $client->getClientId();
@@ -62,7 +64,7 @@ class ApiResourceServerController extends OAuth2ProtectedController implements I
     public function create()
     {
         try {
-            $new_resource_server = Input::all();
+            $values = Input::all();
 
             $rules = array(
                 'host'          => 'required|host|max:255',
@@ -71,17 +73,18 @@ class ApiResourceServerController extends OAuth2ProtectedController implements I
                 'active'        => 'required|boolean',
             );
             // Creates a Validator instance and validates the data.
-            $validation = Validator::make($new_resource_server, $rules);
+            $validation = Validator::make($values, $rules);
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error' => $messages));
+                return $this->error400(array('error'=>'validation','messages' => $messages));
             }
 
-            $new_resource_server_model = $this->resource_server_service->addResourceServer($new_resource_server['host'],
-                $new_resource_server['ip'],
-                $new_resource_server['friendly_name'],
-                $new_resource_server['active']);
+            $new_resource_server_model = $this->resource_server_service->add(
+                $values['host'],
+                $values['ip'],
+                $values['friendly_name'],
+                $values['active']);
 
             return $this->ok(array('resource_server_id' => $new_resource_server_model->id));
         } catch (Exception $ex) {
@@ -104,7 +107,7 @@ class ApiResourceServerController extends OAuth2ProtectedController implements I
     public function regenerateClientSecret($id)
     {
         try {
-            $res = $this->resource_server_service->regenerateResourceServerClientSecret($id);
+            $res = $this->resource_server_service->regenerateClientSecret($id);
             return !is_null($res)?Response::json(array('new_secret'=>$res),200):$this->error404(array('error'=>'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -129,7 +132,7 @@ class ApiResourceServerController extends OAuth2ProtectedController implements I
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error' => $messages));
+                return $this->error400(array('error'=>'validation','messages' => $messages));
             }
 
             $res = $this->resource_server_service->update(intval($values['id']),$values);
@@ -149,7 +152,6 @@ class ApiResourceServerController extends OAuth2ProtectedController implements I
 
     public function updateStatus($id, $active){
         try {
-            $active = is_string($active)?( strtoupper(trim($active))==='TRUE'?true:false ):$active;
             $res = $this->resource_server_service->setStatus($id,$active);
             return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
         } catch (Exception $ex) {
@@ -157,5 +159,4 @@ class ApiResourceServerController extends OAuth2ProtectedController implements I
             return $this->error500($ex);
         }
     }
-
-} 
+}

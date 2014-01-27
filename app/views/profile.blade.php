@@ -60,7 +60,7 @@
                         <td>{{ $site->getRealm() }}</td>
                         <td>{{ $site->getAuthorizationPolicy()}}</td>
                         <td>{{ $site->getUITrustedData() }}</td>
-                        <td>{{ HTML::link(URL::action("UserController@get_deleteTrustedSite",array("id"=>$site->id)),'Delete',array('class'=>'btn del-realm','title'=>'Deletes a decision about a particular trusted site,')) }}</td>
+                        <td>{{ HTML::link(URL::action("UserController@deleteTrustedSite",array("id"=>$site->id)),'Delete',array('class'=>'btn del-realm','title'=>'Deletes a decision about a particular trusted site,')) }}</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -69,11 +69,14 @@
     </div>
     @endif
 
+    @if($is_server_admin)
+    {{ HTML::link(URL::action("AdminController@listResourceServers",null),'Edit Resource Servers',array('class'=>'btn edit-resource-server','title'=>'Edits Resource Servers')) }}
+    @endif
 
     <div class="row-fluid">
         <div id="clients" class="span12">
             <legend><i class="icon-info-sign accordion-toggle" title="Users can keep track of their registered applications and manage them"></i>&nbsp;Registered Applications</legend>
-            {{ HTML::link(URL::action("UserController@postAddRegisteredClient",null),'Register Application',array('class'=>'btn add-client','title'=>'Adds a Registered Application')) }}
+            {{ HTML::link(URL::action("ClientApiController@create",null),'Register Application',array('class'=>'btn add-client','title'=>'Adds a Registered Application')) }}
             @if (count($clients)>0)
             <table id='tclients' class="table table-hover table-condensed">
                 <thead>
@@ -108,7 +111,7 @@
                         <td>{{ $client->updated_at }}</td>
                         <td>&nbsp;
                             {{ HTML::link(URL::action("UserController@getEditRegisteredClient",array("id"=>$client->id)),'Edit',array('class'=>'btn edit-client','title'=>'Edits a Registered Application')) }}
-                            {{ HTML::link(URL::action("UserController@getDeleteRegisteredClient",array("id"=>$client->id)),'Delete',array('class'=>'btn del-client','title'=>'Deletes a Registered Application')) }}</td>
+                            {{ HTML::link(URL::action("ClientApiController@delete",array("id"=>$client->id)),'Delete',array('class'=>'btn del-client','title'=>'Deletes a Registered Application')) }}</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -119,15 +122,15 @@
 
     <div id="dialog-form-register-new-app" title="Register new Application">
         <p style="font-size: 10px;">* You need to register your application to get the necessary credentials to call a Openstack API</p>
-        <form>
+        <form id="form-register-new-app" name="form-register-new-app">
             <fieldset>
-                <label for="app-name">Application Name</label>
-                <input type="text" name="app-name" id="app-name">
+                <label for="app_name">Application Name</label>
+                <input type="text" name="app_name" id="app_name">
 
-                <label for="app-description">Application Description</label>
-                <textarea style="resize: none;" rows="4" cols="50" name="app-description" id="app-description"></textarea>
-                <label for="app-type">Application Type</label>
-                <select name="app-type" id="app-type">
+                <label for="app_desc">Application Description</label>
+                <textarea style="resize: none;" rows="4" cols="50" name="app_desc" id="app_desc"></textarea>
+                <label for="app_type">Application Type</label>
+                <select name="app_type" id="app_type">
                     <option value="2">Web Application</option>
                     <option value="1">Browser (JS Client)</option>
                     <option value="1">Native Application</option>
@@ -178,7 +181,137 @@
 
 @section('scripts')
 <script type="application/javascript">
+
+    function loadClients(){
+        $.ajax(
+            {
+                type: "GET",
+                url: '{{ URL::action("ClientApiController@getByPage",array("user_id"=>$user_id,"page_nbr"=>1,"page_size"=>1000)) }}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                timeout:60000,
+                success: function (data,textStatus,jqXHR) {
+                    //load data...
+
+                    var clients = data.page;
+                    var template = $('<tbody><tr><td class="app-name"></td><td class="client-type"></td><td class="client-active"><input type="checkbox" class="app-active-checkbox"></td><td class="client-locked"><input type="checkbox" disabled="disabled" class="app-locked-checkbox"></td><td class="client-modified"></td><td class="client-actions">&nbsp;<a class="btn edit-client" title="Edits a Registered Application">Edit</a>&nbsp;<a class="btn del-client" title="Deletes a Registered Application">Delete</a></td></tr></tbody>');
+                    var directives = {
+                        'tr':{
+                            'client<-context':{
+                                'td.app-name':'client.app_name',
+                                'td.client-type':'client.client_type',
+                                'td.client-modified':'client.updated_at',
+                                '.app-active-checkbox@value':'client.id',
+                                '.app-active-checkbox@checked':function(arg){
+                                    var client_active = parseInt(arg.item.active);
+                                    return client_active===1?'true':'';
+                                },
+                                '.app-active-checkbox@id':function(arg){
+                                    var client_id = arg.item.id;
+                                    return 'app-active_'+client_id;
+                                },
+                                '.app-locked-checkbox@value':'client.id',
+                                '.app-locked-checkbox@id':function(arg){
+                                    var client_id = arg.item.id;
+                                    return 'app-locked_'+client_id;
+                                },
+                                '.app-locked-checkbox@checked':function(arg){
+                                    var client_locked = parseInt(arg.item.locked);
+                                    return client_locked===1?'true':'';
+                                },
+                                'a.edit-client@href':function(arg){
+                                    var client_id = arg.item.id;
+                                    var href = '{{ URL::action("UserController@getEditRegisteredClient",array("id"=>-1)) }}';
+                                    return href.replace('-1',client_id);
+                                },
+                                'a.del-client@href':function(arg){
+                                    var client_id = arg.item.id;
+                                    var href = '{{ URL::action("ClientApiController@delete",array("id"=>-1)) }}';
+                                    return href.replace('-1',client_id);
+                                }
+                            }
+                        }
+                    };
+                    var body = template.render(clients, directives);
+                    var table = $('<table id="tclients" class="table table-hover table-condensed"><thead><tr><th>Application Name</th><th>Type</th><th>Is Active</th><th>Is Locked</th><th>Modified</th><th>&nbsp;</th></tr></thead>'+body.html()+'</table>');
+                    $('#tclients','#clients').remove();
+                    $('#clients').append(table);
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    var HTTP_status = jqXHR.status;
+                    response = $.parseJSON(jqXHR.responseText);
+                    alert('server error');
+                }
+            }
+        );
+    }
+
     $(document).ready(function() {
+
+        var application_form = $('#form-register-new-app');
+
+        var application_validator = application_form.validate({
+                rules: {
+                    "app_name" : {required: true, nowhitespace:true,rangelength: [1, 255]},
+                    "app_desc" : {required: true, letterswithbasicpunc:true,rangelength: [1, 512]}
+                },
+                onfocusout: false,
+                invalidHandler: function(form, validator) {
+                    var errors = validator.numberOfInvalids();
+                    if (errors) {
+                        validator.errorList[0].element.focus();
+                    }
+                },
+                highlight: function(element) {
+                    $(element).parent().addClass("error");
+                },
+                unhighlight: function(element) {
+                    $(element).parent().removeClass("error");
+                }
+            });
+
+            $("#dialog-form-register-new-app").dialog({
+                autoOpen: false,
+                height: 500,
+                width: 455,
+                modal: true,
+                close: function( event, ui ) {
+                    application_form.cleanForm();
+                    application_validator.resetForm();
+                },
+                buttons: {
+                "Register": function() {
+
+                    var is_valid        = application_form.valid();
+                    if (!is_valid) return;
+                    var application     = application_form.serializeForm();
+                    application.active  = true;
+                    application.user_id = {{$user_id}};
+
+                    $(this).dialog( "close" );
+
+                    var link = $(this).attr('href');
+                    $.ajax({
+                        type: "POST",
+                        url: '{{URL::action("ClientApiController@create",null)}}',
+                        data: JSON.stringify(application),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        timeout:60000,
+                        success: function (data,textStatus,jqXHR) {
+                            loadClients();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            ajaxError(jqXHR, textStatus, errorThrown);
+                        }
+                    });
+                 },
+                 Cancel: function() {
+                    $( this ).dialog( "close" );
+                 }
+                }
+        });
 
         $("body").on('click',".add-client",function(event){
             var link = $(this).attr('href');
@@ -188,11 +321,33 @@
         });
 
         $("body").on('click',".del-client",function(event){
-            if(!confirm("Are you sure to delete this registered application?")){
-                event.preventDefault();
-                return false;
+            if(confirm("Are you sure to delete this registered application?")){
+                var url = $(this).attr('href');
+                $.ajax(
+                    {
+                        type: "DELETE",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        timeout:60000,
+                        success: function (data,textStatus,jqXHR) {
+                            loadClients();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            var HTTP_status = jqXHR.status;
+                            if(HTTP_status!=200){
+                                response = $.parseJSON(jqXHR.responseText);
+                                alert(response.error);
+                            }
+                            else{
+                                alert('server error');
+                            }
+                        }
+                    }
+                );
             }
-            return true;
+            event.preventDefault();
+            return false;
         });
 
 
@@ -200,12 +355,12 @@
 
             var client    = {};
             var client_id = $(this).attr('value');
-            var url       = '{{ URL::action("UserController@postActivateClient",array("id"=>-1)) }}'
+            var url       = '{{ URL::action("ClientApiController@updateStatus",array("id"=>-1)) }}'
             url           = url.replace('-1',client_id);
             client.active = $(this).is(':checked');
             $.ajax(
                 {
-                    type: "POST",
+                    type: "PUT",
                     url: url,
                     data: JSON.stringify(client),
                     contentType: "application/json; charset=utf-8",
@@ -215,102 +370,12 @@
                         //load data...
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        alert( "Request failed: " + textStatus );
+                        var HTTP_status = jqXHR.status;
+                        response = $.parseJSON(jqXHR.responseText);
+                        alert('server error');
                     }
                 }
             );
-        });
-
-
-        $("#dialog-form-register-new-app").dialog({
-            autoOpen: false,
-            height: 450,
-            width: 455,
-            modal: true,
-            buttons: {
-                "Register": function() {
-                    var app_name = $('#app-name','#dialog-form-register-new-app').val();
-                    var app_desc = $('#app-description','#dialog-form-register-new-app').val();
-                    var app_type = $('#app-type','#dialog-form-register-new-app').val();
-
-                    var application = {};
-                    application.app_name = app_name;
-                    application.app_desc = app_desc;
-                    application.app_type = app_type;
-
-                    var link = $(this).attr('href');
-                    $.ajax(
-                        {
-                            type: "POST",
-                            url: '{{URL::action("UserController@postAddRegisteredClient",null)}}',
-                            data: JSON.stringify(application),
-                            contentType: "application/json; charset=utf-8",
-                            dataType: "json",
-                            timeout:60000,
-                            success: function (data,textStatus,jqXHR) {
-                                //load data...
-                                if(data.status==='OK'){
-                                    var clients = data.clients;
-                                    var template = $('<tbody><tr><td class="app-name"></td><td class="client-type"></td><td class="client-active"><input type="checkbox" class="app-active-checkbox"></td><td class="client-locked"><input type="checkbox" disabled="disabled" class="app-locked-checkbox"></td><td class="client-modified"></td><td class="client-actions">&nbsp;<a class="btn edit-client" title="Edits a Registered Application">Edit</a>&nbsp;<a class="btn del-client" title="Deletes a Registered Application">Delete</a></td></tr></tbody>');
-                                    var directives = {
-                                        'tr':{
-                                            'client<-context':{
-                                                'td.app-name':'client.app_name',
-                                                'td.client-type':'client.client_type',
-                                                'td.client-modified':'client.updated_at',
-                                                '.app-active-checkbox@value':'client.id',
-                                                '.app-active-checkbox@checked':function(arg){
-                                                    var client_active = parseInt(arg.item.active);
-                                                    return client_active===1?'true':'';
-                                                },
-                                                '.app-active-checkbox@id':function(arg){
-                                                    var client_id = arg.item.id;
-                                                    return 'app-active_'+client_id;
-                                                },
-                                                '.app-locked-checkbox@value':'client.id',
-                                                '.app-locked-checkbox@id':function(arg){
-                                                    var client_id = arg.item.id;
-                                                    return 'app-locked_'+client_id;
-                                                },
-                                                '.app-locked-checkbox@checked':function(arg){
-                                                    var client_locked = parseInt(arg.item.locked);
-                                                    return client_locked===1?'true':'';
-                                                },
-                                                'a.edit-client@href':function(arg){
-                                                    var client_id = arg.item.id;
-                                                    var href = '{{ URL::action("UserController@getEditRegisteredClient",array("id"=>-1)) }}';
-                                                    return href.replace('-1',client_id);
-                                                },
-                                                'a.del-client@href':function(arg){
-                                                    var client_id = arg.item.id;
-                                                    var href = '{{ URL::action("UserController@getDeleteRegisteredClient",array("id"=>-1)) }}';
-                                                    return href.replace('-1',client_id);
-                                                }
-                                            }
-                                        }
-                                    };
-                                    var body = template.render(clients, directives);
-                                    var table = $('<table id="tclients" class="table table-hover table-condensed"><thead><tr><th>Application Name</th><th>Type</th><th>Is Active</th><th>Is Locked</th><th>Modified</th><th>&nbsp;</th></tr></thead>'+body.html()+'</table>');
-                                    $('#tclients','#clients').remove();
-                                    $('#clients').append(table);
-                                }
-                                else{
-                                    alert(data.msg);
-                                }
-                            },
-                            error: function (jqXHR, textStatus, errorThrown) {
-                                alert( "Request failed: " + textStatus );
-                            }
-                        }
-                    );
-
-                    $(this).dialog( "close" );
-                },
-                Cancel: function() {
-                    $( this ).dialog( "close" );
-                }
-            }
-
         });
 
     });

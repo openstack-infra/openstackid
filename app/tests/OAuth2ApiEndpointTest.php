@@ -1,11 +1,12 @@
 <?php
+
 use oauth2\OAuth2Protocol;
 
 /**
- * Class ApiEndpointTest
+ * Class OAuth2ApiEndpointTest
  * Test Suite for OAuth2 Protected Api Endpoints
  */
-class ApiEndpointTest extends TestCase {
+class OAuth2ApiEndpointTest extends TestCase {
 
     private $access_token;
     private $client_id;
@@ -61,7 +62,7 @@ class ApiEndpointTest extends TestCase {
         $api_endpoint = ApiEndpoint::where('name','=','get-api')->first();
         $this->assertTrue(!is_null($api_endpoint));
 
-        $response = $this->action("GET", "ApiEndpointController@get",
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@get",
             $parameters = array('id' =>$api_endpoint->id),
             array(),
             array(),
@@ -79,7 +80,7 @@ class ApiEndpointTest extends TestCase {
      * @covers get api endpoint by list (paginated)
      */
     public function testGetByPage(){
-        $response = $this->action("GET", "ApiEndpointController@getByPage",
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@getByPage",
             $parameters = array('page_nbr' => 1,'page_size'=>10),
             array(),
             array(),
@@ -105,7 +106,7 @@ class ApiEndpointTest extends TestCase {
             'api_id'             => $api->id
         );
 
-        $response = $this->action("POST", "ApiEndpointController@create",
+        $response = $this->action("POST", "OAuth2ProtectedApiEndpointController@create",
             $data,
             array(),
             array(),
@@ -132,7 +133,7 @@ class ApiEndpointTest extends TestCase {
             'api_id'             => $api->id
         );
 
-        $response = $this->action("POST", "ApiEndpointController@create",
+        $response = $this->action("POST", "OAuth2ProtectedApiEndpointController@create",
             $data,
             array(),
             array(),
@@ -151,7 +152,7 @@ class ApiEndpointTest extends TestCase {
             'name'               => 'test-api-endpoint-update',
         );
 
-        $response = $this->action("PUT", "ApiEndpointController@update",$parameters = $data_updated, array(),
+        $response = $this->action("PUT", "OAuth2ProtectedApiEndpointController@update",$parameters = $data_updated, array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
 
@@ -177,7 +178,7 @@ class ApiEndpointTest extends TestCase {
             'api_id'             => $api->id
         );
 
-        $response = $this->action("POST", "ApiEndpointController@create",
+        $response = $this->action("POST", "OAuth2ProtectedApiEndpointController@create",
             $data,
             array(),
             array(),
@@ -192,7 +193,7 @@ class ApiEndpointTest extends TestCase {
         $new_id = $json_response->api_endpoint_id;
         //update status
 
-        $response = $this->action("GET", "ApiEndpointController@updateStatus",array(
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@updateStatus",array(
                 'id'     => $new_id,
                 'active' => 'false'), array(),
             array(),
@@ -205,7 +206,7 @@ class ApiEndpointTest extends TestCase {
         $this->assertTrue($json_response==='ok');
         $this->assertResponseStatus(200);
 
-        $response = $this->action("GET", "ApiEndpointController@get",$parameters = array('id' => $new_id), array(),
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@get",$parameters = array('id' => $new_id), array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
 
@@ -224,7 +225,7 @@ class ApiEndpointTest extends TestCase {
 
         $id = $api_endpoint->id;
 
-        $response = $this->action("DELETE", "ApiEndpointController@delete",$parameters = array('id' => $id),
+        $response = $this->action("DELETE", "OAuth2ProtectedApiEndpointController@delete",$parameters = array('id' => $id),
             array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
@@ -237,7 +238,7 @@ class ApiEndpointTest extends TestCase {
 
         $this->assertResponseStatus(200);
 
-        $response = $this->action("GET", "ApiEndpointController@get",
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@get",
             $parameters = array('id' => $id),
             array(),
             array(),
@@ -257,7 +258,7 @@ class ApiEndpointTest extends TestCase {
         $scope        = ApiScope::where('name','=',sprintf('%s/api-endpoint/read',$this->current_realm))->first();
         $this->assertTrue(!is_null($scope));
 
-        $response = $this->action("GET", "ApiEndpointController@addRequiredScope",array(
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@addRequiredScope",array(
                 'id'       => $api_endpoint->id,
                 'scope_id' => $scope->id), array(),
             array(),
@@ -267,7 +268,7 @@ class ApiEndpointTest extends TestCase {
         $content = $response->getContent();
         $this->assertTrue(json_decode($content)==='ok');
 
-        $response = $this->action("GET", "ApiEndpointController@get",
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@get",
             $parameters = array('id' =>$api_endpoint->id),
             array(),
             array(),
@@ -286,7 +287,7 @@ class ApiEndpointTest extends TestCase {
         $scope        = ApiScope::where('name','=',sprintf('%s/api-endpoint/update',$this->current_realm))->first();
         $this->assertTrue(!is_null($scope));
 
-        $response = $this->action("GET", "ApiEndpointController@removeRequiredScope",array(
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@removeRequiredScope",array(
                 'id'       => $api_endpoint->id,
                 'scope_id' => $scope->id), array(),
             array(),
@@ -297,7 +298,7 @@ class ApiEndpointTest extends TestCase {
         $response = json_decode($content);
         $this->assertTrue($response==='ok');
 
-        $response = $this->action("GET", "ApiEndpointController@get",
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@get",
             $parameters = array('id' =>$api_endpoint->id),
             array(),
             array(),
@@ -316,16 +317,16 @@ class ApiEndpointTest extends TestCase {
         $scope        = ApiScope::where('name','=',sprintf('%s/api-endpoint/read',$this->current_realm))->first();
         $this->assertTrue(!is_null($scope));
 
-        $response = $this->action("GET", "ApiEndpointController@removeRequiredScope",array(
+        $response = $this->action("GET", "OAuth2ProtectedApiEndpointController@removeRequiredScope",array(
                 'id'       => $api_endpoint->id,
                 'scope_id' => $scope->id), array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
 
-        $this->assertResponseStatus(500);
+        $this->assertResponseStatus(400);
         $content = $response->getContent();
         $response = json_decode($content);
-        $this->assertTrue(isset($response->error) && $response->error==='server error');
+        $this->assertTrue(isset($response->error));
     }
 
 } 

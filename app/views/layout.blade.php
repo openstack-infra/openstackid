@@ -22,12 +22,17 @@
         </div>
         <footer class="row"></footer>
     </div>
+
     {{ HTML::script('js/jquery-2.0.3.min.js')}}
     {{ HTML::script('js/bootstrap.min.js')}}
     {{ HTML::script('js/pure.min.js')}}
     {{ HTML::script('js/jquery-ui-1.10.3.custom.min.js')}}
     {{ HTML::script('js/jquery.validate.min.js')}}
     {{ HTML::script('js/additional-methods.min.js')}}
+    {{ HTML::script('js/jquery.validate.additional.custom.methods.js')}}
+    {{ HTML::script('js/ajax.utils.js')}}
+    {{ HTML::script('js/jquery.cleanform.js')}}
+    {{ HTML::script('js/jquery.serialize.js')}}
     @yield('scripts')
 </body>
 </html>

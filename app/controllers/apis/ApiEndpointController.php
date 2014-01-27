@@ -76,7 +76,7 @@ class ApiEndpointController extends OAuth2ProtectedController implements IRESTCo
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error' => $messages));
+                return $this->error400(array('error'=>'validation','messages' => $messages));
             }
 
             $new_api_endpoint_model = $this->api_endpoint_service->add(
@@ -125,17 +125,16 @@ class ApiEndpointController extends OAuth2ProtectedController implements IRESTCo
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error' => $messages));
+                return $this->error400(array('error'=>'validation','messages' => $messages));
             }
 
             $res = $this->api_endpoint_service->update(intval($values['id']),$values);
 
             return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
-
         }
         catch(InvalidApiEndpoint $ex1){
             $this->log_service->error($ex1);
-            return $this->error404(array('error'=>'api endpoint does not exist!.'));
+            return $this->error404(array('error'=>$ex1->getMessage()));
         }
         catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -145,7 +144,6 @@ class ApiEndpointController extends OAuth2ProtectedController implements IRESTCo
 
     public function updateStatus($id, $active){
         try {
-            $active = is_string($active)?( strtoupper(trim($active))==='TRUE'?true:false ):$active;
             $res    = $this->api_endpoint_service->setStatus($id,$active);
             return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
         } catch (Exception $ex) {
@@ -158,7 +156,16 @@ class ApiEndpointController extends OAuth2ProtectedController implements IRESTCo
         try {
             $res = $this->api_endpoint_service->addRequiredScope($id,$scope_id);
             return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
-        } catch (Exception $ex) {
+        }
+        catch (InvalidApiEndpoint $ex1) {
+            $this->log_service->error($ex1);
+            return $this->error400(array('error'=>$ex1->getMessage()));
+        }
+        catch (InvalidApiScope $ex2) {
+            $this->log_service->error($ex2);
+            return $this->error400(array('error'=>$ex2->getMessage()));
+        }
+        catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
         }
@@ -168,7 +175,16 @@ class ApiEndpointController extends OAuth2ProtectedController implements IRESTCo
         try {
             $res = $this->api_endpoint_service->removeRequiredScope($id,$scope_id);
             return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
-        } catch (Exception $ex) {
+        }
+        catch (InvalidApiEndpoint $ex1) {
+            $this->log_service->error($ex1);
+            return $this->error400(array('error'=>$ex1->getMessage()));
+        }
+        catch (InvalidApiScope $ex2) {
+            $this->log_service->error($ex2);
+            return $this->error400(array('error'=>$ex2->getMessage()));
+        }
+        catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
         }

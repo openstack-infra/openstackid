@@ -30,13 +30,9 @@ $app = new Illuminate\Foundation\Application;
  * These values are easily spoofable and allow attackers to modify the environment for a request.
  * You should convert your environment detection to use machine host names (hostname command on Mac & Ubuntu).
  */
-$env = $app->detectEnvironment(array(
 
-    'local'      => array(),
-	'dev'        => array(),
-    'staging'    => array(),
-    'production' => array(),
-));
+require __DIR__.'/environment.php';
+
 
 /*
 |--------------------------------------------------------------------------

@@ -85,3 +85,19 @@ select, input[type="text"]{
 .email-row{
     margin-top: 5px;
 }
+
+label.error{
+    border: 1px solid #aaa;
+    background: #aa2222;
+    color: #fff;
+    padding: 5px;
+    margin: 0;
+    width: 100%;
+    float:left;
+    -webkit-border-radius: 05px;
+    -moz-border-radius: 05px;
+    border-radius: 05px;
+}
+input.error{
+    border: 1px solid  #aa2222;
+}
