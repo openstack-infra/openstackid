@@ -200,7 +200,7 @@
 
             var client    = {};
             var client_id = $(this).attr('value');
-            var url       = '{{ URL::action("UserController@postActivateClient",array("id"=>-1)) }}'
+            var url       = '{{ URL::action("ClientApiController@updateStatust",array("id"=>-1)) }}'
             url           = url.replace('-1',client_id);
             client.active = $(this).is(':checked');
             $.ajax(
