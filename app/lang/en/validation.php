@@ -99,5 +99,6 @@ return array(
     'text'       => "The :attribute may only contain text.",
     'httpmethod' => "The :attribute must be one of the following values 'GET', 'HEAD','POST','PUT','DELETE','TRACE','CONNECT' OR 'OPTIONS'.",
     'route'      => "The :attribute may be a valid http route.",
-    'host'      => "The :attribute may be a valid host name.",
+    'host'       => "The :attribute may be a valid host name.",
+    'scopename'  => "The :attribute may be a valid scope name.",
 );

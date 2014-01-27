@@ -245,12 +245,6 @@ class UserController extends BaseController
         ));
     }
 
-    public function get_deleteTrustedSite($id)
-    {
-        $this->trusted_sites_service->delTrustedSite($id);
-        return Redirect::action("UserController@getProfile");
-    }
-
     public function postUserProfileOptions()
     {
         $show_full_name = Input::get("show_full_name");
@@ -258,6 +252,12 @@ class UserController extends BaseController
         $show_pic = Input::get("show_pic");
         $user = $this->auth_service->getCurrentUser();
         $this->user_service->saveProfileInfo($user->getId(), $show_pic, $show_full_name, $show_email);
+        return Redirect::action("UserController@getProfile");
+    }
+
+    public function get_deleteTrustedSite($id)
+    {
+        $this->trusted_sites_service->delTrustedSite($id);
         return Redirect::action("UserController@getProfile");
     }
 
@@ -438,8 +438,6 @@ class UserController extends BaseController
     {
         try {
             $input = Input::All();
-
-
             // Build the validation constraint set.
             $rules = array(
                 'scope_id' => 'required',

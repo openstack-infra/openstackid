@@ -60,6 +60,16 @@ Route::filter('auth', function () {
 });
 
 
+Route::filter('auth.server.admin.json',function(){
+    if (Auth::guest()) {
+        return Response::json(array('error' => 'you are not allowed to perform this operation'));
+    }
+    if(Auth::user()->IsServerAdmin()){
+        return Response::json(array('error' => 'you are not allowed to perform this operation'));
+    }
+});
+
+
 Route::filter('auth.basic', function () {
     return Auth::basic();
 });
@@ -166,7 +176,7 @@ Route::filter('user.owns.client.policy',function($route, $request, $protocol ='h
     } catch (Exception $ex) {
         Log::error($ex);
         if($protocol==='json')
-            return Response::json(array('status' => 'ERROR'));
+            return Response::json(array('error' => 'you are not allowed to perform this operation'));
         else
             return View::make('404');
     }

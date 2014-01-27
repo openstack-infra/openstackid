@@ -2,6 +2,10 @@
 use Illuminate\Validation\Validator;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * Class CustomValidator
+ * Custom validation methods
+ */
 class CustomValidator extends Validator {
 
     protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredIf', 'Accepted', 'RequiredWithoutField');
@@ -42,6 +46,11 @@ class CustomValidator extends Validator {
 
     public function validateRoute($attribute, $value, $parameters){
         return true;
+    }
+
+    public function validateScopename($attribute, $value, $parameters){
+        $value = trim($value);
+        return preg_match("/^[a-zA-Z0-9\-\.\,\:\_\/]+$/", $value) == 1;
     }
 
     public function validateHost($attribute, $value, $parameters){
