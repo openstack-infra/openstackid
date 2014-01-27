@@ -60,6 +60,16 @@ Route::filter('auth', function () {
 });
 
 
+Route::filter('auth.server.admin.json',function(){
+    if (Auth::guest()) {
+        return Response::json(array('error' => 'you are not allowed to perform this operation'));
+    }
+    if(Auth::user()->IsServerAdmin()){
+        return Response::json(array('error' => 'you are not allowed to perform this operation'));
+    }
+});
+
+
 Route::filter('auth.basic', function () {
     return Auth::basic();
 });
@@ -152,9 +162,8 @@ Route::filter("ssl", function () {
     }
 });
 
-Route::filter('user.owns.client.policy',function($route, $request, $protocol ='http'){
+Route::filter('user.owns.client.policy',function($route, $request){
     try{
-
         $authentication_service = App::make(UtilsServiceCatalog::AuthenticationService);
         $client_service         = App::make(OAuth2ServiceCatalog::ClientService);
         $client_id              = $route->getParameter('id');
@@ -165,12 +174,12 @@ Route::filter('user.owns.client.policy',function($route, $request, $protocol ='h
 
     } catch (Exception $ex) {
         Log::error($ex);
-        if($protocol==='json')
-            return Response::json(array('status' => 'ERROR'));
-        else
-            return View::make('404');
+        return Response::json(array('error' => 'operation not allowed.'), 400);
     }
 });
+
+
+
 
 // filter to protect an api endpoint with oauth2
 Route::filter('oauth2.protected.endpoint','OAuth2BearerAccessTokenRequestValidator');

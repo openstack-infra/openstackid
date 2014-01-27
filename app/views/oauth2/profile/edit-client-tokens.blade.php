@@ -26,7 +26,7 @@
                 <td>{{ $access_token->created_at }}</td>
                 <td>{{ $access_token->getFriendlyScopes() }}</td>
                 <td>{{ $access_token->getRemainingLifetime() }}</td>
-                <td>{{ HTML::link(URL::action("UserController@getRevokeToken",array("value"=>$access_token->value,'hint'=>'access-token')),'Revoke',array('class'=>'btn revoke-token revoke-access-token','title'=>'Revoke Access Token','data-value'=>$access_token->value,'data-hint'=>'access-token')) }}</td>
+                <td>{{ HTML::link(URL::action("ClientApiController@revokeToken",array("id"=>$client->id,"value"=>$access_token->value,'hint'=>'access-token')),'Revoke',array('class'=>'btn revoke-token revoke-access-token','title'=>'Revoke Access Token','data-value'=>$access_token->value,'data-hint'=>'access-token')) }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -61,7 +61,7 @@
             @else
                 <td>{{ $refresh_token->getRemainingLifetime() }}</td>
             @endif
-            <td>{{ HTML::link(URL::action("UserController@getRevokeToken",array("value"=>$refresh_token->value,'hint'=>'refresh-token')),'Revoke',array('class'=>'btn revoke-token revoke-refresh-token','title'=>'Revoke Refresh Token','data-value'=>$refresh_token->value,'data-hint'=>'refresh-token')) }}</td>
+            <td>{{ HTML::link(URL::action("ClientApiController@revokeToken",array("id"=>$client->id,"value"=>$refresh_token->value,'hint'=>'refresh-token')),'Revoke',array('class'=>'btn revoke-token revoke-refresh-token','title'=>'Revoke Refresh Token','data-value'=>$refresh_token->value,'data-hint'=>'refresh-token')) }}</td>
         </tr>
         @endforeach
         </tbody>
@@ -77,12 +77,12 @@
         $.ajax(
             {
                 type: "GET",
-                url:'{{ URL::action("UserController@getAccessTokens",array("client_id"=>$client->client_id))}}' ,
+                url:'{{ URL::action("ClientApiController@getAccessTokens",array("id"=>$client->id))}}' ,
                 dataType: "json",
                 timeout:60000,
                 success: function (data,textStatus,jqXHR) {
                     //load data...
-                    if(data.status==='OK'){
+
                         if(data.access_tokens.length===0){
                             $('#table-access-tokens').hide();
                             $('#info-access-tokens').show();
@@ -100,7 +100,7 @@
                                         'td.lifetime':'token.lifetime',
                                         'a@href':function(arg){
                                             var token_value = arg.item.value;
-                                            var href = '{{ URL::action("UserController@getRevokeToken",array("value"=>-1,"hint"=>"access-token")) }}';
+                                            var href = '{{ URL::action("ClientApiController@revokeToken",array("id"=>$client->id,"value"=>-1,"hint"=>"access-token")) }}';
                                             return href.replace('-1',token_value);
                                         },
                                         'a@data-value' :'token.value'
@@ -110,10 +110,6 @@
                             var html = template.render(data.access_tokens, directives);
                             $('#body-access-tokens').html(html.html());
                         }
-                    }
-                    else{
-                        alert('There was an error!');
-                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     alert( "Request failed: " + textStatus );
@@ -126,12 +122,12 @@
         $.ajax(
             {
                 type: "GET",
-                url:'{{ URL::action("UserController@getRefreshTokens",array("client_id"=>$client->client_id))}}' ,
+                url:'{{ URL::action("ClientApiController@getRefreshTokens",array("id"=>$client->id))}}' ,
                 dataType: "json",
                 timeout:60000,
                 success: function (data,textStatus,jqXHR) {
                     //load data...
-                    if(data.status==='OK'){
+
                         if(data.refresh_tokens.length===0){
                             $('#table-refresh-tokens').hide();
                             $('#info-refresh-tokens').show();
@@ -152,7 +148,7 @@
                                         },
                                         'a@href':function(arg){
                                             var token_value = arg.item.value;
-                                            var href = '{{ URL::action("UserController@getRevokeToken",array("value"=>-1,"hint"=>"refresh-token")) }}';
+                                            var href = '{{ URL::action("ClientApiController@revokeToken",array("id"=>$client->id,"value"=>-1,"hint"=>"refresh-token")) }}';
                                             return href.replace('-1',token_value);
                                         },
                                         'a@data-value' :'token.value'
@@ -163,10 +159,6 @@
                             $('#body-refresh-tokens').html(html.html());
                             updateAccessTokenList();
                         }
-                    }
-                    else{
-                        alert('There was an error!');
-                    }
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     alert( "Request failed: " + textStatus );

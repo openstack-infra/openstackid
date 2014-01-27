@@ -5,11 +5,11 @@ namespace utils\services;
 
 interface IAuthService
 {
-    const AuthorizationResponse_None = "None";
-    const AuthorizationResponse_AllowOnce = "AllowOnce";
+    const AuthorizationResponse_None         = "None";
+    const AuthorizationResponse_AllowOnce    = "AllowOnce";
     const AuthorizationResponse_AllowForever = "AllowForever";
-    const AuthorizationResponse_DenyForever = "DenyForever";
-    const AuthorizationResponse_DenyOnce = "DenyOnce";
+    const AuthorizationResponse_DenyForever  = "DenyForever";
+    const AuthorizationResponse_DenyOnce     = "DenyOnce";
 
     /**
      * @return bool
@@ -26,6 +26,8 @@ interface IAuthService
     public function login($username, $password, $remember_me);
 
     public function getUserByUsername($username);
+
+    public function getUserById($id);
 
     public function getUserAuthorizationResponse();
 
