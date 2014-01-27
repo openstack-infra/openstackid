@@ -25,7 +25,7 @@ class ResourceServerService implements IResourceServerService {
      * @param int $page_nbr
      * @return mixed
      */
-    public function getAll($page_size = 10, $page_nbr = 1)
+    public function getAll($page_nbr=1,$page_size=10)
     {
         DB::getPaginator()->setCurrentPage($page_nbr);
         return ResourceServer::paginate($page_size);
@@ -39,17 +39,29 @@ class ResourceServerService implements IResourceServerService {
      */
     public function update($id, array $params){
 
-        $resource_server = ResourceServer::find($id);
-        if(is_null($resource_server))
-            throw new InvalidResourceServer(sprintf('resource server id %s does not exists!',$id));
+        $res = false;
+        DB::transaction(function () use ($id,$params,&$res) {
+            $resource_server = ResourceServer::find($id);
+            if(is_null($resource_server))
+                throw new InvalidResourceServer(sprintf('resource server id %s does not exists!',$id));
+            $allowed_update_params = array('host','ip','active','friendly_name');
+            foreach($allowed_update_params as $param){
+                if(array_key_exists($param,$params)){
 
-        $allowed_update_params = array('host','ip','active','friendly_name');
-        foreach($allowed_update_params as $param){
-            if(array_key_exists($param,$params)){
-                $resource_server->{$param} = $params[$param];
+                    if($param =='host'){
+                        if(ResourceServer::where('host','=',$params[$param])->where('id','<>',$id)->count()>0)
+                            throw new InvalidResourceServer(sprintf('there is already another resource server with that hostname (%s).',$params[$param]));
+                    }
+                    if($param =='friendly_name'){
+                        if(ResourceServer::where('friendly_name','=',$params[$param])->where('id','<>',$id)->count()>0)
+                            throw new InvalidResourceServer(sprintf('there is already another resource server with that friendly name (%s).',$params[$param]));
+                    }
+                    $resource_server->{$param} = $params[$param];
+                }
             }
-        }
-        return $this->save($resource_server);
+            $res = $this->save($resource_server);
+        });
+        return $res;
     }
 
     /**
@@ -61,18 +73,18 @@ class ResourceServerService implements IResourceServerService {
         if(!$resource_server->exists() || count($resource_server->getDirty())>0){
             return $resource_server->Save();
         }
-        return false;
+        return true;
     }
 
     /**
      * sets resource server status (active/deactivated)
-     * @param $resource_server_id id of resource server
+     * @param $id id of resource server
      * @param bool $status status (active/non active)
      * @return bool
      */
-    public function setStatus($resource_server_id, $status)
+    public function setStatus($id, $status)
     {
-        return ResourceServer::find($resource_server_id)->update(array('active'=>$status));
+        return ResourceServer::find($id)->update(array('active'=>$status));
     }
 
     /**
@@ -80,11 +92,11 @@ class ResourceServerService implements IResourceServerService {
      * @param $resource_server_id id of resource server
      * @return bool
      */
-    public function delete($resource_server_id)
+    public function delete($id)
     {
         $res = false;
-        DB::transaction(function () use ($resource_server_id,&$res) {
-            $resource_server = ResourceServer::find($resource_server_id);
+        DB::transaction(function () use ($id,&$res) {
+            $resource_server = ResourceServer::find($id);
             if(!is_null($resource_server)){
                 $client = $resource_server->client()->first();
                 if(!is_null($client)){
@@ -99,12 +111,12 @@ class ResourceServerService implements IResourceServerService {
 
     /**
      * get a resource server by id
-     * @param $resource_server_id id of resource server
+     * @param $id id of resource server
      * @return IResourceServer
      */
-    public function get($resource_server_id)
+    public function get($id)
     {
-        return ResourceServer::find($resource_server_id);
+        return ResourceServer::find($id);
     }
 
     /** Creates a new resource server instance
@@ -114,13 +126,20 @@ class ResourceServerService implements IResourceServerService {
      * @param bool $active
      * @return IResourceServer
      */
-    public function addResourceServer($host, $ip, $friendly_name, $active)
+    public function add($host, $ip, $friendly_name, $active)
     {
         $instance = null;
         if(is_string($active)){
             $active = $active==='true'?true:false;
         }
         DB::transaction(function () use ($host, $ip, $friendly_name, $active, &$instance) {
+
+            if(ResourceServer::where('host','=',$host)->count()>0)
+                throw new InvalidResourceServer(sprintf('there is already another resource server with that hostname (%s).',$host));
+
+            if(ResourceServer::where('friendly_name','=',$friendly_name)->count()>0)
+                throw new InvalidResourceServer(sprintf('there is already another resource server with that friendly name (%s).',$friendly_name));
+
             $instance = new ResourceServer(
                 array(
                     'host'          => $host,
@@ -141,13 +160,13 @@ class ResourceServerService implements IResourceServerService {
     }
 
     /**
-     * @param $resource_server_id
+     * @param $id
      * @return bool
      */
-    public function regenerateResourceServerClientSecret($resource_server_id){
+    public function regenerateClientSecret($id){
         $res = null;
-        DB::transaction(function () use ($resource_server_id,&$res) {
-            $resource_server = ResourceServer::find($resource_server_id);
+        DB::transaction(function () use ($id,&$res) {
+            $resource_server = ResourceServer::find($id);
             if(!is_null($resource_server)){
                 $client = $resource_server->client()->first();
                 if(!is_null($client)){

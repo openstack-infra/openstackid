@@ -38,11 +38,12 @@ class ApiEndpointService implements IApiEndpointService {
     /**
      * @param int $page_size
      * @param int $page_nbr
+     * @param array $filters
      * @return mixed
      */
-    public function getAll($page_size=10,$page_nbr=1){
+    public function getAll($page_nbr=1,$page_size=10,array $filters){
         DB::getPaginator()->setCurrentPage($page_nbr);
-        return ApiEndpoint::paginate($page_size);
+        return ApiEndpoint::Filter($filters)->paginate($page_size);
     }
 
     /**
@@ -61,9 +62,8 @@ class ApiEndpointService implements IApiEndpointService {
 
         DB::transaction(function () use ($name, $description, $active, $route, $http_method, $api_id, &$instance) {
 
-            $old_endpoint_api = ApiEndpoint::where('http_method','=',$http_method)->where('route','=',$route)->first();
-
-            if(!is_null($old_endpoint_api))
+            //check that does not exists an endpoint with same http method and same route
+            if(ApiEndpoint::where('http_method','=',$http_method)->where('route','=',$route)->count()>0)
                 throw new InvalidApiEndpoint(sprintf('there is already an endpoint api with route %s and http method %s',$route,$http_method));
 
             $instance = new ApiEndpoint(
@@ -89,16 +89,24 @@ class ApiEndpointService implements IApiEndpointService {
      */
     public function update($id, array $params){
 
-        $endpoint = ApiEndpoint::find($id);
-        if(is_null($endpoint))
-            throw new InvalidApiEndpoint(sprintf('api endpoint id %s does not exists!',$id));
-        $allowed_update_params = array('name','description','active','route','http_method');
-        foreach($allowed_update_params as $param){
-            if(array_key_exists($param,$params)){
-                $endpoint->{$param} = $params[$param];
+        $res = false;
+        DB::transaction(function () use ($id,$params, &$res){
+            $endpoint = ApiEndpoint::find($id);
+            if(is_null($endpoint))
+                throw new InvalidApiEndpoint(sprintf('api endpoint id %s does not exists!',$id));
+
+            $allowed_update_params = array('name','description','active','route','http_method');
+            foreach($allowed_update_params as $param){
+                if(array_key_exists($param,$params)){
+                    $endpoint->{$param} = $params[$param];
+                }
             }
-        }
-        return $this->save($endpoint);
+            //check that does not exists an endpoint with same http method and same route
+            if(ApiEndpoint::where('http_method','=',$endpoint->http_method)->where('route','=',$endpoint->route)->where('id','<>',$endpoint->id)->count()>0)
+                throw new InvalidApiEndpoint(sprintf('there is already an endpoint api with route %s and http method %s',$endpoint->route,$endpoint->http_method));
+            $res = $this->save($endpoint);
+        });
+        return $res;
     }
 
     /**
@@ -203,7 +211,7 @@ class ApiEndpointService implements IApiEndpointService {
         if(!$api_endpoint->exists() || count($api_endpoint->getDirty())>0){
             return $api_endpoint->Save();
         }
-        return false;
+        return true;
     }
 
     /**

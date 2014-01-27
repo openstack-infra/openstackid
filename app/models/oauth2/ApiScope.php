@@ -2,7 +2,9 @@
 
 use  oauth2\models\IApiScope;
 
-class ApiScope extends Eloquent implements IApiScope {
+class ApiScope extends BaseModelEloquent implements IApiScope {
+
+    protected $fillable = array('name' ,'short_description', 'description','active','default','system', 'api_id');
 
     protected $table = 'oauth2_api_scope';
 
@@ -46,6 +48,6 @@ class ApiScope extends Eloquent implements IApiScope {
 
     public function getApiLogo(){
         $api = $this->api()->first();
-        return !is_null($api)? $api->logo:asset('img/apis/server.png');
+        return !is_null($api)? $api->getLogo():asset('img/apis/server.png');
     }
 }

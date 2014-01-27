@@ -55,10 +55,11 @@ interface IApiService {
     public function setStatus($id,$active);
 
     /**
-     * @param int $page_size
      * @param int $page_nbr
+     * @param int $page_size
+     * @param array $filters
      * @return mixed
      */
-    public function getAll($page_size=10,$page_nbr=1);
+    public function getAll($page_nbr=1,$page_size=10,array $filters);
 
 } 

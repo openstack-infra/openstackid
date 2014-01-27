@@ -2,10 +2,11 @@
 
 use oauth2\models\IApiEndpoint;
 
-class ApiEndpoint extends Eloquent implements IApiEndpoint{
+class ApiEndpoint extends BaseModelEloquent implements IApiEndpoint{
 
     protected $table = 'oauth2_api_endpoint';
 
+    protected $fillable = array('active' , 'description','active','name','route', 'http_method', 'api_id');
 
     public function api()
     {

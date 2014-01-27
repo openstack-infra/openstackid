@@ -2,7 +2,9 @@
 
 use oauth2\models\IApi;
 
-class Api  extends Eloquent implements IApi {
+class Api extends BaseModelEloquent implements IApi {
+
+    protected $fillable = array('name','description','active','resource_server_id','logo');
 
     protected $table = 'oauth2_api';
 
@@ -36,7 +38,8 @@ class Api  extends Eloquent implements IApi {
 
     public function getLogo()
     {
-        return $this->logo;
+        $url     = asset('img/apis/server.png');
+        return !empty($this->logo)?$this->logo:$url;
     }
 
 
@@ -66,8 +69,6 @@ class Api  extends Eloquent implements IApi {
     {
         $this->name = $name;
     }
-
-
 
     public function setDescription($description)
     {

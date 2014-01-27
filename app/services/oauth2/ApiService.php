@@ -61,6 +61,11 @@ class ApiService implements  IApiService {
         }
 
         DB::transaction(function () use ($name, $description, $active, $resource_server_id, &$instance) {
+
+            $count = Api::where('name','=',$name)->count();
+            if($count>0)
+                throw new InvalidApi(sprintf('api name %s already exists!',$name));
+
             $instance = new Api(
                 array(
                     'name'               => $name,
@@ -78,21 +83,33 @@ class ApiService implements  IApiService {
     /**
      * @param $id
      * @param array $params
-     * @throws \oauth2\exceptions\InvalidApi
+     * @return bool
      */
     public function update($id, array $params){
 
-        $api = Api::find($id);
-        if(is_null($api))
-            throw new InvalidApi(sprintf('api id %s does not exists!',$id));
+        $res = false;
 
-        $allowed_update_params = array('name','description','active');
-        foreach($allowed_update_params as $param){
-            if(array_key_exists($param,$params)){
-                $api->{$param} = $params[$param];
+        DB::transaction(function () use ($id,$params, &$res) {
+
+            $api = Api::find($id);
+            if(is_null($api))
+                throw new InvalidApi(sprintf('api id %s does not exists!',$id));
+
+            $allowed_update_params = array('name','description','active');
+            foreach($allowed_update_params as $param){
+                if(array_key_exists($param,$params)){
+
+                    if($param=='name'){
+                        if(Api::where('name','=',$params[$param])->where('id','<>',$id)->count()>0)
+                            throw new InvalidApi(sprintf('api name %s already exists!',$params[$param]));
+                    }
+
+                    $api->{$param} = $params[$param];
+                }
             }
-        }
-        return $this->save($api);
+            $res = $this->save($api);
+        });
+        return $res;
     }
 
     /**
@@ -104,7 +121,7 @@ class ApiService implements  IApiService {
         if(!$api->exists() || count($api->getDirty())>0){
             return $api->Save();
         }
-        return false;
+        return true;
     }
 
     /**
@@ -115,17 +132,19 @@ class ApiService implements  IApiService {
     public function setStatus($id, $active)
     {
         $api = Api::find($id);
-        if(is_null($api)) return false;
+        if(is_null($api))
+            throw new InvalidApi(sprintf("api id %s does not exists!",$id));
         return $api->update(array('active'=>$active));
     }
 
     /**
-     * @param int $page_size
      * @param int $page_nbr
+     * @param int $page_size
+     * @param array $filters
      * @return mixed
      */
-    public function getAll($page_size=10,$page_nbr=1){
+    public function getAll($page_nbr=1,$page_size=10,array $filters){
         DB::getPaginator()->setCurrentPage($page_nbr);
-        return Api::paginate($page_size);
+        return Api::Filter($filters)->paginate($page_size);
     }
 }

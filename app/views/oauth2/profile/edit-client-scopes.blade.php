@@ -15,9 +15,9 @@
                 <?php $last_api = $current_api;?>
                 {{-- draw api header --}}
                 <li>
-                @if(!empty($current_api_logo))
+
                 <img width="24" height="24" src="{{$current_api_logo}}" alt="api logo"/>
-                @endif
+
                 <span>{{trim($current_api)}}</span>&nbsp;<i class="icon-info-sign accordion-toggle" title="{{$scope->getApiDescription()}}"></i>
                 <ul class="unstyled list-inline" style="margin-left: 2em">
             @endif
@@ -51,7 +51,7 @@
             $.ajax(
                 {
                     type: "POST",
-                    url: '{{URL::action("UserController@postAddAllowedScope",array("id"=>$client->id))}}',
+                    url: '{{URL::action("ClientApiController@addAllowedScope",array("id"=>$client->id))}}',
                     data: JSON.stringify(scope),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
@@ -60,7 +60,7 @@
                         //load data...
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        alert( "Request failed: " + textStatus );
+                        ajaxError(jqXHR, textStatus, errorThrown);
                     }
                 }
             );

@@ -10,8 +10,11 @@ use oauth2\exceptions\AllowedClientUriAlreadyExistsException;
 use oauth2\exceptions\InvalidClientException;
 use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
+use oauth2\services\IApiScopeService;
 
+use oauth2\services\IApiScope;
 use oauth2\services\IClientService;
+use oauth2\services\id;
 use oauth2\services\OAuth2ServiceCatalog;
 use Request;
 use utils\services\IAuthService;
@@ -24,13 +27,13 @@ use Zend\Math\Rand;
  */
 class ClientService implements IClientService
 {
-
-
     private $auth_service;
+    private $scope_service;
 
-    public function __construct(IAuthService $auth_service)
+    public function __construct(IAuthService $auth_service, IApiScopeService $scope_service)
     {
-        $this->auth_service = $auth_service;
+        $this->auth_service  = $auth_service;
+        $this->scope_service = $scope_service;
     }
 
     /**
@@ -84,11 +87,19 @@ class ClientService implements IClientService
             if ($client_type == IClient::ClientType_Confidential)
                 $instance->client_secret = Rand::getString(24, OAuth2Protocol::VsChar, true);
             $instance->client_type = $client_type;
-            $instance->user_id = $user_id;
-            $instance->active = true;
+            $instance->user_id  = $user_id;
+            $instance->active   = true;
             $instance->Save();
             //default allowed url
             $this->addClientAllowedUri($instance->getId(), 'https://localhost');
+
+            //add default scopes
+            $default_scopes = $this->scope_service->getDefaultScopes();
+
+            foreach($default_scopes as $default_scope){
+                $instance->scopes()->attach($default_scope->id);
+            }
+
         });
         return $instance;
     }
@@ -96,32 +107,35 @@ class ClientService implements IClientService
     public function addClientAllowedUri($id, $uri)
     {
         $client = Client::find($id);
-        if (!is_null($client)) {
-            $client_uri = ClientAuthorizedUri::where('uri', '=', $uri)->where('client_id', '=', $id)->first();
-            if (!is_null($client_uri)) {
-                throw new AllowedClientUriAlreadyExistsException(sprintf('uri : %s', $uri));
-            }
-            $client_authorized_uri = new ClientAuthorizedUri;
-            $client_authorized_uri->client_id = $id;
-            $client_authorized_uri->uri = $uri;
-            $client_authorized_uri->Save();
+
+        if (is_null($client))
+            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+
+        $client_uri = ClientAuthorizedUri::where('uri', '=', $uri)->where('client_id', '=', $id)->first();
+        if (!is_null($client_uri)) {
+            throw new AllowedClientUriAlreadyExistsException(sprintf('uri : %s', $uri));
         }
+
+        $client_authorized_uri = new ClientAuthorizedUri;
+        $client_authorized_uri->client_id = $id;
+        $client_authorized_uri->uri       = $uri;
+        return $client_authorized_uri->Save();
     }
 
     public function addClientScope($id, $scope_id)
     {
         $client = Client::find($id);
-        if (!is_null($client)) {
-            $client->scopes()->attach($scope_id);
-        }
+        if (is_null($client))
+            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+        return $client->scopes()->attach($scope_id);
     }
 
     public function deleteClientScope($id, $scope_id)
     {
         $client = Client::find($id);
-        if (!is_null($client)) {
-            $client->scopes()->detach($scope_id);
-        }
+        if (is_null($client))
+            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+        return $client->scopes()->detach($scope_id);
     }
 
     /**
@@ -131,31 +145,23 @@ class ClientService implements IClientService
      */
     public function deleteClientAllowedUri($id, $uri_id)
     {
-        $uri = ClientAuthorizedUri::where('id', '=', $uri_id)->where('client_id', '=', $id);
-        if (!is_null($uri))
-            $uri->Delete();
-    }
-
-    public function addClientAllowedRealm($id, $realm)
-    {
-        // TODO: Implement addClientAllowedRealm() method.
-    }
-
-    public function deleteClientAllowedRealm($id, $realm_id)
-    {
-        // TODO: Implement deleteClientAllowedRealm() method.
+        return ClientAuthorizedUri::where('id', '=', $uri_id)->where('client_id', '=', $id)->delete();
     }
 
     public function deleteClientByIdentifier($id)
     {
-        $client = Client::find($id);
-        if (!is_null($client)) {
-            $client->authorized_uris()->delete();
-            $client->scopes()->detach();
-            $token_service = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);
-            $token_service->revokeClientRelatedTokens($client->client_id);
-            $client->delete();
-        }
+        $res = false;
+        DB::transaction(function () use ($id,&$res){
+            $client = Client::find($id);
+            if (!is_null($client)) {
+                $client->authorized_uris()->delete();
+                $client->scopes()->detach();
+                $token_service = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);
+                $token_service->revokeClientRelatedTokens($client->client_id);
+                $res = $client->delete();
+            }
+        });
+        return $res;
     }
 
     /**
@@ -188,10 +194,10 @@ class ClientService implements IClientService
     public function lockClient($client_id)
     {
         $client = $this->getClientById($client_id);
-        if (!is_null($client)) {
-            $client->locked = true;
-            $client->Save();
-        }
+        if (is_null($client))
+            throw new InvalidClientException(sprintf("client id %s does not exists!",$client_id));
+        $client->locked = true;
+        return $client->Save();
     }
 
     /**
@@ -207,10 +213,10 @@ class ClientService implements IClientService
     public function activateClient($id, $active)
     {
         $client = $this->getClientByIdentifier($id);
-        if (!is_null($client)) {
-            $client->active = $active;
-            $client->Save();
-        }
+        if (is_null($client))
+            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+        $client->active = $active;
+        return $client->Save();
     }
 
     public function getClientByIdentifier($id)
@@ -222,23 +228,75 @@ class ClientService implements IClientService
     public function setRefreshTokenUsage($id, $use_refresh_token)
     {
         $client = $this->getClientByIdentifier($id);
-        if (!is_null($client)) {
-            $client->use_refresh_token = $use_refresh_token;
-            $client->Save();
-        }
+        if (is_null($client))
+            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+        $client->use_refresh_token = $use_refresh_token;
+        return $client->Save();
     }
 
     public function setRotateRefreshTokenPolicy($id, $rotate_refresh_token)
     {
         $client = $this->getClientByIdentifier($id);
-        if (!is_null($client)) {
-            $client->rotate_refresh_token = $rotate_refresh_token;
-            $client->Save();
-        }
+        if (is_null($client))
+            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+
+        $client->rotate_refresh_token = $rotate_refresh_token;
+        return $client->Save();
     }
 
     public function existClientAppName($app_name)
     {
         return Client::where('app_name', '=', $app_name)->count() > 0;
+    }
+
+    /**
+     * gets an api scope by id
+     * @param $id id of api scope
+     * @return IApiScope
+     */
+    public function get($id)
+    {
+        return Client::find($id);
+    }
+
+
+    public function getAll($page_nbr=1,$page_size=10,array $filters)
+    {
+        DB::getPaginator()->setCurrentPage($page_nbr);
+        return Client::Filter($filters)->paginate($page_size);
+    }
+
+    /**
+     * @param IClient $client
+     * @return bool
+     */
+    public function save(IClient $client)
+    {
+        if(!$client->exists() || count($client->getDirty())>0){
+            return $client->Save();
+        }
+        return true;
+    }
+
+    /**
+     * @param $id
+     * @param array $params
+     * @return bool
+     * @throws \oauth2\exceptions\InvalidClientException
+     */
+    public function update($id, array $params)
+    {
+        $client = Client::find($id);
+        if(is_null($client))
+            throw new InvalidClientException(sprintf('client id %s does not exists!',$id));
+
+        $allowed_update_params = array('app_name','app_description','app_logo','active','locked','use_refresh_token','rotate_refresh_token');
+
+        foreach($allowed_update_params as $param){
+            if(array_key_exists($param,$params)){
+                $client->{$param} = $params[$param];
+            }
+        }
+        return $this->save($client);
     }
 }

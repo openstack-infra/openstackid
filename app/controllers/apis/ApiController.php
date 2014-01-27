@@ -4,32 +4,39 @@ use oauth2\IResourceServerContext;
 use utils\services\ILogService;
 use oauth2\services\IApiService;
 use  oauth2\exceptions\InvalidApi;
-use  oauth2\exceptions\InvalidApiEndpoint;
-use  oauth2\exceptions\InvalidApiScope;
 
 /**
  * Class ApiController
  * REST controller for Api entity CRUD Ops
  */
-class ApiController extends OAuth2ProtectedController implements IRESTController
+class ApiController extends AbstractRESTController implements IRESTController
 {
 
     private $api_service;
 
-    public function __construct(IApiService $api_service,IResourceServerContext $resource_server_context,  ILogService $log_service)
+
+    public function __construct(IApiService $api_service,  ILogService $log_service)
     {
-        parent::__construct($resource_server_context,$log_service);
+        parent::__construct($log_service);
         $this->api_service = $api_service;
+        //set filters allowed values
+        $this->allowed_filter_fields = array('resource_server_id');
+        $this->allowed_filter_op     = array('resource_server_id' => array('='));
+        $this->allowed_filter_value  = array('resource_server_id' => '/^\d+$/');
     }
 
     public function get($id)
     {
         try {
-            $api = $this->api_service->get($id);
+            $api       = $this->api_service->get($id);
             if(is_null($api)){
                 return $this->error404(array('error' => 'api not found'));
             }
+            $scopes    = $api->scopes()->get(array('id','name'));
+            $endpoints = $api->endpoints()->get(array('id','name'));
             $data = $api->toArray();
+            $data['scopes']    = $scopes->toArray();
+            $data['endpoints'] = $endpoints->toArray();
             return $this->ok($data);
         } catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -40,8 +47,10 @@ class ApiController extends OAuth2ProtectedController implements IRESTController
     public function getByPage($page_nbr, $page_size)
     {
         try {
-            $list = $this->api_service->getAll($page_size, $page_nbr);
-            $items = array();
+            //check for optional filters param on querystring
+            $filters = Input::get('filters',null);
+            $list    = $this->api_service->getAll($page_nbr,$page_size, $this->getFilters($filters));
+            $items   = array();
             foreach ($list->getItems() as $api) {
                 array_push($items, $api->toArray());
             }
@@ -72,7 +81,7 @@ class ApiController extends OAuth2ProtectedController implements IRESTController
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error' => $messages));
+                return $this->error400(array('error'=>'validation','messages' => $messages));
             }
 
             $new_api_model = $this->api_service->add(
@@ -83,7 +92,12 @@ class ApiController extends OAuth2ProtectedController implements IRESTController
             );
 
             return $this->ok(array('api_id' => $new_api_model->id));
-        } catch (Exception $ex) {
+        }
+        catch (InvalidApi $ex1) {
+            $this->log_service->error($ex1);
+            return $this->error400(array('error'=>$ex1->getMessage()));
+        }
+        catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
         }
@@ -117,7 +131,7 @@ class ApiController extends OAuth2ProtectedController implements IRESTController
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error' => $messages));
+                return $this->error400(array('error'=>'validation','messages' => $messages));
             }
 
             $res = $this->api_service->update(intval($values['id']),$values);
@@ -127,7 +141,7 @@ class ApiController extends OAuth2ProtectedController implements IRESTController
         }
         catch(InvalidApi $ex1){
             $this->log_service->error($ex1);
-            return $this->error404(array('error'=>'api not found'));
+            return $this->error404(array('error'=>$ex1->getMessage()));
         }
         catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -140,10 +154,14 @@ class ApiController extends OAuth2ProtectedController implements IRESTController
             $active = is_string($active)?( strtoupper(trim($active))==='TRUE'?true:false ):$active;
             $res    = $this->api_service->setStatus($id,$active);
             return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
-        } catch (Exception $ex) {
+        }
+        catch(InvalidApi $ex1){
+            $this->log_service->error($ex1);
+            return $this->error404(array('error'=>$ex1->getMessage()));
+        }
+        catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
         }
     }
-
-} 
+}
