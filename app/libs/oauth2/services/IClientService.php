@@ -58,8 +58,6 @@ interface IClientService {
      */
     public function deleteClientAllowedUri($id,$uri_id);
 
-    public function addClientAllowedRealm($id,$realm);
-    public function deleteClientAllowedRealm($id,$realm_id);
     public function deleteClientByIdentifier($id);
 
     /**
@@ -106,4 +104,36 @@ interface IClientService {
      * @return boolean
      */
     public function existClientAppName($app_name);
+
+
+
+    /**
+     * gets an api scope by id
+     * @param $id id of api scope
+     * @return IApiScope
+     */
+    public function get($id);
+
+    /**
+     * Gets a paginated list of clients
+     * @param int $page_nbr
+     * @param int $page_size
+     * @param array $filters
+     * @return mixed
+     */
+    public function getAll($page_nbr=1,$page_size=10,array $filters);
+
+    /**
+     * @param IClient $client
+     * @return bool
+     */
+    public function save(IClient $client);
+
+    /**
+     * @param $id
+     * @param array $params
+     * @return bool
+     * @throws \oauth2\exceptions\InvalidClientException
+     */
+    public function update($id, array $params);
 } 

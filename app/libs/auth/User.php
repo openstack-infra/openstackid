@@ -207,4 +207,31 @@ class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
     {
         return $this->clients()->get();
     }
+
+
+    /**
+     * Could use system scopes on registered clients
+     * @return bool
+     */
+    public function canUseSystemScopes()
+    {
+        if (is_null($this->member)) {
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        $group = $this->member->groups()->where('code','=',IOAuth2User::OAuth2SystemScopeAdminGroup)->first();
+        return !is_null($group);
+    }
+
+    /**
+     * Is Server Administrator
+     * @return bool
+     */
+    public function IsServerAdmin()
+    {
+        if (is_null($this->member)) {
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        $group = $this->member->groups()->where('code','=',IOAuth2User::OAuth2ServerAdminGroup)->first();
+        return !is_null($group);
+    }
 }

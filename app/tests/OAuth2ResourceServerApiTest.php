@@ -3,10 +3,10 @@
 use oauth2\OAuth2Protocol;
 
 /**
- * Class ResourceServerApiTest
+ * Class OAuth2ResourceServerApiTest
  * Test Suite for OAuth2 Protected Resource Server Api
  */
-class ResourceServerApiTest extends TestCase {
+class OAuth2ResourceServerApiTest extends TestCase {
 
     private $access_token;
     private $client_id;
@@ -56,7 +56,7 @@ class ResourceServerApiTest extends TestCase {
 
         $resource_server = ResourceServer::where('host','=','dev.openstackid.com')->first();
 
-        $response = $this->action("GET", "ApiResourceServerController@get",
+        $response = $this->action("GET", "OAuth2ProtectedApiResourceServerController@get",
             $parameters = array('id' => $resource_server->id),
             array(),
             array(),
@@ -71,7 +71,7 @@ class ResourceServerApiTest extends TestCase {
 
     public function testGetByPage(){
 
-        $response = $this->action("GET", "ApiResourceServerController@getByPage",
+        $response = $this->action("GET", "OAuth2ProtectedApiResourceServerController@getByPage",
             $parameters = array('page_nbr' => 1,'page_size'=>10),
             array(),
             array(),
@@ -92,7 +92,7 @@ class ResourceServerApiTest extends TestCase {
             'active' => 'true',
         );
 
-        $response = $this->action("POST", "ApiResourceServerController@create",
+        $response = $this->action("POST", "OAuth2ProtectedApiResourceServerController@create",
             $data,
             array(),
             array(),
@@ -115,7 +115,7 @@ class ResourceServerApiTest extends TestCase {
         );
 
 
-        $response = $this->action("POST", "ApiResourceServerController@create",
+        $response = $this->action("POST", "OAuth2ProtectedApiResourceServerController@create",
             $data,
             array(),
             array(),
@@ -127,7 +127,7 @@ class ResourceServerApiTest extends TestCase {
 
         $new_id = $json_response->resource_server_id;
 
-        $response = $this->action("GET", "ApiResourceServerController@get",$parameters = array('id' => $new_id),
+        $response = $this->action("GET", "OAuth2ProtectedApiResourceServerController@get",$parameters = array('id' => $new_id),
             array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
@@ -139,7 +139,7 @@ class ResourceServerApiTest extends TestCase {
 
         $client_secret = $json_response->client_secret;
 
-        $response = $this->action("GET", "ApiResourceServerController@regenerateClientSecret",
+        $response = $this->action("GET", "OAuth2ProtectedApiResourceServerController@regenerateClientSecret",
             $parameters = array('id'=>$new_id),
             array(),
             array(),
@@ -169,7 +169,7 @@ class ResourceServerApiTest extends TestCase {
         );
 
 
-        $response = $this->action("POST", "ApiResourceServerController@create",
+        $response = $this->action("POST", "OAuth2ProtectedApiResourceServerController@create",
              $parameters = $data,
             array(),
             array(),
@@ -181,7 +181,7 @@ class ResourceServerApiTest extends TestCase {
 
         $new_id = $json_response->resource_server_id;
 
-        $response = $this->action("DELETE", "ApiResourceServerController@delete",$parameters = array('id' => $new_id),
+        $response = $this->action("DELETE", "OAuth2ProtectedApiResourceServerController@delete",$parameters = array('id' => $new_id),
             array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
@@ -195,7 +195,7 @@ class ResourceServerApiTest extends TestCase {
         $this->assertResponseStatus(200);
 
 
-        $response = $this->action("GET", "ApiResourceServerController@get",$parameters = array('id' => $new_id),
+        $response = $this->action("GET", "OAuth2ProtectedApiResourceServerController@get",$parameters = array('id' => $new_id),
             array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
@@ -215,7 +215,7 @@ class ResourceServerApiTest extends TestCase {
 
         $new_id = $resource_server->id;
 
-        $response = $this->action("DELETE", "ApiResourceServerController@delete",$parameters = array('id' => $new_id),
+        $response = $this->action("DELETE", "OAuth2ProtectedApiResourceServerController@delete",$parameters = array('id' => $new_id),
             array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
@@ -229,7 +229,7 @@ class ResourceServerApiTest extends TestCase {
         $this->assertResponseStatus(200);
 
 
-        $response = $this->action("GET", "ApiResourceServerController@get",$parameters = array('id' => $new_id),
+        $response = $this->action("GET", "OAuth2ProtectedApiResourceServerController@get",$parameters = array('id' => $new_id),
             array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
@@ -250,7 +250,7 @@ class ResourceServerApiTest extends TestCase {
             'active' => true,
         );
 
-        $response = $this->action("POST", "ApiResourceServerController@create",$parameters = $data,
+        $response = $this->action("POST", "OAuth2ProtectedApiResourceServerController@create",$parameters = $data,
             array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
@@ -268,7 +268,7 @@ class ResourceServerApiTest extends TestCase {
             'friendly_name' => 'Resource Server 6',
         );
 
-        $response = $this->action("PUT", "ApiResourceServerController@update",$parameters = $data_update, array(),
+        $response = $this->action("PUT", "OAuth2ProtectedApiResourceServerController@update",$parameters = $data_update, array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
 
@@ -278,7 +278,7 @@ class ResourceServerApiTest extends TestCase {
 
         $this->assertResponseStatus(200);
 
-        $response = $this->action("GET", "ApiResourceServerController@get",$parameters = array('id' => $new_id), array(),
+        $response = $this->action("GET", "OAuth2ProtectedApiResourceServerController@get",$parameters = array('id' => $new_id), array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
 
@@ -300,7 +300,7 @@ class ResourceServerApiTest extends TestCase {
             'active' => true,
         );
 
-        $response = $this->action("POST", "ApiResourceServerController@create",
+        $response = $this->action("POST", "OAuth2ProtectedApiResourceServerController@create",
             $parameters = $data, array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
@@ -312,7 +312,7 @@ class ResourceServerApiTest extends TestCase {
         $new_id = $json_response->resource_server_id;
 
 
-        $response = $this->action("GET", "ApiResourceServerController@updateStatus",array(
+        $response = $this->action("GET", "OAuth2ProtectedApiResourceServerController@updateStatus",array(
             'id'     => $new_id,
             'active' => 'false'), array(),
             array(),
@@ -325,7 +325,7 @@ class ResourceServerApiTest extends TestCase {
         $this->assertTrue($json_response==='ok');
         $this->assertResponseStatus(200);
 
-        $response = $this->action("GET", "ApiResourceServerController@get",$parameters = array('id' => $new_id), array(),
+        $response = $this->action("GET", "OAuth2ProtectedApiResourceServerController@get",$parameters = array('id' => $new_id), array(),
             array(),
             array("HTTP_Authorization" => " Bearer " .$this->access_token));
 

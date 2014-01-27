@@ -12,7 +12,7 @@
             <div class="span12">
                 <label for="client_secret" class="label-client-secret">Client Secret</label>
                 <span id="client_secret">{{ $client->client_secret }}</span>
-                {{ HTML::link(URL::action("UserController@getRegenerateClientSecret",array("id"=>$client->id)),'Regenerate',array('class'=>'btn regenerate-client-secret','title'=>'Regenerates Client Secret')) }}
+                {{ HTML::link(URL::action("ClientApiController@regenerateClientSecret",array("id"=>$client->id)),'Regenerate',array('class'=>'btn regenerate-client-secret','title'=>'Regenerates Client Secret')) }}
             </div>
         </div>
         <div class="row-fluid">
@@ -65,18 +65,13 @@
                         timeout:60000,
                         success: function (data,textStatus,jqXHR) {
                             //load data...
-                            if(data.status==='OK'){
-                                $('#client_secret').text(data.new_secret);
-                                //clean token UI
-                                $('#table-access-tokens').remove();
-                                $('#table-refresh-tokens').remove();
-                            }
-                            else{
-                                alert('There was an error!');
-                            }
+                            $('#client_secret').text(data.new_secret);
+                            //clean token UI
+                            $('#table-access-tokens').remove();
+                            $('#table-refresh-tokens').remove();
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
-                            alert( "Request failed: " + textStatus );
+                            ajaxError(jqXHR, textStatus, errorThrown);
                         }
                     }
                 );
@@ -90,8 +85,8 @@
             param.use_refresh_token  = $(this).is(':checked');
             $.ajax(
                 {
-                    type: "POST",
-                    url: '{{URL::action("UserController@postUseRefreshTokenClient",array("id"=>$client->id))}}',
+                    type: "PUT",
+                    url: '{{URL::action("ClientApiController@setRefreshTokenClient",array("id"=>$client->id))}}',
                     data: JSON.stringify(param),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
@@ -100,7 +95,7 @@
                         //load data...
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        alert( "Request failed: " + textStatus );
+                        ajaxError(jqXHR, textStatus, errorThrown);
                     }
                 }
             );
@@ -111,8 +106,8 @@
             param.rotate_refresh_token  = $(this).is(':checked');
             $.ajax(
                 {
-                    type: "POST",
-                    url: '{{URL::action("UserController@postRotateRefreshTokenPolicy",array("id"=>$client->id))}}',
+                    type: "PUT",
+                    url: '{{URL::action("ClientApiController@setRotateRefreshTokenPolicy",array("id"=>$client->id))}}',
                     data: JSON.stringify(param),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
@@ -121,7 +116,7 @@
                         //load data...
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        alert( "Request failed: " + textStatus );
+                        ajaxError(jqXHR, textStatus, errorThrown);
                     }
                 }
             );

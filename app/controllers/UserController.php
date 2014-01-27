@@ -1,10 +1,10 @@
 <?php
 
-use oauth2\exceptions\AllowedClientUriAlreadyExistsException;
 use oauth2\services\IApiScopeService;
 use oauth2\services\IClientService;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\ITokenService;
+use oauth2\services\IResourceServerService;
 use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\IServerConfigurationService;
@@ -19,6 +19,7 @@ use strategies\OAuth2LoginStrategy;
 use strategies\OpenIdConsentStrategy;
 use strategies\OpenIdLoginStrategy;
 use utils\services\IAuthService;
+
 
 class UserController extends BaseController
 {
@@ -35,6 +36,7 @@ class UserController extends BaseController
     private $client_service;
     private $scope_service;
     private $token_service;
+    private $resource_server_service;
 
     public function __construct(IMementoOpenIdRequestService $openid_memento_service,
                                 IMementoOAuth2AuthenticationRequestService $oauth2_memento_service,
@@ -46,7 +48,8 @@ class UserController extends BaseController
                                 IUserActionService $user_action_service,
                                 IClientService $client_service,
                                 IApiScopeService $scope_service,
-                                ITokenService $token_service)
+                                ITokenService $token_service,
+                                IResourceServerService $resource_server_service)
     {
         $this->openid_memento_service = $openid_memento_service;
         $this->oauth2_memento_service = $oauth2_memento_service;
@@ -59,6 +62,7 @@ class UserController extends BaseController
         $this->client_service = $client_service;
         $this->scope_service = $scope_service;
         $this->token_service = $token_service;
+        $this->resource_server_service = $resource_server_service;
         //filters
         $this->beforeFilter('csrf', array('only' => array('postLogin', 'postConsent')));
 
@@ -80,28 +84,6 @@ class UserController extends BaseController
             $this->login_strategy = new DefaultLoginStrategy($user_action_service, $auth_service);
             $this->consent_strategy = null;
         }
-
-
-        $this->beforeFilter('user.owns.client.policy:json', array('only' => array(
-            'postAddAllowedScope',
-            'getRegenerateClientSecret',
-            'getDeleteClientAllowedUri',
-            'postAddAllowedRedirectUri',
-            'getRegisteredClientUris',
-            'postActivateClient',
-            'postUseRefreshTokenClient',
-            'postRotateRefreshTokenPolicy')));
-
-        $this->beforeFilter('ajax', array('only' => array(
-            'postAddAllowedScope',
-            'getRegenerateClientSecret',
-            'getDeleteClientAllowedUri',
-            'postAddAllowedRedirectUri',
-            'getRegisteredClientUris',
-            'postActivateClient',
-            'postUseRefreshTokenClient',
-            'postRotateRefreshTokenPolicy')));
-
     }
 
     public function getLogin()
@@ -227,13 +209,16 @@ class UserController extends BaseController
 
     public function getProfile()
     {
-        $user = $this->auth_service->getCurrentUser();
-        $sites = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
+        $user    = $this->auth_service->getCurrentUser();
+        $sites   = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
         $actions = $user->getActions();
         $clients = $user->getClients();
 
         return View::make("profile", array(
             "username" => $user->getFullName(),
+            "user_id" => $user->getId(),
+            "is_server_admin" => $user->IsServerAdmin(),
+            "use_system_scopes" => $user->canUseSystemScopes(),
             "openid_url" => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
             "identifier " => $user->getIdentifier(),
             "sites" => $sites,
@@ -243,12 +228,6 @@ class UserController extends BaseController
             'actions' => $actions,
             'clients' => $clients,
         ));
-    }
-
-    public function get_deleteTrustedSite($id)
-    {
-        $this->trusted_sites_service->delTrustedSite($id);
-        return Redirect::action("UserController@getProfile");
     }
 
     public function postUserProfileOptions()
@@ -261,351 +240,10 @@ class UserController extends BaseController
         return Redirect::action("UserController@getProfile");
     }
 
-    public function getEditRegisteredClient($id)
+    public function deleteTrustedSite($id)
     {
-        $client = $this->client_service->getClientByIdentifier($id);
-
-        if (is_null($client)) {
-            Log::warning(sprintf("invalid oauth2 client id %s", $id));
-            return View::make("404");
-        }
-
-        $allowed_uris    = $client->getClientRegisteredUris();
-        $selected_scopes = $client->getClientScopes();
-        $aux_scopes      = array();
-        foreach ($selected_scopes as $scope) {
-            array_push($aux_scopes, $scope->id);
-        }
-        $scopes = $this->scope_service->getAvailableScopes();
-
-        $access_tokens = $this->token_service->getAccessTokenByClient($client->client_id);
-
-        foreach ($access_tokens as $token) {
-            $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ', $token->scope));
-            $token->setFriendlyScopes(implode(',', $friendly_scopes));
-        }
-
-        $refresh_tokens = $this->token_service->getRefreshTokenByClient($client->client_id);
-
-        foreach ($refresh_tokens as $token) {
-            $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ', $token->scope));
-            $token->setFriendlyScopes(implode(',', $friendly_scopes));
-        }
-
-        return View::make("oauth2.profile.edit-client",
-            array(
-                'client' => $client,
-                'allowed_uris' => $allowed_uris,
-                'selected_scopes' => $aux_scopes,
-                'scopes' => $scopes,
-                'access_tokens' => $access_tokens,
-                'refresh_tokens' => $refresh_tokens,
-            ));
+        $this->trusted_sites_service->delTrustedSite($id);
+        return Redirect::action("UserController@getProfile");
     }
 
-    public function getRegisteredClientUris($id)
-    {
-        try {
-            $client = $this->client_service->getClientByIdentifier($id);
-            $allowed_uris = $client->getClientRegisteredUris();
-
-            $container = array();
-            foreach ($allowed_uris as $uri) {
-                array_push($container, array('id' => $uri->id, 'redirect_uri' => $uri->uri));
-            }
-
-            return Response::json(array('status' => 'OK', 'allowed_uris' => $container));
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
-
-    public function getDeleteRegisteredClient($id)
-    {
-        try {
-            $this->client_service->deleteClientByIdentifier($id);
-            return Redirect::back();
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return View::make("404");
-        }
-    }
-
-    public function postAddRegisteredClient()
-    {
-        try {
-            $input = Input::All();
-            $user = $this->auth_service->getCurrentUser();
-
-            // Build the validation constraint set.
-            $rules = array(
-                'app_name' => 'required',
-                'app_desc' => 'required',
-                'app_type' => 'required',
-            );
-
-            // Create a new validator instance.
-            $validator = Validator::make($input, $rules);
-
-            if ($validator->passes()) {
-                $app_name = trim($input['app_name']);
-                $app_desc = trim($input['app_desc']);
-                $app_type = $input['app_type'];
-
-                if ($this->client_service->existClientAppName($app_name)) {
-                    throw new Exception("Application Name already exists!");
-                }
-
-                $this->client_service->addClient($app_type, $user->getId(), $app_name, $app_desc, '');
-
-                $clients = $user->getClients();
-
-                $clients_response = array();
-
-                foreach ($clients as $client) {
-                    array_push($clients_response, array(
-                        'id' => $client->id,
-                        'app_name' => $client->app_name,
-                        'client_type' => $client->getFriendlyClientType(),
-                        'active' => $client->active,
-                        'locked' => $client->locked,
-                        'updated_at' => $client->updated_at->format('Y-m-d H:i:s')
-                    ));
-                }
-                return Response::json(array('status' => 'OK', 'clients' => $clients_response));
-            }
-
-            throw new Exception("invalid param!");
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR', 'msg' => $ex->getMessage()));
-        }
-    }
-
-    public function postAddAllowedRedirectUri($id)
-    {
-        try {
-            $input = Input::All();
-            // Build the validation constraint set.
-            $rules = array(
-                'redirect_uri' => 'url',
-
-            );
-            $messages = array(
-                'url' => 'You must give a valid url'
-            );
-            // Create a new validator instance.
-            $validator = Validator::make($input, $rules, $messages);
-            if ($validator->passes()) {
-                $this->client_service->addClientAllowedUri($id, $input['redirect_uri']);
-                return Response::json(array('status' => 'OK'));
-            } else {
-                return Response::json(array('status' => 'ERROR'));
-            }
-        } catch (AllowedClientUriAlreadyExistsException $ex1) {
-            Log::error($ex1);
-            return Response::json(array('status' => 'ERROR', 'msg' => 'Uri already exists!'));
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR', 'msg' => 'There was an error!'));
-        }
-    }
-
-    public function getDeleteClientAllowedUri($id, $uri_id)
-    {
-        try {
-            $this->client_service->deleteClientAllowedUri($id, $uri_id);
-            return Response::json(array('status' => 'OK'));
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
-
-    public function getRegenerateClientSecret($id)
-    {
-        try {
-            $new_secret = $this->client_service->regenerateClientSecret($id);
-            return Response::json(array('status' => 'OK', 'new_secret' => $new_secret));
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
-
-    public function postAddAllowedScope($id)
-    {
-        try {
-            $input = Input::All();
-
-
-            // Build the validation constraint set.
-            $rules = array(
-                'scope_id' => 'required',
-                'checked' => 'required',
-            );
-
-            // Create a new validator instance.
-            $validator = Validator::make($input, $rules);
-            if ($validator->passes()) {
-                $client_id = $id;
-                $checked = $input['checked'];
-                $scope_id = $input['scope_id'];
-                if ($checked) {
-                    $this->client_service->addClientScope($client_id, $scope_id);
-                } else {
-                    $this->client_service->deleteClientScope($client_id, $scope_id);
-                }
-                return Response::json(array('status' => 'OK'));
-            }
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
-
-    public function postActivateClient($id)
-    {
-        try {
-            $input = Input::All();
-
-            // Build the validation constraint set.
-            $rules = array(
-                'active' => 'required',
-            );
-
-            // Create a new validator instance.
-            $validator = Validator::make($input, $rules);
-            if ($validator->passes()) {
-
-                $active = $input['active'];
-
-                $this->client_service->activateClient($id, $active);
-
-                return Response::json(array('status' => 'OK'));
-            }
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
-
-    public function postUseRefreshTokenClient($id)
-    {
-        try {
-            $input = Input::All();
-
-            // Build the validation constraint set.
-            $rules = array(
-                'use_refresh_token' => 'required'
-            );
-
-            // Create a new validator instance.
-            $validator = Validator::make($input, $rules);
-            if ($validator->passes()) {
-
-                $use_refresh_token = $input['use_refresh_token'];
-
-                $this->client_service->setRefreshTokenUsage($id, $use_refresh_token);
-
-                return Response::json(array('status' => 'OK'));
-            }
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
-
-    public function postRotateRefreshTokenPolicy($id)
-    {
-        try {
-            $input = Input::All();
-
-            // Build the validation constraint set.
-            $rules = array(
-                'rotate_refresh_token' => 'required'
-            );
-
-            // Create a new validator instance.
-            $validator = Validator::make($input, $rules);
-
-            if ($validator->passes()) {
-
-                $rotate_refresh_token = $input['rotate_refresh_token'];
-
-                $this->client_service->setRotateRefreshTokenPolicy($id, $rotate_refresh_token);
-
-                return Response::json(array('status' => 'OK'));
-            }
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
-
-    public function getRevokeToken($value, $hint)
-    {
-        try {
-            $res = false;
-            switch ($hint) {
-                case 'access-token':
-                    $res = $this->token_service->revokeAccessToken($value, true);
-                    break;
-                case 'refresh-token':
-                    $res = $this->token_service->revokeRefreshToken($value, true);
-                    break;
-                default:
-                    break;
-            }
-
-            return $res ? Response::json(array('status' => 'OK')) : Response::json(array('status' => 'ERROR'));
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
-
-    public function getAccessTokens($client_id)
-    {
-        try {
-            $access_tokens = $this->token_service->getAccessTokenByClient($client_id);
-            $res = array();
-            foreach ($access_tokens as $token) {
-                $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ', $token->scope));
-                array_push($res, array(
-                    'value' => $token->value,
-                    'scope' => implode(',', $friendly_scopes),
-                    'lifetime' => $token->getRemainingLifetime(),
-                    'issued' => $token->created_at->format('Y-m-d H:i:s')
-                ));
-            }
-            return Response::json(array('status' => 'OK', 'access_tokens' => $res));
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
-
-    public function getRefreshTokens($client_id)
-    {
-
-        try {
-            $refresh_tokens = $this->token_service->getRefreshTokenByClient($client_id);
-            $res = array();
-            foreach ($refresh_tokens as $token) {
-                $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ', $token->scope));
-                array_push($res, array(
-                    'value'    => $token->value,
-                    'scope'    => implode(',', $friendly_scopes),
-                    'lifetime' => $token->getRemainingLifetime(),
-                    'issued'   => $token->created_at->format('Y-m-d H:i:s')
-                ));
-            }
-            return Response::json(array('status' => 'OK', 'refresh_tokens' => $res));
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return Response::json(array('status' => 'ERROR'));
-        }
-    }
 }

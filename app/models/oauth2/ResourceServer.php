@@ -4,6 +4,8 @@ use oauth2\models\IResourceServer;
 
 class ResourceServer extends Eloquent implements IResourceServer {
 
+    protected $fillable = array('host','ip','active','friendly_name');
+
     protected $table = 'oauth2_resource_server';
 
     public function apis()
