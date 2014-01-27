@@ -1,7 +1,12 @@
 <?php
 use Illuminate\Validation\Validator;
 use Symfony\Component\Translation\TranslatorInterface;
+use oauth2\models\IClient;
 
+/**
+ * Class CustomValidator
+ * Custom validation methods
+ */
 class CustomValidator extends Validator {
 
     protected $implicitRules = array('Required', 'RequiredWith', 'RequiredWithout', 'RequiredIf', 'Accepted', 'RequiredWithoutField');
@@ -14,6 +19,10 @@ class CustomValidator extends Validator {
 
     public function validateBoolean($attribute, $value, $parameters)
     {
+        if(is_bool($value))
+            return true;
+        if(is_int($value))
+            return true;
         return strtoupper(trim($value))==='TRUE' || strtoupper(trim($value))==='FALSE' || strtoupper(trim($value))==='1' || strtoupper(trim($value))==='0' ;
     }
 
@@ -44,7 +53,17 @@ class CustomValidator extends Validator {
         return true;
     }
 
+    public function validateScopename($attribute, $value, $parameters){
+        $value = trim($value);
+        return preg_match("/^[a-zA-Z0-9\-\.\,\:\_\/]+$/", $value) == 1;
+    }
+
     public function validateHost($attribute, $value, $parameters){
         return true;
+    }
+
+    public function validateApplicationtype($attribute, $value, $parameters){
+        $value = intval($value);
+        return ($value == IClient::ClientType_Public || $value==IClient::ClientType_Confidential);
     }
 } 

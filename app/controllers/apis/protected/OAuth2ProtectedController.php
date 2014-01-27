@@ -5,6 +5,7 @@ use utils\services\ILogService;
 
 /**
  * Class OAuth2ProtectedController
+ * OAuth2 Protected Base API
  */
 class OAuth2ProtectedController extends JsonController {
 
@@ -15,5 +16,4 @@ class OAuth2ProtectedController extends JsonController {
         parent::__construct($log_service);
         $this->resource_server_context = $resource_server_context;
     }
-
 }

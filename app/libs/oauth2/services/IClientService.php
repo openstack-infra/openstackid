@@ -106,4 +106,36 @@ interface IClientService {
      * @return boolean
      */
     public function existClientAppName($app_name);
+
+
+
+    /**
+     * gets an api scope by id
+     * @param $id id of api scope
+     * @return IApiScope
+     */
+    public function get($id);
+
+    /**
+     * Gets a paginated list of clients
+     * @param int $user_id
+     * @param int $page_size
+     * @param int $page_nbr
+     * @return mixed
+     */
+    public function getAll($user_id,$page_size=10,$page_nbr=1);
+
+    /**
+     * @param IClient $client
+     * @return bool
+     */
+    public function save(IClient $client);
+
+    /**
+     * @param $id
+     * @param array $params
+     * @return bool
+     * @throws \oauth2\exceptions\InvalidClientException
+     */
+    public function update($id, array $params);
 } 

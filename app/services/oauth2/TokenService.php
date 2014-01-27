@@ -340,14 +340,16 @@ class TokenService implements ITokenService
 
     /**
      * @param $value
+     * @param $is_hashed
      * @return AccessToken
      * @throws \oauth2\exceptions\InvalidAccessTokenException
      * @throws \oauth2\exceptions\InvalidGrantTypeException
      */
-    public function getAccessToken($value)
+    public function getAccessToken($value, $is_hashed = false)
     {
 
-        $hashed_value = Hash::compute('sha256', $value);
+        //hash the given value, bc tokens values are stored hashed on DB
+        $hashed_value = !$is_hashed ? Hash::compute('sha256', $value):$value;
 
         try {
             if (!$this->cache_service->exists($hashed_value)) {

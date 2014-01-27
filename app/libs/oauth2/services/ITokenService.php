@@ -62,11 +62,12 @@ interface ITokenService {
     /**
      * Retrieves a given Access Token
      * @param $value
+     * @param $is_hashed
      * @return AccessToken
      * @throws \oauth2\exceptions\InvalidAccessTokenException
      * @throws \oauth2\exceptions\InvalidGrantTypeException
      */
-    public function getAccessToken($value);
+    public function getAccessToken($value, $is_hashed = false);
 
     /**
      * Checks if current_ip has access rights on the given $access_token

@@ -2,6 +2,9 @@
 
 use auth\AuthHelper;
 
+/**
+ * Class Member
+ */
 class Member extends Eloquent
 {
 
@@ -12,7 +15,12 @@ class Member extends Eloquent
     public function checkPassword($password)
     {
         $digest = AuthHelper::encrypt_password($password, $this->Salt, $this->PasswordEncryption);
-        $res = AuthHelper::compare($this->Password, $digest);
+        $res    = AuthHelper::compare($this->Password, $digest);
         return $res;
+    }
+
+    public function groups(){
+
+        return $this->belongsToMany('Group', 'Group_Members', 'MemberID', 'GroupID');
     }
 }
