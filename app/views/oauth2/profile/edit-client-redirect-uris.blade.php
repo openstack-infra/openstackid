@@ -5,7 +5,7 @@
             <div class="span12">
                 <label for="redirect_uri">New Authorized Redirect Uri&nbsp;<i class="icon-info-sign accordion-toggle" title="Uri schema must be under SSL"></i></label>
                 <input type="text" value="" id="redirect_uri" name="redirect_uri"/>
-                {{HTML::link(URL::action("UserController@postAddAllowedRedirectUri",array("id"=>$client->id)),'Add',array('class'=>'btn add-uri-client','title'=>'Add a new Registered Client Uri')) }}
+                {{HTML::link(URL::action("ClientApiController@addAllowedRedirectUri",array("id"=>$client->id)),'Add',array('class'=>'btn add-uri-client','title'=>'Add a new Registered Client Uri')) }}
 
             </div>
         </div>
@@ -23,7 +23,7 @@
                     @foreach ($allowed_uris as $uri)
                     <tr>
                         <td>{{ $uri->uri }}</td>
-                        <td>&nbsp;{{ HTML::link(URL::action("UserController@getDeleteClientAllowedUri",array("id"=>$client->id,'uri_id'=>$uri->id)),'Delete',array('class'=>'btn del-allowed-uri','title'=>'Deletes a Allowed Uri')) }}</td>
+                        <td>&nbsp;{{ HTML::link(URL::action("ClientApiController@deleteClientAllowedUri",array("id"=>$client->id,'uri_id'=>$uri->id)),'Delete',array('class'=>'btn del-allowed-uri','title'=>'Deletes a Allowed Uri')) }}</td>
                     </tr>
                     @endforeach
                     </tbody>
@@ -38,7 +38,7 @@
 <script type="application/javascript">
 
     function loadAllowedClientUris(){
-        var link = '{{URL::action("UserController@getRegisteredClientUris",array("id"=>$client->id))}}';
+        var link = '{{URL::action("ClientApiController@getRegisteredUris",array("id"=>$client->id))}}';
         $.ajax(
             {
                 type: "GET",
@@ -47,32 +47,29 @@
                 timeout:60000,
                 success: function (data,textStatus,jqXHR) {
                     //load data...
-                    if(data.status==='OK'){
-                        var uris = data.allowed_uris;
-                        var template = $('<tbody><tr><td class="uri-text"></td><td><a title="Deletes a Allowed Uri" class="btn del-allowed-uri">Delete</a></td></tr></tbody>');
-                        var directives = {
+
+                    var uris = data.allowed_uris;
+                    var template = $('<tbody><tr><td class="uri-text"></td><td><a title="Deletes a Allowed Uri" class="btn del-allowed-uri">Delete</a></td></tr></tbody>');
+                    var directives = {
                             'tr':{
                                 'uri<-context':{
-                                    'td.uri-text':'uri.redirect_uri',
+                                    'td.uri-text':'uri.uri',
                                     'a.del-allowed-uri@href':function(arg){
                                         var uri_id = arg.item.id;
-                                        var href = '{{ URL::action("UserController@getDeleteClientAllowedUri", array("id"=>$client->id,"uri_id"=>"-1")) }}';
+                                        var href = '{{ URL::action("ClientApiController@deleteClientAllowedUri", array("id"=>$client->id,"uri_id"=>"-1")) }}';
                                         return href.replace('-1',uri_id);
                                     }
 
                                 }
                             }
-                        };
-                        var html = template.render(uris, directives);
-                        //alert(html.html());
-                        $('#body-allowed-uris').html(html.html());
-                    }
-                    else{
-                        alert('There was an error!');
-                    }
+                    };
+                    var html = template.render(uris, directives);
+                    $('#body-allowed-uris').html(html.html());
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    alert( "Request failed: " + textStatus );
+                    var HTTP_status = jqXHR.status;
+                    response = $.parseJSON(jqXHR.responseText);
+                    displayAlert(response.error,'.add-uri-client');
                 }
             }
         );
@@ -108,19 +105,15 @@
                 contentType: "application/json; charset=utf-8",
                 timeout:60000,
                 success: function (data,textStatus,jqXHR) {
-                    //load data...
-                    if(data.status==='OK'){
-                        $('#redirect_uri').val('');
-                        loadAllowedClientUris();
-                        return;
-                    }
-                    displayAlert(data.msg,'.add-uri-client');
+                    $('#redirect_uri').val('');
+                    loadAllowedClientUris();
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                    alert( "Request failed: " + textStatus );
+                    var HTTP_status = jqXHR.status;
+                    response = $.parseJSON(jqXHR.responseText);
+                    displayAlert(response.error,'.add-uri-client');
                 }
             });
-
             event.preventDefault();
             return false;
         });
@@ -131,21 +124,17 @@
                 var link = $(this).attr('href');
                 $.ajax(
                     {
-                        type: "GET",
+                        type: "DELETE",
                         url: link,
                         dataType: "json",
                         timeout:60000,
                         success: function (data,textStatus,jqXHR) {
-                            //load data...
-                            if(data.status==='OK'){
-                                loadAllowedClientUris();
-                            }
-                            else{
-                                alert('There was an error!');
-                            }
+                           loadAllowedClientUris();
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
-                            alert( "Request failed: " + textStatus );
+                            var HTTP_status = jqXHR.status;
+                            response = $.parseJSON(jqXHR.responseText);
+                            displayAlert(response.error,'.add-uri-client');
                         }
                     }
                 );

@@ -17,3 +17,4 @@ app/config/packages/greggilbert/recaptcha/staging/*
 bootstrap/start.php
 
 
+bootstrap/environments.php

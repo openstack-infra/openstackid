@@ -51,7 +51,7 @@
             $.ajax(
                 {
                     type: "POST",
-                    url: '{{URL::action("UserController@postAddAllowedScope",array("id"=>$client->id))}}',
+                    url: '{{URL::action("ClientApiController@addAllowedScope",array("id"=>$client->id))}}',
                     data: JSON.stringify(scope),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",

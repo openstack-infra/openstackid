@@ -296,6 +296,15 @@ class TestSeeder extends Seeder {
             )
         );
 
+        Api::create(
+            array(
+                'name'            => 'api-scope',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'resource_server_id' => $resource_server->id,
+            )
+        );
+
         //create scopes
 
 
@@ -305,6 +314,7 @@ class TestSeeder extends Seeder {
         $resource_server_api        = Api::where('name','=','resource-server')->first();
         $api_api                    = Api::where('name','=','api')->first();
         $api_api_endpoint           = Api::where('name','=','api-endpoint')->first();
+        $api_scope                  = Api::where('name','=','api-scope')->first();
 
         // create api scopes
 
@@ -526,6 +536,70 @@ class TestSeeder extends Seeder {
                 'system'             => false,
             )
         );
+
+        // api scope endpoint scopes
+
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-scope/read',$current_realm),
+                'short_description'  => 'Get Api Scope',
+                'description'        => 'Get Api Scope',
+                'api_id'             => $api_scope->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-scope/delete',$current_realm),
+                'short_description'  => 'Deletes Api Scope',
+                'description'        => 'Deletes Api Scope',
+                'api_id'             => $api_scope->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-scope/write',$current_realm),
+                'short_description'  => 'Create Api Scope',
+                'description'        => 'Create Api Scope',
+                'api_id'             => $api_scope->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-scope/update',$current_realm),
+                'short_description'  => 'Update Api Scope',
+                'description'        => 'Update Api Scope',
+                'api_id'             => $api_scope->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-scope/update.status',$current_realm),
+                'short_description'  => 'Update Api Scope Status',
+                'description'        => 'Update Api Scope Status',
+                'api_id'             => $api_scope->id,
+                'system'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => sprintf('%s/api-scope/read.page',$current_realm),
+                'short_description'  => 'Get Api Scopes By Page',
+                'description'        => 'Get Api Scopes By Page',
+                'api_id'             => $api_scope->id,
+                'system'             => false,
+            )
+        );
+
 
         //non system ones
 
@@ -781,6 +855,69 @@ class TestSeeder extends Seeder {
             )
         );
 
+        // endpoints scopes
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'get-scope',
+                'active'          =>  true,
+                'api_id'          => $api_scope->id,
+                'route'           => 'api/v1/api-scope/{id}',
+                'http_method'     => 'GET'
+            )
+        );
+
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'delete-scope',
+                'active'          =>  true,
+                'api_id'          => $api_scope->id,
+                'route'           => 'api/v1/api-scope/{id}',
+                'http_method'     => 'DELETE'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'create-scope',
+                'active'          =>  true,
+                'api_id'          => $api_scope->id,
+                'route'           => 'api/v1/api-scope',
+                'http_method'     => 'POST'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'update-scope',
+                'active'          =>  true,
+                'api_id'          => $api_scope->id,
+                'route'           => 'api/v1/api-scope',
+                'http_method'     => 'PUT'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'update-scope-status',
+                'active'          =>  true,
+                'api_id'          => $api_scope->id,
+                'route'           => 'api/v1/api-scope/status/{id}/{active}',
+                'http_method'     => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'scope-get-page',
+                'active'          =>  true,
+                'api_id'          => $api_scope->id,
+                'route'           => 'api/v1/api-scope/{page_nbr}/{page_size}',
+                'http_method'     => 'GET'
+            )
+        );
+
         //attach scopes to endpoints
 
         //resource server api scopes
@@ -895,6 +1032,34 @@ class TestSeeder extends Seeder {
         $endpoint_api_endpoint_update_status        = ApiEndpoint::where('name','=','update-api-endpoint-status')->first();
         $endpoint_api_endpoint_update_status->scopes()->attach($api_endpoint_update_scope->id);
         $endpoint_api_endpoint_update_status->scopes()->attach($api_endpoint_update_status_scope->id);
+
+        $api_scope_read_scope               = ApiScope::where('name','=',sprintf('%s/api-scope/read',$current_realm))->first();
+        $api_scope_write_scope              = ApiScope::where('name','=',sprintf('%s/api-scope/write',$current_realm))->first();
+        $api_scope_read_page_scope          = ApiScope::where('name','=',sprintf('%s/api-scope/read.page',$current_realm))->first();
+        $api_scope_delete_scope             = ApiScope::where('name','=',sprintf('%s/api-scope/delete',$current_realm))->first();
+        $api_scope_update_scope             = ApiScope::where('name','=',sprintf('%s/api-scope/update',$current_realm))->first();
+        $api_scope_update_status_scope      = ApiScope::where('name','=',sprintf('%s/api-scope/update.status',$current_realm))->first();
+
+
+        $endpoint_api_scope_get             = ApiEndpoint::where('name','=','get-scope')->first();
+        $endpoint_api_scope_get->scopes()->attach($api_scope_read_scope->id);
+
+        $endpoint_api_scope_get_page        = ApiEndpoint::where('name','=','scope-get-page')->first();
+        $endpoint_api_scope_get_page->scopes()->attach($api_scope_read_scope->id);
+        $endpoint_api_scope_get_page->scopes()->attach($api_scope_read_page_scope->id);
+
+        $endpoint_api_scope_delete          = ApiEndpoint::where('name','=','delete-scope')->first();
+        $endpoint_api_scope_delete->scopes()->attach($api_scope_delete_scope->id);
+
+        $endpoint_api_scope_create          = ApiEndpoint::where('name','=','create-scope')->first();
+        $endpoint_api_scope_create->scopes()->attach($api_scope_write_scope->id);
+
+        $endpoint_api_scope_update               = ApiEndpoint::where('name','=','update-scope')->first();
+        $endpoint_api_scope_update->scopes()->attach($api_scope_update_scope->id);
+
+        $endpoint_api_scope_update_status        = ApiEndpoint::where('name','=','update-scope-status')->first();
+        $endpoint_api_scope_update_status->scopes()->attach($api_scope_update_scope->id);
+        $endpoint_api_scope_update_status->scopes()->attach($api_scope_update_status_scope->id);
 
         // create users and clients ...
         User::create(
