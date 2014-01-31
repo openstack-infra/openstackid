@@ -178,7 +178,7 @@ Route::filter('user.owns.client.policy',function($route, $request){
         $client_id              = $route->getParameter('id');
         $client                 = $client_service->getClientByIdentifier($client_id);
         $user                   = $authentication_service->getCurrentUser();
-        if (is_null($client) || $client->getUserId() !== $user->getId())
+        if (is_null($client) || intval($client->getUserId()) !== intval($user->getId()))
             throw new Exception('invalid client id for current user');
 
     } catch (Exception $ex) {
@@ -194,7 +194,7 @@ Route::filter('is.current.user',function($route, $request){
         if(is_null($used_id))
             $used_id =  $route->getParameter('user_id');
         $user                   = $authentication_service->getCurrentUser();
-        if (is_null($used_id) || intval($used_id) !== $user->getId())
+        if (is_null($used_id) || intval($used_id) !== intval($user->getId()))
             throw new Exception(sprintf('user id %s does not match with current user id %s',$used_id,$user->getId()));
 
     } catch (Exception $ex) {
