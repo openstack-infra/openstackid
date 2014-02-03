@@ -53,7 +53,8 @@ Route::filter('auth', function () {
         Session::put('url.intended', URL::full());
         return Redirect::action('HomeController@index');
     }
-    if ($redirect = Session::get('url.intended')) {
+    $redirect = Session::get('url.intended');
+    if (!empty($redirect)) {
         Session::forget('url.intended');
         return Redirect::to($redirect);
     }

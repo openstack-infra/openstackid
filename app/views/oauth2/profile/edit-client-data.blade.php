@@ -15,6 +15,7 @@
                 {{ HTML::link(URL::action("ClientApiController@regenerateClientSecret",array("id"=>$client->id)),'Regenerate',array('class'=>'btn regenerate-client-secret','title'=>'Regenerates Client Secret')) }}
             </div>
         </div>
+        @if($client->application_type == oauth2\models\IClient::ApplicationType_Web_App)
         <div class="row-fluid">
             <div class="span12">
                 <label class="label-client-secret">Client Settings</label>
@@ -46,6 +47,7 @@
                 </label>
             </div>
         </div>
+        @endif
         @endif
     </div>
 </div>

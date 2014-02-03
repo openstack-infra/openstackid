@@ -155,6 +155,11 @@ class ApiResourceServerController extends JsonController implements IRESTControl
         }
     }
 
+    /**
+     * @param $id
+     * @param $active
+     * @return mixed
+     */
     public function updateStatus($id, $active){
         try {
             $res = $this->resource_server_service->setStatus($id,$active);

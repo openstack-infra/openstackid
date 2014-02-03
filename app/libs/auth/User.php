@@ -23,6 +23,16 @@ class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
         return $this->hasMany("OpenIdTrustedSite", 'user_id');
     }
 
+    public function access_tokens()
+    {
+        return $this->hasMany('AccessToken');
+    }
+
+    public function refresh_tokens()
+    {
+        return $this->hasMany('RefreshToken');
+    }
+
     public function clients()
     {
         return $this->hasMany("Client", 'user_id');

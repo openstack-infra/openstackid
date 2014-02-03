@@ -20,8 +20,8 @@ class SessionAssociationRequestFactory
     }
 
     /**
-     * @param OpenIdAssociationSessionRequest $message
-     * @return null|ISessionAssociationStrategy
+     * @param OpenIdMessage $message
+     * @return null|SessionAssociationDHStrategy|SessionAssociationUnencryptedStrategy
      */
     public static function buildSessionAssociationStrategy(OpenIdMessage $message)
     {

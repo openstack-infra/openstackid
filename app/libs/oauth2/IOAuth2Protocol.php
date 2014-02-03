@@ -2,7 +2,6 @@
 
 namespace oauth2;
 use oauth2\requests\OAuth2Request;
-use oauth2\OAuth2Message;
 
 interface IOAuth2Protocol {
     /**

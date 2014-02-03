@@ -6,8 +6,8 @@ namespace oauth2\grant_types;
 use oauth2\exceptions\InvalidGrantTypeException;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\ScopeNotAllowedException;
+use oauth2\exceptions\InvalidApplicationType;
 
-use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
 use oauth2\requests\OAuth2AccessTokenRequestClientCredentials;
@@ -80,9 +80,10 @@ class ClientCredentialsGrantType extends AbstractGrantType
     /**
      * @param OAuth2Request $request
      * @return mixed|OAuth2AccessTokenResponse|void
-     * @throws \oauth2\exceptions\UnAuthorizedClientException
-     * @throws \oauth2\exceptions\InvalidOAuth2Request
      * @throws \oauth2\exceptions\ScopeNotAllowedException
+     * @throws \oauth2\exceptions\InvalidOAuth2Request
+     * @throws \oauth2\exceptions\InvalidApplicationType
+     * @throws \oauth2\exceptions\InvalidGrantTypeException
      */
     public function completeFlow(OAuth2Request $request)
     {
@@ -96,8 +97,8 @@ class ClientCredentialsGrantType extends AbstractGrantType
             parent::completeFlow($request);
 
             //only confidential clients could use this grant type
-            if ($this->current_client->getClientType() !== IClient::ClientType_Confidential)
-                throw new UnAuthorizedClientException();
+            if ($this->current_client->getApplicationType() != IClient::ApplicationType_Service)
+                throw new InvalidApplicationType($this->current_client_id,sprintf('client id %s client type must be SERVICE',$this->current_client_id));
 
             //check requested scope
             $scope = $request->getScope();

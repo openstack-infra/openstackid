@@ -15,16 +15,22 @@ use oauth2\exceptions\AccessDeniedException;
 use oauth2\exceptions\BearerTokenDisclosureAttemptException;
 use oauth2\exceptions\ExpiredAuthorizationCodeException;
 use oauth2\exceptions\InvalidAccessTokenException;
+use oauth2\exceptions\InvalidApplicationType;
 use oauth2\exceptions\InvalidAuthorizationCodeException;
 use oauth2\exceptions\InvalidClientException;
+use oauth2\exceptions\InvalidClientType;
 use oauth2\exceptions\InvalidGrantTypeException;
 use oauth2\exceptions\InvalidOAuth2Request;
+use oauth2\exceptions\LockedClientException;
+use oauth2\exceptions\MissingClientIdParam;
 use oauth2\exceptions\OAuth2GenericException;
 use oauth2\exceptions\ReplayAttackException;
 use oauth2\exceptions\ScopeNotAllowedException;
 use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
+use oauth2\exceptions\MissingClientAuthorizationInfo;
+use oauth2\exceptions\InvalidRedeemAuthCodeException;
 
 //grant types
 use oauth2\grant_types\AuthorizationCodeGrantType;
@@ -65,6 +71,7 @@ class OAuth2Protocol implements IOAuth2Protocol
     const OAuth2Protocol_ResponseType_Token = 'token';
     const OAuth2Protocol_ResponseType = 'response_type';
     const OAuth2Protocol_ClientId = 'client_id';
+    const OAuth2Protocol_UserId = 'user_id';
     const OAuth2Protocol_ClientSecret = 'client_secret';
     const OAuth2Protocol_Token = 'token';
     const OAuth2Protocol_TokenType = 'token_type';
@@ -241,7 +248,48 @@ class OAuth2Protocol implements IOAuth2Protocol
                 throw $ex8;
 
             return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_ServerError, $redirect_uri);
-        } catch (Exception $ex) {
+        }
+        catch(InvalidApplicationType $ex9){
+            $this->log_service->error($ex9);
+            $this->checkpoint_service->trackException($ex9);
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if (is_null($redirect_uri))
+                throw $ex9;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
+        }
+        catch(LockedClientException $ex10){
+            $this->log_service->error($ex10);
+            $this->checkpoint_service->trackException($ex10);
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if (is_null($redirect_uri))
+                throw $ex10;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
+        }
+        catch(MissingClientIdParam $ex11){
+            $this->log_service->error($ex11);
+            $this->checkpoint_service->trackException($ex11);
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if (is_null($redirect_uri))
+                throw $ex11;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
+        }
+        catch(InvalidClientType $ex12){
+            $this->log_service->error($ex12);
+            $this->checkpoint_service->trackException($ex12);
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if (is_null($redirect_uri))
+                throw $ex12;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
+        }
+        catch (Exception $ex) {
             $this->log_service->error($ex);
             $this->checkpoint_service->trackException($ex);
 
@@ -326,6 +374,36 @@ class OAuth2Protocol implements IOAuth2Protocol
             $this->log_service->error($ex11);
             $this->checkpoint_service->trackException($ex11);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
+        }
+        catch(InvalidApplicationType $ex12){
+            $this->log_service->error($ex12);
+            $this->checkpoint_service->trackException($ex12);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(LockedClientException $ex13){
+            $this->log_service->error($ex13);
+            $this->checkpoint_service->trackException($ex13);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(MissingClientIdParam $ex14){
+            $this->log_service->error($ex14);
+            $this->checkpoint_service->trackException($ex14);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(InvalidClientType $ex15){
+            $this->log_service->error($ex15);
+            $this->checkpoint_service->trackException($ex15);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(MissingClientAuthorizationInfo $ex16){
+            $this->log_service->error($ex16);
+            $this->checkpoint_service->trackException($ex16);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(InvalidRedeemAuthCodeException $ex17){
+            $this->log_service->error($ex17);
+            $this->checkpoint_service->trackException($ex17);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
         }
         catch (Exception $ex) {
             $this->log_service->error($ex);

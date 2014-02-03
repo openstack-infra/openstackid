@@ -8,6 +8,8 @@ use utils\services\Registry;
 use oauth2\services\OAuth2ServiceCatalog;
 use utils\services\UtilsServiceCatalog;
 use services\oauth2\ResourceServer;
+use \Illuminate\Foundation\AliasLoader;
+
 class ServicesProvider extends ServiceProvider
 {
 
@@ -22,7 +24,7 @@ class ServicesProvider extends ServiceProvider
 
         // Shortcut so developers don't need to add an Alias in app/config/app.php
         $this->app->booting(function () {
-            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
+            $loader = AliasLoader::getInstance();
             $loader->alias('ServerConfigurationService', 'services\\Facades\\ServerConfigurationService');
         });
 
@@ -70,7 +72,11 @@ class ServicesProvider extends ServiceProvider
 
             $lock_user_security_policy = $this->app->make("services\\LockUserSecurityPolicy");
             $lock_user_security_policy->setCounterMeasure($lock_user_counter_measure);
-            //policies...
+
+            $oauth2_lock_client_counter_measure = $this->app->make("services\\OAuth2LockClientCounterMeasure");
+            $oauth2_security_policy             = $this->app->make("services\\OAuth2SecurityPolicy");
+            $oauth2_security_policy->setCounterMeasure($oauth2_lock_client_counter_measure);
+
             $checkpoint_service = new CheckPointService($blacklist_security_policy);
             $checkpoint_service->addPolicy($lock_user_security_policy);
             $checkpoint_service->addPolicy($authorization_code_redeem_Policy);

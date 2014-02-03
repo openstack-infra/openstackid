@@ -6,7 +6,9 @@ use oauth2\exceptions\AccessDeniedException;
 use oauth2\exceptions\InvalidClientException;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\ScopeNotAllowedException;
-use oauth2\exceptions\UnAuthorizedClientException;
+use oauth2\exceptions\OAuth2GenericException;
+use oauth2\exceptions\InvalidApplicationType;
+use oauth2\exceptions\LockedClientException;
 
 use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
@@ -87,13 +89,15 @@ class ImplicitGrantType extends AbstractGrantType
     /**
      * @param OAuth2Request $request
      * @return mixed|OAuth2AccessTokenFragmentResponse
-     * @throws \oauth2\exceptions\InvalidClientException
      * @throws \oauth2\exceptions\UnsupportedResponseTypeException
-     * @throws \oauth2\exceptions\AccessDeniedException
+     * @throws \oauth2\exceptions\LockedClientException
+     * @throws \oauth2\exceptions\InvalidClientException
      * @throws \oauth2\exceptions\ScopeNotAllowedException
-     * @throws \oauth2\exceptions\InvalidOAuth2Request
-     * @throws \oauth2\exceptions\UnAuthorizedClientException
+     * @throws \oauth2\exceptions\OAuth2GenericException
+     * @throws \oauth2\exceptions\InvalidApplicationType
+     * @throws \oauth2\exceptions\AccessDeniedException
      * @throws \oauth2\exceptions\UriNotAllowedException
+     * @throws \oauth2\exceptions\InvalidOAuth2Request
      */
     public function handle(OAuth2Request $request)
     {
@@ -109,13 +113,18 @@ class ImplicitGrantType extends AbstractGrantType
                 throw new UnsupportedResponseTypeException(sprintf("response_type %s", $response_type));
 
             $client = $this->client_service->getClientById($client_id);
+
             if (is_null($client))
-                throw new InvalidClientException(sprintf("client_id %s", $client_id));
+                throw new InvalidClientException($client_id, sprintf("client_id %s", $client_id));
+
+            if (!$client->isActive() || $client->isLocked()) {
+                throw new LockedClientException($client,sprintf('client id %s',$client));
+            }
 
             //check client type
             // only public clients could use this grant type
-            if ($client->getClientType() !== IClient::ClientType_Public)
-                throw new UnAuthorizedClientException();
+            if ($client->getApplicationType() != IClient::ApplicationType_JS_Client)
+                throw new InvalidApplicationType($client_id,sprintf('client id %s client type must be JS CLIENT',$client_id));
 
             //check redirect uri
             $redirect_uri = $request->getRedirectUri();
@@ -144,10 +153,15 @@ class ImplicitGrantType extends AbstractGrantType
                 throw new AccessDeniedException;
             }
 
+            $user = $this->auth_service->getCurrentUser();
+
+            if(is_null($user))
+                throw new OAuth2GenericException("Invalid Current User");
+
             // build current audience ...
             $audience     = $this->scope_service->getStrAudienceByScopeNames(explode(' ',$scope));
             //build access token
-            $access_token = $this->token_service->createAccessTokenFromParams($scope, $client_id, $audience);
+            $access_token = $this->token_service->createAccessTokenFromParams($scope, $client_id, $audience,$user->getId());
             //clear saved data ...
             $this->memento_service->clearCurrentRequest();
             $this->auth_service->clearUserAuthorizationResponse();
@@ -169,9 +183,10 @@ class ImplicitGrantType extends AbstractGrantType
         return OAuth2Protocol::OAuth2Protocol_GrantType_Implicit;
     }
 
-    /** builds specific Token request
+    /**
      * @param OAuth2Request $request
-     * @return mixed
+     * @return mixed|void
+     * @throws \oauth2\exceptions\InvalidOAuth2Request
      */
     public function buildTokenRequest(OAuth2Request $request)
     {

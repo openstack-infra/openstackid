@@ -1,6 +1,5 @@
 <?php
 
-use oauth2\IResourceServerContext;
 use utils\services\ILogService;
 use oauth2\services\IApiService;
 use  oauth2\exceptions\InvalidApi;

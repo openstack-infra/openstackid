@@ -15,13 +15,14 @@ use oauth2\models\RefreshToken;
 interface ITokenService {
 
     /** Creates a brand new authorization code
+     * @param $user_id
      * @param $client_id
      * @param $scope
      * @param string $audience
      * @param null $redirect_uri
      * @return mixed
      */
-    public function createAuthorizationCode($client_id, $scope, $audience='' , $redirect_uri = null);
+    public function createAuthorizationCode($user_id, $client_id, $scope, $audience='' , $redirect_uri = null);
 
 
     /**
@@ -43,12 +44,13 @@ interface ITokenService {
 
     /**
      * Create a brand new Access Token by params
-     * @param $scope
      * @param $client_id
+     * @param $scope
      * @param $audience
-     * @return mixed
+     * @param null $user_id
+     * @return AccessToken
      */
-    public function createAccessTokenFromParams($scope, $client_id, $audience);
+    public function createAccessTokenFromParams($client_id,$scope, $audience,$user_id=null);
 
 
     /** Creates a new Access Token from a given refresh token, and invalidate former associated
@@ -113,6 +115,9 @@ interface ITokenService {
     
     public function getRefreshTokenByClient($client_id);
 
+    public function getAccessTokenByUserId($user_id);
+
+    public function getRefreshTokeByUserId($user_id);
 
     /**
      * Revokes a given access token

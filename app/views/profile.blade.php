@@ -86,7 +86,7 @@
                         <thead>
                         <tr>
                             <th>Application Name</th>
-                            <th>Type</th>
+                            <th>Application Type</th>
                             <th>Is Active</th>
                             <th>Is Locked</th>
                             <th>Modified</th>
@@ -97,7 +97,7 @@
                         @foreach ($clients as $client)
                         <tr>
                             <td>{{ $client->app_name }}</td>
-                            <td>{{ $client->getFriendlyClientType()}}</td>
+                            <td>{{ $client->getFriendlyApplicationType()}}</td>
                             <td>
                                 <input type="checkbox" class="app-active-checkbox" id="app-active_{{$client->id}}"
                                 @if ( $client->active)
@@ -171,17 +171,20 @@
         <p style="font-size: 10px;">* You need to register your application to get the necessary credentials to call a Openstack API</p>
         <form id="form-application" name="form-application">
             <fieldset>
-                <label for="app_name">Application Name</label>
-                <input type="text" name="app_name" id="app_name">
+                <label for="application_name">Application Name</label>
+                <input type="text" name="application_name" id="application_name">
 
-                <label for="app_desc">Application Description</label>
-                <textarea style="resize: none;" rows="4" cols="50" name="app_desc" id="app_desc"></textarea>
-                <label for="app_type">Application Type</label>
-                <select name="app_type" id="app_type">
-                    <option value="2">Web Application</option>
-                    <option value="1">Browser (JS Client)</option>
-                    <option value="1">Native Application</option>
-                </select>
+                <label for="application_description">Application Description</label>
+                <textarea style="resize: none;" rows="4" cols="50" name="application_description" id="application_description"></textarea>
+                <label for="application_type">Application Type</label>
+
+
+
+
+                {{ Form::select('application_type', array(
+                                    'WEB_APPLICATION'  => 'Web Server Application',
+                                    'JS_CLIENT'        => 'Client Side (JS)',
+                                    'SERVICE'          => 'Service Account'), 'WEB_APPLICATION'); }}
                 <label class="checkbox">
                     <input type="checkbox" id="active" name="active">&nbsp;Active
                 </label>
@@ -215,7 +218,7 @@
                         'tr':{
                             'client<-context':{
                                 'td.app-name':'client.app_name',
-                                'td.client-type':'client.client_type',
+                                'td.client-type':'client.application_type',
                                 'td.client-modified':'client.updated_at',
                                 '.app-active-checkbox@value':'client.id',
                                 '.app-active-checkbox@checked':function(arg){

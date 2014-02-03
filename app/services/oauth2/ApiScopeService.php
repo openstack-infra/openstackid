@@ -148,11 +148,12 @@ class ApiScopeService implements IApiScopeService {
         return $res;
     }
 
+
     /**
      * sets api scope status (active/deactivated)
-     * @param $id id of api scope
-     * @param bool $status status (active/non active)
-     * @return void
+     * @param \oauth2\services\id $id
+     * @param bool $status
+     * @throws \oauth2\exceptions\InvalidApiScope
      */
     public function setStatus($id, $status)
     {

@@ -4,6 +4,7 @@ namespace services;
 
 use Exception;
 use Log;
+use Auth;
 use utils\services\ICheckPointService;
 use utils\services\ISecurityPolicy;
 
@@ -40,11 +41,14 @@ class CheckPointService implements ICheckPointService
     public function trackException(Exception $ex)
     {
         try {
-            $remote_ip = IPHelper::getUserIp();
-            $class_name = get_class($ex);
-            $user_trail = new \UserExceptionTrail();
-            $user_trail->from_ip = $remote_ip;
+            $remote_ip                  = IPHelper::getUserIp();
+            $class_name                 = get_class($ex);
+            $user_trail                 = new \UserExceptionTrail();
+            $user_trail->from_ip        = $remote_ip;
             $user_trail->exception_type = $class_name;
+            if(Auth::check()){
+                $user_trail->user_id = Auth::user()->getId();
+            }
             $user_trail->Save();
             Log::error(sprintf("* CheckPointService - exception : << %s >> - IP Address: %s",$ex->getMessage(),$remote_ip));
             //applying policies

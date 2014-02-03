@@ -7,7 +7,6 @@ use oauth2\services\IApiEndpointService;
 use ApiEndpoint;
 use ApiScope;
 use DB;
-use  oauth2\exceptions\InvalidApi;
 use  oauth2\exceptions\InvalidApiEndpoint;
 use  oauth2\exceptions\InvalidApiScope;
 

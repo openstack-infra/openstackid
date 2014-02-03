@@ -17,6 +17,7 @@ class OpenIdNonce
 
     /**
      * @param $nonce_str
+     * @throws InvalidNonce
      */
     public function __construct($nonce_str)
     {

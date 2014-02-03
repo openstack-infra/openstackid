@@ -162,6 +162,11 @@ class ApiScopeController extends AbstractRESTController implements IRESTControll
         }
     }
 
+    /**
+     * @param $id
+     * @param $active
+     * @return mixed
+     */
     public function updateStatus($id, $active){
         try {
             $res    = $this->api_scope_service->setStatus($id,$active);

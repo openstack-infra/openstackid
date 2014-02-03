@@ -89,7 +89,7 @@ class ResourceServerService implements IResourceServerService {
 
     /**
      * deletes a resource server
-     * @param $resource_server_id id of resource server
+     * @param id $id
      * @return bool
      */
     public function delete($id)

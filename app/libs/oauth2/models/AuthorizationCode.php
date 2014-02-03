@@ -19,17 +19,21 @@ class AuthorizationCode extends Token {
         parent::__construct(64);
     }
 
+
     /**
+     * @param $user_id
      * @param $client_id
      * @param $scope
-     * @param $redirect_uri
+     * @param string $audience
+     * @param null $redirect_uri
      * @param int $lifetime
      * @return AuthorizationCode
      */
-    public static function create($client_id, $scope, $audience='' ,$redirect_uri = null, $lifetime = 600){
+    public static function create($user_id, $client_id, $scope, $audience='' ,$redirect_uri = null, $lifetime = 600){
         $instance = new self();
         $instance->value        = Rand::getString($instance->len, OAuth2Protocol::VsChar, true);
         $instance->scope        = $scope;
+        $instance->user_id     = $user_id;
         $instance->redirect_uri = $redirect_uri;
         $instance->client_id    = $client_id;
         $instance->lifetime     = $lifetime;
@@ -39,9 +43,23 @@ class AuthorizationCode extends Token {
         return $instance;
     }
 
-    public static function load($value, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600, $from_ip = '127.0.0.1',$is_hashed = false){
+    /**
+     * @param $value
+     * @param $user_id
+     * @param $client_id
+     * @param $scope
+     * @param string $audience
+     * @param null $redirect_uri
+     * @param null $issued
+     * @param int $lifetime
+     * @param string $from_ip
+     * @param bool $is_hashed
+     * @return AuthorizationCode
+     */
+    public static function load($value, $user_id, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600, $from_ip = '127.0.0.1',$is_hashed = false){
         $instance = new self();
         $instance->value        = $value;
+        $instance->user_id      = $user_id;
         $instance->scope        = $scope;
         $instance->redirect_uri = $redirect_uri;
         $instance->client_id    = $client_id;
@@ -60,23 +78,10 @@ class AuthorizationCode extends Token {
 
     public function toJSON()
     {
-        $o = array(
-            'value'        => $this->value,
-            'redirect_uri' => $this->redirect_uri,
-            'client_id'    => $this->client_id,
-            'scope'        => $this->scope,
-        );
-
-        return json_encode($o);
+        return '{}';
     }
 
     public function fromJSON($json)
     {
-        $o = json_decode($json);
-
-        $this->value     = $o->value;
-        $this->scope     = $o->scope;
-        $this->client_id = $o->client_id;
-        $this->scope     = $o->redirect_uri;
     }
 }

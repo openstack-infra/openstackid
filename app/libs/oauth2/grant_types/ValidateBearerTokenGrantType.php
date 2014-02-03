@@ -2,10 +2,11 @@
 
 namespace oauth2\grant_types;
 
+use oauth2\exceptions\InvalidApplicationType;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\InvalidAccessTokenException;
 use oauth2\exceptions\BearerTokenDisclosureAttemptException;
-use oauth2\exceptions\UnAuthorizedClientException;
+use oauth2\exceptions\LockedClientException;
 use oauth2\exceptions\InvalidGrantTypeException;
 
 use oauth2\requests\OAuth2Request;
@@ -83,8 +84,9 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
     /**
      * @param OAuth2Request $request
      * @return mixed|OAuth2AccessTokenValidationResponse|void
-     * @throws \oauth2\exceptions\UnAuthorizedClientException
      * @throws \oauth2\exceptions\InvalidOAuth2Request
+     * @throws \oauth2\exceptions\LockedClientException
+     * @throws \oauth2\exceptions\InvalidApplicationType
      * @throws \oauth2\exceptions\BearerTokenDisclosureAttemptException
      */
     public function completeFlow(OAuth2Request $request)
@@ -104,35 +106,35 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
                 if(!$this->current_client->isResourceServerClient()){
                     // if current client is not a resource server, then we could only access to our own tokens
                     if($access_token->getClientId()!== $this->current_client_id)
-                        throw new BearerTokenDisclosureAttemptException(sprintf('access token %s does not belongs to client id %s',$token_value, $this->current_client_id));
+                        throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('access token %s does not belongs to client id %s',$token_value, $this->current_client_id));
                 }
                 else{
                     // current client is a resource server, validate client type (must be confidential)
                     if($this->current_client->getClientType()!== IClient::ClientType_Confidential)
-                        throw new UnAuthorizedClientException('resource server client is not of confidential type!');
+                        throw new InvalidApplicationType($this->current_client_id,'resource server client is not of confidential type!');
                     //validate resource server IP address
                     $current_ip      = IPHelper::getUserIp();
                     $resource_server = $this->current_client->getResourceServer();
                     //check if resource server is active
                     if(!$resource_server->active)
-                        throw new UnAuthorizedClientException('resource server is disabled!');
+                        throw new LockedClientException($this->current_client_id,'resource server is disabled!');
                     //check resource server ip address
                     if($current_ip !== $resource_server->ip)
-                        throw new BearerTokenDisclosureAttemptException(sprintf('resource server ip (%s) differs from current request ip %s',$resource_server->ip,$current_ip));
+                        throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('resource server ip (%s) differs from current request ip %s',$resource_server->ip,$current_ip));
                     // check if current ip belongs to a registered resource server audience
                     if(!$this->token_service->checkAccessTokenAudience($access_token,$current_ip))
-                        throw new BearerTokenDisclosureAttemptException(sprintf('access token current audience does not match with current request ip %s', $current_ip));
+                        throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('access token current audience does not match with current request ip %s', $current_ip));
                 }
 
-                return new OAuth2AccessTokenValidationResponse($token_value, $access_token->getScope(), $access_token->getAudience(),$access_token->getClientId(),$access_token->getRemainingLifetime());
+                return new OAuth2AccessTokenValidationResponse($token_value, $access_token->getScope(), $access_token->getAudience(),$access_token->getClientId(),$access_token->getRemainingLifetime(),$access_token->getUserId());
             }
             catch(InvalidAccessTokenException $ex1){
                 $this->log_service->error($ex1);
-                throw new BearerTokenDisclosureAttemptException($ex1->getMessage());
+                throw new BearerTokenDisclosureAttemptException($this->current_client_id,$ex1->getMessage());
             }
             catch(InvalidGrantTypeException $ex2){
                 $this->log_service->error($ex2);
-                throw new BearerTokenDisclosureAttemptException($ex2->getMessage());
+                throw new BearerTokenDisclosureAttemptException($this->current_client_id,$ex2->getMessage());
             }
         }
         throw new InvalidOAuth2Request;

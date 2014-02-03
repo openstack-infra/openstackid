@@ -1,20 +1,10 @@
 <?php
+
 use oauth2\models\IClient;
 
 class Client extends BaseModelEloquent implements IClient {
 
     protected $table = 'oauth2_client';
-
-    public function getFriendlyClientType(){
-        switch($this->client_type){
-            case IClient::ClientType_Confidential:
-                return 'Web Application';
-            break;
-            default:
-                return 'Browser (JS Client)';
-                break;
-        }
-    }
 
     public function access_tokens()
     {
@@ -185,5 +175,25 @@ class Client extends BaseModelEloquent implements IClient {
     public function getResourceServer()
     {
         return $this->resource_server()->first();
+    }
+
+    public function getApplicationType()
+    {
+        return $this->application_type;
+    }
+
+    public function getFriendlyApplicationType(){
+        switch($this->application_type){
+            case IClient::ApplicationType_JS_Client:
+                return 'Client Side (JS)';
+            break;
+            case IClient::ApplicationType_Service:
+                return 'Service Account';
+            break;
+            case IClient::ApplicationType_Web_App:
+                return 'Web Server Application';
+            break;
+        }
+        throw new Exception('Invalid Application Type');
     }
 }

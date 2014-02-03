@@ -37,6 +37,7 @@ class RefreshToken extends Token {
         $instance = new self();
         $instance->value        = Rand::getString($instance->len,OAuth2Protocol::VsChar,true);
         $instance->scope        = $access_token->getScope();
+        $instance->user_id      = $access_token->getUserId();
         $instance->client_id    = $access_token->getClientId();
         $instance->audience     = $access_token->getAudience();
         $instance->from_ip      = IPHelper::getUserIp();
@@ -50,6 +51,7 @@ class RefreshToken extends Token {
         $instance->value        = $params['value'];
         $instance->scope        = $params['scope'];
         $instance->client_id    = $params['client_id'];
+        $instance->user_id      = $params['user_id'];
         $instance->audience     = $params['audience'];
         $instance->from_ip      = $params['from_ip'];
         $instance->issued       = $params['issued'];
@@ -60,7 +62,7 @@ class RefreshToken extends Token {
 
     public function toJSON()
     {
-        // TODO: Implement toJSON() method.
+        return '{}';
     }
 
     public function fromJSON($json)

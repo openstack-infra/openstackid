@@ -19,7 +19,7 @@ class CreateOauth2ClientsTable extends Migration {
             $table->string('app_logo',255)->nullable();
             $table->string('client_id',255)->unique();
             $table->string('client_secret',255)->nullable();
-            $table->smallInteger('client_type');
+            $table->enum('client_type', array('PUBLIC', 'CONFIDENTIAL'));
             $table->boolean('active')->default(true);
             $table->boolean('locked')->default(false);
 
@@ -38,7 +38,7 @@ class CreateOauth2ClientsTable extends Migration {
             $table->integer('max_refresh_token_issuance_qty')->default(0);
             $table->smallInteger('max_refresh_token_issuance_basis');
 
-            $table->boolean('use_refresh_token')->default(true);
+            $table->boolean('use_refresh_token')->default(false);
             $table->boolean('rotate_refresh_token')->default(false);
         });
 	}
