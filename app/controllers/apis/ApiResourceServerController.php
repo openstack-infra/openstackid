@@ -6,7 +6,7 @@ use oauth2\exceptions\InvalidResourceServer;
 /**
  * Class ApiResourceServerController
  */
-class ApiResourceServerController extends JsonController implements IRESTController
+class ApiResourceServerController extends AbstractRESTController implements ICRUDController
 {
     /**
      * @var IResourceServerService $resource_service
@@ -17,6 +17,8 @@ class ApiResourceServerController extends JsonController implements IRESTControl
     {
         parent::__construct($log_service);
         $this->resource_server_service = $resource_server_service;
+        $this->allowed_filter_fields     = array('');
+        $this->allowed_projection_fields = array('*');
     }
 
     public function get($id)
@@ -43,10 +45,15 @@ class ApiResourceServerController extends JsonController implements IRESTControl
         }
     }
 
-    public function getByPage($page_nbr, $page_size)
+    public function getByPage()
     {
         try {
-            $list = $this->resource_server_service->getAll($page_nbr, $page_size);
+            $fields  =  $this->getProjection(Input::get('fields',null));
+            $filters = $this->getFilters(Input::except('fields','limit','offset'));
+            $page_nbr = intval(Input::get('offset',1));
+            $page_size = intval(Input::get('limit',10));
+
+            $list = $this->resource_server_service->getAll($page_nbr, $page_size,$filters,$fields);
             $items = array();
             foreach ($list->getItems() as $rs) {
                 array_push($items, $rs->toArray());
@@ -86,7 +93,7 @@ class ApiResourceServerController extends JsonController implements IRESTControl
                 $values['friendly_name'],
                 $values['active']);
 
-            return $this->ok(array('resource_server_id' => $new_resource_server_model->id));
+            return $this->created(array('resource_server_id' => $new_resource_server_model->id));
         }
         catch(InvalidResourceServer $ex1){
             $this->log_service->error($ex1);
@@ -102,7 +109,7 @@ class ApiResourceServerController extends JsonController implements IRESTControl
     {
         try {
             $res = $this->resource_server_service->delete($id);
-            return $res?Response::json('ok',200):$this->error404(array('error'=>'operation failed'));
+            return $res?$this->deleted():$this->error404(array('error'=>'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
@@ -113,7 +120,7 @@ class ApiResourceServerController extends JsonController implements IRESTControl
     {
         try {
             $res = $this->resource_server_service->regenerateClientSecret($id);
-            return !is_null($res)?Response::json(array('new_secret'=>$res),200):$this->error404(array('error'=>'operation failed'));
+            return !is_null($res)?$this->ok(array('new_secret'=>$res)):$this->error404(array('error'=>'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
@@ -134,16 +141,12 @@ class ApiResourceServerController extends JsonController implements IRESTControl
             );
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($values, $rules);
-
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
                 return $this->error400(array('error'=>'validation','messages' => $messages));
             }
-
             $res = $this->resource_server_service->update(intval($values['id']),$values);
-
-            return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
-
+            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
         }
         catch(InvalidResourceServer $ex1){
             $this->log_service->error($ex1);
@@ -155,10 +158,16 @@ class ApiResourceServerController extends JsonController implements IRESTControl
         }
     }
 
+    /**
+     * @param $id
+     * @param $active
+     * @return mixed
+     */
     public function updateStatus($id, $active){
         try {
+            $active = is_string($active)?(strtoupper(trim($active))==='TRUE'?true:false ):$active;
             $res = $this->resource_server_service->setStatus($id,$active);
-            return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
+            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);

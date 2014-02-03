@@ -1,8 +1,9 @@
 @extends('layout')
 @section('title')
-<title>Welcome to openstackId - Edit API Scope Id # {{ $scope->id }}</title>
+<title>Welcome to openstackId - Server Admin - Edit API Scope</title>
 @stop
 @section('content')
+@include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
 <a href='{{  URL::action("AdminController@editApi",array("id"=>$scope->api_id)) }}'>Go Back</a>
 <legend>Edit API Scope - Id {{ $scope->id }}</legend>
 <div class="row-fluid">
@@ -76,6 +77,8 @@
 @section('scripts')
 <script type="application/javascript">
     $(document).ready(function() {
+
+        $('#server-admin','#main-menu').addClass('active');
 
         var scope_form = $('#scope-form');
 

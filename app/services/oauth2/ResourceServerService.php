@@ -21,14 +21,16 @@ class ResourceServerService implements IResourceServerService {
     }
 
     /**
-     * @param int $page_size
      * @param int $page_nbr
+     * @param int $page_size
+     * @param array $filters
+     * @param array $fields
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10)
+    public function getAll($page_nbr=1,$page_size=10,array $filters=array(), array $fields=array('*'))
     {
         DB::getPaginator()->setCurrentPage($page_nbr);
-        return ResourceServer::paginate($page_size);
+        return ResourceServer::Filter($filters)->paginate($page_size,$fields);
     }
 
     /**
@@ -89,7 +91,7 @@ class ResourceServerService implements IResourceServerService {
 
     /**
      * deletes a resource server
-     * @param $resource_server_id id of resource server
+     * @param id $id
      * @return bool
      */
     public function delete($id)
@@ -152,7 +154,7 @@ class ResourceServerService implements IResourceServerService {
             $instance->Save();
 
             // creates a new client for this brand new resource server
-            $new_client = $this->client_service->addClient(IClient::ClientType_Confidential,null,$host.'.confidential.application',$friendly_name.' confidential oauth2 application');
+            $new_client = $this->client_service->addClient(IClient::ApplicationType_Service,null,$host.'.confidential.application',$friendly_name.' confidential oauth2 application');
             $new_client->resource_server()->associate($instance);
             $new_client->Save();
         });

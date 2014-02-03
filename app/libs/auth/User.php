@@ -10,10 +10,13 @@ use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
 use oauth2\models\IOAuth2User;
 use Eloquent;
-
-class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
+use utils\model\BaseModelEloquent;
+/**
+ * Class User
+ * @package auth
+ */
+class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAuth2User
 {
-
     protected $table = 'openid_users';
 
     private $member;
@@ -21,6 +24,21 @@ class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
     public function trusted_sites()
     {
         return $this->hasMany("OpenIdTrustedSite", 'user_id');
+    }
+
+    public function access_tokens()
+    {
+        return $this->hasMany('AccessToken','user_id');
+    }
+
+    public function refresh_tokens()
+    {
+        return $this->hasMany('RefreshToken','user_id');
+    }
+
+    public function consents()
+    {
+        return $this->hasMany('UserConsent','user_id');
     }
 
     public function clients()
@@ -207,8 +225,6 @@ class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
     {
         return $this->clients()->get();
     }
-
-
     /**
      * Could use system scopes on registered clients
      * @return bool
@@ -226,12 +242,24 @@ class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
      * Is Server Administrator
      * @return bool
      */
-    public function IsServerAdmin()
+    public function isOAuth2ServerAdmin()
     {
         if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
         $group = $this->member->groups()->where('code','=',IOAuth2User::OAuth2ServerAdminGroup)->first();
+        return !is_null($group);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOpenstackIdAdmin()
+    {
+        if (is_null($this->member)) {
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        $group = $this->member->groups()->where('code','=',IOpenIdUser::OpenstackIdServerAdminGroup)->first();
         return !is_null($group);
     }
 }

@@ -11,7 +11,6 @@ namespace openid\extensions\implementations;
 use Exception;
 use openid\OpenIdMessage;
 use openid\requests\OpenIdRequest;
-use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
 use utils\services\UtilsServiceCatalog;
 

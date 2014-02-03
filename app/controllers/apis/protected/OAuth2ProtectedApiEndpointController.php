@@ -24,7 +24,7 @@ class OAuth2ProtectedApiEndpointController  extends OAuth2ProtectedController
 
     public function getByPage($page_nbr, $page_size)
     {
-        return $this->controller->getByPage($page_nbr, $page_size);
+        return $this->controller->getByPage();
     }
 
     public function create()

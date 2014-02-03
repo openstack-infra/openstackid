@@ -3,7 +3,6 @@
 namespace auth;
 
 use Illuminate\Support\ServiceProvider;
-use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
 use utils\services\UtilsServiceCatalog;
 

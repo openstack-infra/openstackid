@@ -3,15 +3,19 @@
 namespace openid\requests;
 
 use openid\OpenIdMessage;
+use utils\services\Registry;
+use utils\services\UtilsServiceCatalog;
 
 abstract class OpenIdRequest
 {
 
     protected $message;
+    protected $log_service;
 
     public function __construct(OpenIdMessage $message)
     {
-        $this->message = $message;
+        $this->message     = $message;
+        $this->log_service = Registry::getInstance()->get(UtilsServiceCatalog::LogService);
     }
 
     public function getMessage()

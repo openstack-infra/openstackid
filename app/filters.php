@@ -53,36 +53,16 @@ Route::filter('auth', function () {
         Session::put('url.intended', URL::full());
         return Redirect::action('HomeController@index');
     }
-    if ($redirect = Session::get('url.intended')) {
+    $redirect = Session::get('url.intended');
+    if (!empty($redirect)) {
         Session::forget('url.intended');
         return Redirect::to($redirect);
-    }
-});
-
-
-Route::filter('auth.server.admin.json',function(){
-    if (Auth::guest()) {
-        return Response::json(array('error' => 'you are not allowed to perform this operation'));
-    }
-    if(!Auth::user()->IsServerAdmin()){
-        return Response::json(array('error' => 'you are not allowed to perform this operation'));
-    }
-});
-
-
-Route::filter('auth.server.admin',function(){
-    if (Auth::guest()) {
-        return View::make('404');
-    }
-    if(!Auth::user()->IsServerAdmin()){
-        return View::make('404');
     }
 });
 
 Route::filter('auth.basic', function () {
     return Auth::basic();
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -191,8 +171,16 @@ Route::filter('is.current.user',function($route, $request){
     try{
         $authentication_service = App::make(UtilsServiceCatalog::AuthenticationService);
         $used_id                = Input::get('user_id',null);
+
+        if(is_null($used_id))
+            $used_id            = Input::get('id',null);
+
         if(is_null($used_id))
             $used_id =  $route->getParameter('user_id');
+
+        if(is_null($used_id))
+            $used_id =  $route->getParameter('id');
+
         $user                   = $authentication_service->getCurrentUser();
         if (is_null($used_id) || intval($used_id) !== intval($user->getId()))
             throw new Exception(sprintf('user id %s does not match with current user id %s',$used_id,$user->getId()));
@@ -207,4 +195,48 @@ Route::filter('is.current.user',function($route, $request){
 
 
 // filter to protect an api endpoint with oauth2
+
 Route::filter('oauth2.protected.endpoint','OAuth2BearerAccessTokenRequestValidator');
+
+//oauth2 server admin filter
+
+Route::filter('oauth2.server.admin.json',function(){
+    if (Auth::guest()) {
+        return Response::json(array('error' => 'you are not allowed to perform this operation'));
+    }
+    if(!Auth::user()->isOAuth2ServerAdmin()){
+        return Response::json(array('error' => 'you are not allowed to perform this operation'));
+    }
+});
+
+
+Route::filter('oauth2.server.admin',function(){
+    if (Auth::guest()) {
+        return View::make('404');
+    }
+    if(!Auth::user()->isOAuth2ServerAdmin()){
+        return View::make('404');
+    }
+});
+
+
+//openstackid server admin
+
+Route::filter('openstackid.server.admin.json',function(){
+    if (Auth::guest()) {
+        return Response::json(array('error' => 'you are not allowed to perform this operation'));
+    }
+    if(!Auth::user()->isOpenstackIdAdmin()){
+        return Response::json(array('error' => 'you are not allowed to perform this operation'));
+    }
+});
+
+
+Route::filter('openstackid.server.admin',function(){
+    if (Auth::guest()) {
+        return View::make('404');
+    }
+    if(!Auth::user()->isOpenstackIdAdmin()){
+        return View::make('404');
+    }
+});

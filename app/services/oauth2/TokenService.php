@@ -4,6 +4,7 @@ namespace services\oauth2;
 
 use AccessToken as DBAccessToken;
 use DB;
+use oauth2\exceptions\AbsentClientException;
 use oauth2\exceptions\InvalidAccessTokenException;
 use oauth2\exceptions\InvalidAuthorizationCodeException;
 use oauth2\exceptions\InvalidGrantTypeException;
@@ -13,10 +14,12 @@ use oauth2\models\AccessToken;
 use oauth2\models\IClient;
 use oauth2\models\AuthorizationCode;
 use oauth2\models\RefreshToken;
+use oauth2\OAuth2Protocol;
 use oauth2\services\Authorization;
 use oauth2\services\IClientService;
 use oauth2\services\ITokenService;
 
+use oauth2\services\IUserConsentService;
 use RefreshToken as RefreshTokenDB;
 use RefreshToken as DBRefreshToken;
 
@@ -27,10 +30,8 @@ use utils\services\ILockManagerService;
 use utils\services\IServerConfigurationService;
 use Zend\Crypt\Hash;
 
-use DateInterval;
-use DateTime;
 use utils\services\ICacheService;
-
+use  utils\services\IAuthService;
 /**
  * Class TokenService
  * Provides all Tokens related operations (create, get and revoke)
@@ -56,27 +57,35 @@ class TokenService implements ITokenService
     private $lock_manager_service;
     private $configuration_service;
     private $cache_service;
+    private $auth_service;
+    private $user_consent_service;
 
-    public function __construct(IClientService $client_service, ILockManagerService $lock_manager_service, IServerConfigurationService $configuration_service, ICacheService $cache_service)
+    public function __construct(IClientService $client_service, ILockManagerService $lock_manager_service, IServerConfigurationService $configuration_service, ICacheService $cache_service, IAuthService $auth_service, IUserConsentService $user_consent_service)
     {
         $this->client_service        = $client_service;
         $this->lock_manager_service  = $lock_manager_service;
         $this->configuration_service = $configuration_service;
         $this->cache_service         = $cache_service;
+        $this->auth_service          = $auth_service;
+        $this->user_consent_service  = $user_consent_service;
     }
 
     /**
-     * Creates a brand new Authorization Code
+     * Creates a brand new authorization code
+     * @param $user_id
      * @param $client_id
-     * @param $scope required scope
-     * @param string $audience aimed resource server audience
-     * @param null $redirect_uri registered client redirect uri
+     * @param $scope
+     * @param string $audience
+     * @param null $redirect_uri
+     * @param string $access_type
+     * @param string $approval_prompt
+     * @param bool $has_previous_user_consent
      * @return AuthorizationCode
      */
-    public function createAuthorizationCode($client_id, $scope, $audience = '', $redirect_uri = null)
+    public function createAuthorizationCode($user_id, $client_id, $scope, $audience='' , $redirect_uri = null,$access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online, $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto, $has_previous_user_consent=false)
     {
         //create model
-        $code         = AuthorizationCode::create($client_id, $scope, $audience, $redirect_uri, $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime'));
+        $code         = AuthorizationCode::create($user_id,$client_id, $scope, $audience, $redirect_uri,$access_type,$approval_prompt,$has_previous_user_consent, $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime'));
         $value        = $code->getValue();
         $hashed_value = Hash::compute('sha256', $value);
         //stores on cache
@@ -88,7 +97,11 @@ class TokenService implements ITokenService
             'redirect_uri' => $code->getRedirectUri(),
             'issued'       => $code->getIssued(),
             'lifetime'     => $code->getLifetime(),
-            'from_ip'      => $code->getFromIp()
+            'from_ip'      => $code->getFromIp(),
+            'user_id'      => $code->getUserId(),
+            'access_type'  => $code->getAccessType(),
+            'approval_prompt'            => $code->getApprovalPrompt(),
+            'has_previous_user_consent'  => $code->getHasPreviousUserConsent()
         ), $code->getLifetime());
 
         //stores brand new auth code hash value on a set by client id...
@@ -115,16 +128,21 @@ class TokenService implements ITokenService
 
             $this->lock_manager_service->acquireLock('lock.get.authcode.' . $hashed_value);
 
-            $cache_values = $this->cache_service->getHash($hashed_value, array('client_id','scope','audience','redirect_uri','issued','lifetime','from_ip'));
+            $cache_values = $this->cache_service->getHash($hashed_value, array('user_id','client_id','scope','audience','redirect_uri','issued','lifetime','from_ip','access_type','approval_prompt','has_previous_user_consent' ));
 
             $code = AuthorizationCode::load($value,
+                $cache_values['user_id'],
                 $cache_values['client_id'],
                 $cache_values['scope'],
                 $cache_values['audience'],
                 $cache_values['redirect_uri'],
                 $cache_values['issued'],
                 $cache_values['lifetime'],
-                $cache_values['from_ip']);
+                $cache_values['from_ip'],
+                $cache_values['access_type'],
+                $cache_values['approval_prompt'],
+                $cache_values['has_previous_user_consent']
+            );
 
             return $code;
         } catch (UnacquiredLockException $ex1) {
@@ -147,7 +165,9 @@ class TokenService implements ITokenService
             $value        = $access_token->getValue();
             $hashed_value = Hash::compute('sha256', $value);
             $client_id    = $access_token->getClientId();
+            $user_id      = $access_token->getUserId();
             $client       = $this->client_service->getClientById($client_id);
+            $user         = $this->auth_service->getUserById($user_id);
 
             $access_token_db = new DBAccessToken (
                 array(
@@ -161,10 +181,15 @@ class TokenService implements ITokenService
             );
 
             $access_token_db->client()->associate($client);
+
+            $access_token_db->user()->associate($user);
+
             $access_token_db->save();
             //check if use refresh tokens...
-            if($client->use_refresh_token && $client->getClientType()==IClient::ClientType_Confidential) {
-                $this->createRefreshToken($access_token);
+            if($client->use_refresh_token && $client->getApplicationType()==IClient::ApplicationType_Web_App && $auth_code->getAccessType()==OAuth2Protocol::OAuth2Protocol_AccessType_Offline) {
+                //but only the first time (approval_prompt == force || not exists previous consent)
+                if(!$auth_code->getHasPreviousUserConsent() || $auth_code->getApprovalPrompt()==OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Force)
+                    $this->createRefreshToken($access_token);
             }
 
             $this->storesAccessTokenOnCache($access_token);
@@ -177,35 +202,55 @@ class TokenService implements ITokenService
         return $access_token;
     }
 
-    public function createAccessTokenFromParams($scope, $client_id, $audience)
+    /**
+     * Create a brand new Access Token by params
+     * @param $client_id
+     * @param $scope
+     * @param $audience
+     * @param null $user_id
+     * @return AccessToken
+     */
+    public function createAccessTokenFromParams($client_id,$scope, $audience,$user_id = null)
     {
-        $access_token = AccessToken::createFromParams($scope, $client_id, $audience, $this->configuration_service->getConfigValue('OAuth2.AccessToken.Lifetime'));
-        $value        = $access_token->getValue();
-        $hashed_value = Hash::compute('sha256', $value);
+        $access_token = null;
 
-        $this->storesAccessTokenOnCache($access_token);
+        DB::transaction(function () use ($client_id,$scope, $audience,$user_id, &$access_token) {
+            $access_token = AccessToken::createFromParams($scope, $client_id, $audience,$user_id, $this->configuration_service->getConfigValue('OAuth2.AccessToken.Lifetime'));
+            $value        = $access_token->getValue();
+            $hashed_value = Hash::compute('sha256', $value);
 
-        $client_id = $access_token->getClientId();
-        $client    = $this->client_service->getClientById($client_id);
+            $this->storesAccessTokenOnCache($access_token);
 
-        //stores in DB
-        $access_token_db = new DBAccessToken(
-            array(
-                'value'    => $hashed_value,
-                'from_ip'  => IPHelper::getUserIp(),
-                'lifetime' => $access_token->getLifetime(),
-                'scope'    => $access_token->getScope(),
-                'audience' => $access_token->getAudience()
-            )
-        );
+            $client_id = $access_token->getClientId();
+            $client    = $this->client_service->getClientById($client_id);
 
-        $access_token_db->client()->associate($client);
-        $access_token_db->Save();
+            //stores in DB
+            $access_token_db = new DBAccessToken(
+                array(
+                    'value'    => $hashed_value,
+                    'from_ip'  => IPHelper::getUserIp(),
+                    'lifetime' => $access_token->getLifetime(),
+                    'scope'    => $access_token->getScope(),
+                    'audience' => $access_token->getAudience()
+                )
+            );
 
-        //stores brand new access token hash value on a set by client id...
-        $this->cache_service->addMemberSet($client_id . self::ClientAccessTokenPrefixList, $hashed_value);
+            $access_token_db->client()->associate($client);
 
-        $this->cache_service->incCounter($client_id . self::ClientAccessTokensQty,self::ClientAccessTokensQtyLifetime);
+            if(!is_null($user_id)){
+                $user = $this->auth_service->getUserById($user_id);
+                $access_token_db->user()->associate($user);
+            }
+
+            $access_token_db->Save();
+
+            //stores brand new access token hash value on a set by client id...
+            $this->cache_service->addMemberSet($client_id . self::ClientAccessTokenPrefixList, $hashed_value);
+
+            $this->cache_service->incCounter($client_id . self::ClientAccessTokensQty,self::ClientAccessTokensQtyLifetime);
+
+        });
+
 
         return $access_token;
     }
@@ -232,7 +277,7 @@ class TokenService implements ITokenService
             if (!is_null($scope) && empty($scope)) {
                 $original_scope     = $refresh_token->getScope();
                 $aux_original_scope = explode(' ', $original_scope);
-                $aux_scope = explode(' ', $scope);
+                $aux_scope          = explode(' ', $scope);
                 //compare original scope with given one, and validate if its included on original one
                 //or not
                 if (count(array_diff($aux_scope, $aux_original_scope)) !== 0)
@@ -249,6 +294,8 @@ class TokenService implements ITokenService
 
             $this->storesAccessTokenOnCache($access_token);
 
+            //get user id
+            $user_id   = $access_token->getUserId();
             //get current client
             $client_id = $access_token->getClientId();
             $client    = $this->client_service->getClientById($client_id);
@@ -267,7 +314,14 @@ class TokenService implements ITokenService
             //save relationships
             $refresh_token_db = DBRefreshToken::where('value','=',$refresh_token_hashed_value)->first();
             $access_token_db->refresh_token()->associate($refresh_token_db);
+
             $access_token_db->client()->associate($client);
+
+            if(!is_null($user_id)){
+                $user = $this->auth_service->getUserById($user_id);
+                $access_token_db->user()->associate($user);
+            }
+
             $access_token_db->Save();
 
             //stores brand new access token hash value on a set by client id...
@@ -294,8 +348,10 @@ class TokenService implements ITokenService
 
         $auth_code           = !is_null($access_token->getAuthCode()) ? Hash::compute('sha256', $access_token->getAuthCode()):'';
         $refresh_token_value = !is_null($access_token->getRefreshToken()) ? Hash::compute('sha256', $access_token->getRefreshToken()->getValue()):'';
+        $user_id             = !is_null($access_token->getUserId())?$access_token->getUserId():0;
 
         $this->cache_service->storeHash($hashed_value, array(
+            'user_id'       => $user_id,
             'client_id'     => $access_token->getClientId(),
             'scope'         => $access_token->getScope(),
             'auth_code'     => $auth_code,
@@ -324,7 +380,10 @@ class TokenService implements ITokenService
         if(!is_null($refresh_token_db))
             $refresh_token_value = $refresh_token_db->value;
 
+        $user_id             = !is_null($access_token->user_id)?$access_token->user_id:0;
+
         $this->cache_service->storeHash($access_token->value, array(
+            'user_id'       => $user_id,
             'client_id'     => $access_token->client_id,
             'scope'         => $access_token->scope,
             'auth_code'     => $access_token->associated_authorization_code,
@@ -374,6 +433,7 @@ class TokenService implements ITokenService
             }
 
             $cache_values = $this->cache_service->getHash($hashed_value, array(
+                'user_id',
                 'client_id',
                 'scope',
                 'auth_code',
@@ -387,6 +447,7 @@ class TokenService implements ITokenService
             // reload auth code ...
             $auth_code = AuthorizationCode::load(
                 $cache_values['auth_code'],
+                intval($cache_values['user_id'])==0?null:intval($cache_values['user_id']),
                 $cache_values['client_id'],
                 $cache_values['scope'],
                 $cache_values['audience'],
@@ -394,7 +455,10 @@ class TokenService implements ITokenService
                 null,
                 $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime'),
                 $cache_values['from_ip'],
-                true
+                $access_type     = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
+                $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
+                $has_previous_user_consent=false,
+                $is_hashed = true
             );
             // reload access token ...
             $access_token        = AccessToken::load($value, $auth_code, $cache_values['issued'],$cache_values['lifetime']);
@@ -444,7 +508,9 @@ class TokenService implements ITokenService
             //hash the given value, bc tokens values are stored hashed on DB
             $hashed_value = Hash::compute('sha256', $value);
             $client_id    = $refresh_token->getClientId();
+            $user_id      = $refresh_token->getUserId();
             $client       = $this->client_service->getClientById($client_id);
+            $user         = $this->auth_service->getUserById($user_id);
             //stores in DB
             $refresh_token_db = new DBRefreshToken (
                 array(
@@ -457,6 +523,7 @@ class TokenService implements ITokenService
             );
 
             $refresh_token_db->client()->associate($client);
+            $refresh_token_db->user()->associate($user);
             $refresh_token_db->Save();
             //associate current access token to refresh token on DB
             $access_token_db = DBAccessToken::where('value','=',Hash::compute('sha256',$access_token->getValue()))->first();
@@ -503,6 +570,7 @@ class TokenService implements ITokenService
             'value'     => $value,
             'scope'     => $refresh_token_db->scope,
             'client_id' => $client->client_id,
+            'user_id'   => $refresh_token_db->user_id,
             'audience'  => $refresh_token_db->audience,
             'from_ip'   => $refresh_token_db->from_ip,
             'issued'    => $refresh_token_db->created_at,
@@ -653,6 +721,8 @@ class TokenService implements ITokenService
 
     public function getAccessTokenByClient($client_id){
         $client        = $this->client_service->getClientById($client_id);
+        if(is_null($client))
+            throw new AbsentClientException(sprintf("client id %d does not exists!",$client_id));
         $res           = array();
         $access_tokens = $client->access_tokens()->get();
         foreach($access_tokens as $access_token){
@@ -662,9 +732,35 @@ class TokenService implements ITokenService
     }
 
     public function getRefreshTokenByClient($client_id){
-        $client = $this->client_service->getClientById($client_id);
+        $client        = $this->client_service->getClientById($client_id);
+        if(is_null($client))
+            throw new AbsentClientException(sprintf("client id %d does not exists!",$client_id));
         $res           = array();
         $refresh_tokens = $client->refresh_tokens()->where('void','=',false)->get();
+        foreach($refresh_tokens as $refresh_token){
+            if(!$refresh_token->isVoid()) array_push($res,$refresh_token);
+        }
+        return $res;
+    }
+
+    public function getAccessTokenByUserId($user_id){
+        $user         = $this->auth_service->getUserById($user_id);
+        if(is_null($user))
+            throw new AbsentClientException(sprintf("user id %d does not exists!",$user_id));
+        $res           = array();
+        $access_tokens = $user->access_tokens()->get();
+        foreach($access_tokens as $access_token){
+            if(!$access_token->isVoid()) array_push($res,$access_token);
+        }
+        return $res;
+    }
+
+    public function getRefreshTokeByUserId($user_id){
+        $user          = $this->auth_service->getUserById($user_id);
+        if(is_null($user))
+            throw new AbsentClientException(sprintf("user id %d does not exists!",$user_id));
+        $res           = array();
+        $refresh_tokens = $user->refresh_tokens()->where('void','=',false)->get();
         foreach($refresh_tokens as $refresh_token){
             if(!$refresh_token->isVoid()) array_push($res,$refresh_token);
         }

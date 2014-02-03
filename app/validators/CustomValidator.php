@@ -63,8 +63,9 @@ class CustomValidator extends Validator {
     }
 
     public function validateApplicationtype($attribute, $value, $parameters){
-        $value = intval($value);
-        return ($value == IClient::ClientType_Public || $value==IClient::ClientType_Confidential);
+        if(!is_string($value)) return false;
+        $value = trim($value);
+        return ($value == IClient::ApplicationType_Service || $value==IClient::ApplicationType_Web_App || $value==IClient::ApplicationType_JS_Client);
     }
 
     public function validateSslurl($attribute, $value, $parameters){

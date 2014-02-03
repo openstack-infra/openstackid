@@ -7,8 +7,12 @@ use openid\services\IServerConfigurationService as IOpenIdServerConfigurationSer
 use ServerConfiguration;
 use utils\services\ICacheService;
 use utils\services\IServerConfigurationService;
-
-class ServerConfigurationService implements IOpenIdServerConfigurationService,IServerConfigurationService
+use DB;
+/**
+ * Class ServerConfigurationService
+ * @package services
+ */
+class ServerConfigurationService implements IOpenIdServerConfigurationService, IServerConfigurationService
 {
 
     const DefaultAssetsUrl = 'http://www.openstack.org/';
@@ -22,18 +26,27 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
 
     private $cache_service;
 
+    /**
+     * @param ICacheService $cache_service
+     */
     public function __construct(ICacheService $cache_service)
     {
 
         $this->cache_service         = $cache_service;
-        //default config values
         $this->default_config_params = array();
-        $this->default_config_params["Private.Association.Lifetime"] = 240;
-        $this->default_config_params["Session.Association.Lifetime"] = 21600;
+        //default config values
+
+        //general
         $this->default_config_params["MaxFailed.Login.Attempts"] = 10;
         $this->default_config_params["MaxFailed.LoginAttempts.2ShowCaptcha"] = 3;
-        $this->default_config_params["Nonce.Lifetime"] = 360;
         $this->default_config_params["Assets.Url"] = 'http://www.openstack.org/';
+
+        //openid
+        $this->default_config_params["OpenId.Private.Association.Lifetime"] = 240;
+        $this->default_config_params["OpenId.Session.Association.Lifetime"] = 21600;
+        $this->default_config_params["OpenId.Nonce.Lifetime"] = 360;
+
+        //policies
 
         $this->default_config_params["BlacklistSecurityPolicy.BannedIpLifeTimeSeconds"] = 21600;
         $this->default_config_params["BlacklistSecurityPolicy.MinutesWithoutExceptions"] = 5;
@@ -53,6 +66,7 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
         $this->default_config_params["BlacklistSecurityPolicy.MaxInvalidAssociationAttempts"]                      = 10;
         $this->default_config_params["BlacklistSecurityPolicy.InvalidAssociationInitialDelay"]                     = 20;
 
+        //oauth2
 
         $this->default_config_params["BlacklistSecurityPolicy.OAuth2.MaxAuthCodeReplayAttackAttempts"]          = 3;
         $this->default_config_params["BlacklistSecurityPolicy.OAuth2.AuthCodeReplayAttackInitialDelay"]         = 10;
@@ -69,6 +83,11 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
         //infinite by default
         $this->default_config_params["OAuth2.RefreshToken.Lifetime"]      = 0;
 
+        //oauth2 policy defaults
+        $this->default_config_params["OAuth2SecurityPolicy.MinutesWithoutExceptions"]          = 2;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts"]  = 5;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts"] = 10;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts"]  = 10;
     }
 
     public function getUserIdentityEndpointURL($identifier)
@@ -91,28 +110,56 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
     public function getConfigValue($key)
     {
         $res = null;
-        try {
+        DB::transaction(function () use ($key,&$res) {
+            try {
 
-            if (!$this->cache_service->exists($key)) {
+                if (!$this->cache_service->exists($key)) {
 
-                if (!is_null($conf = ServerConfiguration::where('key', '=', $key)->first()))
-                    $this->cache_service->addSingleValue($key, $conf->value);
-                else
-                if (isset($this->default_config_params[$key]))
-                    $this->cache_service->addSingleValue($key, $this->default_config_params[$key]);
-                else
-                    return null;
+                    if (!is_null($conf = ServerConfiguration::where('key', '=', $key)->first()))
+                        $this->cache_service->addSingleValue($key, $conf->value);
+                    else
+                        if (isset($this->default_config_params[$key]))
+                            $this->cache_service->addSingleValue($key, $this->default_config_params[$key]);
+                        else{
+                            $res = null;
+                            return;
+                        }
+                }
+                $res = $this->cache_service->getSingleValue($key);
+
+            } catch (Exception $ex) {
+                Log::error($ex);
+                if (isset($this->default_config_params[$key])) {
+                    $res = $this->default_config_params[$key];
+                }
             }
+        });
 
-            $res = $this->cache_service->getSingleValue($key);
-
-        } catch (Exception $ex) {
-            Log::error($ex);
-            if (isset($this->default_config_params[$key])) {
-                $res = $this->default_config_params[$key];
-            }
-        }
         return $res;
     }
 
+    public function getAllConfigValues()
+    {
+        // TODO: Implement getAllConfigValues() method.
+    }
+
+    public function saveConfigValue($key, $value)
+    {
+        $res = false;
+        DB::transaction(function () use ($key, $value,&$res) {
+            $conf = ServerConfiguration::where('key', '=', $key)->first();
+            if(is_null($conf)){
+                $conf = new ServerConfiguration();
+                $conf->key = $key;
+                $conf->value = $value;
+                $res=$conf->Save();
+            }
+            else{
+                $conf->value = $value;
+                $res = $conf->Save();
+            }
+            $this->cache_service->delete($key);
+        });
+        return $res;
+    }
 }

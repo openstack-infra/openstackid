@@ -17,6 +17,6 @@ class AuthenticationStrategy implements IOpenIdAuthenticationStrategy
 
     public function doConsent(OpenIdAuthenticationRequest $request, RequestContext $context)
     {
-        return Redirect::action('UserController@getConsent')->with('context', $context);;
+        return Redirect::action('UserController@getConsent')->with('context', $context);
     }
 }

@@ -3,10 +3,10 @@
 namespace services;
 
 use auth\User;
+use DB;
+use Exception;
 use Log;
 use openid\services\IUserService;
-use Exception;
-use DB;
 
 class UserService implements IUserService
 {
@@ -22,9 +22,9 @@ class UserService implements IUserService
                     $aux_proposed_username = $proposed_username;
                     do {
                         $old_user = \DB::table('openid_users')
-                                    ->where('identifier', '=', $aux_proposed_username)
-                                    ->where('id', '<>', $id)
-                                    ->first();
+                            ->where('identifier', '=', $aux_proposed_username)
+                            ->where('id', '<>', $id)
+                            ->first();
                         if (is_null($old_user)) {
                             \DB::table('openid_users')->where('id', '=', $id)->update(array('identifier' => $aux_proposed_username));
                             $done = true;
@@ -79,7 +79,7 @@ class UserService implements IUserService
             $user = User::where('id', '=', $identifier)->first();
             if (!is_null($user)) {
                 DB::transaction(function () use ($identifier) {
-                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => 1));
+                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => true));
                 });
                 Log::warning(sprintf("User %d locked ", $identifier));
             }
@@ -90,12 +90,14 @@ class UserService implements IUserService
 
     public function unlockUser($identifier)
     {
-        $user = User::where('id', '=', $identifier)->first();
-        if (!is_null($user)) {
-            DB::transaction(function () use ($identifier) {
-                DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => 0));
-            });
-        }
+        $res = false;
+        DB::transaction(function () use ($identifier, &$res) {
+            $user = User::where('id', '=', $identifier)->first();
+            if (!is_null($user)) {
+                $res = DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => false));
+            }
+        });
+        return $res;
     }
 
     public function activateUser($identifier)
@@ -139,5 +141,18 @@ class UserService implements IUserService
         } catch (Exception $ex) {
             Log::error($ex);
         }
+    }
+
+    /**
+     * @param int $page_nbr
+     * @param int $page_size
+     * @param array $filters
+     * @param array $fields
+     * @return mixed
+     */
+    public function getAll($page_nbr = 1, $page_size = 10, array $filters = array(), array $fields = array('*'))
+    {
+        DB::getPaginator()->setCurrentPage($page_nbr);
+        return User::Filter($filters)->paginate($page_size, $fields);
     }
 }

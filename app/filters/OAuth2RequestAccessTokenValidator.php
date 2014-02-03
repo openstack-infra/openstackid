@@ -38,13 +38,12 @@ class OAuth2BearerAccessTokenRequestValidator {
      */
     public function filter($route, $request)
     {
+        $url       = $route->getPath();
+        $method    = $request->getMethod();
+        $realm     = $request->getHost();
 
         try{
-
-            $url       = $route->getPath();
-            $method    = $request->getMethod();
             $endpoint  = $this->api_endpoint_service->getApiEndpointByUrlAndMethod($url, $method);
-            $realm     = $request->getHost();
 
             //api endpoint must be registered on db and active
             if(is_null($endpoint) || !$endpoint->isActive()){

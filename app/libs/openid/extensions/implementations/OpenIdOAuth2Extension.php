@@ -47,6 +47,12 @@ class OpenIdOAuth2Extension extends OpenIdExtension
     private $client_service;
     private $scope_service;
 
+    /**
+     * @param $name
+     * @param $namespace
+     * @param $view
+     * @param $description
+     */
     public function __construct($name, $namespace, $view, $description)
     {
         parent::__construct($name, $namespace, $view, $description);
@@ -57,36 +63,63 @@ class OpenIdOAuth2Extension extends OpenIdExtension
         $this->scope_service       = Registry::getInstance()->get(OAuth2ServiceCatalog::ScopeService);
     }
 
+    /**
+     * @param $param
+     * @param string $separator
+     * @return string
+     */
     public static function param($param, $separator = '.')
     {
         return OpenIdProtocol::OpenIdPrefix . $separator . self::Prefix . $separator . $param;
     }
 
+    /**
+     * @param string $separator
+     * @return string
+     */
     public static function paramNamespace($separator = '.')
     {
         return OpenIdProtocol::OpenIdPrefix . $separator . OpenIdProtocol::OpenIDProtocol_NS . $separator . self::Prefix;
     }
 
+    /**
+     * @param OpenIdRequest $request
+     * @param RequestContext $context
+     * @return mixed|void
+     */
     public function parseRequest(OpenIdRequest $request, RequestContext $context)
     {
         try {
 
             $oauth2_request = new OpenIdOAuth2Request($request->getMessage());
-            if (!$oauth2_request->isValid()) return;
+            if (!$oauth2_request->isValid()){
+
+                $this->log_service->warning_msg('OpenIdOAuth2Extension: Invalid OAuth2 Request');
+                return;
+            }
 
             $scopes    = $oauth2_request->getScope();
             $client_id = $oauth2_request->getClientId();
 
             $client = $this->client_service->getClientById($client_id);
             // do some validations to allow show the oauth2 sub view...
-            if(is_null($client)) return;
+            if(is_null($client)){
+                $this->log_service->warning_msg(sprintf("OpenIdOAuth2Extension: client id %s not found!.",$client_id));
+                return;
+            }
 
             //check is redirect uri is allowed for client
             $redirect_uri = $request->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo);
-            if (!$client->isUriAllowed($redirect_uri)) return;
+            if (!$client->isUriAllowed($redirect_uri)){
+                $this->log_service->warning_msg(sprintf("OpenIdOAuth2Extension: url %s not allowed for client id %s ",$redirect_uri,$client_id));
+                return;
+            }
 
             //check if requested client is allowed to use this scopes
-            if(!$client->isScopeAllowed($scopes)) return;
+            if(!$client->isScopeAllowed($scopes)){
+                $this->log_service->warning_msg(sprintf("OpenIdOAuth2Extension: scope %s not allowed for client id %s ",$scopes,$client_id));
+                return;
+            }
 
             $scopes           = explode(' ', $scopes);
             //get scopes entities
@@ -112,6 +145,12 @@ class OpenIdOAuth2Extension extends OpenIdExtension
         }
     }
 
+    /**
+     * @param OpenIdRequest $request
+     * @param OpenIdResponse $response
+     * @param ResponseContext $context
+     * @return mixed|void
+     */
     public function prepareResponse(OpenIdRequest $request, OpenIdResponse $response, ResponseContext $context)
     {
         try{
@@ -120,11 +159,13 @@ class OpenIdOAuth2Extension extends OpenIdExtension
             //get auth code
             $oauth2_msg = new OAuth2Message(
                 array(
-                    OAuth2Protocol::OAuth2Protocol_ClientId     => $oauth2_request->getClientId(),
-                    OAuth2Protocol::OAuth2Protocol_Scope        => $oauth2_request->getScope(),
-                    OAuth2Protocol::OAuth2Protocol_RedirectUri  => $request->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo),
-                    OAuth2Protocol::OAuth2Protocol_State        => $oauth2_request->getState(),
-                    OAuth2Protocol::OAuth2Protocol_ResponseType => OAuth2Protocol::OAuth2Protocol_ResponseType_Code
+                    OAuth2Protocol::OAuth2Protocol_ClientId        => $oauth2_request->getClientId(),
+                    OAuth2Protocol::OAuth2Protocol_Scope           => $oauth2_request->getScope(),
+                    OAuth2Protocol::OAuth2Protocol_RedirectUri     => $request->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo),
+                    OAuth2Protocol::OAuth2Protocol_State           => $oauth2_request->getState(),
+                    OAuth2Protocol::OAuth2Protocol_Approval_Prompt => $oauth2_request->getApprovalPrompt(),
+                    OAuth2Protocol::OAuth2Protocol_AccessType      => $oauth2_request->getAccessType(),
+                    OAuth2Protocol::OAuth2Protocol_ResponseType    => OAuth2Protocol::OAuth2Protocol_ResponseType_Code
                 )
             );
             // do oauth2 Authorization Code Grant 1st step (get auth code to exchange for an access token)
@@ -163,6 +204,10 @@ class OpenIdOAuth2Extension extends OpenIdExtension
         }
     }
 
+    /**
+     * @param OpenIdRequest $request
+     * @return array|mixed
+     */
     public function getTrustedData(OpenIdRequest $request)
     {
         $data = array();

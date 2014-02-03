@@ -1,8 +1,9 @@
 <?php
 
 use oauth2\models\IResourceServer;
+use utils\model\BaseModelEloquent;
 
-class ResourceServer extends Eloquent implements IResourceServer {
+class ResourceServer extends BaseModelEloquent implements IResourceServer {
 
     protected $fillable = array('host','ip','active','friendly_name');
 

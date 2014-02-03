@@ -1,11 +1,11 @@
 @extends('layout')
 
 @section('title')
-<title>Welcome to openstackId - Edit Resource Servers</title>
+<title>Welcome to openstackId - Server Admin - Resource Server</title>
 @stop
 
 @section('content')
-<a href='{{ URL::action("UserController@getProfile") }}'>Go Back</a>
+@include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
 <div class="row-fluid">
 
     <div class="row-fluid">
@@ -42,6 +42,7 @@
             <td>{{$resource_server->ip}}</td>
             <td>
                 <input type="checkbox" class="resource-server-active-checkbox" id="resource-server-active_{{$resource_server->id}}"
+                       data-resource-server-id="{{$resource_server->id}}"
                 @if ( $resource_server->active)
                 checked
                 @endif
@@ -90,7 +91,7 @@
 <script type="application/javascript">
 
     function loadResourceServers(){
-        var link = '{{URL::action("ApiResourceServerController@getByPage",array("page_nbr"=>1,"page_size"=>1000))}}';
+        var link = '{{URL::action("ApiResourceServerController@getByPage",array("offset"=>1,"limit"=>1000))}}';
         $.ajax(
             {
                 type: "GET",
@@ -100,7 +101,7 @@
                 success: function (data,textStatus,jqXHR) {
                     //load data...
                     var uris = data.page;
-                    var template = $('<tbody><tr><td class="fname"></td><td class="hname"></td><td class="ip"></td><td class="active"><input type="checkbox" class="resource-server-active-checkbox"></td><td>&nbsp;<a class="btn edit-resource-server" title="Edits a Registered Resource Server">Edit</a><a class="btn delete-resource-server" title="Deletes a Registered Resource Server">Delete</a></td></tr></tbody>');
+                    var template = $('<tbody><tr><td class="fname"></td><td class="hname"></td><td class="ip"></td><td class="active"><input type="checkbox" class="resource-server-active-checkbox"></td><td>&nbsp;<a class="btn edit-resource-server" title="Edits a Registered Resource Server">Edit</a>&nbsp;<a class="btn delete-resource-server" title="Deletes a Registered Resource Server">Delete</a></td></tr></tbody>');
                     var directives = {
                         'tr':{
                             'resource_server<-context':{
@@ -112,6 +113,7 @@
                                     var active = parseInt(arg.item.active);
                                     return active===1?'true':'';
                                 },
+                                '.resource-server-active-checkbox@data-resource-server-id':'resource_server.id',
                                 '.resource-server-active-checkbox@id':function(arg){
                                     var id = arg.item.id;
                                     return 'resource-server-active_'+id;
@@ -140,6 +142,8 @@
     }
 
     $(document).ready(function() {
+
+      $('#server-admin','#main-menu').addClass('active');
 
       //validation rules on new server form
       var resource_server_form = $('#form-resource-server');
@@ -174,6 +178,30 @@
         event.preventDefault();
         return false;
       });
+
+
+      $("body").on('click',".resource-server-active-checkbox",function(event){
+          var active = $(this).is(':checked');
+          var resource_server_id = $(this).attr('data-resource-server-id');
+          var url    = '{{ URL::action("ApiResourceServerController@updateStatus",array("id"=>"@id","active"=>"@active")) }}';
+          url        = url.replace('@id',resource_server_id);
+          url        = url.replace('@active',active);
+          $.ajax(
+              {
+                  type: "PUT",
+                  url: url,
+                  contentType: "application/json; charset=utf-8",
+                  timeout:60000,
+                  success: function (data,textStatus,jqXHR) {
+                      //load data...
+                  },
+                  error: function (jqXHR, textStatus, errorThrown) {
+                      ajaxError(jqXHR, textStatus, errorThrown);
+                  }
+              }
+          );
+      });
+
 
       $("body").on('click',"#save-resource-server",function(event){
         var is_valid = resource_server_form.valid();

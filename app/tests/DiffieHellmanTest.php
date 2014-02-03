@@ -2,7 +2,6 @@
 
 use openid\helpers\AssocHandleGenerator;
 use openid\helpers\OpenIdCryptoHelper;
-use openid\OpenIdProtocol;
 use openid\requests\OpenIdDHAssociationSessionRequest;
 use Zend\Crypt\PublicKey\DiffieHellman;
 

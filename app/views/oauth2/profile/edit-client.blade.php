@@ -1,10 +1,10 @@
 @extends('layout')
 @section('title')
-<title>Welcome to openstackId - Edit Registered Application</title>
+<title>Welcome to openstackId - OAUTH2 Console - Edit Client</title>
 @stop
 @section('content')
-<a href="{{ URL::previous() }}">Go Back</a>
-<legend>{{ $client->app_name }}</legend>
+@include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
+<legend>Client {{ $client->app_name }}</legend>
 @if($errors->any())
 <div class="errors">
     <ul>

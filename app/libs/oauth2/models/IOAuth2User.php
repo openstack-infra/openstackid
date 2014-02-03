@@ -34,5 +34,5 @@ interface IOAuth2User {
      * Is Server Administrator
      * @return bool
      */
-    public function IsServerAdmin();
+    public function isOAuth2ServerAdmin();
 } 

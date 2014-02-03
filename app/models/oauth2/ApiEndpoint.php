@@ -1,6 +1,7 @@
 <?php
 
 use oauth2\models\IApiEndpoint;
+use utils\model\BaseModelEloquent;
 
 class ApiEndpoint extends BaseModelEloquent implements IApiEndpoint{
 

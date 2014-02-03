@@ -9,10 +9,11 @@ use openid\OpenIdProtocol;
 use openid\services\OpenIdServiceCatalog;
 use utils\services\Registry;
 use Exception;
-use utils\services\UtilsServiceCatalog;
+
 
 class OpenIdAuthenticationRequest extends OpenIdRequest
 {
+
 
     public function __construct(OpenIdMessage $message)
     {
@@ -33,6 +34,7 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
 
     public function isValid()
     {
+        $res = true;
         try{
             $return_to   = $this->getReturnTo();
             $claimed_id  = $this->getClaimedId();
@@ -42,19 +44,29 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
             $valid_realm = OpenIdUriHelper::checkRealm($realm, $return_to);
             $valid_id    = $this->isValidIdentifier($claimed_id, $identity);
 
-            return !empty($return_to)
+            $res = !empty($return_to)
             && !empty($realm)
             && $valid_realm
             && !empty($claimed_id)
             && !empty($identity)
             && $valid_id
             && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
+            if(!$res){
+                $msg = sprintf("return_to is empty? %b.",empty($return_to)).PHP_EOL;
+                $msg = $msg.sprintf("realm is empty? %b.",empty($realm)).PHP_EOL;
+                $msg = $msg.sprintf("claimed_id is empty? %b.",empty($claimed_id)).PHP_EOL;
+                $msg = $msg.sprintf("identity is empty? %b.",empty($identity)).PHP_EOL;
+                $msg = $msg.sprintf("mode is empty? %b.",empty($mode)).PHP_EOL;
+                $msg = $msg.sprintf("is valid realm? %b.",$valid_realm).PHP_EOL;
+                $msg = $msg.sprintf("is valid identifier? %b.",$valid_id).PHP_EOL;
+                $this->log_service->warning_msg($msg);
+            }
         }
         catch(Exception $ex){
-            $log = Registry::getInstance()->get(UtilsServiceCatalog::LogService);
-            $log->error($ex);
-            return false;
+            $this->log_service->error($ex);
+            $res = false;
         }
+        return $res;
     }
 
     public function getReturnTo()

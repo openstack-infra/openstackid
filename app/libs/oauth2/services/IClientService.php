@@ -3,7 +3,6 @@
 namespace oauth2\services;
 
 use oauth2\models\IClient;
-
 /**
  * Interface IClientService
  * @package oauth2\services
@@ -32,14 +31,14 @@ interface IClientService {
 
     /**
      * Creates a new client
-     * @param $client_type
+     * @param $application_type
      * @param $user_id
      * @param $app_name
      * @param $app_description
      * @param string $app_logo
      * @return IClient
      */
-    public function addClient($client_type, $user_id, $app_name, $app_description, $app_logo='');
+    public function addClient($application_type, $user_id, $app_name, $app_description, $app_logo='');
     public function addClientScope($id,$scope_id);
     public function deleteClientScope($id,$scope_id);
 
@@ -73,6 +72,13 @@ interface IClientService {
      * @return mixed
      */
     public function lockClient($client_id);
+
+    /**
+     * unLock a client application by client id
+     * @param $client_id client id
+     * @return mixed
+     */
+    public function unlockClient($client_id);
 
     /**
      * Activate/Deactivate given client
@@ -115,13 +121,13 @@ interface IClientService {
     public function get($id);
 
     /**
-     * Gets a paginated list of clients
      * @param int $page_nbr
      * @param int $page_size
      * @param array $filters
+     * @param array $fields
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10,array $filters);
+    public function getAll($page_nbr=1,$page_size=10,array $filters=array(), array $fields=array('*'));
 
     /**
      * @param IClient $client
@@ -136,4 +142,5 @@ interface IClientService {
      * @throws \oauth2\exceptions\InvalidClientException
      */
     public function update($id, array $params);
+
 } 

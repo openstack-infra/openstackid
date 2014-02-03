@@ -14,6 +14,7 @@ abstract class Token
 {
 
     const DefaultByteLength = 32;
+
     protected $value;
     protected $lifetime;
     protected $issued;
@@ -23,6 +24,7 @@ abstract class Token
     protected $audience;
     protected $from_ip;
     protected $is_hashed;
+    protected $user_id;
 
     public function __construct($len = self::DefaultByteLength)
     {
@@ -64,6 +66,10 @@ abstract class Token
     public function getFromIp()
     {
         return $this->from_ip;
+    }
+
+    public function getUserId(){
+        return $this->user_id;
     }
 
     public function getRemainingLifetime()
