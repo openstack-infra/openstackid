@@ -1,14 +1,13 @@
 @extends('layout')
 
 @section('title')
-<title>Welcome to openstackId - {{ Lang::get("messages.edit_api_title", array("id" => $api->id)) }}</title>
+<title>Welcome to openstackId - Server Admin - Edit API</title>
 @stop
 
 @section('content')
+@include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
 <a href='{{ URL::action("AdminController@editResourceServer",array("id"=>$api->resource_server_id)) }}'>{{ Lang::get("messages.edit_api_go_back") }}</a>
-
 <legend>{{ Lang::get("messages.edit_api_title", array("id" => $api->id)) }}</legend>
-
 <div class="row-fluid">
     <div class="span6">
         <form class="form-horizontal" id="api-form" name="api-form" action='{{URL::action("ApiController@update",null)}}'>
@@ -263,7 +262,7 @@
     function loadScopes(){
         $.ajax({
             type: "GET",
-            url: '{{ URL::action("ApiScopeController@getByPage",array("page_nbr"=>1,"page_size"=>1000))."?filters=".urlencode("api_id:=:").$api->id }}',
+            url: '{{ URL::action("ApiScopeController@getByPage",array("offset"=>1,"limit"=>1000,"api_id"=>$api->id)) }}',
             contentType: "application/json; charset=utf-8",
             timeout:60000,
             success: function (data,textStatus,jqXHR) {
@@ -348,7 +347,7 @@
     function loadEndpoints(){
         $.ajax({
             type: "GET",
-            url: '{{ URL::action("ApiEndpointController@getByPage",array("page_nbr"=>1,"page_size"=>1000))."?filters=".urlencode("api_id:=:").$api->id }}',
+            url: '{{ URL::action("ApiEndpointController@getByPage",array("offset"=>1,"limit"=>1000,"api_id"=>$api->id)) }}',
             contentType: "application/json; charset=utf-8",
             timeout:60000,
             success: function (data,textStatus,jqXHR) {
@@ -412,6 +411,8 @@
 
     $(document).ready(function() {
 
+        $('#server-admin','#main-menu').addClass('active');
+
         var api_form = $('#api-form');
         var api_validator = api_form.validate({
             rules: {
@@ -465,7 +466,7 @@
 
             $.ajax(
                 {
-                    type: "GET",
+                    type: "PUT",
                     url: url,
                     contentType: "application/json; charset=utf-8",
                     timeout:60000,
@@ -629,7 +630,7 @@
             url           = url.replace('@active',active);
             $.ajax(
                 {
-                    type: "GET",
+                    type: "PUT",
                     url: url,
                     contentType: "application/json; charset=utf-8",
                     timeout:60000,

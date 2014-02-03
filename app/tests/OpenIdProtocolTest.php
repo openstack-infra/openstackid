@@ -110,7 +110,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdProtocol::param(OpenIdProtocol::OpenIdProtocol_DHConsumerPublic) => $b64_public,
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(200);
 
@@ -143,7 +143,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdProtocol::param(OpenIdProtocol::OpenIdProtocol_DHConsumerPublic) => $b64_public,
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(200);
 
@@ -171,7 +171,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_SessionType) => OpenIdProtocol::AssociationSessionTypeNoEncryption,
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(200);
 
@@ -207,7 +207,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(302);
 
@@ -218,7 +218,7 @@ class OpenIdProtocolTest extends TestCase
         $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]));
 
         //http://openid.net/specs/openid-authentication-2_0.html#check_auth
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $this->prepareCheckAuthenticationParams($openid_response));
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $this->prepareCheckAuthenticationParams($openid_response));
         $openid_response = $this->getOpenIdResponseLineBreak($response->getContent());
         $this->assertResponseStatus(200);
         $this->assertTrue($openid_response['is_valid'] === 'true');
@@ -239,7 +239,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdProtocol::param(OpenIdProtocol::OpenIdProtocol_DHConsumerPublic) => $b64_public,
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(200);
 
@@ -272,7 +272,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_AssocHandle) => $openid_response['assoc_handle'],
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(302);
 
@@ -323,7 +323,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(302);
 
@@ -385,7 +385,7 @@ class OpenIdProtocolTest extends TestCase
 
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(302);
 
@@ -433,7 +433,7 @@ class OpenIdProtocolTest extends TestCase
         $this->assertTrue(!empty($email) && $email ==='smarcet@gmail.com');
 
         //http://openid.net/specs/openid-authentication-2_0.html#check_auth
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $this->prepareCheckAuthenticationParams($openid_response));
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $this->prepareCheckAuthenticationParams($openid_response));
         $openid_response = $this->getOpenIdResponseLineBreak($response->getContent());
         $this->assertResponseStatus(200);
         $this->assertTrue($openid_response['is_valid'] === 'true');
@@ -475,7 +475,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdOAuth2Extension::param(OpenIdOAuth2Extension::State)      => uniqid(),
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(302);
 
@@ -522,7 +522,7 @@ class OpenIdProtocolTest extends TestCase
 
 
         //http://openid.net/specs/openid-authentication-2_0.html#check_auth
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $this->prepareCheckAuthenticationParams($openid_response));
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $this->prepareCheckAuthenticationParams($openid_response));
         $openid_response = $this->getOpenIdResponseLineBreak($response->getContent());
         $this->assertResponseStatus(200);
         $this->assertTrue($openid_response['is_valid'] === 'true');
@@ -559,7 +559,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdOAuth2Extension::param(OpenIdOAuth2Extension::State)      => uniqid(),
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(302);
 
@@ -603,7 +603,7 @@ class OpenIdProtocolTest extends TestCase
 
 
         //http://openid.net/specs/openid-authentication-2_0.html#check_auth
-        $response        = $this->action("POST", "OpenIdProviderController@op_endpoint", $this->prepareCheckAuthenticationParams($openid_response));
+        $response        = $this->action("POST", "OpenIdProviderController@endpoint", $this->prepareCheckAuthenticationParams($openid_response));
         $openid_response = $this->getOpenIdResponseLineBreak($response->getContent());
         $this->assertResponseStatus(200);
         $this->assertTrue($openid_response['is_valid'] === 'true');
@@ -641,7 +641,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdOAuth2Extension::param(OpenIdOAuth2Extension::State)      => uniqid(),
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(302);
 
@@ -685,7 +685,7 @@ class OpenIdProtocolTest extends TestCase
 
 
         //http://openid.net/specs/openid-authentication-2_0.html#check_auth
-        $response        = $this->action("POST", "OpenIdProviderController@op_endpoint", $this->prepareCheckAuthenticationParams($openid_response));
+        $response        = $this->action("POST", "OpenIdProviderController@endpoint", $this->prepareCheckAuthenticationParams($openid_response));
         $openid_response = $this->getOpenIdResponseLineBreak($response->getContent());
         $this->assertResponseStatus(200);
         $this->assertTrue($openid_response['is_valid'] === 'true');
@@ -721,7 +721,7 @@ class OpenIdProtocolTest extends TestCase
             OpenIdOAuth2Extension::param(OpenIdOAuth2Extension::State)      => uniqid(),
         );
 
-        $response = $this->action("POST", "OpenIdProviderController@op_endpoint", $params);
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(302);
 

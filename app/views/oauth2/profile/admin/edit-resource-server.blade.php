@@ -1,14 +1,13 @@
 @extends('layout')
 
 @section('title')
-<title>Welcome to openstackId - Edit Resource Server</title>
+<title>Welcome to openstackId - Server Admin - Edit Resource Server</title>
 @stop
 
 @section('content')
-<a href="{{ URL::action("AdminController@listResourceServers",null) }}">Go Back</a>
-
+@include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
+<a href="{{ URL::action("AdminController@listResourceServers") }}">Go Back</a>
 <legend>Edit Resource Server - Id {{ $resource_server->id }}</legend>
-
 <div class="row-fluid">
     <div class="span6">
         <form class="form-horizontal" id="resource-server-form" name="resource-server-form" action='{{URL::action("ApiResourceServerController@update",null)}}'>
@@ -42,6 +41,17 @@
                         </label>
                     </div>
                 </div>
+                @if(!is_null($resource_server->client()->first()))
+                <div class="control-group">
+                    <div class="controls">
+                        <label for="client_id" class="label-client-secret">Client ID</label>
+                        <span id="client_id">{{ $resource_server->client()->first()->client_id }}</span>
+                        <label for="client_secret" class="label-client-secret">Client Secret</label>
+                        <span id="client_secret">{{ $resource_server->client()->first()->client_secret }}</span>
+                        {{ HTML::link(URL::action("ApiResourceServerController@regenerateClientSecret",array("id"=> $resource_server->id)),'Regenerate',array('class'=>'btn regenerate-client-secret','title'=>'Regenerates Client Secret')) }}
+                    </div>
+                </div>
+                @endif
                 <div class="control-group">
                     <div class="controls">
                         <button type="submit" class="btn">Save</button>
@@ -142,7 +152,7 @@
     function loadApis(){
         $.ajax({
             type: "GET",
-            url: '{{ URL::action("ApiController@getByPage",array("page_nbr"=>1,"page_size"=>1000))."?filters=".urlencode("resource_server_id:=:").$resource_server->id }}',
+            url: '{{ URL::action("ApiController@getByPage",array("offset"=>1,"limit"=>1000,"resource_server_id"=>$resource_server->id)) }}',
             contentType: "application/json; charset=utf-8",
             timeout:60000,
             success: function (data,textStatus,jqXHR) {
@@ -199,6 +209,8 @@
     }
 
     $(document).ready(function() {
+
+        $('#server-admin','#main-menu').addClass('active');
 
         if($('#table-apis tr').length===1){
             $('#info-apis').show();
@@ -310,7 +322,7 @@
             url        = url.replace('@active',active);
             $.ajax(
                 {
-                    type: "GET",
+                    type: "PUT",
                     url: url,
                     contentType: "application/json; charset=utf-8",
                     timeout:60000,
@@ -335,6 +347,32 @@
                         timeout:60000,
                         success: function (data,textStatus,jqXHR) {
                             loadApis();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            ajaxError(jqXHR, textStatus, errorThrown);
+                        }
+                    }
+                );
+            }
+            event.preventDefault();
+            return false;
+        });
+
+        $("body").on('click',".regenerate-client-secret",function(event){
+            if(confirm("Are you sure? Regenerating client secret would invalidate all current tokens")){
+                var link = $(this).attr('href');
+                $.ajax(
+                    {
+                        type: "PUT",
+                        url: link,
+                        dataType: "json",
+                        timeout:60000,
+                        success: function (data,textStatus,jqXHR) {
+                            //load data...
+                            $('#client_secret').text(data.new_secret);
+                            //clean token UI
+                            $('#table-access-tokens').remove();
+                            $('#table-refresh-tokens').remove();
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
                             ajaxError(jqXHR, textStatus, errorThrown);

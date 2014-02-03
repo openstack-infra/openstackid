@@ -1,6 +1,7 @@
 <?php
 
 use oauth2\models\IApi;
+use utils\model\BaseModelEloquent;
 
 class Api extends BaseModelEloquent implements IApi {
 

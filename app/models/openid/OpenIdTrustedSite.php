@@ -2,7 +2,6 @@
 
 use openid\model\ITrustedSite;
 
-
 class OpenIdTrustedSite extends Eloquent implements ITrustedSite
 {
 

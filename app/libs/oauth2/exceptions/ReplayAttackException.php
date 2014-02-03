@@ -6,7 +6,6 @@ use Exception;
 
 class ReplayAttackException extends Exception
 {
-
     private $auth_code;
 
     public function getAuthCode(){
@@ -19,5 +18,4 @@ class ReplayAttackException extends Exception
         $message = "Possible Replay Attack : " . $message;
         parent::__construct($message, 0, null);
     }
-
 }

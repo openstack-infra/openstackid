@@ -15,7 +15,8 @@ class OAuth2IndirectErrorResponseFactoryMethod {
      * @param OAuth2Request $request
      * @param $error
      * @param $return_url
-     * @return OAuth2IndirectResponse
+     * @return null|OAuth2IndirectErrorResponse|OAuth2IndirectFragmentErrorResponse
+     * @throws Exception
      */
     public static function buildResponse(OAuth2Request $request = null,$error, $return_url){
         $response = null;

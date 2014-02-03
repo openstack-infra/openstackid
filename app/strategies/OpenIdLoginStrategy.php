@@ -55,7 +55,7 @@ class OpenIdLoginStrategy implements ILoginStrategy
         //go to authentication flow again
         $msg = $this->memento_service->getCurrentRequest();
         $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(), IUserActionService::LoginAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
-        return Redirect::action("OpenIdProviderController@op_endpoint");
+        return Redirect::action("OpenIdProviderController@endpoint");
     }
 
     public function  cancelLogin()

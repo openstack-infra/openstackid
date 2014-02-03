@@ -6,7 +6,9 @@ use oauth2\exceptions\AccessDeniedException;
 use oauth2\exceptions\InvalidClientException;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\ScopeNotAllowedException;
-use oauth2\exceptions\UnAuthorizedClientException;
+use oauth2\exceptions\OAuth2GenericException;
+use oauth2\exceptions\InvalidApplicationType;
+use oauth2\exceptions\LockedClientException;
 
 use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
@@ -24,7 +26,7 @@ use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use ReflectionClass;
 use utils\services\IAuthService;
 use utils\services\ILogService;
-
+use oauth2\services\IUserConsentService;
 /**
  * Class ImplicitGrantType
  * http://tools.ietf.org/html/rfc6749#section-4.2
@@ -55,13 +57,14 @@ class ImplicitGrantType extends AbstractGrantType
     private $auth_strategy;
     private $scope_service;
 
-    public function __construct(IApiScopeService $scope_service, IClientService $client_service, ITokenService $token_service, IAuthService $auth_service, IMementoOAuth2AuthenticationRequestService $memento_service, IOAuth2AuthenticationStrategy $auth_strategy, ILogService $log_service)
+    public function __construct(IApiScopeService $scope_service, IClientService $client_service, ITokenService $token_service, IAuthService $auth_service, IMementoOAuth2AuthenticationRequestService $memento_service, IOAuth2AuthenticationStrategy $auth_strategy, ILogService $log_service, IUserConsentService $user_consent_service)
     {
         parent::__construct($client_service, $token_service, $log_service);
-        $this->scope_service   = $scope_service;
-        $this->auth_service    = $auth_service;
-        $this->memento_service = $memento_service;
-        $this->auth_strategy   = $auth_strategy;
+        $this->user_consent_service  = $user_consent_service;
+        $this->scope_service         = $scope_service;
+        $this->auth_service          = $auth_service;
+        $this->memento_service       = $memento_service;
+        $this->auth_strategy         = $auth_strategy;
     }
 
     /** Given an OAuth2Request, returns true if it can handle it, false otherwise
@@ -87,13 +90,15 @@ class ImplicitGrantType extends AbstractGrantType
     /**
      * @param OAuth2Request $request
      * @return mixed|OAuth2AccessTokenFragmentResponse
-     * @throws \oauth2\exceptions\InvalidClientException
      * @throws \oauth2\exceptions\UnsupportedResponseTypeException
-     * @throws \oauth2\exceptions\AccessDeniedException
+     * @throws \oauth2\exceptions\LockedClientException
+     * @throws \oauth2\exceptions\InvalidClientException
      * @throws \oauth2\exceptions\ScopeNotAllowedException
-     * @throws \oauth2\exceptions\InvalidOAuth2Request
-     * @throws \oauth2\exceptions\UnAuthorizedClientException
+     * @throws \oauth2\exceptions\OAuth2GenericException
+     * @throws \oauth2\exceptions\InvalidApplicationType
+     * @throws \oauth2\exceptions\AccessDeniedException
      * @throws \oauth2\exceptions\UriNotAllowedException
+     * @throws \oauth2\exceptions\InvalidOAuth2Request
      */
     public function handle(OAuth2Request $request)
     {
@@ -109,13 +114,18 @@ class ImplicitGrantType extends AbstractGrantType
                 throw new UnsupportedResponseTypeException(sprintf("response_type %s", $response_type));
 
             $client = $this->client_service->getClientById($client_id);
+
             if (is_null($client))
-                throw new InvalidClientException(sprintf("client_id %s", $client_id));
+                throw new InvalidClientException($client_id, sprintf("client_id %s", $client_id));
+
+            if (!$client->isActive() || $client->isLocked()) {
+                throw new LockedClientException($client,sprintf('client id %s',$client));
+            }
 
             //check client type
             // only public clients could use this grant type
-            if ($client->getClientType() !== IClient::ClientType_Public)
-                throw new UnAuthorizedClientException();
+            if ($client->getApplicationType() != IClient::ApplicationType_JS_Client)
+                throw new InvalidApplicationType($client_id,sprintf('client id %s client type must be JS CLIENT',$client_id));
 
             //check redirect uri
             $redirect_uri = $request->getRedirectUri();
@@ -135,19 +145,34 @@ class ImplicitGrantType extends AbstractGrantType
                 return $this->auth_strategy->doLogin($this->memento_service->getCurrentAuthorizationRequest());
             }
 
+            $approval_prompt = $request->getApprovalPrompt();
+
+            $user = $this->auth_service->getCurrentUser();
+
+            if(is_null($user))
+                throw new OAuth2GenericException("Invalid Current User");
             //validate authorization
+            //check for former user consents
             $authorization_response = $this->auth_service->getUserAuthorizationResponse();
-            if ($authorization_response === IAuthService::AuthorizationResponse_None) {
-                $this->memento_service->saveCurrentAuthorizationRequest();
-                return $this->auth_strategy->doConsent($this->memento_service->getCurrentAuthorizationRequest());
-            } else if ($authorization_response === IAuthService::AuthorizationResponse_DenyOnce) {
-                throw new AccessDeniedException;
+            $former_user_consent = $this->user_consent_service->get($user->getId(),$client->getId(),$scope);
+            if( !(!is_null($former_user_consent) && $approval_prompt == OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto)){
+                if ($authorization_response == IAuthService::AuthorizationResponse_None) {
+                    $this->memento_service->saveCurrentAuthorizationRequest();
+                    return $this->auth_strategy->doConsent($this->memento_service->getCurrentAuthorizationRequest());
+                }
+                else if ($authorization_response == IAuthService::AuthorizationResponse_DenyOnce) {
+                    throw new AccessDeniedException;
+                }
+                //save possitive consent
+                if(is_null($former_user_consent))
+                    $this->user_consent_service->add($user->getId(),$client->getId(),$scope);
             }
+
 
             // build current audience ...
             $audience     = $this->scope_service->getStrAudienceByScopeNames(explode(' ',$scope));
             //build access token
-            $access_token = $this->token_service->createAccessTokenFromParams($scope, $client_id, $audience);
+            $access_token = $this->token_service->createAccessTokenFromParams($client_id,$scope, $audience,$user->getId());
             //clear saved data ...
             $this->memento_service->clearCurrentRequest();
             $this->auth_service->clearUserAuthorizationResponse();
@@ -169,9 +194,10 @@ class ImplicitGrantType extends AbstractGrantType
         return OAuth2Protocol::OAuth2Protocol_GrantType_Implicit;
     }
 
-    /** builds specific Token request
+    /**
      * @param OAuth2Request $request
-     * @return mixed
+     * @return mixed|void
+     * @throws \oauth2\exceptions\InvalidOAuth2Request
      */
     public function buildTokenRequest(OAuth2Request $request)
     {

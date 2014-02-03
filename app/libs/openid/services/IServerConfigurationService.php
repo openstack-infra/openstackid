@@ -13,11 +13,9 @@ interface IServerConfigurationService
     public function getOPEndpointURL();
 
     /**
-     *
+     * @param $identifier
      * @return mixed
      */
     public function getUserIdentityEndpointURL($identifier);
-
-
 
 }

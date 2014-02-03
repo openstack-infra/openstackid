@@ -1,14 +1,13 @@
 @extends('layout')
 
 @section('title')
-<title>Welcome to openstackId - {{ Lang::get("messages.edit_endpoint_title", array("id" => $endpoint->id)) }}</title>
+<title>Welcome to openstackId - Server Admin - Edit API Endpoint</title>
 @stop
 
 @section('content')
+@include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
 <a href='{{  URL::action("AdminController@editApi", array("id"=>$endpoint->api_id)) }}'>Go Back</a>
-
 <legend>{{ Lang::get("messages.edit_endpoint_title", array("id" => $endpoint->id)) }}</legend>
-
 <div class="row-fluid">
     <div class="span6">
         <form class="form-horizontal" id="endpoint-form" name="endpoint-form" action='{{URL::action("ApiEndpointController@update",null)}}'>
@@ -90,6 +89,8 @@
 
     $(document).ready(function() {
 
+        $('#server-admin','#main-menu').addClass('active');
+
         var endpoint_form = $('#endpoint-form');
 
         var endpoint_validator = endpoint_form.validate({
@@ -99,8 +100,6 @@
                 "route":      {required: true, nowhitespace:true,rangelength: [1, 1024]}
             }
         });
-
-
 
         endpoint_form.submit(function( event ) {
             var is_valid = endpoint_form.valid();
@@ -134,9 +133,10 @@
             var del_link = $(this).attr('data-remove-link');
             var checked  = $(this).is(':checked');
             var url      = checked?add_link:del_link;
+            var verb     = checked?'PUT':'DELETE';
             $.ajax(
                 {
-                    type: "GET",
+                    type: verb,
                     url: url,
                     contentType: "application/json; charset=utf-8",
                     timeout:60000,

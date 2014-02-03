@@ -1,28 +1,25 @@
 <?php
 
-use oauth2\IResourceServerContext;
 use utils\services\ILogService;
 use oauth2\services\IApiService;
-use  oauth2\exceptions\InvalidApi;
+use oauth2\exceptions\InvalidApi;
 
 /**
  * Class ApiController
  * REST controller for Api entity CRUD Ops
  */
-class ApiController extends AbstractRESTController implements IRESTController
+class ApiController extends AbstractRESTController implements ICRUDController
 {
 
     private $api_service;
 
-
-    public function __construct(IApiService $api_service,  ILogService $log_service)
+    public function __construct(IApiService $api_service, ILogService $log_service)
     {
         parent::__construct($log_service);
         $this->api_service = $api_service;
         //set filters allowed values
-        $this->allowed_filter_fields = array('resource_server_id');
-        $this->allowed_filter_op     = array('resource_server_id' => array('='));
-        $this->allowed_filter_value  = array('resource_server_id' => '/^\d+$/');
+        $this->allowed_filter_fields     = array('resource_server_id');
+        $this->allowed_projection_fields = array('*');
     }
 
     public function get($id)
@@ -44,12 +41,15 @@ class ApiController extends AbstractRESTController implements IRESTController
         }
     }
 
-    public function getByPage($page_nbr, $page_size)
+    public function getByPage()
     {
         try {
             //check for optional filters param on querystring
-            $filters = Input::get('filters',null);
-            $list    = $this->api_service->getAll($page_nbr,$page_size, $this->getFilters($filters));
+            $fields  =  $this->getProjection(Input::get('fields',null));
+            $filters = $this->getFilters(Input::except('fields','limit','offset'));
+            $page_nbr = intval(Input::get('offset',1));
+            $page_size = intval(Input::get('limit',10));
+            $list    = $this->api_service->getAll($page_nbr,$page_size, $filters,$fields);
             $items   = array();
             foreach ($list->getItems() as $api) {
                 array_push($items, $api->toArray());
@@ -91,7 +91,7 @@ class ApiController extends AbstractRESTController implements IRESTController
                 $new_api['resource_server_id']
             );
 
-            return $this->ok(array('api_id' => $new_api_model->id));
+            return $this->created(array('api_id' => $new_api_model->id));
         }
         catch (InvalidApi $ex1) {
             $this->log_service->error($ex1);
@@ -107,7 +107,7 @@ class ApiController extends AbstractRESTController implements IRESTController
     {
         try {
             $res = $this->api_service->delete($id);
-            return $res?Response::json('ok',200):$this->error404(array('error'=>'operation failed'));
+            return $res?$this->deleted():$this->error404(array('error'=>'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
@@ -136,7 +136,7 @@ class ApiController extends AbstractRESTController implements IRESTController
 
             $res = $this->api_service->update(intval($values['id']),$values);
 
-            return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
+            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
 
         }
         catch(InvalidApi $ex1){
@@ -153,7 +153,7 @@ class ApiController extends AbstractRESTController implements IRESTController
         try {
             $active = is_string($active)?( strtoupper(trim($active))==='TRUE'?true:false ):$active;
             $res    = $this->api_service->setStatus($id,$active);
-            return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
+            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
         }
         catch(InvalidApi $ex1){
             $this->log_service->error($ex1);

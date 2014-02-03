@@ -61,7 +61,7 @@ class OpenIdConsentStrategy implements IConsentStrategy
                 throw new InvalidOpenIdMessageException();
             $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(), IUserActionService::ConsentAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
             $this->auth_service->setUserAuthorizationResponse($trust_action[0]);
-            return Redirect::action('OpenIdProviderController@op_endpoint');
+            return Redirect::action('OpenIdProviderController@endpoint');
         }
         return Redirect::action('UserController@getConsent');
     }

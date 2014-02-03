@@ -8,6 +8,8 @@ use utils\services\Registry;
 use oauth2\services\OAuth2ServiceCatalog;
 use utils\services\UtilsServiceCatalog;
 use services\oauth2\ResourceServer;
+use \Illuminate\Foundation\AliasLoader;
+
 class ServicesProvider extends ServiceProvider
 {
 
@@ -22,7 +24,7 @@ class ServicesProvider extends ServiceProvider
 
         // Shortcut so developers don't need to add an Alias in app/config/app.php
         $this->app->booting(function () {
-            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
+            $loader = AliasLoader::getInstance();
             $loader->alias('ServerConfigurationService', 'services\\Facades\\ServerConfigurationService');
         });
 
@@ -35,10 +37,15 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(OpenIdServiceCatalog::ServerConfigurationService, 'services\\ServerConfigurationService');
         $this->app->singleton(OpenIdServiceCatalog::UserService, 'services\\UserService');
         $this->app->singleton(OpenIdServiceCatalog::NonceService, 'services\\NonceService');
+
         $this->app->singleton(UtilsServiceCatalog::LogService, 'services\\LogService');
         $this->app->singleton(UtilsServiceCatalog::LockManagerService, 'services\\LockManagerService');
         $this->app->singleton(UtilsServiceCatalog::ServerConfigurationService, 'services\\ServerConfigurationService');
+        $this->app->singleton(UtilsServiceCatalog::BannedIpService, 'services\\utils\\BannedIPService');
 
+        $this->app->singleton('services\\IUserActionService', 'services\\UserActionService');
+
+        $this->app->singleton('oauth2\\IResourceServerContext', 'services\\oauth2\\ResourceServerContext');
 
         $this->app->singleton("services\\DelayCounterMeasure", 'services\\DelayCounterMeasure');
         $this->app->singleton("services\\LockUserCounterMeasure", 'services\\LockUserCounterMeasure');
@@ -47,11 +54,11 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton("services\\BlacklistSecurityPolicy", 'services\\BlacklistSecurityPolicy');
         $this->app->singleton("services\\LockUserSecurityPolicy", 'services\\LockUserSecurityPolicy');
 
+        $this->app->singleton("services\\OAuth2LockClientCounterMeasure", 'services\\OAuth2LockClientCounterMeasure');
+        $this->app->singleton("services\\OAuth2SecurityPolicy", 'services\\OAuth2SecurityPolicy');
+
         $this->app->singleton("services\\oauth2\\AuthorizationCodeRedeemPolicy", 'services\\oauth2\\AuthorizationCodeRedeemPolicy');
 
-        $this->app->singleton('services\\IUserActionService', 'services\\UserActionService');
-
-        $this->app->singleton('oauth2\\IResourceServerContext', 'services\\oauth2\\ResourceServerContext');
 
         $this->app->singleton(UtilsServiceCatalog::CheckPointService,
         function(){
@@ -70,10 +77,15 @@ class ServicesProvider extends ServiceProvider
 
             $lock_user_security_policy = $this->app->make("services\\LockUserSecurityPolicy");
             $lock_user_security_policy->setCounterMeasure($lock_user_counter_measure);
-            //policies...
+
+            $oauth2_lock_client_counter_measure = $this->app->make("services\\OAuth2LockClientCounterMeasure");
+            $oauth2_security_policy             = $this->app->make("services\\OAuth2SecurityPolicy");
+            $oauth2_security_policy->setCounterMeasure($oauth2_lock_client_counter_measure);
+
             $checkpoint_service = new CheckPointService($blacklist_security_policy);
             $checkpoint_service->addPolicy($lock_user_security_policy);
             $checkpoint_service->addPolicy($authorization_code_redeem_Policy);
+            $checkpoint_service->addPolicy($oauth2_security_policy);
             return $checkpoint_service;
         });
 
@@ -99,6 +111,7 @@ class ServicesProvider extends ServiceProvider
         $this->app->singleton(OAuth2ServiceCatalog::ResourceServerService, 'services\\oauth2\\ResourceServerService');
         $this->app->singleton(OAuth2ServiceCatalog::ApiService, 'services\\oauth2\\ApiService');
         $this->app->singleton(OAuth2ServiceCatalog::ApiEndpointService, 'services\\oauth2\\ApiEndpointService');
+        $this->app->singleton(OAuth2ServiceCatalog::UserConsentService, 'services\\oauth2\\UserConsentService');
 
         Registry::getInstance()->set(OAuth2ServiceCatalog::MementoService, $this->app->make(OAuth2ServiceCatalog::MementoService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::TokenService, $this->app->make(OAuth2ServiceCatalog::TokenService));

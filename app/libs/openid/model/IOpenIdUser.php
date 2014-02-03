@@ -1,8 +1,21 @@
 <?php
 
 namespace openid\model;
-
+/**
+ * Interface IOpenIdUser
+ * @package openid\model
+ */
 interface IOpenIdUser {
+    /**
+     *
+     */
+    const OpenstackIdServerAdminGroup = 'openstackid-server-admin';
+
+    /**
+     * @return bool
+     */
+    public function isOpenstackIdAdmin();
+
     public function getId();
     public function getIdentifier();
     public function getEmail();

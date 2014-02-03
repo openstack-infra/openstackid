@@ -20,12 +20,13 @@ interface IApiEndpointService {
     public function get($id);
 
     /**
-     * @param int $page_size
      * @param int $page_nbr
+     * @param int $page_size
      * @param array $filters
+     * @param array $fields
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10,array $filters);
+    public function getAll($page_nbr=1,$page_size=10,array $filters=array(),array $fields=array('*'));
 
 
     /**

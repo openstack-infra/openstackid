@@ -5,13 +5,9 @@ use oauth2\models\IApi;
 use oauth2\services\IApiService;
 use Api;
 use DB;
-use  oauth2\exceptions\InvalidApi;
-use  oauth2\exceptions\InvalidApiEndpoint;
-use  oauth2\exceptions\InvalidApiScope;
+use oauth2\exceptions\InvalidApi;
 
 class ApiService implements  IApiService {
-
-
     /**
      * @param $api_id
      * @return IApi
@@ -114,7 +110,7 @@ class ApiService implements  IApiService {
 
     /**
      * @param IApi $api
-     * @return void
+     * @return bool|void
      */
     public function save(IApi $api)
     {
@@ -128,6 +124,7 @@ class ApiService implements  IApiService {
      * @param $id
      * @param $active
      * @return bool
+     * @throws \oauth2\exceptions\InvalidApi
      */
     public function setStatus($id, $active)
     {
@@ -141,10 +138,11 @@ class ApiService implements  IApiService {
      * @param int $page_nbr
      * @param int $page_size
      * @param array $filters
+     * @param array $fields
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10,array $filters){
+    public function getAll($page_nbr=1,$page_size=10,array $filters=array(), array $fields=array('*')){
         DB::getPaginator()->setCurrentPage($page_nbr);
-        return Api::Filter($filters)->paginate($page_size);
+        return Api::Filter($filters)->paginate($page_size,$fields);
     }
 }

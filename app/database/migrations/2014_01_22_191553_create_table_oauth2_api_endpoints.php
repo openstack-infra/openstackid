@@ -19,7 +19,7 @@ class CreateTableOauth2ApiEndpoints extends Migration {
             $table->string('name',255)->unique();
             $table->timestamps();
             $table->text("route");
-            $table->enum('http_method', array('GET', 'HEAD','POST','PUT','DELETE','TRACE','CONNECT','OPTIONS'));
+            $table->enum('http_method', array('GET', 'HEAD','POST','PUT','DELETE','TRACE','CONNECT','OPTIONS','PATCH'));
             $table->bigInteger("api_id")->unsigned();
             $table->index('api_id');
 

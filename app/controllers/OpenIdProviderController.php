@@ -17,7 +17,7 @@ class OpenIdProviderController extends BaseController
         $this->memento_service = $memento_service;
     }
 
-    public function op_endpoint()
+    public function endpoint()
     {
         $msg = $this->memento_service->getCurrentRequest();
         if (is_null($msg) || !$msg->isValid())

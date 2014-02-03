@@ -321,11 +321,30 @@ class TestSeeder extends Seeder {
                 'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client',
                 'client_secret'        => 'ITc/6Y5N7kOtGKhg',
                 'client_type'          => IClient::ClientType_Confidential,
+                'application_type'     => IClient::ApplicationType_Web_App,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => true,
                 'use_refresh_token'    => true
             )
         );
+
+
+        Client::create(
+            array(
+                'app_name'             => 'oauth2.service',
+                'app_description'      => 'oauth2.service',
+                'app_logo'             => null,
+                'client_id'            => '11z87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client',
+                'client_secret'        => '11c/6Y5N7kOtGKhg',
+                'client_type'          => IClient::ClientType_Confidential,
+                'application_type'     => IClient::ApplicationType_Service,
+                'user_id'              => $user->id,
+                'rotate_refresh_token' => true,
+                'use_refresh_token'    => true
+            )
+        );
+
+
 
         Client::create(
             array(
@@ -335,6 +354,7 @@ class TestSeeder extends Seeder {
                 'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client',
                 'client_secret'        => null,
                 'client_type'          => IClient::ClientType_Public,
+                'application_type'     => IClient::ApplicationType_JS_Client,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => false,
                 'use_refresh_token'    => false
@@ -349,6 +369,7 @@ class TestSeeder extends Seeder {
                 'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ2x.openstack.client',
                 'client_secret'        => null,
                 'client_type'          => IClient::ClientType_Public,
+                'application_type'     => IClient::ApplicationType_JS_Client,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => false,
                 'use_refresh_token'    => false
@@ -363,6 +384,7 @@ class TestSeeder extends Seeder {
                 'client_id'            => 'resource.server.1.openstack.client',
                 'client_secret'        => '123456789',
                 'client_type'          =>  IClient::ClientType_Confidential,
+                'application_type'     => IClient::ApplicationType_Service,
                 'resource_server_id'   => $resource_server->id,
                 'rotate_refresh_token' => false,
                 'use_refresh_token'    => false
@@ -371,11 +393,13 @@ class TestSeeder extends Seeder {
 
         $client_confidential = Client::where('app_name','=','oauth2_test_app')->first();
         $client_public       = Client::where('app_name','=','oauth2_test_app_public')->first();
+        $client_service      = Client::where('app_name','=','oauth2.service')->first();
         //attach scopes
         $scopes = ApiScope::get();
         foreach($scopes as $scope){
             $client_confidential->scopes()->attach($scope->id);
             $client_public->scopes()->attach($scope->id);
+            $client_service->scopes()->attach($scope->id);
         }
         //add uris
         ClientAuthorizedUri::create(
@@ -749,7 +773,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'create-resource-server',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-server',
+                'route'           => 'api/v1/resource-servers',
                 'http_method'     => 'POST'
             )
         );
@@ -759,7 +783,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'get-resource-server',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-server/{id}',
+                'route'           => 'api/v1/resource-servers/{id}',
                 'http_method'     => 'GET'
             )
         );
@@ -769,8 +793,8 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-regenerate-secret',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-server/regenerate-client-secret/{id}',
-                'http_method'     => 'GET'
+                'route'           => 'api/v1/resource-servers/{id}/client-secret',
+                'http_method'     => 'PUT'
             )
         );
 
@@ -779,7 +803,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-get-page',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-server/{page_nbr}/{page_size}',
+                'route'           => 'api/v1/resource-servers',
                 'http_method'     => 'GET'
             )
         );
@@ -789,7 +813,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-delete',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-server/{id}',
+                'route'           => 'api/v1/resource-servers/{id}',
                 'http_method'     => 'DELETE'
             )
         );
@@ -799,7 +823,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-update',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-server',
+                'route'           => 'api/v1/resource-servers',
                 'http_method'     => 'PUT'
             )
         );
@@ -809,8 +833,8 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-update-status',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-server/status/{id}/{active}',
-                'http_method'     => 'GET'
+                'route'           => 'api/v1/resource-servers/{id}/status/{active}',
+                'http_method'     => 'PUT'
             )
         );
 

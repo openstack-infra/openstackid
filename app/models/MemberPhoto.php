@@ -1,6 +1,8 @@
 <?php
 
-class MemberPhoto extends Eloquent
+use utils\model\BaseModelEloquent;
+
+class MemberPhoto extends BaseModelEloquent
 {
     protected $table = 'File';
     //external os members db (SS)

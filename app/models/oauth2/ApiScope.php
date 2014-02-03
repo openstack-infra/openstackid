@@ -1,6 +1,7 @@
 <?php
 
-use  oauth2\models\IApiScope;
+use oauth2\models\IApiScope;
+use utils\model\BaseModelEloquent;
 
 class ApiScope extends BaseModelEloquent implements IApiScope {
 

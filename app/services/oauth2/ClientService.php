@@ -7,11 +7,13 @@ use ClientAuthorizedUri;
 use DB;
 use Input;
 use oauth2\exceptions\AllowedClientUriAlreadyExistsException;
-use oauth2\exceptions\InvalidClientException;
+use oauth2\exceptions\InvalidClientType;
+use oauth2\exceptions\MissingClientAuthorizationInfo;
+use oauth2\exceptions\AbsentClientException;
+
 use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
 use oauth2\services\IApiScopeService;
-
 use oauth2\services\IApiScope;
 use oauth2\services\IClientService;
 use oauth2\services\id;
@@ -44,7 +46,7 @@ class ClientService implements IClientService
      * client credentials in the request-body using the following
      * parameters:
      * implementation of http://tools.ietf.org/html/rfc6749#section-2.3.1
-     * @throws InvalidClientException;
+     * @throws MissingClientAuthorizationInfo;
      * @return list
      */
     public function getCurrentClientAuthInfo()
@@ -57,14 +59,14 @@ class ClientService implements IClientService
             $auth_header = explode(' ', $auth_header);
 
             if (!is_array($auth_header) || count($auth_header) < 2)
-                throw new InvalidClientException;
+                throw new MissingClientAuthorizationInfo;
 
             $auth_header_content = $auth_header[1];
             $auth_header_content = base64_decode($auth_header_content);
             $auth_header_content = explode(':', $auth_header_content);
 
             if (!is_array($auth_header_content) || count($auth_header_content) !== 2)
-                throw new InvalidClientException;
+                throw new MissingClientAuthorizationInfo;
 
             //client_id:client_secret
             return array($auth_header_content[0], $auth_header_content[1]);
@@ -75,10 +77,13 @@ class ClientService implements IClientService
         return array($client_id, $client_secret);
     }
 
-    public function addClient($client_type, $user_id, $app_name, $app_description, $app_logo = '')
+    public function addClient($application_type, $user_id, $app_name, $app_description, $app_logo = '')
     {
         $instance = null;
-        DB::transaction(function () use ($client_type, $user_id, $app_name, $app_description, $app_logo, &$instance) {
+        DB::transaction(function () use ($application_type, $user_id, $app_name, $app_description, $app_logo, &$instance) {
+
+            //check $application_type vs client_type
+            $client_type = $application_type == IClient::ApplicationType_JS_Client?IClient::ClientType_Public:IClient::ClientType_Confidential;
             $instance = new Client;
             $instance->app_name = $app_name;
             $instance->app_logo = $app_logo;
@@ -86,9 +91,13 @@ class ClientService implements IClientService
             //only generates secret for confidential clients
             if ($client_type == IClient::ClientType_Confidential)
                 $instance->client_secret = Rand::getString(24, OAuth2Protocol::VsChar, true);
-            $instance->client_type = $client_type;
-            $instance->user_id  = $user_id;
-            $instance->active   = true;
+            $instance->client_type      = $client_type;
+            $instance->application_type = $application_type;
+
+            $instance->user_id              = $user_id;
+            $instance->active               = true;
+            $instance->use_refresh_token    = false;
+            $instance->rotate_refresh_token = false;
             $instance->Save();
             //default allowed url
             $this->addClientAllowedUri($instance->getId(), 'https://localhost');
@@ -109,7 +118,7 @@ class ClientService implements IClientService
         $client = Client::find($id);
 
         if (is_null($client))
-            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+            throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
 
         $client_uri = ClientAuthorizedUri::where('uri', '=', $uri)->where('client_id', '=', $id)->first();
         if (!is_null($client_uri)) {
@@ -126,7 +135,7 @@ class ClientService implements IClientService
     {
         $client = Client::find($id);
         if (is_null($client))
-            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+            throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
         return $client->scopes()->attach($scope_id);
     }
 
@@ -134,7 +143,7 @@ class ClientService implements IClientService
     {
         $client = Client::find($id);
         if (is_null($client))
-            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+            throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
         return $client->scopes()->detach($scope_id);
     }
 
@@ -174,31 +183,52 @@ class ClientService implements IClientService
         $new_secret = '';
         DB::transaction(function () use ($id, &$new_secret) {
             $client = Client::find($id);
-            if (!is_null($client)) {
-                $client_secret = Rand::getString(24, OAuth2Protocol::VsChar, true);
-                $client->client_secret = $client_secret;
-                $client->Save();
-                $token_service = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);
-                $token_service->revokeClientRelatedTokens($client->client_id);
-                $new_secret = $client->client_secret;
-            }
+
+            if(is_null($client))
+                throw new AbsentClientException(sprintf("client id %d does not exists!.",$id));
+
+            if($client->client_type != IClient::ClientType_Confidential)
+                throw new InvalidClientType($id,sprintf("client id %d is not confidential!.",$id));
+
+            $client_secret = Rand::getString(24, OAuth2Protocol::VsChar, true);
+            $client->client_secret = $client_secret;
+            $client->Save();
+            $token_service = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);
+            $token_service->revokeClientRelatedTokens($client->client_id);
+            $new_secret = $client->client_secret;
+
         });
         return $new_secret;
     }
 
     /**
-     * Lock a client application by client id
-     * @param $client_id client id
+     * @param client $client_id
      * @return mixed
+     * @throws \oauth2\exceptions\AbsentClientException
      */
     public function lockClient($client_id)
     {
-        $client = $this->getClientById($client_id);
+        $client = $this->getClientByIdentifier($client_id);
         if (is_null($client))
-            throw new InvalidClientException(sprintf("client id %s does not exists!",$client_id));
+            throw new AbsentClientException($client_id,sprintf("client id %s does not exists!",$client_id));
         $client->locked = true;
         return $client->Save();
     }
+
+    /**
+     * @param client $client_id
+     * @return mixed
+     * @throws \oauth2\exceptions\AbsentClientException
+     */
+    public function unlockClient($client_id)
+    {
+        $client = $this->getClientByIdentifier($client_id);
+        if (is_null($client))
+            throw new AbsentClientException($client_id,sprintf("client id %s does not exists!",$client_id));
+        $client->locked = false;
+        return $client->Save();
+    }
+
 
     /**
      * @param $client_id
@@ -214,7 +244,7 @@ class ClientService implements IClientService
     {
         $client = $this->getClientByIdentifier($id);
         if (is_null($client))
-            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+            throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
         $client->active = $active;
         return $client->Save();
     }
@@ -229,7 +259,7 @@ class ClientService implements IClientService
     {
         $client = $this->getClientByIdentifier($id);
         if (is_null($client))
-            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+            throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
         $client->use_refresh_token = $use_refresh_token;
         return $client->Save();
     }
@@ -238,7 +268,7 @@ class ClientService implements IClientService
     {
         $client = $this->getClientByIdentifier($id);
         if (is_null($client))
-            throw new InvalidClientException(sprintf("client id %s does not exists!",$id));
+            throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
 
         $client->rotate_refresh_token = $rotate_refresh_token;
         return $client->Save();
@@ -259,11 +289,17 @@ class ClientService implements IClientService
         return Client::find($id);
     }
 
-
-    public function getAll($page_nbr=1,$page_size=10,array $filters)
+    /**
+     * @param int $page_nbr
+     * @param int $page_size
+     * @param array $filters
+     * @param array $fields
+     * @return mixed
+     */
+    public function getAll($page_nbr=1,$page_size=10,array $filters=array(), array $fields=array('*'))
     {
         DB::getPaginator()->setCurrentPage($page_nbr);
-        return Client::Filter($filters)->paginate($page_size);
+        return Client::Filter($filters)->paginate($page_size,$fields);
     }
 
     /**
@@ -282,13 +318,13 @@ class ClientService implements IClientService
      * @param $id
      * @param array $params
      * @return bool
-     * @throws \oauth2\exceptions\InvalidClientException
+     * @throws \oauth2\exceptions\AbsentClientException
      */
     public function update($id, array $params)
     {
         $client = Client::find($id);
         if(is_null($client))
-            throw new InvalidClientException(sprintf('client id %s does not exists!',$id));
+            throw new AbsentClientException(sprintf('client id %s does not exists!',$id));
 
         $allowed_update_params = array('app_name','app_description','app_logo','active','locked','use_refresh_token','rotate_refresh_token');
 

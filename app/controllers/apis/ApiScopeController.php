@@ -8,7 +8,7 @@ use oauth2\exceptions\InvalidApiScope;
 /**
  * Class ApiScopeController
  */
-class ApiScopeController extends AbstractRESTController implements IRESTController {
+class ApiScopeController extends AbstractRESTController implements ICRUDController {
 
     private $api_scope_service;
 
@@ -17,9 +17,8 @@ class ApiScopeController extends AbstractRESTController implements IRESTControll
         parent::__construct($log_service);
         $this->api_scope_service = $api_scope_service;
         //set filters allowed values
-        $this->allowed_filter_fields = array('api_id');
-        $this->allowed_filter_op     = array('api_id' => array('='));
-        $this->allowed_filter_value  = array('api_id' => '/^\d+$/');
+        $this->allowed_filter_fields     = array('api_id');
+        $this->allowed_projection_fields = array('*');
     }
 
     public function get($id)
@@ -37,12 +36,16 @@ class ApiScopeController extends AbstractRESTController implements IRESTControll
         }
     }
 
-    public function getByPage($page_nbr, $page_size)
+    public function getByPage()
     {
         try {
             //check for optional filters param on querystring
-            $filters = Input::get('filters',null);
-            $list = $this->api_scope_service->getAll($page_nbr, $page_size, $this->getFilters($filters));
+            $fields  =  $this->getProjection(Input::get('fields',null));
+            $filters = $this->getFilters(Input::except('fields','limit','offset'));
+            $page_nbr = intval(Input::get('offset',1));
+            $page_size = intval(Input::get('limit',10));
+
+            $list = $this->api_scope_service->getAll($page_nbr, $page_size, $filters,$fields);
             $items = array();
             foreach ($list->getItems() as $scope) {
                 array_push($items, $scope->toArray());
@@ -91,7 +94,7 @@ class ApiScopeController extends AbstractRESTController implements IRESTControll
                 $values['api_id']
             );
 
-            return $this->ok(array('scope_id' => $new_scope->id));
+            return $this->created(array('scope_id' => $new_scope->id));
         }
         catch(InvalidApi $ex1){
             $this->log_service->error($ex1);
@@ -111,7 +114,7 @@ class ApiScopeController extends AbstractRESTController implements IRESTControll
     {
         try {
             $res = $this->api_scope_service->delete($id);
-            return $res?Response::json('ok',200):$this->error404(array('error'=>'operation failed'));
+            return $res?$this->deleted():$this->error404(array('error'=>'operation failed'));
         }
         catch(InvalidApiScope $ex1){
             $this->log_service->error($ex1);
@@ -149,7 +152,7 @@ class ApiScopeController extends AbstractRESTController implements IRESTControll
 
             $res = $this->api_scope_service->update(intval($values['id']),$values);
 
-            return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
+            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
 
         }
         catch(InvalidApiScope $ex1){
@@ -162,10 +165,15 @@ class ApiScopeController extends AbstractRESTController implements IRESTControll
         }
     }
 
+    /**
+     * @param $id
+     * @param $active
+     * @return mixed
+     */
     public function updateStatus($id, $active){
         try {
             $res    = $this->api_scope_service->setStatus($id,$active);
-            return $res?Response::json('ok',200):$this->error400(array('error'=>'operation failed'));
+            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);

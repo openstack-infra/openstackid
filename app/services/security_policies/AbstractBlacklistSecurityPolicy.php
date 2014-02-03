@@ -5,6 +5,7 @@ namespace services;
 use BannedIP;
 use DB;
 use Log;
+use Auth;
 use utils\services\ICacheService;
 use utils\services\ILockManagerService;
 use utils\services\ISecurityPolicy;
@@ -54,7 +55,10 @@ abstract class AbstractBlacklistSecurityPolicy implements ISecurityPolicy
                     $banned_ip->ip = $remote_address;
                 }
                 $banned_ip->exception_type = $exception_type;
-                $banned_ip->hits = $initial_hits;
+                $banned_ip->hits           = $initial_hits;
+                if(Auth::check()){
+                    $banned_ip->user_id = Auth::user()->getId();
+                }
                 $banned_ip->Save();
             });
 

@@ -10,4 +10,8 @@ interface IServerConfigurationService {
      * @return mixed
      */
     public function getConfigValue($key);
+
+    public function getAllConfigValues();
+
+    public function saveConfigValue($key,$value);
 } 

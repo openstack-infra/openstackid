@@ -1,11 +1,12 @@
 <?php
 
 use auth\AuthHelper;
+use utils\model\BaseModelEloquent;
 
 /**
  * Class Member
  */
-class Member extends Eloquent
+class Member extends BaseModelEloquent
 {
 
     protected $primaryKey ='ID';

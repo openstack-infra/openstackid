@@ -38,13 +38,12 @@ class OAuth2BearerAccessTokenRequestValidator {
      */
     public function filter($route, $request)
     {
+        $url       = $route->getPath();
+        $method    = $request->getMethod();
+        $realm     = $request->getHost();
 
         try{
-
-            $url       = $route->getPath();
-            $method    = $request->getMethod();
             $endpoint  = $this->api_endpoint_service->getApiEndpointByUrlAndMethod($url, $method);
-            $realm     = $request->getHost();
 
             //api endpoint must be registered on db and active
             if(is_null($endpoint) || !$endpoint->isActive()){
@@ -88,12 +87,17 @@ class OAuth2BearerAccessTokenRequestValidator {
                     implode(' ',$endpoint_scopes));
             }
 
-            $this->resource_server_context->setAuthorizationContext(array(
+            $context = array(
                 'access_token' => $access_token_value,
                 'expires_in'   => $access_token->getRemainingLifetime(),
                 'client_id'    => $access_token->getClientId(),
                 'scope'        => $access_token->getScope()
-            ));
+            );
+
+            if(!is_null($access_token>getUserId()))
+                $context['user_id'] = $access_token>getUserId();
+
+            $this->resource_server_context->setAuthorizationContext($context);
 
         }
         catch(OAuth2ResourceServerException $ex1){

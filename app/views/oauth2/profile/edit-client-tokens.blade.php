@@ -203,7 +203,7 @@
 
                 $.ajax(
                     {
-                        type: "GET",
+                        type: "DELETE",
                         url: url,
                         dataType: "json",
                         timeout:60000,

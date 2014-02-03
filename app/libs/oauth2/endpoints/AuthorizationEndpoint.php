@@ -5,7 +5,6 @@ namespace oauth2\endpoints;
 use oauth2\requests\OAuth2Request;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\IOAuth2Protocol;
-use oauth2\exceptions\InvalidGrantTypeException;
 
 /**
  * Class AuthorizationEndpoint

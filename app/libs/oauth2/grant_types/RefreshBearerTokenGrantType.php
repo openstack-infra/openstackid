@@ -3,7 +3,7 @@
 namespace oauth2\grant_types;
 
 use Exception;
-
+use oauth2\models\IClient;
 use oauth2\requests\OAuth2Request;
 use oauth2\OAuth2Protocol;
 use oauth2\services\IClientService;
@@ -13,7 +13,8 @@ use oauth2\requests\OAuth2RefreshAccessTokenRequest;
 
 use ReflectionClass;
 
-use oauth2\exceptions\UnAuthorizedClientException;
+use oauth2\exceptions\InvalidApplicationType;
+use oauth2\exceptions\UseRefreshTokenException;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\InvalidGrantTypeException;
 
@@ -66,9 +67,10 @@ class RefreshBearerTokenGrantType extends AbstractGrantType {
      * o  validate the refresh token.
      *
      * @param OAuth2Request $request
-     * @return OAuth2AccessTokenResponse|void
-     * @throws \oauth2\exceptions\UnAuthorizedClientException
+     * @return mixed|OAuth2AccessTokenResponse|void
+     * @throws \oauth2\exceptions\UseRefreshTokenException
      * @throws \oauth2\exceptions\InvalidOAuth2Request
+     * @throws \oauth2\exceptions\InvalidApplicationType
      * @throws \oauth2\exceptions\InvalidGrantTypeException
      */
     public function completeFlow(OAuth2Request $request)
@@ -79,8 +81,11 @@ class RefreshBearerTokenGrantType extends AbstractGrantType {
 
             parent::completeFlow($request);
 
+            if($this->current_client->getApplicationType()!=IClient::ApplicationType_Web_App)
+                throw new InvalidApplicationType($this->current_client_id,sprintf('client id %s client type must be WEB_APPLICATION',$this->current_client_id));
+
             if(!$this->current_client->use_refresh_token)
-                throw new UnAuthorizedClientException("current client could not use refresh tokens");
+                throw new UseRefreshTokenException("current client id %s could not use refresh tokens",$this->current_client_id);
 
             $refresh_token_value = $request->getRefreshToken();
             $scope               = $request->getScope();

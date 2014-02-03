@@ -1,13 +1,12 @@
 <?php
 
 namespace oauth2\exceptions;
-use \Exception;
 
-class UnAuthorizedClientException extends Exception
+class UnAuthorizedClientException extends OAuth2ClientBaseException
 {
-    public function __construct($message = "")
+    public function __construct($client_id, $message = "")
     {
         $message = "UnAuthorized Client: " . $message;
-        parent::__construct($message, 0, null);
+        parent::__construct($client_id,$message);
     }
 }

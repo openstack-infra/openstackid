@@ -19,7 +19,15 @@ class JsonController extends BaseController  {
         return Response::json(array('error' => 'server error'), 500);
     }
 
-    protected function ok($data){
+    protected function created($data='ok'){
+        return Response::json($data, 201);
+    }
+
+    protected function deleted($data='ok'){
+        return Response::json($data, 204);
+    }
+
+    protected function ok($data='ok'){
         return Response::json($data, 200);
     }
 

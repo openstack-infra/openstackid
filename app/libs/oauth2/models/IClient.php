@@ -2,17 +2,24 @@
 
 namespace oauth2\models;
 
-
+/**
+ * Interface IClient
+ * @package oauth2\models
+ */
 interface IClient {
 
-    const ClientType_Public       = 1;
-    const ClientType_Confidential = 2;
+    const ClientType_Public         = 'PUBLIC';
+    const ClientType_Confidential   = 'CONFIDENTIAL';
+
+    const ApplicationType_Web_App   = 'WEB_APPLICATION';
+    const ApplicationType_JS_Client = 'JS_CLIENT';
+    const ApplicationType_Service   = 'SERVICE';
 
     public function getId();
     public function getClientId();
     public function getClientSecret();
     public function getClientType();
-    public function getFriendlyClientType();
+    public function getApplicationType();
     public function getClientAuthorizedRealms();
     public function getClientScopes();
     public function getClientRegisteredUris();
@@ -28,5 +35,5 @@ interface IClient {
     public function isActive();
     public function isResourceServerClient();
     public function getResourceServer();
-
-} 
+    public function getFriendlyApplicationType();
+}

@@ -10,4 +10,5 @@ interface IResourceServerContext {
     public function getCurrentAccessTokenLifetime();
     public function getCurrentClientId();
     public function setAuthorizationContext($auth_context);
+    public function getCurrentUserId();
 } 

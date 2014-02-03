@@ -10,4 +10,5 @@ class UtilsServiceCatalog {
     const LockManagerService         = 'utils\\services\\ILockManagerService';
     const ServerConfigurationService = 'utils\\services\\IServerConfigurationService';
     const CacheService               = 'utils\\services\\ICacheService';
+    const BannedIpService            = 'utils\\services\\IBannedIPService';
 } 
