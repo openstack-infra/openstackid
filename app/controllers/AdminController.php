@@ -8,8 +8,10 @@ use oauth2\services\IResourceServerService;
 use oauth2\services\IApiEndpointService;
 use utils\services\IAuthService;;
 
+/**
+ * Class AdminController
+ */
 class AdminController extends BaseController {
-
 
     private $client_service;
     private $scope_service;
@@ -77,6 +79,8 @@ class AdminController extends BaseController {
                 'selected_scopes' => $aux_scopes,
                 'scopes'          => $scopes,
                 'access_tokens'   => $access_tokens,
+                "is_server_admin" => $user->IsServerAdmin(),
+                "use_system_scopes" => $user->canUseSystemScopes(),
                 'refresh_tokens'  => $refresh_tokens,
             ));
     }
@@ -119,5 +123,69 @@ class AdminController extends BaseController {
         return View::make("oauth2.profile.admin.edit-endpoint",array(
             'endpoint' => $endpoint ,
             'selected_scopes' => $selected_scopes));
+    }
+
+    public function editIssuedGrants(){
+        $user           = $this->auth_service->getCurrentUser();
+        $access_tokens  = $this->token_service->getAccessTokenByUserId($user->getId());
+        $refresh_tokens = $this->token_service->getRefreshTokeByUserId($user->getId());
+
+
+        foreach($access_tokens as $access_token){
+            $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ',$access_token->scope));
+            $access_token->setFriendlyScopes(implode(', ',$friendly_scopes));
+        }
+
+        foreach($refresh_tokens as $refresh_token){
+            $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ',$refresh_token->scope));
+            $refresh_token->setFriendlyScopes(implode(', ',$friendly_scopes));
+        }
+        return View::make("oauth2.profile.edit-user-grants",array(
+            'access_tokens'   => $access_tokens ,
+            'refresh_tokens'  => $refresh_tokens ,
+            'is_server_admin' => $user->IsServerAdmin(),
+            ));
+    }
+
+    public function revokeToken($value){
+        $hint = Input::get('hint','none');
+        $user = $this->auth_service->getCurrentUser();
+        try{
+            switch($hint){
+                case 'access_token':{
+                    $token = $this->token_service->getAccessToken($value,true);
+                    if(is_null($token->getUserId()) || intval($token->getUserId())!=intval($user->getId()))
+                        throw new Exception(sprintf("access token %s does not belongs to user id %s!.",$value,$user->getId()));
+                    $this->token_service->revokeAccessToken($value,true);
+                }
+                    break;
+                case 'refresh_token':
+                    $token = $this->token_service->getRefreshToken($value,true);
+                    if(is_null($token->getUserId()) || intval($token->getUserId())!=intval($user->getId()))
+                        throw new Exception(sprintf("refresh token %s does not belongs to user id %s!.",$value,$user->getId()));
+                    $this->token_service->revokeRefreshToken($value,true);
+                    break;
+                default:
+                    throw new Exception(sprintf("hint %s not allowed",$hint));
+                    break;
+            }
+        }
+        catch(Exception $ex){
+            Log::error($ex);
+        }
+        return Redirect::action("AdminController@editIssuedGrants");
+    }
+
+    public function listOAuth2Clients(){
+        $user    = $this->auth_service->getCurrentUser();
+        $clients = $user->getClients();
+
+        return View::make("oauth2.profile.clients", array(
+            "username" => $user->getFullName(),
+            "user_id" => $user->getId(),
+            "is_server_admin" => $user->IsServerAdmin(),
+            "use_system_scopes" => $user->canUseSystemScopes(),
+            'clients' => $clients,
+        ));
     }
 }

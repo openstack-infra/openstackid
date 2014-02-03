@@ -6,7 +6,7 @@ use oauth2\exceptions\InvalidResourceServer;
 /**
  * Class ApiResourceServerController
  */
-class ApiResourceServerController extends JsonController implements IRESTController
+class ApiResourceServerController extends JsonController implements ICRUDController
 {
     /**
      * @var IResourceServerService $resource_service
@@ -17,6 +17,8 @@ class ApiResourceServerController extends JsonController implements IRESTControl
     {
         parent::__construct($log_service);
         $this->resource_server_service = $resource_server_service;
+        $this->allowed_filter_fields     = array('');
+        $this->allowed_projection_fields = array('*');
     }
 
     public function get($id)
@@ -43,10 +45,15 @@ class ApiResourceServerController extends JsonController implements IRESTControl
         }
     }
 
-    public function getByPage($page_nbr, $page_size)
+    public function getByPage()
     {
         try {
-            $list = $this->resource_server_service->getAll($page_nbr, $page_size);
+            $fields  =  $this->getProjection(Input::get('fields',null));
+            $filters = $this->getFilters(Input::except('fields','limit','offset'));
+            $page_nbr = intval(Input::get('offset',1));
+            $page_size = intval(Input::get('limit',10));
+
+            $list = $this->resource_server_service->getAll($page_nbr, $page_size,$filters,$fields);
             $items = array();
             foreach ($list->getItems() as $rs) {
                 array_push($items, $rs->toArray());
@@ -155,6 +162,11 @@ class ApiResourceServerController extends JsonController implements IRESTControl
         }
     }
 
+    /**
+     * @param $id
+     * @param $active
+     * @return mixed
+     */
     public function updateStatus($id, $active){
         try {
             $res = $this->resource_server_service->setStatus($id,$active);

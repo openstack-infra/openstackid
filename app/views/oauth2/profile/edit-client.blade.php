@@ -3,8 +3,22 @@
 <title>Welcome to openstackId - Edit Registered Application</title>
 @stop
 @section('content')
-<a href="{{ URL::previous() }}">Go Back</a>
-<legend>{{ $client->app_name }}</legend>
+
+<div class="navbar">
+    <div class="navbar-inner">
+        <ul class="nav">
+            <li ><a href='{{ URL::action("UserController@getProfile") }}'>Profile</a></li>
+            <li class="active"><a href='{{URL::action("AdminController@listOAuth2Clients")}}'>OAUTH2 Console</a></li>
+            <li><a href='{{URL::action("AdminController@editIssuedGrants")}}'>Issued OAUTH2 Grants</a></li>
+            @if($is_server_admin)
+            <li><a href='{{URL::action("AdminController@listResourceServers")}}'>Server Administration</a></li>
+            @endif
+            <li><a href='{{ URL::action("UserController@logout") }}'>Logout</a></li>
+        </ul>
+    </div>
+</div>
+
+<legend>Client {{ $client->app_name }}</legend>
 @if($errors->any())
 <div class="errors">
     <ul>

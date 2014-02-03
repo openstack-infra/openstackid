@@ -25,7 +25,7 @@ interface IApiEndpointService {
      * @param array $filters
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10,array $filters);
+    public function getAll($page_nbr=1,$page_size=10,array $filters,array $fields=array('*'));
 
 
     /**

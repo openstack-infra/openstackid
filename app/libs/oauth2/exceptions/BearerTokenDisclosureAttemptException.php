@@ -2,15 +2,11 @@
 
 namespace oauth2\exceptions;
 
-use Exception;
-
-class BearerTokenDisclosureAttemptException extends Exception
+class BearerTokenDisclosureAttemptException extends OAuth2ClientBaseException
 {
-
-    public function __construct($message = "")
+    public function __construct($client_id,$message = "")
     {
         $message = "Bearer Token Disclosure Attempt Attack: " . $message;
-        parent::__construct($message, 0, null);
+        parent::__construct($client_id,$message);
     }
-
 }

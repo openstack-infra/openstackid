@@ -90,7 +90,7 @@
 <script type="application/javascript">
 
     function loadResourceServers(){
-        var link = '{{URL::action("ApiResourceServerController@getByPage",array("page_nbr"=>1,"page_size"=>1000))}}';
+        var link = '{{URL::action("ApiResourceServerController@getByPage",array("offset"=>1,"limit"=>1000))}}';
         $.ajax(
             {
                 type: "GET",

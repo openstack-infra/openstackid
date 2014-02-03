@@ -22,7 +22,7 @@ interface IResourceServerService {
      * @param int $page_nbr
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10);
+    public function getAll($page_nbr=1,$page_size=10,array $filters, array $fields=array('*'));
 
     /**
      * @param IResourceServer $resource_server

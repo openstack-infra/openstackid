@@ -25,9 +25,12 @@ class ApiScopeService implements IApiScopeService {
         return ApiScope::where('active','=',true)->whereIn('name',$scopes_names)->get();
     }
 
+    /**
+     * @param array $scopes_names
+     * @return mixed
+     */
     public function getFriendlyScopesByName(array $scopes_names){
-
-        return DB::table('oauth2_api_scope')->where('active','=',true)->whereIn('name',$scopes_names)->lists('short_description');
+       return DB::table('oauth2_api_scope')->where('active','=',true)->whereIn('name',$scopes_names)->lists('short_description');
     }
 
     /**
@@ -55,6 +58,10 @@ class ApiScopeService implements IApiScopeService {
         return $res;
     }
 
+    /**
+     * @param array $scopes_names
+     * @return array|mixed
+     */
     public function getAudienceByScopeNames(array $scopes_names){
         $scopes = $this->getScopesByName($scopes_names);
         $audience = array();
@@ -68,6 +75,10 @@ class ApiScopeService implements IApiScopeService {
         return $audience;
     }
 
+    /**
+     * @param array $scopes_names
+     * @return string
+     */
     public function getStrAudienceByScopeNames(array $scopes_names){
         $audiences = $this->getAudienceByScopeNames($scopes_names);
         $audience  = '';
@@ -95,10 +106,10 @@ class ApiScopeService implements IApiScopeService {
      * @param array $filters
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10, array $filters)
+    public function getAll($page_nbr=1,$page_size=10, array $filters, array $fields=array('*'))
     {
         DB::getPaginator()->setCurrentPage($page_nbr);
-        return ApiScope::Filter($filters)->paginate($page_size);
+        return ApiScope::Filter($filters)->paginate($page_size,$fields);
     }
 
     /**
@@ -148,11 +159,12 @@ class ApiScopeService implements IApiScopeService {
         return $res;
     }
 
+
     /**
      * sets api scope status (active/deactivated)
-     * @param $id id of api scope
-     * @param bool $status status (active/non active)
-     * @return void
+     * @param \oauth2\services\id $id
+     * @param bool $status
+     * @throws \oauth2\exceptions\InvalidApiScope
      */
     public function setStatus($id, $status)
     {
@@ -223,6 +235,9 @@ class ApiScopeService implements IApiScopeService {
         return $instance;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDefaultScopes(){
         return $scopes = ApiScope::where('default','=',true)->where('active','=',true)->get(array('id'));
     }

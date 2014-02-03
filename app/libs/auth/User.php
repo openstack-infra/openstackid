@@ -11,6 +11,10 @@ use utils\services\Registry;
 use oauth2\models\IOAuth2User;
 use Eloquent;
 
+/**
+ * Class User
+ * @package auth
+ */
 class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
 {
 
@@ -21,6 +25,21 @@ class User extends Eloquent implements UserInterface, IOpenIdUser, IOAuth2User
     public function trusted_sites()
     {
         return $this->hasMany("OpenIdTrustedSite", 'user_id');
+    }
+
+    public function access_tokens()
+    {
+        return $this->hasMany('AccessToken','user_id');
+    }
+
+    public function refresh_tokens()
+    {
+        return $this->hasMany('RefreshToken','user_id');
+    }
+
+    public function consents()
+    {
+        return $this->hasMany('UserConsent','user_id');
     }
 
     public function clients()

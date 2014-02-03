@@ -1,6 +1,5 @@
 <?php
 
-use oauth2\IResourceServerContext;
 use utils\services\ILogService;
 use oauth2\services\IApiService;
 use  oauth2\exceptions\InvalidApi;
@@ -9,7 +8,7 @@ use  oauth2\exceptions\InvalidApi;
  * Class ApiController
  * REST controller for Api entity CRUD Ops
  */
-class ApiController extends AbstractRESTController implements IRESTController
+class ApiController extends AbstractRESTController implements ICRUDController
 {
 
     private $api_service;
@@ -20,9 +19,8 @@ class ApiController extends AbstractRESTController implements IRESTController
         parent::__construct($log_service);
         $this->api_service = $api_service;
         //set filters allowed values
-        $this->allowed_filter_fields = array('resource_server_id');
-        $this->allowed_filter_op     = array('resource_server_id' => array('='));
-        $this->allowed_filter_value  = array('resource_server_id' => '/^\d+$/');
+        $this->allowed_filter_fields     = array('resource_server_id');
+        $this->allowed_projection_fields = array('*');
     }
 
     public function get($id)
@@ -44,12 +42,15 @@ class ApiController extends AbstractRESTController implements IRESTController
         }
     }
 
-    public function getByPage($page_nbr, $page_size)
+    public function getByPage()
     {
         try {
             //check for optional filters param on querystring
-            $filters = Input::get('filters',null);
-            $list    = $this->api_service->getAll($page_nbr,$page_size, $this->getFilters($filters));
+            $fields  =  $this->getProjection(Input::get('fields',null));
+            $filters = $this->getFilters(Input::except('fields','limit','offset'));
+            $page_nbr = intval(Input::get('offset',1));
+            $page_size = intval(Input::get('limit',10));
+            $list    = $this->api_service->getAll($page_nbr,$page_size, $filters,$fields);
             $items   = array();
             foreach ($list->getItems() as $api) {
                 array_push($items, $api->toArray());

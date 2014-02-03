@@ -8,6 +8,10 @@ use ServerConfiguration;
 use utils\services\ICacheService;
 use utils\services\IServerConfigurationService;
 
+/**
+ * Class ServerConfigurationService
+ * @package services
+ */
 class ServerConfigurationService implements IOpenIdServerConfigurationService,IServerConfigurationService
 {
 
@@ -69,6 +73,11 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService,IS
         //infinite by default
         $this->default_config_params["OAuth2.RefreshToken.Lifetime"]      = 0;
 
+        //oauth2 policy defaults
+        $this->default_config_params["OAuth2SecurityPolicy.MinutesWithoutExceptions"]          = 2;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts"]  = 5;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts"] = 10;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts"]  = 10;
     }
 
     public function getUserIdentityEndpointURL($identifier)

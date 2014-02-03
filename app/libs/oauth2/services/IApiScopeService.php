@@ -8,8 +8,6 @@ use oauth2\models\IApiScope;
  * @package oauth2\services
  */
 interface IApiScopeService {
-
-
     /**
      * gets an api scope by id
      * @param $id id of api scope
@@ -24,7 +22,7 @@ interface IApiScopeService {
      * @param array $filters
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10, array $filters);
+    public function getAll($page_nbr=1,$page_size=10, array $filters, array $fields=array('*'));
 
     /**
      * @param IApiScope $scope
@@ -95,7 +93,16 @@ interface IApiScopeService {
      */
     public function getAudienceByScopeNames(array $scopes_names);
 
+    /**
+     * gets audience string for a given scopes sets (resource servers)
+     * @param array $scopes_names
+     * @return mixed
+     */
     public function getStrAudienceByScopeNames(array $scopes_names);
 
+    /**
+     * gets a list of default scopes
+     * @return mixed
+     */
     public function getDefaultScopes();
 } 

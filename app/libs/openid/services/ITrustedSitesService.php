@@ -13,8 +13,9 @@ interface ITrustedSitesService
 
     /**
      * @param IOpenIdUser $user
-     * @param $return_to
-     * @return  \array
+     * @param $realm
+     * @param array $data
+     * @return mixed
      */
     public function getTrustedSites(IOpenIdUser $user, $realm, $data = array());
 

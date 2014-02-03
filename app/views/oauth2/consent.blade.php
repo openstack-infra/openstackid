@@ -21,8 +21,11 @@
                 <div class="span2">
                     <img src="{{$app_logo}}" border="0"/>
                 </div>
-                <div class="span10">
-                    <h2>{{$app_name}}&nbsp;<i data-content="Developer Email: <a href='mailto:{{$dev_info_email}}'>{{$dev_info_email}}</a>.<br> Clicking 'Accept' will redirect you to: <a href='{{$redirect_to}}' target="_blank">{{$redirect_to}}</a>" class="icon-info-sign info" title="Developer Info"></i></h2>
+                <div class="span9">
+                    <h2>{{$app_name}}&nbsp;</h2>
+                </div>
+                <div class="span1">
+                    <i data-content="Developer Email: <a href='mailto:{{$dev_info_email}}'>{{$dev_info_email}}</a>.<br> Clicking 'Accept' will redirect you to: <a href='{{$redirect_to}}' target='_blank'>{{$redirect_to}}</a>" class="icon-info-sign info" title="Developer Info"></i>
                 </div>
             </div>
             <legend>This app would like to:</legend>

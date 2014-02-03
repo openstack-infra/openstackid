@@ -142,7 +142,7 @@
     function loadApis(){
         $.ajax({
             type: "GET",
-            url: '{{ URL::action("ApiController@getByPage",array("page_nbr"=>1,"page_size"=>1000))."?filters=".urlencode("resource_server_id:=:").$resource_server->id }}',
+            url: '{{ URL::action("ApiController@getByPage",array("offset"=>1,"limit"=>1000))."?filters=".urlencode("resource_server_id:=:").$resource_server->id }}',
             contentType: "application/json; charset=utf-8",
             timeout:60000,
             success: function (data,textStatus,jqXHR) {
@@ -310,7 +310,7 @@
             url        = url.replace('@active',active);
             $.ajax(
                 {
-                    type: "GET",
+                    type: "PUT",
                     url: url,
                     contentType: "application/json; charset=utf-8",
                     timeout:60000,

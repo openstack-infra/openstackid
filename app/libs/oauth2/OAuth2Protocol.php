@@ -15,16 +15,22 @@ use oauth2\exceptions\AccessDeniedException;
 use oauth2\exceptions\BearerTokenDisclosureAttemptException;
 use oauth2\exceptions\ExpiredAuthorizationCodeException;
 use oauth2\exceptions\InvalidAccessTokenException;
+use oauth2\exceptions\InvalidApplicationType;
 use oauth2\exceptions\InvalidAuthorizationCodeException;
 use oauth2\exceptions\InvalidClientException;
+use oauth2\exceptions\InvalidClientType;
 use oauth2\exceptions\InvalidGrantTypeException;
 use oauth2\exceptions\InvalidOAuth2Request;
+use oauth2\exceptions\LockedClientException;
+use oauth2\exceptions\MissingClientIdParam;
 use oauth2\exceptions\OAuth2GenericException;
 use oauth2\exceptions\ReplayAttackException;
 use oauth2\exceptions\ScopeNotAllowedException;
 use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
+use oauth2\exceptions\MissingClientAuthorizationInfo;
+use oauth2\exceptions\InvalidRedeemAuthCodeException;
 
 //grant types
 use oauth2\grant_types\AuthorizationCodeGrantType;
@@ -44,6 +50,7 @@ use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use oauth2\strategies\OAuth2IndirectErrorResponseFactoryMethod;
+use oauth2\services\IUserConsentService;
 use utils\services\IAuthService;
 use utils\services\ICheckPointService;
 use utils\services\ILogService;
@@ -65,6 +72,7 @@ class OAuth2Protocol implements IOAuth2Protocol
     const OAuth2Protocol_ResponseType_Token = 'token';
     const OAuth2Protocol_ResponseType = 'response_type';
     const OAuth2Protocol_ClientId = 'client_id';
+    const OAuth2Protocol_UserId = 'user_id';
     const OAuth2Protocol_ClientSecret = 'client_secret';
     const OAuth2Protocol_Token = 'token';
     const OAuth2Protocol_TokenType = 'token_type';
@@ -77,6 +85,26 @@ class OAuth2Protocol implements IOAuth2Protocol
     const OAuth2Protocol_Scope = 'scope';
     const OAuth2Protocol_Audience = 'audience';
     const OAuth2Protocol_State = 'state';
+    /**
+     * Indicates whether the user should be re-prompted for consent. The default is auto,
+     * so a given user should only see the consent page for a given set of scopes the first time
+     * through the sequence. If the value is force, then the user sees a consent page even if they
+     * previously gave consent to your application for a given set of scopes.
+     */
+    const OAuth2Protocol_Approval_Prompt = 'approval_prompt';
+    const OAuth2Protocol_Approval_Prompt_Force = 'force';
+    const OAuth2Protocol_Approval_Prompt_Auto = 'auto';
+
+    /**
+     * Indicates whether your application needs to access an API when the user is not present at
+     * the browser. This parameter defaults to online. If your application needs to refresh access tokens
+     * when the user is not present at the browser, then use offline. This will result in your application
+     * obtaining a refresh token the first time your application exchanges an authorization code for a user.
+     */
+    const OAuth2Protocol_AccessType = 'access_type';
+    const OAuth2Protocol_AccessType_Online = 'online';
+    const OAuth2Protocol_AccessType_Offline = 'offline';
+
     const OAuth2Protocol_GrantType = 'grant_type';
     const OAuth2Protocol_Error = 'error';
     const OAuth2Protocol_ErrorDescription = 'error_description';
@@ -138,11 +166,12 @@ class OAuth2Protocol implements IOAuth2Protocol
         IMementoOAuth2AuthenticationRequestService $memento_service,
         IOAuth2AuthenticationStrategy $auth_strategy,
         ICheckPointService $checkpoint_service,
-        IApiScopeService   $scope_service)
+        IApiScopeService   $scope_service,
+        IUserConsentService $user_consent_service)
     {
 
-        $authorization_code_grant_type    = new AuthorizationCodeGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service);
-        $implicit_grant_type              = new ImplicitGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service);
+        $authorization_code_grant_type    = new AuthorizationCodeGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service,$user_consent_service);
+        $implicit_grant_type              = new ImplicitGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service,$user_consent_service);
         $refresh_bearer_token_grant_type  = new RefreshBearerTokenGrantType($client_service, $token_service, $log_service);
         $client_credential_grant_type     = new ClientCredentialsGrantType($scope_service,$client_service, $token_service, $log_service);
 
@@ -241,7 +270,48 @@ class OAuth2Protocol implements IOAuth2Protocol
                 throw $ex8;
 
             return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_ServerError, $redirect_uri);
-        } catch (Exception $ex) {
+        }
+        catch(InvalidApplicationType $ex9){
+            $this->log_service->error($ex9);
+            $this->checkpoint_service->trackException($ex9);
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if (is_null($redirect_uri))
+                throw $ex9;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
+        }
+        catch(LockedClientException $ex10){
+            $this->log_service->error($ex10);
+            $this->checkpoint_service->trackException($ex10);
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if (is_null($redirect_uri))
+                throw $ex10;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
+        }
+        catch(MissingClientIdParam $ex11){
+            $this->log_service->error($ex11);
+            $this->checkpoint_service->trackException($ex11);
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if (is_null($redirect_uri))
+                throw $ex11;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
+        }
+        catch(InvalidClientType $ex12){
+            $this->log_service->error($ex12);
+            $this->checkpoint_service->trackException($ex12);
+
+            $redirect_uri = $this->validateRedirectUri($request);
+            if (is_null($redirect_uri))
+                throw $ex12;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse($request, OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, $redirect_uri);
+        }
+        catch (Exception $ex) {
             $this->log_service->error($ex);
             $this->checkpoint_service->trackException($ex);
 
@@ -326,6 +396,36 @@ class OAuth2Protocol implements IOAuth2Protocol
             $this->log_service->error($ex11);
             $this->checkpoint_service->trackException($ex11);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest);
+        }
+        catch(InvalidApplicationType $ex12){
+            $this->log_service->error($ex12);
+            $this->checkpoint_service->trackException($ex12);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(LockedClientException $ex13){
+            $this->log_service->error($ex13);
+            $this->checkpoint_service->trackException($ex13);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(MissingClientIdParam $ex14){
+            $this->log_service->error($ex14);
+            $this->checkpoint_service->trackException($ex14);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(InvalidClientType $ex15){
+            $this->log_service->error($ex15);
+            $this->checkpoint_service->trackException($ex15);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(MissingClientAuthorizationInfo $ex16){
+            $this->log_service->error($ex16);
+            $this->checkpoint_service->trackException($ex16);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(InvalidRedeemAuthCodeException $ex17){
+            $this->log_service->error($ex17);
+            $this->checkpoint_service->trackException($ex17);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
         }
         catch (Exception $ex) {
             $this->log_service->error($ex);

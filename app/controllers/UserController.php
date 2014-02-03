@@ -212,7 +212,6 @@ class UserController extends BaseController
         $user    = $this->auth_service->getCurrentUser();
         $sites   = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
         $actions = $user->getActions();
-        $clients = $user->getClients();
 
         return View::make("profile", array(
             "username" => $user->getFullName(),
@@ -226,7 +225,6 @@ class UserController extends BaseController
             "show_full_name" => $user->getShowProfileFullName(),
             "show_email" => $user->getShowProfileEmail(),
             'actions' => $actions,
-            'clients' => $clients,
         ));
     }
 

@@ -25,7 +25,7 @@ class OAuth2ProtectedApiResourceServerController extends OAuth2ProtectedControll
 
     public function getByPage($page_nbr, $page_size)
     {
-        return $this->controller->getByPage($page_nbr, $page_size);
+        return $this->controller->getByPage();
     }
 
     public function create()

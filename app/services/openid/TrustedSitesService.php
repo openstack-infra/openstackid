@@ -48,8 +48,9 @@ class TrustedSitesService implements ITrustedSitesService
 
     /**
      * @param IOpenIdUser $user
-     * @param $return_to
-     * @return Array | ITrustedSite
+     * @param $realm
+     * @param array $data
+     * @return array|mixed
      */
     public function getTrustedSites(IOpenIdUser $user, $realm, $data = array())
     {

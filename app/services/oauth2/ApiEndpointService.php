@@ -7,7 +7,6 @@ use oauth2\services\IApiEndpointService;
 use ApiEndpoint;
 use ApiScope;
 use DB;
-use  oauth2\exceptions\InvalidApi;
 use  oauth2\exceptions\InvalidApiEndpoint;
 use  oauth2\exceptions\InvalidApiScope;
 
@@ -41,9 +40,9 @@ class ApiEndpointService implements IApiEndpointService {
      * @param array $filters
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10,array $filters){
+    public function getAll($page_nbr=1,$page_size=10,array $filters, array $fields=array('*')){
         DB::getPaginator()->setCurrentPage($page_nbr);
-        return ApiEndpoint::Filter($filters)->paginate($page_size);
+        return ApiEndpoint::Filter($filters)->paginate($page_size,$fields);
     }
 
     /**

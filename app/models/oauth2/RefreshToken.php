@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Class RefreshToken
+ * Refresh Token Entity
+ */
 class RefreshToken extends Eloquent {
 
     protected $table = 'oauth2_refresh_token';
@@ -15,6 +19,10 @@ class RefreshToken extends Eloquent {
 
     public function client(){
         return $this->belongsTo('Client');
+    }
+
+    public function user(){
+        return $this->belongsTo('auth\User');
     }
 
     public function isVoid(){

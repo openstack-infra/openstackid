@@ -323,6 +323,7 @@ class OpenIdUriHelper
      *
      * @static
      * @param string $trust_root The trust root to check
+     * @throws \openid\exceptions\InvalidTLDException
      * @return bool $sanity Whether the trust root looks OK
      */
     private static function _isSane($trust_root)

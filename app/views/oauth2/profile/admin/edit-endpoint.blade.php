@@ -134,9 +134,10 @@
             var del_link = $(this).attr('data-remove-link');
             var checked  = $(this).is(':checked');
             var url      = checked?add_link:del_link;
+            var verb     = checked?'PUT':'DELETE';
             $.ajax(
                 {
-                    type: "GET",
+                    type: verb,
                     url: url,
                     contentType: "application/json; charset=utf-8",
                     timeout:60000,

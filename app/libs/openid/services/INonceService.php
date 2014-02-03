@@ -23,9 +23,9 @@ interface INonceService
      * To prevent replay attacks, the OP MUST NOT issue more than one verification response
      * for each authentication response it had previously issued. An authentication response
      * and its matching verification request may be identified by their "openid.response_nonce" values.
-     * @param $nonce
+     * @param OpenIdNonce $nonce
      * @param $signature
-     * @throws ReplayAttackException
+     * @param $realm
      * @return mixed
      */
     public function markNonceAsInvalid(OpenIdNonce $nonce, $signature, $realm);

@@ -16,9 +16,11 @@ class AuthHelper
     );
 
     /**
-     * @param $password user password
-     * @param $salt  password salt
-     * @param string $algorithm Name of selected hashing algorithm (i.e. "md5", "sha256", "haval160,4", etc..)
+     * @param $password
+     * @param $salt
+     * @param string $algorithm
+     * @return string
+     * @throws \Exception
      */
     public static function encrypt_password($password, $salt, $algorithm = "sha1")
     {

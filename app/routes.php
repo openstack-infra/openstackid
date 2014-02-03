@@ -71,6 +71,11 @@ Route::group(array("before" => array("ssl", "auth")), function () {
 Route::group(array('prefix' => 'admin','before' => 'ssl|auth'), function(){
     //client admin UI
     Route::get('clients/edit/{id}',array('before' => 'user.owns.client.policy', 'uses' => 'AdminController@getEditRegisteredClient'));
+    Route::get('clients',array('uses' => 'AdminController@listOAuth2Clients'));
+
+    Route::get('/grants','AdminController@editIssuedGrants');
+    Route::get('/grants/revoke/{value}','AdminController@revokeToken');
+
     //server admin UI
     Route::group(array('before' => 'auth.server.admin'), function(){
         Route::get('/resource-servers','AdminController@listResourceServers');
@@ -91,7 +96,7 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
     Route::group(array('prefix' => 'clients'), function(){
 
         Route::post('/', array('before' => 'is.current.user', 'uses' => 'ClientApiController@create'));
-        Route::get('/{page_nbr}/{page_size}',array('before' => 'is.current.user', 'uses' => 'ClientApiController@getByPage'));
+        Route::get('/',array('before' => 'is.current.user', 'uses' => 'ClientApiController@getByPage'));
         Route::delete('/{id}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@delete'));
 
         Route::group(array('prefix' => 'uris','before' => 'user.owns.client.policy'), function(){
@@ -100,53 +105,48 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
             Route::delete('/{id}/{uri_id}',"ClientApiController@deleteClientAllowedUri");
         });
 
-        Route::group(array('prefix' => 'data','before' => 'user.owns.client.policy'), function(){
-            Route::get('/regenerate-secret/{id}',"ClientApiController@regenerateClientSecret");
-            Route::put('/refresh-token/use/{id}',"ClientApiController@setRefreshTokenClient");
-            Route::put('/refresh-token/rotate/{id}',"ClientApiController@setRotateRefreshTokenPolicy");
-            Route::get('/access-token/{id}',"ClientApiController@getAccessTokens");
-            Route::get('/refresh-token/{id}',"ClientApiController@getRefreshTokens");
-            Route::get('/token/revoke/{id}/{value}/{hint}',"ClientApiController@revokeToken");
-            Route::get('/activate/{id}/{active}',"ClientApiController@updateStatus");
-        });
-
-        Route::group(array('prefix' => 'scopes','before' => 'user.owns.client.policy'), function(){
-            Route::post('/set/{id}',"ClientApiController@addAllowedScope");
-        });
+        Route::put('/{id}/secret',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@regenerateClientSecret'));
+        Route::put('/{id}/use-refresh-token',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@setRefreshTokenClient'));
+        Route::put('/{id}/rotate-refresh-token',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@setRotateRefreshTokenPolicy'));
+        Route::get('/{id}/access-token',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@getAccessTokens'));
+        Route::get('/{id}/refresh-token',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@getRefreshTokens'));
+        Route::delete('/{id}/token/{value}/{hint}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@revokeToken'));
+        Route::put('/{id}/status/{active}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@updateStatus'));
+        Route::post('/{id}/set-scopes',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@addAllowedScope'));
 
     });
 
-    Route::group(array('prefix' => 'resource-server', 'before' => 'auth.server.admin.json'), function(){
+    Route::group(array('prefix' => 'resource-servers', 'before' => 'auth.server.admin.json'), function(){
         Route::delete('/{id}',"ApiResourceServerController@delete");
         Route::post('/',"ApiResourceServerController@create");
         Route::put('/',"ApiResourceServerController@update");
-        Route::get('/{page_nbr}/{page_size}',"ApiResourceServerController@getByPage");
+        Route::get('/',"ApiResourceServerController@getByPage");
     });
 
-    Route::group(array('prefix' => 'api', 'before' => 'auth.server.admin.json'), function(){
+    Route::group(array('prefix' => 'apis', 'before' => 'auth.server.admin.json'), function(){
         Route::delete('/{id}',"ApiController@delete");
         Route::post('/',"ApiController@create");
-        Route::get('/{page_nbr}/{page_size}',"ApiController@getByPage");
+        Route::get('/',"ApiController@getByPage");
         Route::put('/',"ApiController@update");
-        Route::get('/status/{id}/{active}',"ApiController@updateStatus");
+        Route::put('/{id}/status/{active}',"ApiController@updateStatus");
     });
 
-    Route::group(array('prefix' => 'scope', 'before' => 'auth.server.admin.json'), function(){
+    Route::group(array('prefix' => 'scopes', 'before' => 'auth.server.admin.json'), function(){
         Route::delete('/{id}',"ApiScopeController@delete");
         Route::post('/',"ApiScopeController@create");
-        Route::get('/{page_nbr}/{page_size}',"ApiScopeController@getByPage");
+        Route::get('/',"ApiScopeController@getByPage");
         Route::put('/',"ApiScopeController@update");
-        Route::get('/status/{id}/{active}',"ApiScopeController@updateStatus");
+        Route::put('/{id}/status/{active}',"ApiScopeController@updateStatus");
     });
 
-    Route::group(array('prefix' => 'endpoint', 'before' => 'auth.server.admin.json'), function(){
+    Route::group(array('prefix' => 'endpoints', 'before' => 'auth.server.admin.json'), function(){
         Route::delete('/{id}',"ApiEndpointController@delete");
+        Route::get('/',"ApiEndpointController@getByPage");
         Route::post('/',"ApiEndpointController@create");
-        Route::get('/{page_nbr}/{page_size}',"ApiEndpointController@getByPage");
         Route::put('/',"ApiEndpointController@update");
-        Route::get('/status/{id}/{active}',"ApiEndpointController@updateStatus");
-        Route::get('/scope/add/{id}/{scope_id}',"ApiEndpointController@addRequiredScope");
-        Route::get('/scope/remove/{id}/{scope_id}',"ApiEndpointController@removeRequiredScope");
+        Route::put('/{id}/status/{active}',"ApiEndpointController@updateStatus");
+        Route::put('/{id}/scope/{scope_id}',"ApiEndpointController@addRequiredScope");
+        Route::delete('/{id}/scope/{scope_id}',"ApiEndpointController@removeRequiredScope");
     });
 });
 
@@ -156,47 +156,47 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
 Route::group(array('prefix' => 'api/v1', 'before' => 'ssl|oauth2.protected.endpoint'), function()
 {
     //resource server api
-    Route::group(array('prefix' => 'resource-server'), function(){
+    Route::group(array('prefix' => 'resource-servers'), function(){
 
         Route::post('/',"OAuth2ProtectedApiResourceServerController@create");
-        Route::get('/regenerate-client-secret/{id}',"OAuth2ProtectedApiResourceServerController@regenerateClientSecret");
+        Route::put('/{id}/client-secret',"OAuth2ProtectedApiResourceServerController@regenerateClientSecret");
         Route::get('/{id}',"OAuth2ProtectedApiResourceServerController@get");
-        Route::get('/{page_nbr}/{page_size}',"OAuth2ProtectedApiResourceServerController@getByPage");
+        Route::get('/',"OAuth2ProtectedApiResourceServerController@getByPage");
         Route::delete('/{id}',"OAuth2ProtectedApiResourceServerController@delete");
         Route::put('/',"OAuth2ProtectedApiResourceServerController@update");
-        Route::get('/status/{id}/{active}',"OAuth2ProtectedApiResourceServerController@updateStatus");
+        Route::put('/{id}/status/{active}',"OAuth2ProtectedApiResourceServerController@updateStatus");
     });
 
     // api
-    Route::group(array('prefix' => 'api'), function(){
+    Route::group(array('prefix' => 'apis'), function(){
         Route::get('/{id}',"OAuth2ProtectedApiController@get");
-        Route::get('/{page_nbr}/{page_size}',"OAuth2ProtectedApiController@getByPage");
+        Route::get('/',"OAuth2ProtectedApiController@getByPage");
         Route::delete('/{id}',"OAuth2ProtectedApiController@delete");
         Route::post('/',"OAuth2ProtectedApiController@create");
         Route::put('/',"OAuth2ProtectedApiController@update");
-        Route::get('/status/{id}/{active}',"OAuth2ProtectedApiController@updateStatus");
+        Route::put('/{id}/status/{active}',"OAuth2ProtectedApiController@updateStatus");
     });
 
     // api endpoints
-    Route::group(array('prefix' => 'api-endpoint'), function(){
+    Route::group(array('prefix' => 'api-endpoints'), function(){
         Route::get('/{id}',"OAuth2ProtectedApiEndpointController@get");
-        Route::get('/{page_nbr}/{page_size}',"OAuth2ProtectedApiEndpointController@getByPage");
+        Route::get('/',"OAuth2ProtectedApiEndpointController@getByPage");
         Route::post('/',"OAuth2ProtectedApiEndpointController@create");
         Route::put('/',"OAuth2ProtectedApiEndpointController@update");
         Route::delete('/{id}',"OAuth2ProtectedApiEndpointController@delete");
-        Route::get('/status/{id}/{active}',"OAuth2ProtectedApiEndpointController@updateStatus");
-        Route::get('/scope/add/{id}/{scope_id}',"OAuth2ProtectedApiEndpointController@addRequiredScope");
-        Route::get('/scope/remove/{id}/{scope_id}',"OAuth2ProtectedApiEndpointController@removeRequiredScope");
+        Route::put('/{id}/status/{active}',"OAuth2ProtectedApiEndpointController@updateStatus");
+        Route::put('/{id}/scope/{scope_id}',"OAuth2ProtectedApiEndpointController@addRequiredScope");
+        Route::delete('/{id}/scope/{scope_id}',"OAuth2ProtectedApiEndpointController@removeRequiredScope");
     });
 
     //scopes endpoints
-    Route::group(array('prefix' => 'api-scope'), function(){
+    Route::group(array('prefix' => 'api-scopes'), function(){
+        Route::get('/',"OAuth2ProtectedApiScopeController@getByPage");
         Route::get('/{id}',"OAuth2ProtectedApiScopeController@get");
-        Route::get('/{page_nbr}/{page_size}',"OAuth2ProtectedApiScopeController@getByPage");
         Route::post('/',"OAuth2ProtectedApiScopeController@create");
         Route::put('/',"OAuth2ProtectedApiScopeController@update");
         Route::delete('/{id}',"OAuth2ProtectedApiScopeController@delete");
-        Route::get('/status/{id}/{active}',"OAuth2ProtectedApiScopeController@updateStatus");
+        Route::put('/{id}/status/{active}',"OAuth2ProtectedApiScopeController@updateStatus");
     });
 
 });
