@@ -42,6 +42,20 @@
             </div>
         </div>
     </div>
+    @if($client->application_type == oauth2\models\IClient::ApplicationType_JS_Client)
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOrigins">
+                Allowed Javascript Origins
+            </a>
+        </div>
+        <div id="collapseOrigins" class="accordion-body collapse">
+            <div class="accordion-inner">
+                @include('oauth2.profile.edit-client-allowed-origins',array('access_tokens' => $access_tokens, 'refresh_tokens' => $refresh_tokens,'client'=>$client,'allowed_uris'=>$allowed_uris,'allowed_origins'=>$allowed_origins))
+            </div>
+        </div>
+    </div>
+    @endif
     <div class="accordion-group">
         <div class="accordion-heading">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">

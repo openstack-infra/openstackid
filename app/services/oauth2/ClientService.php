@@ -4,6 +4,8 @@ namespace services\oauth2;
 
 use Client;
 use ClientAuthorizedUri;
+use ClientAllowedOrigin;
+
 use DB;
 use Input;
 use oauth2\exceptions\AllowedClientUriAlreadyExistsException;
@@ -77,10 +79,10 @@ class ClientService implements IClientService
         return array($client_id, $client_secret);
     }
 
-    public function addClient($application_type, $user_id, $app_name, $app_description, $app_logo = '')
+    public function addClient($application_type, $user_id, $app_name, $app_description,$app_url=null, $app_logo = '')
     {
         $instance = null;
-        DB::transaction(function () use ($application_type, $user_id, $app_name, $app_description, $app_logo, &$instance) {
+        DB::transaction(function () use ($application_type, $user_id, $app_name,$app_url, $app_description, $app_logo, &$instance) {
 
             //check $application_type vs client_type
             $client_type = $application_type == IClient::ApplicationType_JS_Client?IClient::ClientType_Public:IClient::ClientType_Confidential;
@@ -98,6 +100,7 @@ class ClientService implements IClientService
             $instance->active               = true;
             $instance->use_refresh_token    = false;
             $instance->rotate_refresh_token = false;
+            $instance->website              = $app_url;
             $instance->Save();
             //default allowed url
             $this->addClientAllowedUri($instance->getId(), 'https://localhost');
@@ -115,20 +118,24 @@ class ClientService implements IClientService
 
     public function addClientAllowedUri($id, $uri)
     {
-        $client = Client::find($id);
+        $res = false;
+        DB::transaction(function () use ($id,$uri,&$res){
+            $client = Client::find($id);
 
-        if (is_null($client))
-            throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
+            if (is_null($client))
+                throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
 
-        $client_uri = ClientAuthorizedUri::where('uri', '=', $uri)->where('client_id', '=', $id)->first();
-        if (!is_null($client_uri)) {
-            throw new AllowedClientUriAlreadyExistsException(sprintf('uri : %s', $uri));
-        }
+            $client_uri = ClientAuthorizedUri::where('uri', '=', $uri)->where('client_id', '=', $id)->first();
+            if (!is_null($client_uri)) {
+                throw new AllowedClientUriAlreadyExistsException(sprintf('uri : %s', $uri));
+            }
 
-        $client_authorized_uri = new ClientAuthorizedUri;
-        $client_authorized_uri->client_id = $id;
-        $client_authorized_uri->uri       = $uri;
-        return $client_authorized_uri->Save();
+            $client_authorized_uri = new ClientAuthorizedUri;
+            $client_authorized_uri->client_id = $id;
+            $client_authorized_uri->uri       = $uri;
+            $res = $client_authorized_uri->Save();
+        });
+        return $res;
     }
 
     public function addClientScope($id, $scope_id)
@@ -208,11 +215,15 @@ class ClientService implements IClientService
      */
     public function lockClient($client_id)
     {
-        $client = $this->getClientByIdentifier($client_id);
-        if (is_null($client))
-            throw new AbsentClientException($client_id,sprintf("client id %s does not exists!",$client_id));
-        $client->locked = true;
-        return $client->Save();
+        $res = false;
+        DB::transaction(function () use ($client_id, &$res) {
+            $client = $this->getClientByIdentifier($client_id);
+            if (is_null($client))
+                throw new AbsentClientException($client_id,sprintf("client id %s does not exists!",$client_id));
+            $client->locked = true;
+            $res = $client->Save();
+        });
+        return $res;
     }
 
     /**
@@ -222,11 +233,15 @@ class ClientService implements IClientService
      */
     public function unlockClient($client_id)
     {
-        $client = $this->getClientByIdentifier($client_id);
-        if (is_null($client))
-            throw new AbsentClientException($client_id,sprintf("client id %s does not exists!",$client_id));
-        $client->locked = false;
-        return $client->Save();
+        $res = false;
+        DB::transaction(function () use ($client_id, &$res) {
+            $client = $this->getClientByIdentifier($client_id);
+            if (is_null($client))
+                throw new AbsentClientException($client_id,sprintf("client id %s does not exists!",$client_id));
+            $client->locked = false;
+            $res = $client->Save();
+        });
+        return $res;
     }
 
 
@@ -322,17 +337,65 @@ class ClientService implements IClientService
      */
     public function update($id, array $params)
     {
-        $client = Client::find($id);
-        if(is_null($client))
-            throw new AbsentClientException(sprintf('client id %s does not exists!',$id));
+        $res = false;
+        DB::transaction(function () use ($id,$params, &$res) {
+            $client = Client::find($id);
+            if(is_null($client))
+                throw new AbsentClientException(sprintf('client id %s does not exists!',$id));
 
-        $allowed_update_params = array('app_name','app_description','app_logo','active','locked','use_refresh_token','rotate_refresh_token');
+            $allowed_update_params = array(
+                'app_name','website','app_description','app_logo','active','locked','use_refresh_token','rotate_refresh_token');
 
-        foreach($allowed_update_params as $param){
-            if(array_key_exists($param,$params)){
-                $client->{$param} = $params[$param];
+            foreach($allowed_update_params as $param){
+                if(array_key_exists($param,$params)){
+                    $client->{$param} = $params[$param];
+                }
             }
-        }
-        return $this->save($client);
+            $res = $this->save($client);
+        });
+        return $res;
+    }
+
+    /**
+     * @param $id
+     * @param $origin
+     * @return mixed
+     * @throws \oauth2\exceptions\AllowedClientUriAlreadyExistsException
+     * @throws \oauth2\exceptions\AbsentClientException
+     */
+    public function addClientAllowedOrigin($id, $origin)
+    {
+        $res = false;
+        DB::transaction(function () use ($id, $origin, &$res) {
+            $client = Client::find($id);
+
+            if (is_null($client))
+                throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
+
+            if($client->getApplicationType()!=IClient::ApplicationType_JS_Client)
+                throw new InvalidClientType($id,sprintf("client id %s application type must be JS_CLIENT",$id));
+
+            $client_origin = ClientAllowedOrigin::where('allowed_origin', '=', $origin)->where('client_id', '=', $id)->first();
+            if (!is_null($client_origin)) {
+                throw new AllowedClientUriAlreadyExistsException(sprintf('origin : %s', $origin));
+            }
+
+            $client_origin                 = new ClientAllowedOrigin;
+            $client_origin->client_id      = $id;
+            $client_origin->allowed_origin = $origin;
+
+            $res =  $client_origin->Save();
+        });
+        return $res;
+    }
+
+    /**
+     * @param $id
+     * @param $origin_id
+     * @return mixed
+     */
+    public function deleteClientAllowedOrigin($id, $origin_id)
+    {
+        return ClientAllowedOrigin::where('id', '=', $origin_id)->where('client_id', '=', $id)->delete();
     }
 }

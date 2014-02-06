@@ -12,49 +12,13 @@ class ApiSeeder extends Seeder {
 
         Api::create(
             array(
-                'name'               => 'resource-server',
-                'logo'               =>  null,
-                'active'             =>  true,
-                'Description'        => 'Resource Server CRUD operations',
-                'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
-            )
-        );
-
-        Api::create(
-            array(
-                'name'            => 'api',
+                'name'            => 'users',
                 'logo'            =>  null,
                 'active'          =>  true,
-                'Description'     => 'Api CRUD operations',
+                'Description'     => 'User Info',
                 'resource_server_id' => $resource_server->id,
                 'logo'               => asset('img/apis/server.png')
             )
         );
-
-
-        Api::create(
-            array(
-                'name'            => 'api-endpoint',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'Description'     => 'Api Endpoints CRUD operations',
-                'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
-            )
-        );
-
-        Api::create(
-            array(
-                'name'            => 'api-scope',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'Description'     => 'Api Scopes CRUD operations',
-                'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
-            )
-        );
-
     }
-
-} 
+}

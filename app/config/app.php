@@ -111,6 +111,7 @@ return array(
         'oauth2\OAuth2ServiceProvider',
         'openid\OpenIdServiceProvider',
         'Greggilbert\Recaptcha\RecaptchaServiceProvider',
+        'services\CORSProvider',
 	),
 
 	/*

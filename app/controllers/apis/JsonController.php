@@ -5,7 +5,7 @@ use utils\services\ILogService;
 /**
  * Class JsonController
  */
-class JsonController extends BaseController  {
+abstract class JsonController extends BaseController  {
 
     protected $log_service;
 

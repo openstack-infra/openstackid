@@ -13,11 +13,11 @@ class ResourceServerContext implements IResourceServerContext {
     private $auth_context;
 
     /**
-     * @return null|string
+     * @return array
      */
     public function getCurrentScope()
     {
-        return isset($this->auth_context['scope'])?$this->auth_context['scope']:null;
+        return isset($this->auth_context['scope'])? explode(' ',$this->auth_context['scope']):array();
     }
 
     /**
@@ -46,18 +46,18 @@ class ResourceServerContext implements IResourceServerContext {
     }
 
     /**
+     * @return null|int
+     */
+    public function getCurrentUserId()
+    {
+        return isset($this->auth_context['user_id'])?intval($this->auth_context['user_id']):null;
+    }
+
+    /**
      * @param $auth_context
      */
     public function setAuthorizationContext($auth_context)
     {
         $this->auth_context = $auth_context;
-    }
-
-    /**
-     * @return null
-     */
-    public function getCurrentUserId()
-    {
-        return isset($this->auth_context['user_id'])?$this->auth_context['user_id']:null;
     }
 }

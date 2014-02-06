@@ -27,6 +27,16 @@ class ApiEndpointService implements IApiEndpointService {
     }
 
     /**
+     * @param $url
+     * @return IApiEndpoint
+     */
+    public function getApiEndpointByUrl($url)
+    {
+        return ApiEndpoint::where('route','=',$url)->first();
+    }
+
+
+    /**
      * @param $id
      * @return IApiEndpoint
      */

@@ -103,4 +103,5 @@ return array(
     'scopename'       => "The :attribute may be a valid scope name.",
     'applicationtype' => "The :attribute may be a valid application type.",
     'sslurl'          => "The :attribute may be a valid URL under ssl schema.",
+    'sslorigin'       => "The :attribute may be a valid HTTP origin under ssl schema."
 );

@@ -8,6 +8,8 @@ use ServerConfiguration;
 use utils\services\ICacheService;
 use utils\services\IServerConfigurationService;
 use DB;
+use Config;
+
 /**
  * Class ServerConfigurationService
  * @package services
@@ -37,8 +39,8 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
         //default config values
 
         //general
-        $this->default_config_params["MaxFailed.Login.Attempts"] = 10;
-        $this->default_config_params["MaxFailed.LoginAttempts.2ShowCaptcha"] = 3;
+        $this->default_config_params["MaxFailed.Login.Attempts"]             = Config::get('server.MaxFailed_Login_Attempts', 10);
+        $this->default_config_params["MaxFailed.LoginAttempts.2ShowCaptcha"] = Config::get('server.MaxFailed_LoginAttempts_2ShowCaptcha', 3);
         $this->default_config_params["Assets.Url"] = 'http://www.openstack.org/';
 
         //openid
@@ -84,10 +86,12 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
         $this->default_config_params["OAuth2.RefreshToken.Lifetime"]      = 0;
 
         //oauth2 policy defaults
-        $this->default_config_params["OAuth2SecurityPolicy.MinutesWithoutExceptions"]          = 2;
-        $this->default_config_params["OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts"]  = 5;
-        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts"] = 10;
-        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts"]  = 10;
+        $this->default_config_params["OAuth2SecurityPolicy.MinutesWithoutExceptions"]                    = 2;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts"]            = 5;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts"]           = 10;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts"]            = 10;
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidInvalidClientCredentialsAttempts"]  = 5;
+
     }
 
     public function getUserIdentityEndpointURL($identifier)

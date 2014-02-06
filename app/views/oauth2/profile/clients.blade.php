@@ -60,16 +60,16 @@
         <p style="font-size: 10px;">* You need to register your application to get the necessary credentials to call a Openstack API</p>
         <form id="form-application" name="form-application">
             <fieldset>
-                <label for="application_name">Application Name</label>
-                <input type="text" name="application_name" id="application_name">
+                <label for="app_name">Application Name</label>
+                <input type="text" name="app_name" id="app_name">
 
-                <label for="application_description">Application Description</label>
-                <textarea style="resize: none;" rows="4" cols="50" name="application_description" id="application_description"></textarea>
+                <label for="website">Application Web Site Url</label>
+                <input type="text" name="website" id="website">
+
+                <label for="app_description">Application Description</label>
+                <textarea style="resize: none;" rows="4" cols="50" name="app_description" id="app_description"></textarea>
+
                 <label for="application_type">Application Type</label>
-
-
-
-
                 {{ Form::select('application_type', array(
                 'WEB_APPLICATION'  => 'Web Server Application',
                 'JS_CLIENT'        => 'Client Side (JS)',
@@ -161,7 +161,8 @@
         var application_validator = application_form.validate({
             rules: {
                 "app_name" : {required: true, nowhitespace:true,rangelength: [1, 255]},
-                "app_desc" : {required: true, free_text:true,rangelength: [1, 512]}
+                "app_description" : {required: true, free_text:true,rangelength: [1, 512]},
+                "website" : {url:true}
             }
         });
 

@@ -17,9 +17,8 @@ use oauth2\exceptions\InvalidAuthorizationRequestException;
 |
 */
 
-
 //SAP (single access point)
-App::before(function ($request) {
+App::before(function($request){
     try {
         //checkpoint security pattern entry point
         $checkpoint_service = Registry::getInstance()->get(UtilsServiceCatalog::CheckPointService);
@@ -30,11 +29,19 @@ App::before(function ($request) {
         Log::error($ex);
         return View::make('404');
     }
+
+    $cors = Registry::getInstance()->get('CORSMiddleware');
+    if($response = $cors->verifyRequest($request))
+        return $response;
 });
 
+App::after(function($request, $response){
 
-App::after(function ($request, $response) {
-    //
+    $response->headers->set('X-content-type-options','nosniff');
+    $response->headers->set('X-xss-protection','1; mode=block');
+
+    $cors = Registry::getInstance()->get('CORSMiddleware');
+    $cors->modifyResponse($request, $response);
 });
 
 /*
@@ -78,7 +85,6 @@ Route::filter('auth.basic', function () {
 Route::filter('guest', function () {
     if (Auth::check()) return Redirect::to('/');
 });
-
 
 /*
 |--------------------------------------------------------------------------

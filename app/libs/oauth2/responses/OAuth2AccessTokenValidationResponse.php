@@ -17,6 +17,7 @@ class OAuth2AccessTokenValidationResponse extends OAuth2DirectResponse {
         $this[OAuth2Protocol::OAuth2Protocol_Scope]                 = $scope;
         $this[OAuth2Protocol::OAuth2Protocol_Audience]              = $audience;
         $this[OAuth2Protocol::OAuth2Protocol_AccessToken_ExpiresIn] = $expires_in;
+
         if(!is_null($user_id)){
             $this[OAuth2Protocol::OAuth2Protocol_UserId] = $user_id;
         }

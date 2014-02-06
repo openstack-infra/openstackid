@@ -76,4 +76,12 @@ class ApiEndpoint extends BaseModelEloquent implements IApiEndpoint{
     {
         $this->name= $name;
     }
+
+    /**
+     * @return \oauth2\models\booll
+     */
+    public function supportCORS()
+    {
+        return $this->allow_cors;
+    }
 }

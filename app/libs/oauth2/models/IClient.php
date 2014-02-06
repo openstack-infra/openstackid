@@ -20,12 +20,16 @@ interface IClient {
     public function getClientSecret();
     public function getClientType();
     public function getApplicationType();
-    public function getClientAuthorizedRealms();
+
     public function getClientScopes();
-    public function getClientRegisteredUris();
     public function isScopeAllowed($scope);
-    public function isRealmAllowed($realm);
+
+    public function getClientRegisteredUris();
     public function isUriAllowed($uri);
+
+    public function getClientAllowedOrigins();
+    public function isOriginAllowed($origin);
+
     public function getApplicationName();
     public function getApplicationLogo();
     public function getApplicationDescription();

@@ -105,12 +105,15 @@ return array(
         'Illuminate\View\ViewServiceProvider',
         'Illuminate\Workbench\WorkbenchServiceProvider',
         'Illuminate\Redis\RedisServiceProvider',
+        'services\UtilsProvider',
+        'services\OpenIdProvider',
         'auth\AuthenticationServiceProvider',
         'services\ServicesProvider',
         'strategies\StrategyProvider',
         'oauth2\OAuth2ServiceProvider',
         'openid\OpenIdServiceProvider',
         'Greggilbert\Recaptcha\RecaptchaServiceProvider',
+        'services\oauth2\CORS\CORSProvider',
 	),
 
 	/*

@@ -88,9 +88,7 @@ Route::group(array('prefix' => 'admin','before' => 'ssl|auth'), function(){
     });
 });
 
-
 //Admin Backend API
-
 Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function()
 {
 
@@ -112,14 +110,17 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
         Route::get('/',array('before' => 'is.current.user', 'uses' => 'ClientApiController@getByPage'));
         Route::delete('/{id}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@delete'));
 
-        Route::group(array('prefix' => 'uris','before' => 'user.owns.client.policy'), function(){
-            Route::get('/{id}',"ClientApiController@getRegisteredUris");
-            Route::post('/{id}',"ClientApiController@addAllowedRedirectUri");
-            Route::delete('/{id}/{uri_id}',"ClientApiController@deleteClientAllowedUri");
-        });
+        //allowed redirect uris endpoints
+        Route::get('/{id}/uris',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@getRegisteredUris'));
+        Route::post('/{id}/uris',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@addAllowedRedirectUri'));
+        Route::delete('/{id}/uris/{uri_id}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@deleteClientAllowedUri'));
+
+        //allowed origin endpoints endpoints
+        Route::get('/{id}/origins',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@geAllowedOrigins'));
+        Route::post('/{id}/origins',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@addAllowedOrigin'));
+        Route::delete('/{id}/origins/{origin_id}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@deleteClientAllowedOrigin'));
 
         Route::delete('/{id}/lock',array('before' => 'openstackid.server.admin.json', 'uses' => 'ClientApiController@unlock'));
-
         Route::put('/{id}/secret',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@regenerateClientSecret'));
         Route::put('/{id}/use-refresh-token',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@setRefreshTokenClient'));
         Route::put('/{id}/rotate-refresh-token',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@setRotateRefreshTokenPolicy'));
@@ -173,13 +174,10 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
     });
 });
 
-
 //OAuth2 Protected API
-
-Route::group(array('prefix' => 'api/v1', 'before' => 'ssl|oauth2.protected.endpoint'), function()
+Route::group(array('prefix' => 'api/v1', 'before' => 'ssl|oauth2.cors.before|oauth2.protected.endpoint'), function()
 {
-    /*
-    Route::group(array('prefix' => ''), function(){
+    Route::group(array('prefix' => 'users'), function(){
+        Route::get('/me','OAuth2UserApiController@me');
     });
-    */
 });

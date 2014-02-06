@@ -55,11 +55,13 @@ class TestSeeder extends Seeder {
         $this->seedApiScopes();
         $this->seedApiEndpointScopes();
         $this->seedApiScopeScopes();
+        $this->seedUsersScopes();
         //endpoints
         $this->seedResourceServerEndpoints();
         $this->seedApiEndpoints();
         $this->seedApiEndpointEndpoints();
         $this->seedScopeEndpoints();
+        $this->seedUsersEndpoints();
 
         $this->seedTestUsersAndClients();
     }
@@ -328,7 +330,6 @@ class TestSeeder extends Seeder {
             )
         );
 
-
         Client::create(
             array(
                 'app_name'             => 'oauth2.service',
@@ -343,8 +344,6 @@ class TestSeeder extends Seeder {
                 'use_refresh_token'    => true
             )
         );
-
-
 
         Client::create(
             array(
@@ -460,6 +459,17 @@ class TestSeeder extends Seeder {
                 'logo'            =>  null,
                 'active'          =>  true,
                 'Description'     => 'Api Scopes CRUD operations',
+                'resource_server_id' => $resource_server->id,
+                'logo'               => asset('img/apis/server.png')
+            )
+        );
+
+        Api::create(
+            array(
+                'name'            => 'users',
+                'logo'            =>  null,
+                'active'          =>  true,
+                'Description'     => 'User Info',
                 'resource_server_id' => $resource_server->id,
                 'logo'               => asset('img/apis/server.png')
             )
@@ -758,6 +768,42 @@ class TestSeeder extends Seeder {
                 'description'        => 'Get Api Scopes By Page',
                 'api_id'             => $api_scope->id,
                 'system'             => true,
+            )
+        );
+
+    }
+
+    private function seedUsersScopes(){
+        $current_realm = Config::get('app.url');
+        $users    = Api::where('name','=','users')->first();
+
+        ApiScope::create(
+            array(
+                'name'               => 'profile',
+                'short_description'  => 'This scope value requests access to the End-Users default profile Claims',
+                'description'        => 'This scope value requests access to the End-Users default profile Claims, which are: name, family_name, given_name, middle_name, nickname, preferred_username, profile, picture, website, gender, birthdate, zoneinfo, locale, and updated_at',
+                'api_id'             => $users->id,
+                'system'             => false,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => 'email',
+                'short_description'  => 'This scope value requests access to the email and email_verified Claims',
+                'description'        => 'This scope value requests access to the email and email_verified Claims',
+                'api_id'             => $users->id,
+                'system'             => false,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => 'address',
+                'short_description'  => 'This scope value requests access to the address Claim.',
+                'description'        => 'This scope value requests access to the address Claim.',
+                'api_id'             => $users->id,
+                'system'             => false,
             )
         );
 
@@ -1203,5 +1249,28 @@ class TestSeeder extends Seeder {
         $endpoint_api_scope_update_status->scopes()->attach($api_scope_update_scope->id);
         $endpoint_api_scope_update_status->scopes()->attach($api_scope_update_status_scope->id);
     }
-}
 
+    private function seedUsersEndpoints(){
+        $users                  = Api::where('name','=','users')->first();
+        $current_realm  = Config::get('app.url');
+        // endpoints scopes
+
+        ApiEndpoint::create(
+            array(
+                'name'            => 'get-user-info',
+                'active'          =>  true,
+                'api_id'          => $users->id,
+                'route'           => 'api/v1/users/me',
+                'http_method'     => 'GET'
+            )
+        );
+        $profile_scope = ApiScope::where('name','=','profile')->first();
+        $email_scope   = ApiScope::where('name','=','email')->first();
+        $address_scope = ApiScope::where('name','=','address')->first();
+
+        $get_user_info_endpoint = ApiEndpoint::where('name','=','get-user-info')->first();
+        $get_user_info_endpoint->scopes()->attach($profile_scope->id);
+        $get_user_info_endpoint->scopes()->attach($email_scope->id);
+        $get_user_info_endpoint->scopes()->attach($address_scope->id);
+    }
+}

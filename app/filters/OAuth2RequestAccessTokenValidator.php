@@ -18,11 +18,31 @@ use oauth2\IResourceServerContext;
  */
 class OAuth2BearerAccessTokenRequestValidator {
 
+
+    protected function headers()
+    {
+        if (function_exists('getallheaders')) {
+            // @codeCoverageIgnoreStart
+            $headers = getallheaders();
+        } else {
+            // @codeCoverageIgnoreEnd
+            $headers = array();
+            foreach ($this->server() as $name => $value) {
+                if (substr($name, 0, 5) == 'HTTP_') {
+                    $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+                    $headers[$name] = $value;
+                }
+            }
+        }
+        return $headers;
+    }
+
     private $api_endpoint_service;
     private $token_service;
     private $log_service;
     private $checkpoint_service;
     private $resource_server_context;
+    private $headers;
 
     public function __construct(IResourceServerContext $resource_server_context,IApiEndpointService $api_endpoint_service, ITokenService $token_service, ILogService $log_service, ICheckPointService $checkpoint_service){
         $this->api_endpoint_service    = $api_endpoint_service;
@@ -30,6 +50,7 @@ class OAuth2BearerAccessTokenRequestValidator {
         $this->log_service             = $log_service;
         $this->checkpoint_service      = $checkpoint_service;
         $this->resource_server_context = $resource_server_context;
+        $this->headers                 = $this->headers();
     }
 
     /**
@@ -39,6 +60,10 @@ class OAuth2BearerAccessTokenRequestValidator {
     public function filter($route, $request)
     {
         $url       = $route->getPath();
+
+        if(strpos($url, '/') != 0){
+            $url =   '/'.$url;
+        }
         $method    = $request->getMethod();
         $realm     = $request->getHost();
 
@@ -51,7 +76,7 @@ class OAuth2BearerAccessTokenRequestValidator {
             }
 
             //check first http basic auth header
-            $auth_header = Request::header('Authorization');
+            $auth_header = isset($this->headers['Authorization'])?$this->headers['Authorization']:null;
             if(!is_null($auth_header) && !empty($auth_header))
                 $access_token_value = BearerAccessTokenAuthorizationHeaderParser::getInstance()->parse($auth_header);
             else{
@@ -94,8 +119,8 @@ class OAuth2BearerAccessTokenRequestValidator {
                 'scope'        => $access_token->getScope()
             );
 
-            if(!is_null($access_token>getUserId()))
-                $context['user_id'] = $access_token>getUserId();
+            if(!is_null($access_token->getUserId()))
+                $context['user_id'] = $access_token->getUserId();
 
             $this->resource_server_context->setAuthorizationContext($context);
 

@@ -7,7 +7,7 @@ use utils\services\ILogService;
  * Class OAuth2ProtectedController
  * OAuth2 Protected Base API
  */
-class OAuth2ProtectedController extends JsonController {
+abstract class OAuth2ProtectedController extends JsonController {
 
     protected $resource_server_context;
 
