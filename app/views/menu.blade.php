@@ -26,7 +26,7 @@
                     @endif
                     @if($is_openstackid_admin)
                     <li class="nav-header">Server</li>
-                    <li><a href=''>Users</a></li>
+                    <li><a href='{{URL::action("AdminController@listLockedUsers")}}'>Users</a></li>
                     <li><a href='{{URL::action("AdminController@listBannedIPs")}}'>Banned IPs</a></li>
                     <li><a href='{{URL::action("AdminController@listServerConfig")}}'>Server Configuration</a></li>
                     @endif
