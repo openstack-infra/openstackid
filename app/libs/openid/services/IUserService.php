@@ -9,6 +9,7 @@ namespace openid\services;
 interface IUserService
 {
 
+    public function get($id);
     /**
      * @param $id
      * @param $proposed_username

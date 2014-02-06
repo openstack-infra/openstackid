@@ -30,8 +30,9 @@ class OAuth2SecurityPolicy  implements ISecurityPolicy{
         ;
         $this->exception_dictionary = array(
             'auth2\exceptions\BearerTokenDisclosureAttemptException' => array('OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts'),
-            'auth2\exceptions\InvalidClientException' => array('OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts'),
-            'auth2\exceptions\InvalidRedeemAuthCodeException' => array('OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts'),
+            'auth2\exceptions\InvalidClientException'                => array('OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts'),
+            'auth2\exceptions\InvalidRedeemAuthCodeException'        => array('OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts'),
+            'auth2\exceptions\InvalidClientCredentials'              => array('OAuth2SecurityPolicy.MaxInvalidInvalidClientCredentialsAttempts'),
         );
     }
     /**

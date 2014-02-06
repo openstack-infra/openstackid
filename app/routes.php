@@ -88,9 +88,7 @@ Route::group(array('prefix' => 'admin','before' => 'ssl|auth'), function(){
     });
 });
 
-
 //Admin Backend API
-
 Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function()
 {
 
@@ -173,13 +171,10 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
     });
 });
 
-
 //OAuth2 Protected API
-
 Route::group(array('prefix' => 'api/v1', 'before' => 'ssl|oauth2.protected.endpoint'), function()
 {
-    /*
-    Route::group(array('prefix' => ''), function(){
+    Route::group(array('prefix' => 'users'), function(){
+        Route::get('/me','OAuth2UserApiController@me');
     });
-    */
 });

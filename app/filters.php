@@ -17,9 +17,9 @@ use oauth2\exceptions\InvalidAuthorizationRequestException;
 |
 */
 
-
 //SAP (single access point)
-App::before(function ($request) {
+App::before(function($request)
+{
     try {
         //checkpoint security pattern entry point
         $checkpoint_service = Registry::getInstance()->get(UtilsServiceCatalog::CheckPointService);
@@ -30,12 +30,32 @@ App::before(function ($request) {
         Log::error($ex);
         return View::make('404');
     }
+    if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        //no content
+        $statusCode = 204;
+        $headers = [
+            'Access-Control-Allow-Origin'      => '*',
+            'Access-Control-Allow-Methods'     => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers'     => 'Origin, Content-Type, Accept, Authorization, X-Requested-With',
+            'Access-Control-Allow-Credentials' => 'true'
+        ];
+        return Response::make('', $statusCode, $headers);
+    }
 });
 
-
-App::after(function ($request, $response) {
-    //
+App::after(function($request, $response)
+{
+    $response->headers->set('X-content-type-options','nosniff');
+    $response->headers->set('X-xss-protection','1; mode=block');
+    $response->headers->set('X-frame-options','SAMEORIGIN');
+    //CORS
+    $response->headers->set('Access-Control-Allow-Origin', '*');
+    $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-Requested-With');
+    $response->headers->set('Access-Control-Allow-Credentials', 'true');
+    return $response;
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -239,4 +259,26 @@ Route::filter('openstackid.server.admin',function(){
     if(!Auth::user()->isOpenstackIdAdmin()){
         return View::make('404');
     }
+});
+
+Route::filter('CORS.before',function($route, $request, $response){
+    if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        //no content
+        $statusCode = 204;
+        $headers = [
+            'Access-Control-Allow-Origin'      => '*',
+            'Access-Control-Allow-Methods'     => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers'     => 'Origin, Content-Type, Accept, Authorization, X-Requested-With',
+            'Access-Control-Allow-Credentials' => 'true'
+        ];
+        return Response::make(null, $statusCode, $headers);
+    }
+});
+
+Route::filter('CORS.after',function($route, $request, $response){
+    $response->headers->set('Access-Control-Allow-Origin', '*');
+    $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    $response->headers->set('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization, X-Requested-With');
+    $response->headers->set('Access-Control-Allow-Credentials', 'true');
+    return $response;
 });

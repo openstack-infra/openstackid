@@ -120,6 +120,8 @@ class ServicesProvider extends ServiceProvider
         Registry::getInstance()->set(OAuth2ServiceCatalog::ResourceServerService, $this->app->make(OAuth2ServiceCatalog::ResourceServerService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::ApiService, $this->app->make(OAuth2ServiceCatalog::ApiService));
         Registry::getInstance()->set(OAuth2ServiceCatalog::ApiEndpointService, $this->app->make(OAuth2ServiceCatalog::ApiEndpointService));
+        //OAUTH2 resource server endpoints
+        $this->app->singleton('oauth2\resource_server\IUserService', 'services\oauth2\resource_server\UserService');
     }
 
     public function register()

@@ -31,7 +31,7 @@
             <legend>This app would like to:</legend>
             <ul class="unstyled list-inline">
             @foreach ($requested_scopes as $scope)
-                <li> {{$scope->short_description}}&nbsp;<i class="icon-info-sign info" data-content="{{$scope->description}}" title="Scope Info"></i></li>
+                <li> {{$scope->short_description}}&nbsp;<i class="icon-info-sign info" data-content="{{ $scope->description }}" title="Scope Info"></i></li>
             @endforeach
             </ul>
             <p class="privacy-policy">
@@ -51,7 +51,7 @@
 <script type="application/javascript">
     $(document).ready(function() {
 
-        $('.icon-info-sign').popover({html:true});
+        $('.icon-info-sign').popover({html:true,placement:'bottom'});
 
         $(':not(#anything)').on('click', function (e) {
             $('.icon-info-sign').each(function () {

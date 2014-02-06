@@ -126,7 +126,7 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 
     public function getNickName()
     {
-        return $this->getFullName;
+        return $this->getFullName();
     }
 
     public function getGender()
@@ -134,7 +134,7 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
         if (is_null($this->member)) {
             $this->member = Member::where('Email', '=', $this->external_id)->first();
         }
-        return "";
+        return $this->member->Gender;
     }
 
     public function getCountry()
@@ -261,5 +261,37 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
         }
         $group = $this->member->groups()->where('code','=',IOpenIdUser::OpenstackIdServerAdminGroup)->first();
         return !is_null($group);
+    }
+
+    public function getStreetAddress()
+    {
+        if (is_null($this->member)) {
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return sprintf("%s, %s ",$this->member->Address,$this->member->Suburb);
+    }
+
+    public function getRegion()
+    {
+        if (is_null($this->member)) {
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->member->State;
+    }
+
+    public function getLocality()
+    {
+        if (is_null($this->member)) {
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->member->City;
+    }
+
+    public function getPostalCode()
+    {
+        if (is_null($this->member)) {
+            $this->member = Member::where('Email', '=', $this->external_id)->first();
+        }
+        return $this->member->Postcode;
     }
 }

@@ -72,7 +72,17 @@ class UserApiController extends AbstractRESTController implements ICRUDControlle
 
     public function get($id)
     {
-        // TODO: Implement get() method.
+        try {
+            $user       = $this->user_service->get($id);
+            if(is_null($user)){
+                return $this->error404(array('error' => 'user not found'));
+            }
+            $data = $user->toArray();
+            return $this->ok($data);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
+            return $this->error500($ex);
+        }
     }
 
     public function create()

@@ -3,9 +3,9 @@
 namespace oauth2\grant_types;
 
 use oauth2\exceptions\InvalidClientException;
-use oauth2\exceptions\InvalidClientType;
 use oauth2\exceptions\MissingClientIdParam;
 use oauth2\exceptions\LockedClientException;
+use oauth2\exceptions\InvalidClientCredentials;
 
 use oauth2\models\IClient;
 use oauth2\requests\OAuth2Request;
@@ -38,10 +38,9 @@ abstract class AbstractGrantType implements IGrantType
      * @param OAuth2Request $request
      * @return mixed|void
      * @throws \oauth2\exceptions\MissingClientIdParam
-     * @throws \oauth2\exceptions\InvalidClientType
+     * @throws \oauth2\exceptions\InvalidClientCredentials
      * @throws \oauth2\exceptions\InvalidClientException
      * @throws \oauth2\exceptions\LockedClientException
-     * @throws \oauth2\exceptions\MissingClientAuthorizationInfo
      */
     public function completeFlow(OAuth2Request $request)
     {
@@ -64,7 +63,7 @@ abstract class AbstractGrantType implements IGrantType
 
         //verify client credentials (only for confidential clients )
         if ($this->current_client->getClientType() == IClient::ClientType_Confidential && $this->current_client->getClientSecret() !== $this->current_client_secret)
-            throw new InvalidClientType($this->current_client_id,sprintf('client id %s',$this->current_client_id));
+            throw new InvalidClientCredentials($this->current_client_id, sprintf('client id %s',$this->current_client_id));
 
     }
 } 
