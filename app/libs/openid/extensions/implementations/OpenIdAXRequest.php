@@ -6,8 +6,6 @@ use openid\exceptions\InvalidOpenIdMessageException;
 use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdMessage;
 use openid\requests\OpenIdRequest;
-
-
 /**
  * Class OpenIdAXRequest
  * Implements http://openid.net/specs/openid-attribute-exchange-1_0.html

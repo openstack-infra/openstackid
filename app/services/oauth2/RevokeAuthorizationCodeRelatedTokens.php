@@ -5,7 +5,7 @@ namespace services\oauth2;
 use Exception;
 use Log;
 use oauth2\services\OAuth2ServiceCatalog;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use utils\services\ISecurityPolicyCounterMeasure;
 
 
@@ -32,8 +32,8 @@ class RevokeAuthorizationCodeRelatedTokens implements ISecurityPolicyCounterMeas
             $auth_code      = $params["auth_code"];
             //$client_id      = $params["client_id"];
 
-            $token_service   = Registry::getInstance()->get(OAuth2ServiceCatalog::TokenService);
-            //$client_service  = Registry::getInstance()->get(OAuth2ServiceCatalog::ClientService);
+            $token_service   = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::TokenService);
+            //$client_service  = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ClientService);
 
             $token_service->revokeAuthCodeRelatedTokens($auth_code);
 

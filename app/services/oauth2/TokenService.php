@@ -23,7 +23,7 @@ use oauth2\services\IUserConsentService;
 use RefreshToken as RefreshTokenDB;
 use RefreshToken as DBRefreshToken;
 
-use services\IPHelper;
+use utils\IPHelper;
 use utils\exceptions\UnacquiredLockException;
 
 use utils\services\ILockManagerService;

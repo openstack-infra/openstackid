@@ -9,7 +9,7 @@ use openid\OpenIdProtocol;
 use openid\services\IMementoOpenIdRequestService;
 use openid\services\IServerConfigurationService;
 use Redirect;
-use services\IPHelper;
+use utils\IPHelper;
 use services\IUserActionService;
 use Session;
 use utils\services\IAuthService;

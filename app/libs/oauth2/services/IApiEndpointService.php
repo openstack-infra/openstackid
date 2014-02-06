@@ -7,11 +7,17 @@ use oauth2\models\IApiEndpoint;
 interface IApiEndpointService {
 
     /**
-     * @param $url
-     * @param $http_method
+     * @param string$url
+     * @param string $http_method
      * @return IApiEndpoint
      */
     public function getApiEndpointByUrlAndMethod($url,$http_method);
+
+    /**
+     * @param string $url
+     * @return IApiEndpoint
+     */
+    public function getApiEndpointByUrl($url);
 
     /**
      * @param $id
@@ -34,12 +40,13 @@ interface IApiEndpointService {
      * @param string $name
      * @param string $description
      * @param boolean $active
+     * @param boolean $allow_cors
      * @param string $route
      * @param string $http_method
      * @param int $api_id
      * @return IApiEndpoint
      */
-    public function add($name, $description, $active, $route, $http_method, $api_id);
+    public function add($name, $description, $active, $allow_cors, $route, $http_method, $api_id);
 
 
     /**

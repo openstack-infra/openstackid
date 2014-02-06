@@ -40,6 +40,17 @@
                 <div class="control-group">
                     <div class="controls">
                         <label class="checkbox">
+                            <input type="checkbox" id="allow_cors"
+                            @if ( $endpoint->allow_cors)
+                            checked
+                            @endif
+                            name="allow_cors">&nbsp;allows CORS
+                        </label>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="controls">
+                        <label class="checkbox">
                             <input type="checkbox" id="active"
                             @if ( $endpoint->active)
                             checked
@@ -97,7 +108,7 @@
             rules: {
                 "name"  :     {required: true, nowhitespace:true,rangelength: [1, 255]},
                 "description":{required: true, free_text:true,rangelength: [1, 1024]},
-                "route":      {required: true, nowhitespace:true,rangelength: [1, 1024]}
+                "route":      {required: true, endpointroute:true,rangelength: [1, 1024]}
             }
         });
 

@@ -25,13 +25,13 @@
                     <h2>{{$app_name}}&nbsp;</h2>
                 </div>
                 <div class="span1">
-                    <i data-content="Developer Email: <a href='mailto:{{$dev_info_email}}'>{{$dev_info_email}}</a>.<br> Clicking 'Accept' will redirect you to: <a href='{{$redirect_to}}' target='_blank'>{{$redirect_to}}</a>" class="icon-info-sign info" title="Developer Info"></i>
+                    <i data-content="Developer Email: <a href='mailto:{{$dev_info_email}}'>{{$dev_info_email}}</a>.<br> Clicking 'Accept' will redirect you to: <a href='{{$website}}' target='_blank'>{{$website}}</a>" class="icon-info-sign info" title="Developer Info"></i>
                 </div>
             </div>
             <legend>This app would like to:</legend>
             <ul class="unstyled list-inline">
             @foreach ($requested_scopes as $scope)
-                <li> {{$scope->short_description}}&nbsp;<i class="icon-info-sign info" data-content="{{$scope->description}}" title="Scope Info"></i></li>
+                <li> {{$scope->short_description}}&nbsp;<i class="icon-info-sign info" data-content="{{ $scope->description }}" title="Scope Info"></i></li>
             @endforeach
             </ul>
             <p class="privacy-policy">
@@ -51,7 +51,7 @@
 <script type="application/javascript">
     $(document).ready(function() {
 
-        $('.icon-info-sign').popover({html:true});
+        $('.icon-info-sign').popover({html:true,placement:'bottom'});
 
         $(':not(#anything)').on('click', function (e) {
             $('.icon-info-sign').each(function () {

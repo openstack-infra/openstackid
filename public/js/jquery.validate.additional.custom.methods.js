@@ -16,8 +16,14 @@ jQuery.validator.addMethod("scopename", function(value, element) {
 }, "please enter a valid scope name.");
 
 jQuery.validator.addMethod("free_text", function(value, element) {
-    return this.optional(element) || /^[a-z\-.,()'"\s\/]+$/i.test(value);
+    return this.optional(element) || /^[a-z\-_.,()'"\s\:\/]+$/i.test(value);
 }, "Letters or punctuation only please");
+
+jQuery.validator.addMethod("endpointroute", function(value, element) {
+    return this.optional(element) || /^\/([\w@][\w.:@]+)\/?[\w\.?=%&=\-@/$,{}]*$/ig.test(value);
+}, "please enter a valid endpoint route");
+
+
 
 
 var showCustomLabel = function ( element, message ) {

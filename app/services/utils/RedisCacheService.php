@@ -1,6 +1,6 @@
 <?php
 
-namespace services;
+namespace services\utils;
 
 use utils\services\ICacheService;
 
@@ -13,12 +13,18 @@ use utils\services\ICacheService;
 class RedisCacheService implements ICacheService {
 
     //services
-    private $redis;
+    private $redis = null;
 
     public function __construct(){
-        $this->redis  = \RedisLV4::connection();
+
     }
 
+
+    public function boot(){
+        if(is_null($this->redis)){
+            $this->redis  = \RedisLV4::connection();
+        }
+    }
     /**
      * @param $key
      * @return mixed

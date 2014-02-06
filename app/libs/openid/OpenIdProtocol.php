@@ -5,10 +5,9 @@ namespace openid;
 use openid\handlers\OpenIdAuthenticationRequestHandler;
 use openid\handlers\OpenIdCheckAuthenticationRequestHandler;
 use openid\handlers\OpenIdSessionAssociationRequestHandler;
-use openid\services\OpenIdServiceCatalog;
 use openid\XRDS\XRDSDocumentBuilder;
 use openid\XRDS\XRDSService;
-use utils\services\Registry;
+
 //services
 use utils\services\ILogService;
 use openid\services\IMementoOpenIdRequestService;
@@ -20,6 +19,7 @@ use openid\services\IServerConfigurationService;
 use openid\services\INonceService;
 use utils\services\IAuthService;
 use utils\services\ICheckPointService;
+
 
 
 /**
@@ -126,7 +126,8 @@ class OpenIdProtocol implements IOpenIdProtocol
     );
 
     private $request_handlers;
-
+    private $server_extension_service;
+    private $server_config_service;
 
     public function __construct(
                                 IAuthService $auth_service,
@@ -141,9 +142,11 @@ class OpenIdProtocol implements IOpenIdProtocol
                                 ICheckPointService $checkpoint_service)
     {
         //create chain of responsibility
-        $check_auth             = new OpenIdCheckAuthenticationRequestHandler($association_service, $nonce_service, $log_service,$checkpoint_service,  null);
-        $session_assoc          = new OpenIdSessionAssociationRequestHandler($log_service,$checkpoint_service, $check_auth);
-        $this->request_handlers = new OpenIdAuthenticationRequestHandler($auth_service, $memento_request_service, $auth_strategy, $server_extension_service, $association_service, $trusted_sites_service, $server_config_service, $nonce_service, $log_service,$checkpoint_service, $session_assoc);
+        $check_auth                     = new OpenIdCheckAuthenticationRequestHandler($association_service, $nonce_service, $log_service,$checkpoint_service,  null);
+        $session_assoc                  = new OpenIdSessionAssociationRequestHandler($log_service,$checkpoint_service, $check_auth);
+        $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service, $memento_request_service, $auth_strategy, $server_extension_service, $association_service, $trusted_sites_service, $server_config_service, $nonce_service, $log_service,$checkpoint_service, $session_assoc);
+        $this->server_extension_service = $server_extension_service;
+        $this->server_config_service    = $server_config_service;
     }
 
     public static function isAssocTypeSupported($assoc_type)
@@ -173,17 +176,13 @@ class OpenIdProtocol implements IOpenIdProtocol
 
     public function getXRDSDiscovery($mode, $canonical_id = null)
     {
-        $server_extension_service = Registry::getInstance()->get(OpenIdServiceCatalog::ServerExtensionsService);
-        $server_config_service = Registry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
-
-        $active_extensions = $server_extension_service->getAllActiveExtensions();
+        $active_extensions = $this->server_extension_service->getAllActiveExtensions();
         $extensions = array();
         foreach ($active_extensions as $ext) {
             array_push($extensions, $ext->getNamespace());
         }
-
         $services = array();
-        array_push($services, new XRDSService(0, $mode == IOpenIdProtocol::OpenIdXRDSModeUser ? self::ClaimedIdentifierType : self::OPIdentifierType, $server_config_service->getOPEndpointURL(), $extensions, $canonical_id));
+        array_push($services, new XRDSService(0, $mode == IOpenIdProtocol::OpenIdXRDSModeUser ? self::ClaimedIdentifierType : self::OPIdentifierType, $this->server_config_service->getOPEndpointURL(), $extensions, $canonical_id));
         $builder = new XRDSDocumentBuilder($services, $canonical_id);
         $xrds = $builder->render();
         return $xrds;

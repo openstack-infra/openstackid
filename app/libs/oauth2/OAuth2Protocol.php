@@ -31,6 +31,7 @@ use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
 use oauth2\exceptions\MissingClientAuthorizationInfo;
 use oauth2\exceptions\InvalidRedeemAuthCodeException;
+use oauth2\exceptions\InvalidClientCredentials;
 
 //grant types
 use oauth2\grant_types\AuthorizationCodeGrantType;
@@ -427,6 +428,11 @@ class OAuth2Protocol implements IOAuth2Protocol
             $this->checkpoint_service->trackException($ex17);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
         }
+        catch(InvalidClientCredentials $ex18){
+            $this->log_service->error($ex18);
+            $this->checkpoint_service->trackException($ex18);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
         catch (Exception $ex) {
             $this->log_service->error($ex);
             $this->checkpoint_service->trackException($ex);
@@ -477,6 +483,11 @@ class OAuth2Protocol implements IOAuth2Protocol
             $this->log_service->error($ex2);
             $this->checkpoint_service->trackException($ex2);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidGrant);
+        }
+        catch(InvalidClientCredentials $ex3){
+            $this->log_service->error($ex3);
+            $this->checkpoint_service->trackException($ex3);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
         }
         catch (Exception $ex) {
             $this->log_service->error($ex);

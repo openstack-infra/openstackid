@@ -6,6 +6,7 @@ use Exception;
 use Log;
 use utils\services\ICacheService;
 use utils\services\ISecurityPolicyCounterMeasure;
+use utils\IPHelper;
 
 class DelayCounterMeasure implements ISecurityPolicyCounterMeasure
 {

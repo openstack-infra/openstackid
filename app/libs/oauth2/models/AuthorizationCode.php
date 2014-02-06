@@ -2,7 +2,7 @@
 
 namespace oauth2\models;
 
-use services\IPHelper;
+use utils\IPHelper;
 use Zend\Math\Rand;
 use oauth2\OAuth2Protocol;
 /**

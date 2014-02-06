@@ -4,7 +4,8 @@ namespace openid\model;
 
 use openid\exceptions\InvalidNonce;
 use openid\helpers\OpenIdErrorMessages;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
+use utils\services\UtilsServiceCatalog;
 
 class OpenIdNonce
 {
@@ -72,8 +73,8 @@ class OpenIdNonce
      */
     public function isValid()
     {
-        $server_configuration_service = Registry::getInstance()->get("openid\\services\\IServerConfigurationService");
-        $allowed_skew = $server_configuration_service->getConfigValue("Nonce.Lifetime");
+        $server_configuration_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::ServerConfigurationService);
+        $allowed_skew                 = $server_configuration_service->getConfigValue("Nonce.Lifetime");
         $now = time();
         // Time after which we should not use the nonce
         $past = $now - $allowed_skew;

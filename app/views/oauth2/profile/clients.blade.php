@@ -57,26 +57,55 @@
         <h3 id="myModalLabel">Register new Application</h3>
     </div>
     <div class="modal-body">
-        <p style="font-size: 10px;">* You need to register your application to get the necessary credentials to call a Openstack API</p>
-        <form id="form-application" name="form-application">
+        <p style="font-size: 10px;"><i class="icon-info-sign accordion-toggle" title="OAuth 2.0 allows users to share specific data with you (for example, contact lists) while keeping their usernames, passwords, and other information private."></i> You need to register your application to get the necessary credentials to call a Openstack API</p>
+        <form id="form-application" name="form-application" class="form-horizontal">
             <fieldset>
-                <label for="application_name">Application Name</label>
-                <input type="text" name="application_name" id="application_name">
+                <div class="control-group">
+                <label class="control-label" for="app_name">Application Name</label>
+                <div class="controls">
+                    <input type="text" name="app_name" id="app_name">
+                </div>
+                </div>
 
-                <label for="application_description">Application Description</label>
-                <textarea style="resize: none;" rows="4" cols="50" name="application_description" id="application_description"></textarea>
-                <label for="application_type">Application Type</label>
+                <div class="control-group">
+                <label  class="control-label" for="website">Application Web Site Url</label>
+                <div class="controls">
+                    <input type="text" name="website" id="website">
+                </div>
+                </div>
 
+                <div class="control-group">
+                    <label class="control-label"  for="app_description">Application Description</label>
+                    <div class="controls">
+                        <textarea style="resize: none;" rows="4" cols="50" name="app_description" id="app_description"></textarea>
+                    </div>
+                </div>
 
+                <div class="control-group">
 
+                    <label class="control-label" for="application_type">Application Type</label>
+                    <i class="icon-info-sign accordion-toggle" style="float:left;" title="Web Server Application : The OpenstackId OAuth 2.0 endpoint supports web server applications that use languages and frameworks such as PHP, Java, Python, Ruby, and ASP.NET. These applications might access an Openstack API while the user is present at the application or after the user has left the application. This flow requires that the application can keep a secret.
+Client Side (JS) : JavaScript-centric applications. These applications may access a Openstack API while the user is present at the application, and this type of application cannot keep a secret.
+Service Account : The OpenstackId OAuth 2.0 Authorization Server supports server-to-server interactions. The requesting application has to prove its own identity to gain access to an API, and an end-user doesn't have to be involved. "></i>
+                    <div class="controls">
 
-                {{ Form::select('application_type', array(
-                'WEB_APPLICATION'  => 'Web Server Application',
-                'JS_CLIENT'        => 'Client Side (JS)',
-                'SERVICE'          => 'Service Account'), 'WEB_APPLICATION'); }}
-                <label class="checkbox">
-                    <input type="checkbox" id="active" name="active">&nbsp;Active
-                </label>
+                        <select id="application_type" name="application_type">
+                            <option value="WEB_APPLICATION">Web Server Application</option>
+                            <option value="JS_CLIENT">Client Side (JS)</option>
+                            <option value="SERVICE">Service Account</option>
+                        </select>
+
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="controls">
+                        <label class="checkbox">
+                            <input type="checkbox" id="active" name="active">&nbsp;Active
+                        </label>
+                    </div>
+                </div>
+
             </fieldset>
         </form>
     </div>
@@ -161,7 +190,8 @@
         var application_validator = application_form.validate({
             rules: {
                 "app_name" : {required: true, nowhitespace:true,rangelength: [1, 255]},
-                "app_desc" : {required: true, free_text:true,rangelength: [1, 512]}
+                "app_description" : {required: true, free_text:true,rangelength: [1, 512]},
+                "website" : {required:true,url:true}
             }
         });
 
@@ -250,7 +280,6 @@
                 }
             );
         });
-
     });
 </script>
 @stop

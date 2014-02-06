@@ -13,6 +13,7 @@ class UpdateOauth2Client extends Migration {
 	{
         Schema::table('oauth2_client', function($table)
         {
+            $table->text("website");
             $table->enum('application_type', array('WEB_APPLICATION', 'JS_CLIENT','SERVICE'));
         });
 	}
@@ -24,12 +25,10 @@ class UpdateOauth2Client extends Migration {
 	 */
 	public function down()
 	{
-
         Schema::table('oauth2_client', function($table)
         {
-
+            $table->dropColumn('website');
             $table->dropColumn('application_type');
         });
 	}
-
 }

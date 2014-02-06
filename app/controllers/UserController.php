@@ -11,7 +11,7 @@ use openid\services\IServerConfigurationService;
 use openid\services\ITrustedSitesService;
 use openid\services\IUserService;
 use openid\XRDS\XRDSDocumentBuilder;
-use services\IPHelper;
+use utils\IPHelper;
 use services\IUserActionService;
 use strategies\DefaultLoginStrategy;
 use strategies\OAuth2ConsentStrategy;

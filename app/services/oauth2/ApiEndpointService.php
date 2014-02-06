@@ -27,6 +27,16 @@ class ApiEndpointService implements IApiEndpointService {
     }
 
     /**
+     * @param $url
+     * @return IApiEndpoint
+     */
+    public function getApiEndpointByUrl($url)
+    {
+        return ApiEndpoint::where('route','=',$url)->first();
+    }
+
+
+    /**
      * @param $id
      * @return IApiEndpoint
      */
@@ -51,16 +61,17 @@ class ApiEndpointService implements IApiEndpointService {
      * @param string $name
      * @param string $description
      * @param boolean $active
+     * @param boolean $allow_cors
      * @param string $route
      * @param string $http_method
      * @param integer $api_id
      * @return IApiEndpoint
      */
-    public function add($name, $description, $active, $route, $http_method, $api_id)
+    public function add($name, $description, $active,$allow_cors, $route, $http_method, $api_id)
     {
         $instance = null;
 
-        DB::transaction(function () use ($name, $description, $active, $route, $http_method, $api_id, &$instance) {
+        DB::transaction(function () use ($name, $description, $active,$allow_cors, $route, $http_method, $api_id, &$instance) {
 
             //check that does not exists an endpoint with same http method and same route
             if(ApiEndpoint::where('http_method','=',$http_method)->where('route','=',$route)->count()>0)
@@ -74,6 +85,7 @@ class ApiEndpointService implements IApiEndpointService {
                     'route'              => $route,
                     'http_method'        => $http_method,
                     'api_id'             => $api_id,
+                    'allow_cors'         => $allow_cors
                 )
             );
             $instance->Save();
@@ -95,7 +107,7 @@ class ApiEndpointService implements IApiEndpointService {
             if(is_null($endpoint))
                 throw new InvalidApiEndpoint(sprintf('api endpoint id %s does not exists!',$id));
 
-            $allowed_update_params = array('name','description','active','route','http_method');
+            $allowed_update_params = array('name','description','active','route','http_method','allow_cors');
             foreach($allowed_update_params as $param){
                 if(array_key_exists($param,$params)){
                     $endpoint->{$param} = $params[$param];

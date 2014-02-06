@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/16/13
- * Time: 2:29 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\extensions;
 
@@ -13,8 +6,7 @@ use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
-use utils\services\Registry;
-use utils\services\UtilsServiceCatalog;
+use utils\services\ILogService;
 
 /**
  * Class OpenIdExtension
@@ -37,13 +29,13 @@ abstract class OpenIdExtension
      * @param $view
      * @param $description
      */
-    public function __construct($name, $namespace, $view, $description)
+    public function __construct($name, $namespace, $view, $description, ILogService $log_service)
     {
         $this->namespace = $namespace;
         $this->name = $name;
         $this->view = $view;
         $this->description = $description;
-        $this->log_service = Registry::getInstance()->get(UtilsServiceCatalog::LogService);
+        $this->log_service = $log_service;
     }
 
     public function getNamespace()

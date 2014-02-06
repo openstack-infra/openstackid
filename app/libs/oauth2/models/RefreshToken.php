@@ -3,7 +3,7 @@
 namespace oauth2\models;
 
 use Zend\Math\Rand;
-use services\IPHelper;
+use utils\IPHelper;
 use oauth2\OAuth2Protocol;
 /**
  * Class RefreshToken

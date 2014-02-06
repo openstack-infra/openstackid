@@ -5,7 +5,8 @@ namespace openid\requests;
 use openid\helpers\OpenIdUriHelper;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
-use utils\services\Registry;
+use openid\services\OpenIdServiceCatalog;
+use utils\services\ServiceLocator;
 
 class OpenIdCheckAuthenticationRequest extends OpenIdAuthenticationRequest
 {
@@ -34,7 +35,8 @@ class OpenIdCheckAuthenticationRequest extends OpenIdAuthenticationRequest
         $claimed_returnTo    = $this->getReturnTo();
         $signed              = $this->getSigned();
 
-        $server_configuration_service = Registry::getInstance()->get("openid\\services\\IServerConfigurationService");
+        $server_configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::ServerConfigurationService);
+
         if (
             !is_null($mode) && !empty($mode) && $mode == OpenIdProtocol::CheckAuthenticationMode
             && !is_null($claimed_returnTo) && !empty($claimed_returnTo) && OpenIdUriHelper::checkReturnTo($claimed_returnTo)

@@ -15,9 +15,20 @@ use utils\services\UtilsServiceCatalog;
 class OpenIdServiceProvider extends ServiceProvider
 {
 
+
     public function boot()
     {
-        $this->app->bind('openid\IOpenIdProtocol', 'openid\OpenIdProtocol');
+
+    }
+
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->app->singleton('openid\IOpenIdProtocol', 'openid\OpenIdProtocol');
 
         $auth_extension_service = $this->app->make('auth\\IAuthenticationExtensionService');
 
@@ -28,13 +39,8 @@ class OpenIdServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register the service provider.
-     *
-     * @return void
-     */
-    public function register()
+    public function provides()
     {
-        // TODO: Implement register() method.
+        return array('openid');
     }
 }

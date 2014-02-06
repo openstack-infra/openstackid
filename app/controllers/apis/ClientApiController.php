@@ -18,6 +18,7 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
     private $scope_service;
     private $token_service;
 
+
     /**
      * @param IApiScopeService $scope_service
      * @param ITokenService $token_service
@@ -65,8 +66,9 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
             // Build the validation constraint set.
             $rules = array(
                 'user_id'                 => 'required|integer',
-                'application_name'        => 'required|alpha_dash|max:255',
-                'application_description' => 'required|text',
+                'app_name'                => 'required|alpha_dash|max:255',
+                'app_description'         => 'required|freetext',
+                'website'                 => 'required|url',
                 'application_type'        => 'required|applicationtype',
             );
 
@@ -78,11 +80,11 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
                 return $this->error400(array('error'=>'validation','messages' => $messages));
             }
 
-            if ($this->client_service->existClientAppName($values['application_name'])) {
+            if ($this->client_service->existClientAppName($values['app_name'])) {
                 return $this->error400(array('error' => 'application Name already exists!.'));
             }
 
-            $new_client = $this->client_service->addClient($values['application_type'], intval($values['user_id']), trim($values['application_name']), trim($values['application_description']));
+            $new_client = $this->client_service->addClient($values['application_type'], intval($values['user_id']), trim($values['app_name']), trim($values['app_description']), trim($values['website']));
 
             return $this->created(array('client_id' => $new_client->id));
 
@@ -150,12 +152,13 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
             $values = Input::all();
 
             $rules = array(
-                'id' => 'required|integer',
-                'app_name' => 'sometimes|required|alpha_dash|max:255',
-                'app_description' => 'sometimes|required|text',
-                'active' => 'sometimes|required|boolean',
-                'locked' => 'sometimes|required|boolean',
-                'use_refresh_token' => 'sometimes|required|boolean',
+                'id'                   => 'required|integer',
+                'app_name'             => 'sometimes|required|alpha_dash|max:255',
+                'app_description'      => 'sometimes|required|freetext',
+                'website'              => 'sometimes|required|url',
+                'active'               => 'sometimes|required|boolean',
+                'locked'               => 'sometimes|required|boolean',
+                'use_refresh_token'    => 'sometimes|required|boolean',
                 'rotate_refresh_token' => 'sometimes|required|boolean',
             );
 
@@ -180,6 +183,10 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
         }
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getRegisteredUris($id)
     {
         try {
@@ -198,6 +205,10 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
         }
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function addAllowedRedirectUri($id)
     {
         try {
@@ -210,7 +221,7 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
             $validation = Validator::make($values, $rules);
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error' => $messages));
+                return $this->error400(array('error'=>'validation','messages' => $messages));
             }
             $res = $this->client_service->addClientAllowedUri($id, $values['redirect_uri']);
             return $res ? $this->ok(): $this->error404(array('error' => 'operation failed'));
@@ -226,6 +237,11 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
         }
     }
 
+    /**
+     * @param $id
+     * @param $uri_id
+     * @return mixed
+     */
     public function deleteClientAllowedUri($id, $uri_id)
     {
         try {
@@ -308,7 +324,7 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
             $validation = Validator::make($values, $rules);
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error' => $messages));
+                return $this->error400(array('error'=>'validation','messages' => $messages));
             }
 
             $res = $this->client_service->setRefreshTokenUsage($id, $values['use_refresh_token']);
@@ -337,7 +353,7 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
             $validation = Validator::make($values, $rules);
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error' => $messages));
+                return $this->error400(array('error'=>'validation','messages' => $messages));
             }
 
             $res = $this->client_service->setRotateRefreshTokenPolicy($id, $values['rotate_refresh_token']);
@@ -454,4 +470,75 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
             return $this->error500($ex);
         }
     }
+
+
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function geAllowedOrigins($id)
+    {
+        try {
+            $client          = $this->client_service->getClientByIdentifier($id);
+            $allowed_origins = $client->allowed_origins()->get(array('id', 'allowed_origin'));
+            $data = array();
+            foreach ($allowed_origins as $origin) {
+                array_push($data, $origin->toArray());
+            }
+            return $this->ok(array('allowed_origins' => $data));
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function addAllowedOrigin($id)
+    {
+        try {
+            $values = Input::All();
+            // Build the validation constraint set.
+            $rules = array(
+                'origin' => 'sslorigin|required',
+            );
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($values, $rules);
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+                return $this->error400(array('error'=>'validation','messages' => $messages));
+            }
+            $res = $this->client_service->addClientAllowedOrigin($id, $values['origin']);
+            return $res ? $this->ok(): $this->error404(array('error' => 'operation failed'));
+        } catch (AllowedClientUriAlreadyExistsException $ex1) {
+            $this->log_service->error($ex1);
+            return $this->error400(array('error' => $ex1->getMessage()));
+        } catch (AbsentClientException $ex2) {
+            $this->log_service->error($ex2);
+            return $this->error404(array('error' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $id
+     * @param $origin_id
+     * @return mixed
+     */
+    public function deleteClientAllowedOrigin($id, $origin_id)
+    {
+        try {
+            $res = $this->client_service->deleteClientAllowedOrigin($id, $origin_id);
+            return $res ? $this->ok() : $this->error404(array('error' => 'operation failed'));
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
+            return $this->error500($ex);
+        }
+    }
+
 }

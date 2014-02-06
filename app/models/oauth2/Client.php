@@ -37,6 +37,12 @@ class Client extends BaseModelEloquent implements IClient {
         return $this->hasMany('ClientAuthorizedUri','client_id');
     }
 
+    public function allowed_origins()
+    {
+        return $this->hasMany('ClientAllowedOrigin','client_id');
+    }
+
+
     public function getClientId()
     {
         return $this->client_id;
@@ -50,11 +56,6 @@ class Client extends BaseModelEloquent implements IClient {
     public function getClientType()
     {
         return $this->client_type;
-    }
-
-    public function getClientAuthorizedRealms()
-    {
-        // TODO: Implement getClientAuthorizedRealms() method.
     }
 
     public function getClientScopes()
@@ -98,14 +99,10 @@ class Client extends BaseModelEloquent implements IClient {
         return $res;
     }
 
-    public function isRealmAllowed($realm)
-    {
-        return false;
-    }
 
     public function isUriAllowed($uri)
     {
-        if(! filter_var($uri, FILTER_VALIDATE_URL)) return false;
+        if(!filter_var($uri, FILTER_VALIDATE_URL)) return false;
         $parts = @parse_url($uri);
         if ($parts === false) {
             return false;
@@ -113,12 +110,15 @@ class Client extends BaseModelEloquent implements IClient {
         if($parts['scheme']!=='https')
             return false;
         $client_authorized_uri = ClientAuthorizedUri::where('client_id', '=', $this->id)->where('uri','=',$uri)->first();
-        if(is_null($client_authorized_uri)){
+        if(!is_null($client_authorized_uri)) return true;
+
+        if(isset($parts['path'])){
             $aux_uri = $parts['scheme'].'://'.strtolower($parts['host']).strtolower($parts['path']);
             $client_authorized_uri = ClientAuthorizedUri::where('client_id', '=', $this->id)->where('uri','=',$aux_uri)->first();
             return !is_null($client_authorized_uri);
         }
-        return true;
+        return false;
+
     }
 
     public function getApplicationName()
@@ -182,6 +182,10 @@ class Client extends BaseModelEloquent implements IClient {
         return $this->application_type;
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     public function getFriendlyApplicationType(){
         switch($this->application_type){
             case IClient::ApplicationType_JS_Client:
@@ -195,5 +199,40 @@ class Client extends BaseModelEloquent implements IClient {
             break;
         }
         throw new Exception('Invalid Application Type');
+    }
+
+    public function getClientAllowedOrigins()
+    {
+        return $this->allowed_origins()->get();
+    }
+
+    /**
+     * the origin is the triple {protocol, host, port}
+     * @param $origin
+     * @return bool
+     */
+    public function isOriginAllowed($origin)
+    {
+        if(!filter_var($origin, FILTER_VALIDATE_URL)) return false;
+        $parts = @parse_url($origin);
+        if ($parts === false) {
+            return false;
+        }
+        if($parts['scheme']!=='https')
+            return false;
+        $origin_without_port = sprinf("%sː//%s",$parts['scheme'],$parts['host']);
+        $client_allowed_origin  = $this->allowed_origins()->where('allowed_origin','=',$origin_without_port)->first();
+        if(!is_null($client_allowed_origin)) return true;
+        if(isset($parts['port'])){
+           $origin_with_port    = sprinf("%sː//%s:%s",$parts['scheme'],$parts['host'],$parts['port']);
+           $client_authorized_uri = $this->allowed_origins()->where('allowed_origin','=',$origin_with_port)->first();;
+           return !is_null($client_authorized_uri);
+        }
+        return false;
+    }
+
+    public function getWebsite()
+    {
+        return $this->website;
     }
 }

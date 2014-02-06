@@ -1,6 +1,6 @@
 <?php
 
-namespace services;
+namespace services\openid;
 
 use auth\User;
 use DB;
@@ -143,6 +143,9 @@ class UserService implements IUserService
         }
     }
 
+    public function get($id){
+        return User::find($id);
+    }
     /**
      * @param int $page_nbr
      * @param int $page_size

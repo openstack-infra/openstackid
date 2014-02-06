@@ -1,7 +1,6 @@
 <?php
-
-
 namespace auth;
+
 use auth\exceptions\AuthenticationException;
 use auth\exceptions\AuthenticationInvalidPasswordAttemptException;
 use auth\exceptions\AuthenticationLockedUserLoginAttempt;
@@ -10,10 +9,9 @@ use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\UserProviderInterface;
 use Log;
 use Member;
-use openid\services\OpenIdServiceCatalog;
-use utils\services\Registry;
-use utils\services\UtilsServiceCatalog;
 use DB;
+use openid\services\IUserService;
+use utils\services\ICheckPointService;
 
 /**
  * Class CustomAuthProvider
@@ -24,9 +22,15 @@ class CustomAuthProvider implements UserProviderInterface
 {
 
     private $auth_extension_service;
+    private $user_service;
+    private $checkpoint_service;
 
-    public function __construct(IAuthenticationExtensionService $auth_extension_service){
+    public function __construct(IAuthenticationExtensionService $auth_extension_service,
+                                IUserService $user_service,
+                                ICheckPointService $checkpoint_service){
         $this->auth_extension_service = $auth_extension_service;
+        $this->user_service           = $user_service;
+        $this->checkpoint_service     = $checkpoint_service;
     }
 
     /**
@@ -98,13 +102,11 @@ class CustomAuthProvider implements UserProviderInterface
                     $user = User::where('external_id', '=', $identifier)->first();
                 }
 
-                $user_service = Registry::getInstance()->get(OpenIdServiceCatalog::UserService);
+
 
                 $user_name = $member->FirstName . "." . $member->Surname;
                 //do association between user and member
-                $user_service->associateUser($user->id, strtolower($user_name));
-
-                $server_configuration = Registry::getInstance()->get(UtilsServiceCatalog::ServerConfigurationService);
+                $this->user_service->associateUser($user->id, strtolower($user_name));
 
                 //update user fields
                 $user->last_login_date      = gmdate("Y-m-d H:i:s", time());
@@ -124,8 +126,7 @@ class CustomAuthProvider implements UserProviderInterface
                 }
             });
          } catch (Exception $ex) {
-            $checkpoint_service = Registry::getInstance()->get(UtilsServiceCatalog::CheckPointService);
-            $checkpoint_service->trackException($ex);
+            $this->checkpoint_service->trackException($ex);
             Log::error($ex);
             $user = null;
         }

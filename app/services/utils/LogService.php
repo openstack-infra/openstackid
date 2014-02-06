@@ -1,6 +1,6 @@
 <?php
 
-namespace services;
+namespace services\utils;
 
 use Exception;
 use Log;

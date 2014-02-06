@@ -239,6 +239,10 @@
                 </select>
 
                 <label class="checkbox">
+                    <input type="checkbox" id="allow_cors" name="allow_cors">&nbsp;Allows CORS
+                </label>
+
+                <label class="checkbox">
                     <input type="checkbox" id="active" name="active">&nbsp;Active
                 </label>
 
@@ -654,7 +658,7 @@
                 rules: {
                     "name"  :     {required: true, nowhitespace:true,rangelength: [1, 255]},
                     "description":{required: true, free_text:true,rangelength: [1, 1024]},
-                    "route":      {required: true, nowhitespace:true,rangelength: [1, 1024]}
+                    "route":      {required: true,endpointroute:true,rangelength: [1, 1024]}
                 }
          });
 

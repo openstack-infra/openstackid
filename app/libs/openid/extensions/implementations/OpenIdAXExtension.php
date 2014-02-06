@@ -10,9 +10,9 @@ use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
-
+use utils\services\ILogService;
 /**
  * Class OpenIdAXExtension
  * Implements
@@ -36,9 +36,9 @@ class OpenIdAXExtension extends OpenIdExtension
     const FetchRequest = "fetch_request";
     public static $available_properties;
 
-    public function __construct($name, $namespace, $view, $description)
+    public function __construct($name, $namespace, $view, $description, ILogService $log_service)
     {
-        parent::__construct($name, $namespace, $view, $description);
+        parent::__construct($name, $namespace, $view, $description, $log_service);
         self::$available_properties[OpenIdAXExtension::Country] = "http://axschema.org/contact/country/home";
         self::$available_properties[OpenIdAXExtension::Email] = "http://axschema.org/contact/email";
         self::$available_properties[OpenIdAXExtension::FirstMame] = "http://axschema.org/namePerson/first";
@@ -72,9 +72,11 @@ class OpenIdAXExtension extends OpenIdExtension
             $response->addParam(self::paramNamespace(), self::NamespaceUrl);
             $response->addParam(self::param(self::Mode), self::FetchResponse);
             $context->addSignParam(self::param(self::Mode));
-            $attributes = $ax_request->getRequiredAttributes();
-            $auth_service = Registry::getInstance()->get(UtilsServiceCatalog::AuthenticationService);
-            $user = $auth_service->getCurrentUser();
+
+            $attributes   = $ax_request->getRequiredAttributes();
+            $auth_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::AuthenticationService);
+            $user         = $auth_service->getCurrentUser();
+
             foreach ($attributes as $attr) {
                 $response->addParam(self::param(self::Type) . "." . $attr, self::$available_properties[$attr]);
                 $context->addSignParam(self::param(self::Type) . "." . $attr);

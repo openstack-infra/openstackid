@@ -8,6 +8,7 @@
     text-indent: -1000em;
     width: 177px;
 }
+
 .panel-heading {
     background-color: #F5F5F5;
     border-bottom: 1px solid #DDDDDD;
@@ -16,6 +17,7 @@
     margin: -15px -15px 15px;
     padding: 10px 15px;
 }
+
 .panel {
     background-color: #FFFFFF;
     border: 1px solid #DDDDDD;
@@ -24,24 +26,30 @@
     margin-bottom: 20px;
     padding: 15px;
 }
+
 * {
     -moz-box-sizing: border-box;
 }
+
 .margin-top-20 {
     margin-top: 20px;
 }
 
-select, input[type="text"]{
+
+.modal-body select, .modal-body input[type="text"]{
     height: 30px !important;
     width: 100%;
 }
+
 
 textarea {
     width: 100%;
 }
 
-#redirect_uri{
+#redirect_uri, #origin{
     margin-bottom: 0px!important;
+    height: 30px !important;
+    width: 90% !important;
 }
 
 #dialog-form-register-new-app textarea {
@@ -66,9 +74,6 @@ textarea {
     padding-bottom: 1px;
 }
 
-#redirect_uri{
-    width: 100%;
-}
 
 .popover-content{
     font-size: 12px;

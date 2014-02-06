@@ -13,10 +13,8 @@
             <legend>General Configuration</legend>
             <label for="general-max-failed-login-attempts">MaximunFailed Login Attempts&nbsp;<i class="icon-info-sign accordion-toggle" title="in seconds"></i></label>
             <input type="number" min="5" step="1" id="general-max-failed-login-attempts" name="general-max-failed-login-attempts" value="{{$config_values['MaxFailed.Login.Attempts']}}"/>
-
             <label for="general-max-failed-login-attempts-captcha">MaximunFailed Login Attempts To Show Captcha&nbsp;<i class="icon-info-sign accordion-toggle" title="in seconds"></i></label>
             <input type="number" min="3" step="1" id="general-max-failed-login-attempts-captcha" name="general-max-failed-login-attempts-captcha" value="{{$config_values['MaxFailed.LoginAttempts.2ShowCaptcha']}}"/>
-
             <legend>OPENID Configuration</legend>
             <label for="openid-private-association-lifetime">Private Association Lifetime&nbsp;<i class="icon-info-sign accordion-toggle" title="in seconds"></i></label>
             <input type="number"   min="240" max="512" step="1" id="openid-private-association-lifetime" name="openid-private-association-lifetime" value="{{$config_values['OpenId.Private.Association.Lifetime']}}"/>
@@ -36,6 +34,7 @@
         </form>
     </div>
 </div>
+
 @foreach($errors->all() as $message)
 <div class="alert alert-error">
     <button type="button" class="close" data-dismiss="alert">&times;</button>

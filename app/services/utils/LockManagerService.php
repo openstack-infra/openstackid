@@ -1,6 +1,6 @@
 <?php
 
-namespace services;
+namespace services\utils;
 
 use utils\services\ICacheService;
 use utils\services\ILockManagerService;

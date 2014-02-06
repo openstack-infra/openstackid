@@ -1,6 +1,6 @@
 <?php
 
-namespace services;
+namespace services\openid;
 
 use Input;
 use openid\OpenIdMessage;

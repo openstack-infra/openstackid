@@ -31,14 +31,15 @@ interface IClientService {
 
     /**
      * Creates a new client
-     * @param $application_type
-     * @param $user_id
-     * @param $app_name
-     * @param $app_description
-     * @param string $app_logo
+     * @param  string $application_type
+     * @param  int $user_id
+     * @param  string $app_name
+     * @param  string $app_description
+     * @param  null|string $app_url
+     * @param  string $app_logo
      * @return IClient
      */
-    public function addClient($application_type, $user_id, $app_name, $app_description, $app_logo='');
+    public function addClient($application_type, $user_id, $app_name, $app_description,$app_url=null, $app_logo='');
     public function addClientScope($id,$scope_id);
     public function deleteClientScope($id,$scope_id);
 
@@ -51,11 +52,25 @@ interface IClientService {
     public function addClientAllowedUri($id,$uri);
 
     /**
+     * @param $id
+     * @param $origin
+     * @return mixed
+     */
+    public function addClientAllowedOrigin($id,$origin);
+
+    /**
      * Deletes a former client allowed redirection Uri
      * @param $id client identifier
      * @param $uri_id uri identifier
      */
     public function deleteClientAllowedUri($id,$uri_id);
+
+    /**
+     * @param $id
+     * @param $origin_id
+     * @return mixed
+     */
+    public function deleteClientAllowedOrigin($id,$origin_id);
 
     public function deleteClientByIdentifier($id);
 

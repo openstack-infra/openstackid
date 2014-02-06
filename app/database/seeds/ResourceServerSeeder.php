@@ -6,14 +6,15 @@ class ResourceServerSeeder extends Seeder {
     {
         DB::table('oauth2_resource_server')->delete();
         $current_realm = Config::get('app.url');
+
+        $res = @parse_url($current_realm);
+
         ResourceServer::create(
             array(
                 'friendly_name'   => 'openstack id server',
-                'host'            => $current_realm,
+                'host'            =>  $res['host'],
                 'ip'              => '127.0.0.1'
             )
         );
-
     }
-
-} 
+}

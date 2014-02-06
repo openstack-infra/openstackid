@@ -1,5 +1,8 @@
 <?php
 
+use utils\services\ServiceLocator;
+use utils\services\UtilsServiceCatalog;
+use openid\services\OpenIdServiceCatalog;
 /*
 |--------------------------------------------------------------------------
 | Create The Application
@@ -63,13 +66,17 @@ $framework = $app['path.base'].'/vendor/laravel/framework/src';
 require $framework.'/Illuminate/Foundation/start.php';
 
 
-//custom authentication
+//custom authenticationbootstrap/start.php
 use Illuminate\Auth\Guard;
 use auth\CustomAuthProvider;
 
 Auth::extend('custom', function($app) {
     return new Guard(
-        new CustomAuthProvider($app->app->make('auth\\IAuthenticationExtensionService')),
+        new CustomAuthProvider(
+            ServiceLocator::getInstance()->getService('auth\\IAuthenticationExtensionService'),
+            ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::UserService),
+            ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService)
+            ),
         App::make('session.store')
     );
 });

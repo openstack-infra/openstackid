@@ -12,8 +12,9 @@ use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
 use Exception;
 
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
+use utils\services\ILogService;
 
 use oauth2\requests\OAuth2AuthorizationRequest;
 use oauth2\OAuth2Protocol;
@@ -53,14 +54,14 @@ class OpenIdOAuth2Extension extends OpenIdExtension
      * @param $view
      * @param $description
      */
-    public function __construct($name, $namespace, $view, $description)
+    public function __construct($name, $namespace, $view, $description, ILogService $log_service)
     {
-        parent::__construct($name, $namespace, $view, $description);
+        parent::__construct($name, $namespace, $view, $description,$log_service);
 
-        $this->oauth2_protocol     = Registry::getInstance()->get('oauth2\IOAuth2Protocol');
-        $this->checkpoint_service  = Registry::getInstance()->get(UtilsServiceCatalog::CheckPointService);
-        $this->client_service      = Registry::getInstance()->get(OAuth2ServiceCatalog::ClientService);
-        $this->scope_service       = Registry::getInstance()->get(OAuth2ServiceCatalog::ScopeService);
+        $this->oauth2_protocol     = ServiceLocator::getInstance()->getService('oauth2\IOAuth2Protocol');
+        $this->checkpoint_service  = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
+        $this->client_service      = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ClientService);
+        $this->scope_service       = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ScopeService);
     }
 
     /**
@@ -136,6 +137,7 @@ class OpenIdOAuth2Extension extends OpenIdExtension
                 'app_name'         => $client->getApplicationName(),
                 'app_logo'         => $client->getApplicationLogo(),
                 'redirect_to'      => $return_to,
+                'website'          => $client->getWebsite(),
                 'dev_info_email'   => $client->getDeveloperEmail()
             ));
 

@@ -25,6 +25,10 @@ interface IOpenIdUser {
     public function getNickName();
     public function getGender();
     public function getCountry();
+    public function getStreetAddress();
+    public function getRegion();
+    public function getLocality();
+    public function getPostalCode();
     public function getLanguage();
     public function getTimeZone();
     public function getDateOfBirth();

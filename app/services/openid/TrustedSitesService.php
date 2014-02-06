@@ -1,6 +1,6 @@
 <?php
 
-namespace services;
+namespace services\openid;
 
 use openid\model\IOpenIdUser;
 use openid\model\ITrustedSite;

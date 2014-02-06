@@ -1,12 +1,16 @@
 <?php
 
-namespace services;
+namespace services\openid;
 
 use openid\handlers\IOpenIdAuthenticationStrategy;
 use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdAuthenticationRequest;
 use Redirect;
 
+/**
+ * Class AuthenticationStrategy
+ * @package services\openid
+ */
 class AuthenticationStrategy implements IOpenIdAuthenticationStrategy
 {
 

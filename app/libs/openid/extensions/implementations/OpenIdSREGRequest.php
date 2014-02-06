@@ -1,17 +1,11 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 11/4/13
- * Time: 11:06 AM
- */
 
 namespace openid\extensions\implementations;
 
 use Exception;
 use openid\OpenIdMessage;
 use openid\requests\OpenIdRequest;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
 
 /**
@@ -25,14 +19,12 @@ class OpenIdSREGRequest extends OpenIdRequest
     private $attributes;
     private $optional_attributes;
     private $policy_url;
-    private $log;
 
     public function __construct(OpenIdMessage $message)
     {
         parent::__construct($message);
         $this->attributes = array();
         $this->optional_attributes = array();
-        $this->log = Registry::getInstance()->get(UtilsServiceCatalog::LogService);
     }
 
     public function isValid()
@@ -83,7 +75,7 @@ class OpenIdSREGRequest extends OpenIdRequest
                 return true;
             }
         } catch (Exception $ex) {
-            $this->log->error($ex);
+            $this->log_service->error($ex);
         }
         return false;
     }

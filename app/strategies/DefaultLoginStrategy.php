@@ -3,7 +3,7 @@ namespace strategies;
 
 use Auth;
 use Redirect;
-use services\IPHelper;
+use utils\IPHelper;
 use services\IUserActionService;
 use utils\services\IAuthService;
 use View;

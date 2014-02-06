@@ -6,7 +6,7 @@ use openid\responses\OpenIdDirectResponse;
 use openid\responses\OpenIdIndirectResponse;
 use openid\responses\OpenIdResponse;
 use utils\IHttpResponseStrategy;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 
 class OpenIdResponseStrategyFactoryMethod
 {
@@ -21,12 +21,12 @@ class OpenIdResponseStrategyFactoryMethod
         switch ($type) {
             case OpenIdIndirectResponse::OpenIdIndirectResponse:
             {
-                return Registry::getInstance()->get(OpenIdIndirectResponse::OpenIdIndirectResponse);
+                return ServiceLocator::getInstance()->getService(OpenIdIndirectResponse::OpenIdIndirectResponse);
             }
                 break;
             case OpenIdDirectResponse::OpenIdDirectResponse:
             {
-                return Registry::getInstance()->get(OpenIdDirectResponse::OpenIdDirectResponse);
+                return ServiceLocator::getInstance()->getService(OpenIdDirectResponse::OpenIdDirectResponse);
             }
                 break;
             default:

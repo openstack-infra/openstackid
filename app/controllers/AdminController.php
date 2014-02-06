@@ -60,6 +60,7 @@ class AdminController extends BaseController {
         }
 
         $allowed_uris    = $client->getClientRegisteredUris();
+        $allowed_origins = $client->getClientAllowedOrigins();
         $selected_scopes = $client->getClientScopes();
         $aux_scopes      = array();
 
@@ -87,6 +88,7 @@ class AdminController extends BaseController {
             array(
                 'client'          => $client,
                 'allowed_uris'    => $allowed_uris,
+                'allowed_origins' => $allowed_origins,
                 'selected_scopes' => $aux_scopes,
                 'scopes'          => $scopes,
                 'access_tokens'   => $access_tokens,

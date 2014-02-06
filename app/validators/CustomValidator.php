@@ -71,4 +71,40 @@ class CustomValidator extends Validator {
     public function validateSslurl($attribute, $value, $parameters){
         return preg_match(";^https:\/\/([\w@][\w.:@]+)\/?[\w\.?=%&=\-@/$,]*$;i",$value)==1;
     }
+
+    public function validateFreeText($attribute, $value, $parameters){
+        return preg_match('|^[a-z\-@_.,()\'"\s\:\/]+$|i',$value)==1;
+    }
+
+
+    public function validateSslorigin($attribute, $value, $parameters){
+        if(filter_var($value, FILTER_VALIDATE_URL)){
+            $parts = @parse_url($value);
+
+            if ($parts === false) {
+                return false;
+            }
+
+            if($parts['scheme']!=='https')
+                return false;
+
+            if(isset($parts['query']))
+                return false;
+
+            if(isset($parts['fragment']))
+                return false;
+
+            if(isset($parts['path']))
+                return false;
+
+            if(isset($parts['user']))
+                return false;
+
+            if(isset($parts['pass']))
+                return false;
+
+            return true;
+        }
+        return false;
+    }
 } 

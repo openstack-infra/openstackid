@@ -11,7 +11,7 @@ use openid\requests\OpenIdAssociationSessionRequest;
 use openid\responses\OpenIdAssociationSessionResponse;
 use openid\responses\OpenIdUnencryptedAssociationSessionResponse;
 use openid\services\OpenIdServiceCatalog;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
 use Zend\Crypt\Exception\InvalidArgumentException;
 use Zend\Crypt\Exception\RuntimeException;
@@ -27,9 +27,9 @@ class SessionAssociationUnencryptedStrategy implements ISessionAssociationStrate
     public function __construct(OpenIdAssociationSessionRequest $request)
     {
         $this->current_request               = $request;
-        $this->association_service           = Registry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
-        $this->server_configuration_service  = Registry::getInstance()->get(OpenIdServiceCatalog:: ServerConfigurationService);
-        $this->log_service                   = Registry::getInstance()->get(UtilsServiceCatalog:: LogService);
+        $this->association_service           = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::AssociationService);
+        $this->server_configuration_service  = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog:: ServerConfigurationService);
+        $this->log_service                   = ServiceLocator::getInstance()->getService(UtilsServiceCatalog:: LogService);
     }
 
     /**

@@ -7,7 +7,7 @@ use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
 
 use openid\services\OpenIdServiceCatalog;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use Exception;
 
 
@@ -113,7 +113,7 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
          * other information in its payload, using extensions.
          */
 
-        $server_configuration_service = Registry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
+        $server_configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::ServerConfigurationService);
         if (is_null($claimed_id) && is_null($identity))
             return false;
         //http://specs.openid.net/auth/2.0/identifier_select

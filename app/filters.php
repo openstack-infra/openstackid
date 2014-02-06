@@ -2,7 +2,7 @@
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\OpenIdServiceCatalog;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
 use oauth2\services\OAuth2ServiceCatalog;
 use oauth2\exceptions\InvalidAuthorizationRequestException;
@@ -17,12 +17,11 @@ use oauth2\exceptions\InvalidAuthorizationRequestException;
 |
 */
 
-
 //SAP (single access point)
-App::before(function ($request) {
+App::before(function($request){
     try {
         //checkpoint security pattern entry point
-        $checkpoint_service = Registry::getInstance()->get(UtilsServiceCatalog::CheckPointService);
+        $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
         if (!$checkpoint_service->check()) {
             return View::make('404');
         }
@@ -30,11 +29,19 @@ App::before(function ($request) {
         Log::error($ex);
         return View::make('404');
     }
+
+    $cors = ServiceLocator::getInstance()->getService('CORSMiddleware');
+    if($response = $cors->verifyRequest($request))
+        return $response;
 });
 
+App::after(function($request, $response){
 
-App::after(function ($request, $response) {
-    //
+    $response->headers->set('X-content-type-options','nosniff');
+    $response->headers->set('X-xss-protection','1; mode=block');
+
+    $cors = ServiceLocator::getInstance()->getService('CORSMiddleware');
+    $cors->modifyResponse($request, $response);
 });
 
 /*
@@ -78,7 +85,6 @@ Route::filter('auth.basic', function () {
 Route::filter('guest', function () {
     if (Auth::check()) return Redirect::to('/');
 });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -141,7 +147,7 @@ Route::filter("oauth2.needs.auth.request", function () {
 
 Route::filter("ssl", function () {
     if (!Request::secure()) {
-        $openid_memento_service = Registry::getInstance()->get(OpenIdServiceCatalog::MementoService);
+        $openid_memento_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::MementoService);
         $openid_memento_service->saveCurrentRequest();
 
         $oauth2_memento_service = App::make(OAuth2ServiceCatalog::MementoService);

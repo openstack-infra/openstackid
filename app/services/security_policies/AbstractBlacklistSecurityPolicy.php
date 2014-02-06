@@ -11,6 +11,7 @@ use utils\services\ILockManagerService;
 use utils\services\ISecurityPolicy;
 use utils\services\ISecurityPolicyCounterMeasure;
 use utils\services\IServerConfigurationService;
+use utils\IPHelper;
 
 abstract class AbstractBlacklistSecurityPolicy implements ISecurityPolicy
 {

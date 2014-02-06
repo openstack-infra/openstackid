@@ -1,6 +1,6 @@
 <?php
 
-namespace services;
+namespace services\openid;
 
 use Exception;
 use Log;
@@ -11,6 +11,7 @@ use openid\services\INonceService;
 use utils\exceptions\UnacquiredLockException;
 use utils\services\ILockManagerService;
 use utils\services\ICacheService;
+use utils\services\IServerConfigurationService;
 
 class NonceService implements INonceService
 {
@@ -18,11 +19,15 @@ class NonceService implements INonceService
 
     private $cache_service;
     private $lock_manager_service;
+    private $configuration_service;
 
-    public function __construct(ILockManagerService $lock_manager_service,ICacheService $cache_service)
+    public function __construct(ILockManagerService $lock_manager_service,
+                                ICacheService $cache_service,
+                                IServerConfigurationService $configuration_service)
     {
-        $this->lock_manager_service = $lock_manager_service;
-        $this->cache_service        = $cache_service;
+        $this->lock_manager_service  = $lock_manager_service;
+        $this->cache_service         = $cache_service;
+        $this->configuration_service = $configuration_service;
     }
 
     /**
@@ -33,7 +38,7 @@ class NonceService implements INonceService
     public function lockNonce(OpenIdNonce $nonce)
     {
         $raw_nonce = $nonce->getRawFormat();
-        $lock_lifetime = \ServerConfigurationService::getConfigValue("Nonce.Lifetime");
+        $lock_lifetime = $this->configuration_service->getConfigValue("Nonce.Lifetime");
         try {
             $this->lock_manager_service->acquireLock('lock.nonce.' . $raw_nonce, $lock_lifetime);
         } catch (UnacquiredLockException $ex) {
@@ -91,7 +96,7 @@ class NonceService implements INonceService
     {
         try {
             $raw_nonce = $nonce->getRawFormat();
-            $lifetime = \ServerConfigurationService::getConfigValue("Nonce.Lifetime");
+            $lifetime  = $this->configuration_service->getConfigValue("Nonce.Lifetime");
             $this->cache_service->setSingleValue($raw_nonce . $signature, $realm, $lifetime );
         } catch (Exception $ex) {
             Log::error($ex);

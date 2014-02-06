@@ -17,6 +17,11 @@ interface IApiEndpoint {
     public function setStatus($active);
 
     /**
+     * @return booll
+     */
+    public function supportCORS();
+
+    /**
      * @return IApi
      */
     public function getApi();

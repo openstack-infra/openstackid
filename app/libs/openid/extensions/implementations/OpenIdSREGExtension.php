@@ -9,9 +9,10 @@ use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
 use Exception;
+use utils\services\ILogService;
 
 /**
  * Class OpenIdSREGExtension
@@ -41,9 +42,9 @@ class OpenIdSREGExtension extends OpenIdExtension
 
     public static $available_properties;
 
-    public function __construct($name, $namespace, $view, $description)
+    public function __construct($name, $namespace, $view, $description, ILogService $log_service)
     {
-        parent::__construct($name, $namespace, $view, $description);
+        parent::__construct($name, $namespace, $view, $description,$log_service);
         self::$available_properties[OpenIdSREGExtension::Nickname] = OpenIdSREGExtension::Nickname;
         self::$available_properties[OpenIdSREGExtension::Email] = OpenIdSREGExtension::Email;
         self::$available_properties[OpenIdSREGExtension::FullName] = OpenIdSREGExtension::FullName;
@@ -90,7 +91,7 @@ class OpenIdSREGExtension extends OpenIdExtension
             $opt_attributes = $simple_reg_request->getOptionalAttributes();
             $attributes = array_merge($attributes, $opt_attributes);
 
-            $auth_service = Registry::getInstance()->get(UtilsServiceCatalog::AuthenticationService);
+            $auth_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::AuthenticationService);
             $user = $auth_service->getCurrentUser();
 
             foreach ($attributes as $attr => $value) {

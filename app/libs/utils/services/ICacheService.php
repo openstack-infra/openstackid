@@ -86,4 +86,6 @@ interface ICacheService {
      * @return mixed
      */
     public function setKeyExpiration($key, $ttl);
+
+    public function boot();
 } 

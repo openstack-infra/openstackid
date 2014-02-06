@@ -3,11 +3,18 @@
 use utils\services\IBannedIPService;
 use utils\services\ILogService;
 
+/**
+ * Class ApiBannedIPController
+ */
 class ApiBannedIPController extends AbstractRESTController implements ICRUDController
 {
 
     private $banned_ip_service;
 
+    /**
+     * @param IBannedIPService $banned_ip_service
+     * @param ILogService $log_service
+     */
     public function __construct(IBannedIPService $banned_ip_service, ILogService $log_service)
     {
 

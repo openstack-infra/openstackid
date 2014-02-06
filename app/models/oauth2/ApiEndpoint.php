@@ -7,7 +7,7 @@ class ApiEndpoint extends BaseModelEloquent implements IApiEndpoint{
 
     protected $table = 'oauth2_api_endpoint';
 
-    protected $fillable = array('active' , 'description','active','name','route', 'http_method', 'api_id');
+    protected $fillable = array('active' , 'description','active','allow_cors', 'name','route', 'http_method', 'api_id');
 
     public function api()
     {
@@ -75,5 +75,13 @@ class ApiEndpoint extends BaseModelEloquent implements IApiEndpoint{
     public function setName($name)
     {
         $this->name= $name;
+    }
+
+    /**
+     * @return \oauth2\models\booll
+     */
+    public function supportCORS()
+    {
+        return $this->allow_cors;
     }
 }

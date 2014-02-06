@@ -10,7 +10,7 @@ use openid\requests\OpenIdAuthenticationRequest;
 use openid\responses\OpenIdNonImmediateNegativeAssertion;
 use openid\services\IMementoOpenIdRequestService;
 use openid\strategies\OpenIdResponseStrategyFactoryMethod;
-use services\IPHelper;
+use utils\IPHelper;
 use services\IUserActionService;
 use utils\services\IAuthService;
 

@@ -69,8 +69,9 @@ class ApiEndpointController extends AbstractRESTController implements ICRUDContr
 
             $rules = array(
                 'name'               => 'required|alpha_dash|max:255',
-                'description'        => 'required|text',
+                'description'        => 'required|freetext',
                 'active'             => 'required|boolean',
+                'allow_cors'         => 'required|boolean',
                 'route'              => 'required|route',
                 'http_method'        => 'required|httpmethod',
                 'api_id'             => 'required|integer',
@@ -88,6 +89,7 @@ class ApiEndpointController extends AbstractRESTController implements ICRUDContr
                 $new_api_endpoint['name'],
                 $new_api_endpoint['description'],
                 $new_api_endpoint['active'],
+                $new_api_endpoint['allow_cors'],
                 $new_api_endpoint['route'],
                 $new_api_endpoint['http_method'],
                 $new_api_endpoint['api_id']
@@ -128,8 +130,9 @@ class ApiEndpointController extends AbstractRESTController implements ICRUDContr
             $rules = array(
                 'id'                 => 'required|integer',
                 'name'               => 'sometimes|required|alpha_dash|max:255',
-                'description'        => 'sometimes|required|text',
+                'description'        => 'sometimes|required|freetext',
                 'active'             => 'sometimes|required|boolean',
+                'allow_cors'         => 'sometimes|required|boolean',
                 'route'              => 'sometimes|required|route',
                 'http_method'        => 'sometimes|required|httpmethod',
             );

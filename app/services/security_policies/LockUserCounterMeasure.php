@@ -6,7 +6,7 @@ use auth\User;
 use Exception;
 use Log;
 use openid\services\OpenIdServiceCatalog;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use utils\services\ISecurityPolicyCounterMeasure;
 
 class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
@@ -18,14 +18,14 @@ class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
 
             if (!isset($params["user_identifier"])) return;
             $user_identifier      = $params["user_identifier"];
-            $server_configuration = Registry::getInstance()->get(OpenIdServiceCatalog::ServerConfigurationService);
-            $user_service         = Registry::getInstance()->get(OpenIdServiceCatalog::UserService);
+            $server_configuration = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::ServerConfigurationService);
+            $user_service         = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::UserService);
 
             $user = User::where('external_id', '=', $user_identifier)->first();
             if(is_null($user))
                 return;
             //apply lock policy
-            if ($user->login_failed_attempt < $server_configuration->getConfigValue("MaxFailed.Login.Attempts"))
+            if (intval($user->login_failed_attempt) < intval($server_configuration->getConfigValue("MaxFailed.Login.Attempts")))
                 $user_service->updateFailedLoginAttempts($user->id);
             else {
                 $user_service->lockUser($user->id);

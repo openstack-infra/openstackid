@@ -68,8 +68,8 @@ class ApiScopeController extends AbstractRESTController implements ICRUDControll
 
             $rules = array(
                 'name'               => 'required|scopename|max:512',
-                'short_description'  => 'required|text|max:512',
-                'description'        => 'required|text',
+                'short_description'  => 'required|freetext|max:512',
+                'description'        => 'required|freetext',
                 'active'             => 'required|boolean',
                 'default'            => 'required|boolean',
                 'system'             => 'required|boolean',
@@ -135,8 +135,8 @@ class ApiScopeController extends AbstractRESTController implements ICRUDControll
             $rules = array(
                 'id'                 => 'required|integer',
                 'name'               => 'sometimes|required|scopename|max:512',
-                'description'        => 'sometimes|required|text',
-                'short_description'  => 'sometimes|required|text|max:512',
+                'description'        => 'sometimes|required|freetext',
+                'short_description'  => 'sometimes|required|freetext|max:512',
                 'active'             => 'sometimes|required|boolean',
                 'system'             => 'sometimes|required|boolean',
                 'default'            => 'sometimes|required|boolean',

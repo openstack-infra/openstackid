@@ -12,4 +12,5 @@ class OAuth2ServiceCatalog {
     const ApiService            = 'oauth2\\services\\IApiService';
     const ApiEndpointService    = 'oauth2\\services\\IApiEndpointService';
     const UserConsentService    = 'oauth2\\services\\IUserConsentService';
+    const AllowedOriginService  = 'oauth2\\services\\IAllowedOriginService';
 }

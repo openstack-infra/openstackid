@@ -5,13 +5,7 @@
             <div style="position:absolute;top:13px;margin-left:5px"><i class="icon-refresh accordion-toggle refresh-access-tokens" title="Update Access Tokens List"></i></div>
         </div>
     </div>
-    <div class="row-fluid">
-        <div class="alert alert-info" id="info-access-tokens" style="display: none">
-            <strong>There are not any Access Tokens granted for this application</strong>
-        </div>
-    </div>
-
-    <table id='table-access-tokens' class="table table-hover table-condensed">
+     <table id='table-access-tokens' class="table table-hover table-condensed">
         <thead>
         <tr>
             <th><i class="icon-info-sign accordion-toggle" title="Time is on UTC"></i>&nbsp;Issued</th>
@@ -31,15 +25,11 @@
             @endforeach
         </tbody>
     </table>
+    <span id="info-access-tokens" class="label label-info">** There are not any Access Tokens granted for this application.</span>
     <div class="row-fluid">
         <h4 style="float:left">Issued Refresh Tokens</h4>
         <div style="position: relative;float:left;">
             <div style="position:absolute;top:13px;margin-left:5px"><i class="icon-refresh accordion-toggle refresh-refresh-tokens" title="Update Refresh Tokens List"></i></div>
-        </div>
-    </div>
-    <div class="row-fluid">
-        <div class="alert alert-info" style="display: none" id="info-refresh-tokens">
-           <strong>There are not any Refresh Tokens granted for this application</strong>
         </div>
     </div>
     <table id='table-refresh-tokens' class="table table-hover table-condensed">
@@ -66,7 +56,7 @@
         @endforeach
         </tbody>
     </table>
-
+    <span id="info-refresh-tokens" class="label label-info">** There are not any Refresh Tokens granted for this application.</span>
 </div>
 @section('scripts')
 @parent
@@ -172,10 +162,18 @@
             $('#info-access-tokens').show();
             $('#table-access-tokens').hide();
         }
+        else{
+            $('#info-access-tokens').hide();
+            $('#table-access-tokens').show();
+        }
 
         if($('#table-refresh-tokens tr').length===1){
             $('#info-refresh-tokens').show();
             $('#table-refresh-tokens').hide();
+        }
+        else{
+            $('#info-refresh-tokens').hide();
+            $('#table-refresh-tokens').show();
         }
 
         $("body").on('click','.refresh-refresh-tokens',function(event){

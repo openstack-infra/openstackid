@@ -9,7 +9,7 @@ use openid\model\IAssociation;
 use openid\requests\OpenIdDHAssociationSessionRequest;
 use openid\responses\OpenIdDiffieHellmanAssociationSessionResponse;
 use openid\services\OpenIdServiceCatalog;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
 use Zend\Crypt\PublicKey\DiffieHellman;
 
@@ -27,9 +27,9 @@ class SessionAssociationDHStrategy implements ISessionAssociationStrategy
     public function __construct(OpenIdDHAssociationSessionRequest $request)
     {
         $this->current_request = $request;
-        $this->association_service = Registry::getInstance()->get(OpenIdServiceCatalog::AssociationService);
-        $this->server_configuration_service = Registry::getInstance()->get(OpenIdServiceCatalog:: ServerConfigurationService);
-        $this->log = Registry::getInstance()->get(UtilsServiceCatalog:: LogService);
+        $this->association_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::AssociationService);
+        $this->server_configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog:: ServerConfigurationService);
+        $this->log = ServiceLocator::getInstance()->getService(UtilsServiceCatalog:: LogService);
     }
 
     /**

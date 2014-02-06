@@ -6,7 +6,7 @@ use oauth2\responses\OAuth2DirectResponse;
 use oauth2\responses\OAuth2IndirectFragmentResponse;
 use oauth2\responses\OAuth2IndirectResponse;
 use oauth2\responses\OAuth2Response;
-use utils\services\Registry;
+use utils\services\ServiceLocator;
 
 class OAuth2ResponseStrategyFactoryMethod {
 
@@ -16,19 +16,19 @@ class OAuth2ResponseStrategyFactoryMethod {
         switch ($type) {
             case OAuth2IndirectResponse::OAuth2IndirectResponse:
             {
-                return Registry::getInstance()->get(OAuth2IndirectResponse::OAuth2IndirectResponse);
+                return ServiceLocator::getInstance()->getService(OAuth2IndirectResponse::OAuth2IndirectResponse);
             }
             break;
 
             case OAuth2IndirectFragmentResponse::OAuth2IndirectFragmentResponse:
             {
-                return Registry::getInstance()->get(OAuth2IndirectFragmentResponse::OAuth2IndirectFragmentResponse);
+                return ServiceLocator::getInstance()->getService(OAuth2IndirectFragmentResponse::OAuth2IndirectFragmentResponse);
             }
             break;
 
             case OAuth2DirectResponse::OAuth2DirectResponse:
             {
-                return Registry::getInstance()->get(OAuth2DirectResponse::OAuth2DirectResponse);
+                return ServiceLocator::getInstance()->getService(OAuth2DirectResponse::OAuth2DirectResponse);
             }
             break;
             default:

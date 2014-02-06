@@ -1,12 +1,14 @@
 <?php
 
-namespace services;
+namespace services\utils;
 
 use Exception;
 use Log;
 use Auth;
 use utils\services\ICheckPointService;
 use utils\services\ISecurityPolicy;
+use utils\IPHelper;
+use UserExceptionTrail;
 
 class CheckPointService implements ICheckPointService
 {
@@ -43,7 +45,7 @@ class CheckPointService implements ICheckPointService
         try {
             $remote_ip                  = IPHelper::getUserIp();
             $class_name                 = get_class($ex);
-            $user_trail                 = new \UserExceptionTrail();
+            $user_trail                 = new UserExceptionTrail();
             $user_trail->from_ip        = $remote_ip;
             $user_trail->exception_type = $class_name;
             if(Auth::check()){

@@ -4,7 +4,7 @@
 @stop
 @section('content')
 @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
-<legend>Client {{ $client->app_name }}</legend>
+<legend><i class="icon-info-sign accordion-toggle" title="OAuth 2.0 allows users to share specific data with you (for example, contact lists) while keeping their usernames, passwords, and other information private."></i>&nbsp;{{$client->getFriendlyApplicationType()}} - Client {{ $client->app_name }}</legend>
 @if($errors->any())
 <div class="errors">
     <ul>
@@ -42,6 +42,20 @@
             </div>
         </div>
     </div>
+    @if($client->application_type == oauth2\models\IClient::ApplicationType_JS_Client)
+    <div class="accordion-group">
+        <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOrigins">
+                Allowed Javascript Origins
+            </a>
+        </div>
+        <div id="collapseOrigins" class="accordion-body collapse">
+            <div class="accordion-inner">
+                @include('oauth2.profile.edit-client-allowed-origins',array('access_tokens' => $access_tokens, 'refresh_tokens' => $refresh_tokens,'client'=>$client,'allowed_uris'=>$allowed_uris,'allowed_origins'=>$allowed_origins))
+            </div>
+        </div>
+    </div>
+    @endif
     <div class="accordion-group">
         <div class="accordion-heading">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
