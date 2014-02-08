@@ -108,7 +108,7 @@ $.extend($.fn, {
 			return valid;
 		}
 	},
-	// attributes: space seperated list of attributes to retrieve and remove
+	// attributes: space separated list of attributes to retrieve and remove
 	removeAttrs: function( attributes ) {
 		var result = {},
 			$element = this;
@@ -859,7 +859,7 @@ $.extend($.validator, {
 				value = $element.attr(method);
 			}
 
-			// convert the value to a number for number inputs, and for text for backwards compability
+			// convert the value to a number for number inputs, and for text for backwards compatibility
 			// allows type="date" and others to be compared as strings
 			if ( /min|max/.test( method ) && ( type === null || /number|range|text/.test( type ) ) ) {
 				value = Number(value);

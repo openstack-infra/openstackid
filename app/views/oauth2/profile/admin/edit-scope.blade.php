@@ -105,7 +105,7 @@
                         dataType: "json",
                         timeout:60000,
                         success: function (data,textStatus,jqXHR) {
-                            displaySuccessMessage('{{ Lang::get("messages.global_successfull_save_entity", array("entity" => "Scope")) }}',scope_form);
+                            displaySuccessMessage('{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "Scope")) }}',scope_form);
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
                             ajaxError(jqXHR, textStatus, errorThrown);

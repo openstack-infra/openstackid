@@ -755,7 +755,7 @@ class TokenService implements ITokenService
         return $res;
     }
 
-    public function getRefreshTokeByUserId($user_id){
+    public function getRefreshTokenByUserId($user_id){
         $user          = $this->auth_service->getUserById($user_id);
         if(is_null($user))
             throw new AbsentClientException(sprintf("user id %d does not exists!",$user_id));

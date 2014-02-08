@@ -161,7 +161,7 @@ class AdminController extends BaseController {
 
         $user           = $this->auth_service->getCurrentUser();
         $access_tokens  = $this->token_service->getAccessTokenByUserId($user->getId());
-        $refresh_tokens = $this->token_service->getRefreshTokeByUserId($user->getId());
+        $refresh_tokens = $this->token_service->getRefreshTokenByUserId($user->getId());
 
         foreach($access_tokens as $access_token){
             $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ',$access_token->scope));
