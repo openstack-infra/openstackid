@@ -436,7 +436,7 @@
                         dataType: "json",
                         timeout:60000,
                         success: function (data,textStatus,jqXHR) {
-                            displaySuccessMessage('{{ Lang::get("messages.global_successfull_save_entity", array("entity" => "API")) }}',api_form);
+                            displaySuccessMessage('{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "API")) }}',api_form);
                         },
                         error: function (jqXHR, textStatus, errorThrown) {
                             ajaxError(jqXHR, textStatus, errorThrown);

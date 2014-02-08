@@ -104,10 +104,10 @@ class OpenIdCryptoHelper
     }
 
     /**
-     * Returns lenght of binary string in bytes
+     * Returns length of binary string in bytes
      *
      * @param string $str
-     * @return int the string lenght
+     * @return int the string length
      */
     static public function strlen($str)
     {
