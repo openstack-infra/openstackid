@@ -100,4 +100,20 @@ class OAuth2UserServiceApiTest  extends TestCase {
         $content   = $response->getContent();
         $user_info = json_decode($content);
     }
+
+    public function testGetInfoCORS(){
+        $response = $this->action("OPTION", "OAuth2UserApiController@me",
+            array(),
+            array(),
+            array(),
+            array(
+                "HTTP_Authorization" => " Bearer " .$this->access_token,
+                'HTTP_Origin' => array('www.test.com','www.test1.com'),
+                'HTTP_Access-Control-Request-Method'=>'GET',
+            ));
+
+        $this->assertResponseStatus(403);
+        $content   = $response->getContent();
+        $user_info = json_decode($content);
+    }
 }

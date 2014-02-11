@@ -15,7 +15,7 @@ return array(
     /**
      * http://www.w3.org/TR/cors/#access-control-allow-headers-response-header
      */
-    'AllowedHeaders'      => 'origin, content-type, accept, authorization',
+    'AllowedHeaders'      => 'origin, content-type, accept, authorization, x-requested-with',
     /**
      * http://www.w3.org/TR/cors/#access-control-allow-methods-response-header
      */
