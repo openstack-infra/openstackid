@@ -52,7 +52,9 @@ class BannedIPService implements IBannedIPService {
             $remote_address = Request::server('REMOTE_ADDR');
             //try to create on cache
             $this->cache_service->addSingleValue($remote_address, $initial_hits, intval($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds")));
+
             DB::transaction(function () use ($remote_address, $exception_type, $initial_hits,&$res) {
+
                 $banned_ip = BannedIP::where("ip", "=", $remote_address)->first();
                 if (!$banned_ip) {
                     $banned_ip = new BannedIP();
@@ -60,11 +62,12 @@ class BannedIPService implements IBannedIPService {
                 }
                 $banned_ip->exception_type = $exception_type;
                 $banned_ip->hits           = $initial_hits;
-                $current_user = $this->auth_service->getCurrentUser();
-                if(!is_null($current_user)){
-                    $banned_ip->user_id = $current_user->getId();
-                }
-                $res = $banned_ip->Save();
+
+	            if(Auth::check()){
+		            $banned_ip->user_id    = Auth::user()->getId();
+	            }
+
+	            $res = $banned_ip->Save();
             });
 
         } catch (Exception $ex) {
@@ -76,11 +79,14 @@ class BannedIPService implements IBannedIPService {
 
     public function delete($ip)
     {
-        $res = false;
-        DB::transaction(function () use ($ip,&$res) {
-            if($banned_ip = $this->getByIP($ip)){
+        $res           = false;
+	    $cache_service = $this->cache_service;
+		$this_var      = $this;
+	    DB::transaction(function () use ($ip,&$res,&$cache_service,&$this_var) {
+
+            if($banned_ip = $this_var->getByIP($ip)){
                 $res = $banned_ip->delete();
-                $this->cache_service->delete($ip);
+	            $cache_service->delete($ip);
             }
         });
         return $res;

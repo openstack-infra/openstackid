@@ -102,7 +102,9 @@ class ApiEndpointService implements IApiEndpointService {
     public function update($id, array $params){
 
         $res = false;
-        DB::transaction(function () use ($id,$params, &$res){
+	    $this_var = $this;
+
+        DB::transaction(function () use ($id,$params, &$res,&$this_var){
             $endpoint = ApiEndpoint::find($id);
             if(is_null($endpoint))
                 throw new InvalidApiEndpoint(sprintf('api endpoint id %s does not exists!',$id));
@@ -116,7 +118,7 @@ class ApiEndpointService implements IApiEndpointService {
             //check that does not exists an endpoint with same http method and same route
             if(ApiEndpoint::where('http_method','=',$endpoint->http_method)->where('route','=',$endpoint->route)->where('id','<>',$endpoint->id)->count()>0)
                 throw new InvalidApiEndpoint(sprintf('there is already an endpoint api with route %s and http method %s',$endpoint->route,$endpoint->http_method));
-            $res = $this->save($endpoint);
+            $res = $this_var->save($endpoint);
         });
         return $res;
     }
@@ -133,6 +135,7 @@ class ApiEndpointService implements IApiEndpointService {
     public function addRequiredScope($api_endpoint_id, $scope_id)
     {
         $res = false;
+
         DB::transaction(function () use($api_endpoint_id, $scope_id,&$res){
 
             $api_endpoint = ApiEndpoint::find($api_endpoint_id);
@@ -174,6 +177,7 @@ class ApiEndpointService implements IApiEndpointService {
     {
 
         $res = false;
+
         DB::transaction(function () use($api_endpoint_id, $scope_id,&$res){
 
             $api_endpoint = ApiEndpoint::find($api_endpoint_id);
@@ -233,7 +237,7 @@ class ApiEndpointService implements IApiEndpointService {
      */
     public function setStatus($id, $active)
     {
-        $endpoint = ApiEndpoint::find($id);
+	    $endpoint = ApiEndpoint::find($id);
         if(is_null($endpoint)) return false;
         return $endpoint->update(array('active'=>$active));
     }

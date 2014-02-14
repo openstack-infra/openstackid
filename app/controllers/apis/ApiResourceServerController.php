@@ -165,7 +165,6 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
      */
     public function updateStatus($id, $active){
         try {
-            $active = is_string($active)?(strtoupper(trim($active))==='TRUE'?true:false ):$active;
             $res = $this->resource_server_service->setStatus($id,$active);
             return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
         } catch (Exception $ex) {

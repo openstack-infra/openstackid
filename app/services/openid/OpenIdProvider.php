@@ -2,9 +2,8 @@
 namespace services\openid;
 
 use Illuminate\Support\ServiceProvider;
-use utils\services\UtilsServiceCatalog;
-use utils\services\ServiceLocator;
 use openid\services\OpenIdServiceCatalog;
+use App;
 
 class OpenIdProvider extends ServiceProvider {
 
@@ -16,14 +15,14 @@ class OpenIdProvider extends ServiceProvider {
     public function register()
     {
         //register on boot bc we rely on Illuminate\Redis\ServiceProvider\RedisServiceProvider
-        $this->app->singleton(OpenIdServiceCatalog::MementoService, 'services\\openid\\MementoRequestService');
-        $this->app->singleton(OpenIdServiceCatalog::AuthenticationStrategy, 'services\\openid\\AuthenticationStrategy');
-        $this->app->singleton(OpenIdServiceCatalog::ServerExtensionsService, 'services\\openid\\ServerExtensionsService');
-        $this->app->singleton(OpenIdServiceCatalog::AssociationService, 'services\\openid\\AssociationService');
-        $this->app->singleton(OpenIdServiceCatalog::TrustedSitesService, 'services\\openid\\TrustedSitesService');
-        $this->app->singleton(OpenIdServiceCatalog::ServerConfigurationService, 'services\\utils\\ServerConfigurationService');
-        $this->app->singleton(OpenIdServiceCatalog::UserService, 'services\\openid\\UserService');
-        $this->app->singleton(OpenIdServiceCatalog::NonceService, 'services\\openid\\NonceService');
+        App::singleton(OpenIdServiceCatalog::MementoService, 'services\\openid\\MementoRequestService');
+        App::singleton(OpenIdServiceCatalog::AuthenticationStrategy, 'services\\openid\\AuthenticationStrategy');
+        App::singleton(OpenIdServiceCatalog::ServerExtensionsService, 'services\\openid\\ServerExtensionsService');
+        App::singleton(OpenIdServiceCatalog::AssociationService, 'services\\openid\\AssociationService');
+        App::singleton(OpenIdServiceCatalog::TrustedSitesService, 'services\\openid\\TrustedSitesService');
+        App::singleton(OpenIdServiceCatalog::ServerConfigurationService, 'services\\utils\\ServerConfigurationService');
+        App::singleton(OpenIdServiceCatalog::UserService, 'services\\openid\\UserService');
+        App::singleton(OpenIdServiceCatalog::NonceService, 'services\\openid\\NonceService');
     }
 
     public function provides()

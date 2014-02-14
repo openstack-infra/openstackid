@@ -83,9 +83,10 @@ class ApiService implements  IApiService {
      */
     public function update($id, array $params){
 
-        $res = false;
+        $res      = false;
+	    $this_var = $this;
 
-        DB::transaction(function () use ($id,$params, &$res) {
+        DB::transaction(function () use ($id,$params, &$res, &$this_var) {
 
             $api = Api::find($id);
             if(is_null($api))
@@ -103,7 +104,7 @@ class ApiService implements  IApiService {
                     $api->{$param} = $params[$param];
                 }
             }
-            $res = $this->save($api);
+            $res = $this_var->save($api);
         });
         return $res;
     }

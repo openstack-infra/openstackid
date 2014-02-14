@@ -284,11 +284,8 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
     public function updateStatus($id,$active)
     {
         try {
-
             $res = $this->client_service->activateClient($id, $active);
-
             return $res ? $this->ok() : $this->error404(array('error' => 'operation failed'));
-
         } catch (AbsentClientException $ex1) {
             $this->log_service->error($ex1);
             return $this->error404(array('error' => $ex1->getMessage()));

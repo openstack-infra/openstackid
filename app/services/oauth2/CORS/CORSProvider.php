@@ -3,6 +3,7 @@
 namespace services\oauth2\CORS;
 
 use Illuminate\Support\ServiceProvider;
+use App;
 
 class CORSProvider extends ServiceProvider {
 
@@ -14,7 +15,7 @@ class CORSProvider extends ServiceProvider {
      */
     public function register()
     {
-        $this->app->singleton('CORSMiddleware', 'services\oauth2\CORS\CORSMiddleware');
+	    App::singleton('CORSMiddleware', 'services\oauth2\CORS\CORSMiddleware');
     }
 
     public function boot(){

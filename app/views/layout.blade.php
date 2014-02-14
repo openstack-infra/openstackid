@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container">
-        <header class="row">
+        <header class="row-fluid">
             <div class="span5">
                 <h1 id="logo"><a href="/">Open Stack</a></h1>
             </div>
@@ -17,10 +17,10 @@
                 @yield('header_right')
             </div>
         </header>
-        <div class="row" id="main-content">
+        <div class="row-fluid" id="main-content">
             @yield('content')
         </div>
-        <footer class="row"></footer>
+        <footer class="row-fluid"></footer>
     </div>
 
     {{ HTML::script('js/jquery-2.1.0.min.js')}}

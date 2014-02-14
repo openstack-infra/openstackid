@@ -4,6 +4,7 @@ namespace auth;
 
 use Illuminate\Support\ServiceProvider;
 use utils\services\UtilsServiceCatalog;
+use App;
 
 class AuthenticationServiceProvider extends ServiceProvider
 {
@@ -14,8 +15,8 @@ class AuthenticationServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->singleton(UtilsServiceCatalog::AuthenticationService, 'auth\\AuthService');
-        $this->app->singleton('auth\\IAuthenticationExtensionService', 'auth\\AuthenticationExtensionService');
+        App::singleton(UtilsServiceCatalog::AuthenticationService, 'auth\\AuthService');
+	    App::singleton('auth\\IAuthenticationExtensionService', 'auth\\AuthenticationExtensionService');
     }
 
     public function provides()

@@ -3,10 +3,10 @@ namespace services\utils;
 
 use Illuminate\Support\ServiceProvider;
 use utils\services\UtilsServiceCatalog;
-use App;
 use Illuminate\Foundation\AliasLoader;
+use App;
 
-class UtilsProvider  extends ServiceProvider {
+class UtilsProvider extends ServiceProvider {
 
     protected $defer = false;
     /**
@@ -16,27 +16,27 @@ class UtilsProvider  extends ServiceProvider {
      */
     public function register()
     {
-        $this->app->singleton(UtilsServiceCatalog::CacheService, 'services\\utils\\RedisCacheService');
+        App::singleton(UtilsServiceCatalog::CacheService, 'services\\utils\\RedisCacheService');
 
         App::resolving('redis',function($redis){
-            $cache_service = $this->app->make(UtilsServiceCatalog::CacheService);
+            $cache_service = App::make(UtilsServiceCatalog::CacheService);
             $cache_service->boot();
         });
 
-        $this->app['serverconfigurationservice'] = $this->app->share(function ($app) {
-            return new ServerConfigurationService($this->app->make(UtilsServiceCatalog::CacheService));
+        $this->app['serverconfigurationservice'] = App::share(function ($app) {
+            return new ServerConfigurationService(App::make(UtilsServiceCatalog::CacheService));
         });
 
         // Shortcut so developers don't need to add an Alias in app/config/app.php
-        $this->app->booting(function () {
+        App::booting(function () {
             $loader = AliasLoader::getInstance();
             $loader->alias('ServerConfigurationService', 'services\\facades\\ServerConfigurationService');
         });
 
-        $this->app->singleton(UtilsServiceCatalog::LogService, 'services\\utils\\LogService');
-        $this->app->singleton(UtilsServiceCatalog::LockManagerService, 'services\\utils\\LockManagerService');
-        $this->app->singleton(UtilsServiceCatalog::ServerConfigurationService, 'services\\utils\\ServerConfigurationService');
-        $this->app->singleton(UtilsServiceCatalog::BannedIpService, 'services\\utils\\BannedIPService');
+        App::singleton(UtilsServiceCatalog::LogService, 'services\\utils\\LogService');
+        App::singleton(UtilsServiceCatalog::LockManagerService, 'services\\utils\\LockManagerService');
+        App::singleton(UtilsServiceCatalog::ServerConfigurationService, 'services\\utils\\ServerConfigurationService');
+        App::singleton(UtilsServiceCatalog::BannedIpService, 'services\\utils\\BannedIPService');
     }
 
     public function provides()

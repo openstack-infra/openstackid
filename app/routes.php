@@ -13,7 +13,7 @@
 
 Route::pattern('id', '[0-9]+');
 Route::pattern('uri_id', '[0-9]+');
-Route::pattern('active', '(true|false|1|0)');
+Route::pattern('active', '(true|false)');
 Route::pattern('hint', '(access-token|refresh-token)');
 Route::pattern('scope_id', '[0-9]+');
 

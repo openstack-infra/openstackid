@@ -26,8 +26,6 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
 
     private $default_config_params;
 
-    private $cache_service;
-
     /**
      * @param ICacheService $cache_service
      */
@@ -112,28 +110,31 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
      */
     public function getConfigValue($key)
     {
-        $res = null;
-        DB::transaction(function () use ($key, &$res) {
+        $res                   = null;
+	    $cache_service         = $this->cache_service;
+	    $default_config_params = $this->default_config_params;
+
+        DB::transaction(function () use ($key, &$res,&$cache_service,&$default_config_params) {
             try {
 
-                if (!$this->cache_service->exists($key)) {
+                if (!$cache_service->exists($key)) {
 
                     if (!is_null($conf = ServerConfiguration::where('key', '=', $key)->first()))
-                        $this->cache_service->addSingleValue($key, $conf->value);
+	                    $cache_service->addSingleValue($key, $conf->value);
                     else
-                        if (isset($this->default_config_params[$key]))
-                            $this->cache_service->addSingleValue($key, $this->default_config_params[$key]);
+                        if (isset($default_config_params[$key]))
+	                        $cache_service->addSingleValue($key, $default_config_params[$key]);
                         else {
                             $res = null;
                             return;
                         }
                 }
-                $res = $this->cache_service->getSingleValue($key);
+                $res = $cache_service->getSingleValue($key);
 
             } catch (Exception $ex) {
                 Log::error($ex);
-                if (isset($this->default_config_params[$key])) {
-                    $res = $this->default_config_params[$key];
+                if (isset($default_config_params[$key])) {
+                    $res = $default_config_params[$key];
                 }
             }
         });
@@ -148,19 +149,24 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
 
     public function saveConfigValue($key, $value)
     {
-        $res = false;
-        DB::transaction(function () use ($key, $value, &$res) {
+        $res           = false;
+	    $cache_service = $this->cache_service;
+
+	    DB::transaction(function () use ($key, $value, &$res,&$cache_service) {
+
             $conf = ServerConfiguration::where('key', '=', $key)->first();
+
             if (is_null($conf)) {
-                $conf = new ServerConfiguration();
-                $conf->key = $key;
+                $conf        = new ServerConfiguration();
+                $conf->key   = $key;
                 $conf->value = $value;
                 $res = $conf->Save();
             } else {
                 $conf->value = $value;
-                $res = $conf->Save();
+                $res         = $conf->Save();
             }
-            $this->cache_service->delete($key);
+
+		    $cache_service->delete($key);
         });
         return $res;
     }

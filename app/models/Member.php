@@ -10,7 +10,7 @@ class Member extends BaseModelEloquent
 {
 
     protected $primaryKey ='ID';
-    protected $table = 'Member';
+    protected $table      = 'Member';
     //external os members db (SS)
     protected $connection = 'os_members';
 

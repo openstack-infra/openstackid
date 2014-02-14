@@ -131,8 +131,10 @@ class ApiScopeService implements IApiScopeService {
      */
     public function update($id, array $params)
     {
-        $res = false;
-        DB::transaction(function () use ($id,$params,&$res) {
+        $res      = false;
+	    $this_var = $this;
+
+        DB::transaction(function () use ($id,$params,&$res,&$this_var) {
 
             //check that scope exists...
             $scope = ApiScope::find($id);
@@ -153,7 +155,7 @@ class ApiScopeService implements IApiScopeService {
                     $scope->{$param} = $params[$param];
                 }
             }
-            $res = $this->save($scope);
+            $res = $this_var->save($scope);
         });
         return $res;
     }
@@ -165,13 +167,13 @@ class ApiScopeService implements IApiScopeService {
      * @param bool $status
      * @throws \oauth2\exceptions\InvalidApiScope
      */
-    public function setStatus($id, $status)
+    public function setStatus($id, $active)
     {
-        $scope = ApiScope::find($id);
+	    $scope = ApiScope::find($id);
         if(is_null($scope))
             throw new InvalidApiScope(sprintf('scope id %s does not exists!',$id));
 
-        return $scope->update(array('active'=>$status));
+        return $scope->update(array('active'=>$active));
     }
 
     /**
@@ -183,6 +185,7 @@ class ApiScopeService implements IApiScopeService {
     {
         $res = false;
         DB::transaction(function () use ($id,&$res) {
+
             $scope = ApiScope::find($id);
             if(is_null($scope))
                 throw new InvalidApiScope(sprintf('scope id %s does not exists!',$id));

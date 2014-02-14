@@ -39,6 +39,10 @@ class OpenIdProtocolTest extends TestCase
         parent::prepareForTests();
         Route::enableFilters();
         $this->current_realm = Config::get('app.url');
+
+	    $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
+	    $this->be($user);
+	    Session::start();
     }
 
     /**
@@ -193,10 +197,7 @@ class OpenIdProtocolTest extends TestCase
 
     public function testAuthenticationSetupModePrivateAssociation(){
         //set login info
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-        Auth::login($user);
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
-
 
         $params = array(
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
@@ -256,11 +257,7 @@ class OpenIdProtocolTest extends TestCase
         $this->assertTrue(isset($openid_response['enc_mac_key']));
         $this->assertTrue(isset($openid_response['expires_in']));
 
-        //set login info
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-        Auth::login($user);
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
-
 
         $params = array(
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
@@ -309,10 +306,7 @@ class OpenIdProtocolTest extends TestCase
 
     public function testAuthenticationCheckImmediateAuthenticationPrivateSession(){
         //set login info
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-        Auth::login($user);
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
-
 
         $params = array(
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
@@ -365,11 +359,7 @@ class OpenIdProtocolTest extends TestCase
     public function testCheckSetupSREGExtension(){
 
         //set login info
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-        Auth::login($user);
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
-
-
+	    Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
         $sreg_required_params = array('email','fullname');
 
         $params = array(
@@ -447,8 +437,6 @@ class OpenIdProtocolTest extends TestCase
     public function testCheckSetupOAuth2Extension(){
 
         //set login info
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-        Auth::login($user);
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
 
         $scope = array(
@@ -531,8 +519,6 @@ class OpenIdProtocolTest extends TestCase
     public function testCheckSetupOAuth2ExtensionWrongClientId(){
 
         //set login info
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-        Auth::login($user);
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $scope = array(
@@ -612,8 +598,6 @@ class OpenIdProtocolTest extends TestCase
     public function testCheckSetupOAuth2ExtensionBadRequest(){
 
         //set login info
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-        Auth::login($user);
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $scope = array(

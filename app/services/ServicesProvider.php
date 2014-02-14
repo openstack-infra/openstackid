@@ -5,6 +5,7 @@ use Illuminate\Support\ServiceProvider;
 use utils\services\UtilsServiceCatalog;
 use services\oauth2\ResourceServer;
 use services\utils\CheckPointService;
+use App;
 
 /**
  * Class ServicesProvider
@@ -21,36 +22,36 @@ class ServicesProvider extends ServiceProvider
 
     public function register(){
 
-        $this->app->singleton('services\\IUserActionService', 'services\\UserActionService');
-        $this->app->singleton("services\\DelayCounterMeasure", 'services\\DelayCounterMeasure');
-        $this->app->singleton("services\\LockUserCounterMeasure", 'services\\LockUserCounterMeasure');
-        $this->app->singleton("services\\oauth2\\RevokeAuthorizationCodeRelatedTokens", 'services\\oauth2\\RevokeAuthorizationCodeRelatedTokens');
-        $this->app->singleton("services\\BlacklistSecurityPolicy", 'services\\BlacklistSecurityPolicy');
-        $this->app->singleton("services\\LockUserSecurityPolicy", 'services\\LockUserSecurityPolicy');
-        $this->app->singleton("services\\OAuth2LockClientCounterMeasure", 'services\\OAuth2LockClientCounterMeasure');
-        $this->app->singleton("services\\OAuth2SecurityPolicy", 'services\\OAuth2SecurityPolicy');
-        $this->app->singleton("services\\oauth2\\AuthorizationCodeRedeemPolicy", 'services\\oauth2\\AuthorizationCodeRedeemPolicy');
+        App::singleton('services\\IUserActionService', 'services\\UserActionService');
+        App::singleton("services\\DelayCounterMeasure", 'services\\DelayCounterMeasure');
+        App::singleton("services\\LockUserCounterMeasure", 'services\\LockUserCounterMeasure');
+        App::singleton("services\\oauth2\\RevokeAuthorizationCodeRelatedTokens", 'services\\oauth2\\RevokeAuthorizationCodeRelatedTokens');
+        App::singleton("services\\BlacklistSecurityPolicy", 'services\\BlacklistSecurityPolicy');
+        App::singleton("services\\LockUserSecurityPolicy", 'services\\LockUserSecurityPolicy');
+        App::singleton("services\\OAuth2LockClientCounterMeasure", 'services\\OAuth2LockClientCounterMeasure');
+        App::singleton("services\\OAuth2SecurityPolicy", 'services\\OAuth2SecurityPolicy');
+        App::singleton("services\\oauth2\\AuthorizationCodeRedeemPolicy", 'services\\oauth2\\AuthorizationCodeRedeemPolicy');
 
-        $this->app->singleton(UtilsServiceCatalog::CheckPointService,
+        App::singleton(UtilsServiceCatalog::CheckPointService,
             function(){
                 //set security policies
-                $delay_counter_measure = $this->app->make("services\\DelayCounterMeasure");
+                $delay_counter_measure = App::make("services\\DelayCounterMeasure");
 
-                $blacklist_security_policy = $this->app->make("services\\BlacklistSecurityPolicy");
+                $blacklist_security_policy = App::make("services\\BlacklistSecurityPolicy");
                 $blacklist_security_policy->setCounterMeasure($delay_counter_measure);
 
-                $revoke_tokens_counter_measure = $this->app->make("services\\oauth2\\RevokeAuthorizationCodeRelatedTokens");
+                $revoke_tokens_counter_measure = App::make("services\\oauth2\\RevokeAuthorizationCodeRelatedTokens");
 
-                $authorization_code_redeem_Policy = $this->app->make("services\\oauth2\\AuthorizationCodeRedeemPolicy");
+                $authorization_code_redeem_Policy = App::make("services\\oauth2\\AuthorizationCodeRedeemPolicy");
                 $authorization_code_redeem_Policy->setCounterMeasure($revoke_tokens_counter_measure);
 
-                $lock_user_counter_measure = $this->app->make("services\\LockUserCounterMeasure");
+                $lock_user_counter_measure = App::make("services\\LockUserCounterMeasure");
 
-                $lock_user_security_policy = $this->app->make("services\\LockUserSecurityPolicy");
+                $lock_user_security_policy = App::make("services\\LockUserSecurityPolicy");
                 $lock_user_security_policy->setCounterMeasure($lock_user_counter_measure);
 
-                $oauth2_lock_client_counter_measure = $this->app->make("services\\OAuth2LockClientCounterMeasure");
-                $oauth2_security_policy             = $this->app->make("services\\OAuth2SecurityPolicy");
+                $oauth2_lock_client_counter_measure = App::make("services\\OAuth2LockClientCounterMeasure");
+                $oauth2_security_policy             = App::make("services\\OAuth2SecurityPolicy");
                 $oauth2_security_policy->setCounterMeasure($oauth2_lock_client_counter_measure);
 
                 $checkpoint_service = new CheckPointService($blacklist_security_policy);

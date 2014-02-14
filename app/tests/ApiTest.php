@@ -213,12 +213,10 @@ class ApiTest extends TestCase {
         $response = $this->action("GET", "ApiController@get",$parameters = array('id' => $new_id), array(),
             array(),
             array());
-
+	    $this->assertResponseStatus(200);
         $content = $response->getContent();
-
-        $updated_values = json_decode($content);
-        $this->assertTrue($updated_values->active === 0);
-        $this->assertResponseStatus(200);
+	    $updated_values = json_decode($content);
+        $this->assertTrue($updated_values->active == '0');
     }
 
     public function testDeleteExisting(){

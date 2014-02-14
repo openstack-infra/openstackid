@@ -81,20 +81,24 @@ class ClientService implements IClientService
 
     public function addClient($application_type, $user_id, $app_name, $app_description,$app_url=null, $app_logo = '')
     {
-        $instance = null;
-        DB::transaction(function () use ($application_type, $user_id, $app_name,$app_url, $app_description, $app_logo, &$instance) {
+        $instance      = null;
+	    $this_var      = $this;
+	    $scope_service = $this_var->scope_service;
+
+        DB::transaction(function () use ($application_type, $user_id, $app_name,$app_url, $app_description, $app_logo, &$instance, &$this_var,&$scope_service) {
 
             //check $application_type vs client_type
-            $client_type = $application_type == IClient::ApplicationType_JS_Client?IClient::ClientType_Public:IClient::ClientType_Confidential;
-            $instance = new Client;
-            $instance->app_name = $app_name;
-            $instance->app_logo = $app_logo;
+            $client_type         = $application_type == IClient::ApplicationType_JS_Client? IClient::ClientType_Public : IClient::ClientType_Confidential;
+            $instance            = new Client;
+            $instance->app_name  = $app_name;
+            $instance->app_logo  = $app_logo;
             $instance->client_id = Rand::getString(32, OAuth2Protocol::VsChar, true) . '.openstack.client';
             //only generates secret for confidential clients
             if ($client_type == IClient::ClientType_Confidential)
                 $instance->client_secret = Rand::getString(24, OAuth2Protocol::VsChar, true);
-            $instance->client_type      = $client_type;
-            $instance->application_type = $application_type;
+
+            $instance->client_type          = $client_type;
+            $instance->application_type     = $application_type;
 
             $instance->user_id              = $user_id;
             $instance->active               = true;
@@ -103,10 +107,10 @@ class ClientService implements IClientService
             $instance->website              = $app_url;
             $instance->Save();
             //default allowed url
-            $this->addClientAllowedUri($instance->getId(), 'https://localhost');
+	        $this_var->addClientAllowedUri($instance->getId(), 'https://localhost');
 
             //add default scopes
-            $default_scopes = $this->scope_service->getDefaultScopes();
+            $default_scopes = $scope_service->getDefaultScopes();
 
             foreach($default_scopes as $default_scope){
                 $instance->scopes()->attach($default_scope->id);
@@ -130,10 +134,10 @@ class ClientService implements IClientService
                 throw new AllowedClientUriAlreadyExistsException(sprintf('uri : %s', $uri));
             }
 
-            $client_authorized_uri = new ClientAuthorizedUri;
+            $client_authorized_uri            = new ClientAuthorizedUri;
             $client_authorized_uri->client_id = $id;
             $client_authorized_uri->uri       = $uri;
-            $res = $client_authorized_uri->Save();
+            $res                              = $client_authorized_uri->Save();
         });
         return $res;
     }
@@ -189,6 +193,7 @@ class ClientService implements IClientService
     {
         $new_secret = '';
         DB::transaction(function () use ($id, &$new_secret) {
+
             $client = Client::find($id);
 
             if(is_null($client))
@@ -197,12 +202,12 @@ class ClientService implements IClientService
             if($client->client_type != IClient::ClientType_Confidential)
                 throw new InvalidClientType($id,sprintf("client id %d is not confidential!.",$id));
 
-            $client_secret = Rand::getString(24, OAuth2Protocol::VsChar, true);
+            $client_secret         = Rand::getString(24, OAuth2Protocol::VsChar, true);
             $client->client_secret = $client_secret;
             $client->Save();
-            $token_service = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::TokenService);
+            $token_service         = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::TokenService);
             $token_service->revokeClientRelatedTokens($client->client_id);
-            $new_secret = $client->client_secret;
+            $new_secret            = $client->client_secret;
 
         });
         return $new_secret;
@@ -215,13 +220,16 @@ class ClientService implements IClientService
      */
     public function lockClient($client_id)
     {
-        $res = false;
-        DB::transaction(function () use ($client_id, &$res) {
-            $client = $this->getClientByIdentifier($client_id);
+        $res      = false;
+	    $this_var = $this;
+
+        DB::transaction(function () use ($client_id, &$res, &$this_var) {
+
+            $client = $this_var->getClientByIdentifier($client_id);
             if (is_null($client))
                 throw new AbsentClientException($client_id,sprintf("client id %s does not exists!",$client_id));
             $client->locked = true;
-            $res = $client->Save();
+            $res            = $client->Save();
         });
         return $res;
     }
@@ -233,13 +241,16 @@ class ClientService implements IClientService
      */
     public function unlockClient($client_id)
     {
-        $res = false;
-        DB::transaction(function () use ($client_id, &$res) {
-            $client = $this->getClientByIdentifier($client_id);
+        $res      = false;
+	    $this_var = $this;
+
+        DB::transaction(function () use ($client_id, &$res, &$this_var) {
+
+            $client = $this_var->getClientByIdentifier($client_id);
             if (is_null($client))
                 throw new AbsentClientException($client_id,sprintf("client id %s does not exists!",$client_id));
             $client->locked = false;
-            $res = $client->Save();
+            $res            = $client->Save();
         });
         return $res;
     }
@@ -337,8 +348,11 @@ class ClientService implements IClientService
      */
     public function update($id, array $params)
     {
-        $res = false;
-        DB::transaction(function () use ($id,$params, &$res) {
+        $res      = false;
+	    $this_var = $this;
+
+        DB::transaction(function () use ($id,$params, &$res, &$this_var) {
+
             $client = Client::find($id);
             if(is_null($client))
                 throw new AbsentClientException(sprintf('client id %s does not exists!',$id));
@@ -351,7 +365,7 @@ class ClientService implements IClientService
                     $client->{$param} = $params[$param];
                 }
             }
-            $res = $this->save($client);
+            $res = $this_var->save($client);
         });
         return $res;
     }
@@ -367,6 +381,7 @@ class ClientService implements IClientService
     {
         $res = false;
         DB::transaction(function () use ($id, $origin, &$res) {
+
             $client = Client::find($id);
 
             if (is_null($client))

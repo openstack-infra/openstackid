@@ -59,13 +59,16 @@ class AssociationService implements IAssociationService
                     return null;
                 }
 
+	            $secret_unpack  = \unpack('H*', $assoc->secret);
+	            $secret_unpack  = array_shift($secret_unpack);
                 //repopulate cache
                 $this->cache_service->storeHash($handle, array(
                     "type"         => $assoc->type,
                     "mac_function" => $assoc->mac_function,
                     "issued"       => $assoc->issued,
                     "lifetime"     => $assoc->lifetime,
-                    "secret"       => \bin2hex($assoc->secret),
+                    //"secret"       => \bin2hex($assoc->secret),
+		            "secret"       =>  \unpack('H*',$secret_unpack ),
                     "realm"        => $assoc->realm),
                     $remaining_lifetime);
             }
@@ -87,12 +90,15 @@ class AssociationService implements IAssociationService
                 $this->lock_manager_service->acquireLock($lock_name);
             }
 
-            $assoc = new OpenIdAssociation();
+	        $secret = \pack('H*', $cache_values['secret']);
+            $assoc  = new OpenIdAssociation();
+
             $assoc->type         = $cache_values['type'];
             $assoc->mac_function = $cache_values['mac_function'];
             $assoc->issued       = $cache_values['issued'];
             $assoc->lifetime     = $cache_values['lifetime'];
-            $assoc->secret       = \hex2bin($cache_values['secret']);
+            //$assoc->secret       = \hex2bin($cache_values['secret']);
+	        $assoc->secret       = $secret;
             $realm               = $cache_values['realm'];
             if (!empty($realm))
                 $assoc->realm = $realm;
@@ -153,14 +159,16 @@ class AssociationService implements IAssociationService
             if (is_null($realm))
                 $realm = '';
 
+	        $secret_unpack  = \unpack('H*', $secret);
+	        $secret_unpack = array_shift($secret_unpack);
             $this->cache_service->storeHash($handle, array(
                 "type"         => $type,
                 "mac_function" => $mac_function,
                 "issued"       => $issued,
                 "lifetime"     => $lifetime,
-                "secret"       => \bin2hex($secret),
-                "realm"        => $realm),$lifetime);
-
+                //"secret"       => \bin2hex($secret),
+	            "secret"       => $secret_unpack,
+	            "realm"        => $realm),$lifetime);
 
         } catch (UnacquiredLockException $ex1) {
             throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackPrivateAssociationAlreadyUsed, $handle));

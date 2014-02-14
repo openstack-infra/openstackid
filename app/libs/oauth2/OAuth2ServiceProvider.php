@@ -3,6 +3,7 @@
 namespace oauth2;
 
 use Illuminate\Support\ServiceProvider;
+use App;
 
 class OAuth2ServiceProvider extends ServiceProvider
 {
@@ -12,7 +13,7 @@ class OAuth2ServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->singleton('oauth2\IOAuth2Protocol', 'oauth2\OAuth2Protocol');
+        App::singleton('oauth2\IOAuth2Protocol', 'oauth2\OAuth2Protocol');
     }
 
     public function provides()

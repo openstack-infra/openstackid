@@ -12,14 +12,14 @@
                 <legend>{{ $username }}</legend>
                 @endif
                 @if( $show_pic && !empty($pic))
-                <div class="row">
+                <div class="row-fluid">
                     <div class="span4">
                         <img src="{{ $pic }}" class="img-polaroid">
                     </div>
                 </div>
                 @endif
                 @if( $show_email )
-                    <div class="row email-row">
+                    <div class="row-fluid email-row">
                         <div class="span4">
                              <i class="icon-envelope"></i>
                             <a href="mailto:{{ $email }}">{{ $email }}</a>
@@ -40,14 +40,14 @@
             <legend>{{ $username }}</legend>
             @endif
             @if( $show_pic && !empty($pic))
-            <div class="row">
+            <div class="row-fluid">
                 <div class="span4">
                     <img src="{{ $pic }}" class="img-polaroid">
                 </div>
             </div>
             @endif
             @if( $show_email )
-            <div class="row email-row">
+            <div class="row-fluid email-row">
                 <div class="span4">
                     <i class="icon-envelope"></i>
                     <a href="mailto:{{ $email }}">{{ $email }}</a>

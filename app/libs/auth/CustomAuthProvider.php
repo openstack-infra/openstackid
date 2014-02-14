@@ -64,9 +64,14 @@ class CustomAuthProvider implements UserProviderInterface
      */
     public function retrieveByCredentials(array $credentials)
     {
-        $user = null;
+        $user                   = null;
+	    $user_service           = $this->user_service;
+	    $auth_extension_service = $this->auth_extension_service;
+
         try {
-            DB::transaction(function () use ($credentials, &$user) {
+
+
+            DB::transaction(function () use ($credentials, &$user,&$user_service,&$auth_extension_service) {
 
                 if (!isset($credentials['username']) || !isset($credentials['password']))
                     throw new AuthenticationException("invalid crendentials");
@@ -102,11 +107,9 @@ class CustomAuthProvider implements UserProviderInterface
                     $user = User::where('external_id', '=', $identifier)->first();
                 }
 
-
-
                 $user_name = $member->FirstName . "." . $member->Surname;
                 //do association between user and member
-                $this->user_service->associateUser($user->id, strtolower($user_name));
+	            $user_service->associateUser($user->id, strtolower($user_name));
 
                 //update user fields
                 $user->last_login_date      = gmdate("Y-m-d H:i:s", time());
@@ -119,7 +122,7 @@ class CustomAuthProvider implements UserProviderInterface
                 $user                       = User::where('external_id', '=', $identifier)->first();
                 $user->setMember($member);
 
-                $auth_extensions = $this->auth_extension_service->getExtensions();
+                $auth_extensions = $auth_extension_service->getExtensions();
 
                 foreach($auth_extensions as $auth_extension){
                     $auth_extension->process($user);

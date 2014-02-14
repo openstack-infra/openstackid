@@ -2,7 +2,6 @@
 
 namespace openid\services;
 
-use openid\exceptions\ReplayAttackException;
 use openid\model\OpenIdNonce;
 
 interface INonceService

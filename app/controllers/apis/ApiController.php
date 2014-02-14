@@ -151,8 +151,7 @@ class ApiController extends AbstractRESTController implements ICRUDController
 
     public function updateStatus($id, $active){
         try {
-            $active = is_string($active)?( strtoupper(trim($active))==='TRUE'?true:false ):$active;
-            $res    = $this->api_service->setStatus($id,$active);
+	        $res    = $this->api_service->setStatus($id,$active);
             return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
         }
         catch(InvalidApi $ex1){

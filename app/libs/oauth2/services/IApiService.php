@@ -52,7 +52,7 @@ interface IApiService {
      * @param $active
      * @return bool
      */
-    public function setStatus($id,$active);
+    public function setStatus($id, $active);
 
     /**
      * @param int $page_nbr

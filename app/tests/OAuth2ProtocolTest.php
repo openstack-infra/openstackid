@@ -13,6 +13,16 @@ class OAuth2ProtocolTest extends TestCase
 
     private $current_realm;
 
+	protected function prepareForTests()
+	{
+		parent::prepareForTests();
+		//Route::enableFilters();
+		$this->current_realm = Config::get('app.url');
+		$user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
+		$this->be($user);
+		Session::start();
+	}
+
     /**
      * Get Auth Code Test
      */
@@ -28,9 +38,6 @@ class OAuth2ProtocolTest extends TestCase
             'scope' => sprintf('%s/resource-server/read', $this->current_realm),
         );
 
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-        Auth::login($user);
 
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -63,9 +70,6 @@ class OAuth2ProtocolTest extends TestCase
             OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
         );
 
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-        Auth::login($user);
 
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -124,11 +128,6 @@ class OAuth2ProtocolTest extends TestCase
 
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
             $client_secret = 'ITc/6Y5N7kOtGKhg';
-
-            //do login and consent ...
-            $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-            Auth::login($user);
 
             Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -222,10 +221,6 @@ class OAuth2ProtocolTest extends TestCase
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
             $client_secret = 'ITc/6Y5N7kOtGKhg';
 
-            //do login and consent ...
-            $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-            Auth::login($user);
 
             Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -324,11 +319,6 @@ class OAuth2ProtocolTest extends TestCase
 
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
             $client_secret = 'ITc/6Y5N7kOtGKhg';
-
-            //do login and consent ...
-            $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-            Auth::login($user);
 
             Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -432,11 +422,6 @@ class OAuth2ProtocolTest extends TestCase
 
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
-        //do login and consent ...
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-        Auth::login($user);
-
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $params = array(
@@ -474,11 +459,6 @@ class OAuth2ProtocolTest extends TestCase
     public function testTokenRevocation()
     {
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
-
-        //do login and consent ...
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-        Auth::login($user);
 
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -533,11 +513,6 @@ class OAuth2ProtocolTest extends TestCase
     public function testTokenRevocationInvalidClient()
     {
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
-
-        //do login and consent ...
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-        Auth::login($user);
 
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -594,11 +569,6 @@ class OAuth2ProtocolTest extends TestCase
 
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
-        //do login and consent ...
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-        Auth::login($user);
-
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $params = array(
@@ -653,11 +623,6 @@ class OAuth2ProtocolTest extends TestCase
     {
 
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
-
-        //do login and consent ...
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-        Auth::login($user);
 
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -740,11 +705,4 @@ class OAuth2ProtocolTest extends TestCase
         }
 
     }
-
-    protected function prepareForTests()
-    {
-        parent::prepareForTests();
-        //Route::enableFilters();
-        $this->current_realm = Config::get('app.url');
-    }
-} 
+}

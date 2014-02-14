@@ -53,7 +53,7 @@ class ResourceServerApiTest extends TestCase {
             'host' => 'www.resource.server.2.test.com',
             'ip' => '127.0.0.1',
             'friendly_name' => 'Resource Server 2',
-            'active' => 'true',
+            'active' => true,
         );
 
         $response = $this->action("POST", "ApiResourceServerController@create",
@@ -282,7 +282,7 @@ class ResourceServerApiTest extends TestCase {
         $content = $response->getContent();
 
         $updated_values = json_decode($content);
-        $this->assertTrue($updated_values->active === 0);
+        $this->assertTrue($updated_values->active == '0');
         $this->assertResponseStatus(200);
 
     }

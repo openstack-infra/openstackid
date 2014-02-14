@@ -65,7 +65,8 @@ class ApiEndpointTest extends TestCase {
             'active'             => true,
             'route'              => '/api/v1/api-endpoint/test',
             'http_method'        => 'POST',
-            'api_id'             => $api->id
+            'api_id'             => $api->id,
+	        'allow_cors'        => true
         );
 
         $response = $this->action("POST", "ApiEndpointController@create",
@@ -92,7 +93,8 @@ class ApiEndpointTest extends TestCase {
             'active'             => true,
             'route'              => '/api/v1/api-endpoint/test',
             'http_method'        => 'POST',
-            'api_id'             => $api->id
+            'api_id'             => $api->id,
+	        'allow_cors'        => true
         );
 
         $response = $this->action("POST", "ApiEndpointController@create",
@@ -137,7 +139,8 @@ class ApiEndpointTest extends TestCase {
             'active'             => true,
             'route'              => '/api/v1/api-endpoint/test',
             'http_method'        => 'POST',
-            'api_id'             => $api->id
+            'api_id'             => $api->id,
+	        'allow_cors'        => true
         );
 
         $response = $this->action("POST", "ApiEndpointController@create",
@@ -155,11 +158,11 @@ class ApiEndpointTest extends TestCase {
         $new_id = $json_response->api_endpoint_id;
         //update status
 
-        $response = $this->action("PUT", "ApiEndpointController@updateStatus",array(
-                'id'     => $new_id,
-                'active' => 'false'), array(),
-            array(),
-            array());
+        $response = $this->action(
+	        $method='PUT',
+	        $action="ApiEndpointController@updateStatus",
+	        array('id'     => $new_id, 'active' => 'false')
+	        );
 
         $content = $response->getContent();
 
@@ -173,10 +176,11 @@ class ApiEndpointTest extends TestCase {
             array());
 
         $content = $response->getContent();
+	    $this->assertResponseStatus(200);
 
         $updated_values = json_decode($content);
-        $this->assertTrue($updated_values->active === 0);
-        $this->assertResponseStatus(200);
+        $this->assertTrue($updated_values->active == '0');
+
     }
 
     public function testDeleteExisting(){

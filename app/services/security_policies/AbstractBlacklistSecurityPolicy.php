@@ -50,16 +50,20 @@ abstract class AbstractBlacklistSecurityPolicy implements ISecurityPolicy
             //try to create on db
 
             DB::transaction(function () use ($remote_address, $exception_type, $initial_hits) {
-                $banned_ip = BannedIP::where("ip", "=", $remote_address)->first();
+
+                $banned_ip         = BannedIP::where("ip", "=", $remote_address)->first();
+
                 if (!$banned_ip) {
-                    $banned_ip = new BannedIP();
+                    $banned_ip     = new BannedIP();
                     $banned_ip->ip = $remote_address;
                 }
                 $banned_ip->exception_type = $exception_type;
                 $banned_ip->hits           = $initial_hits;
+
                 if(Auth::check()){
-                    $banned_ip->user_id = Auth::user()->getId();
+                    $banned_ip->user_id    = Auth::user()->getId();
                 }
+
                 $banned_ip->Save();
             });
 

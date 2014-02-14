@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use openid\extensions\OpenIdAuthenticationExtension;
 use openid\services\OpenIdServiceCatalog;
 use utils\services\UtilsServiceCatalog;
+use App;
 
 /**
  * Class OpenIdServiceProvider
@@ -28,13 +29,13 @@ class OpenIdServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('openid\IOpenIdProtocol', 'openid\OpenIdProtocol');
+	    App::singleton('openid\IOpenIdProtocol', 'openid\OpenIdProtocol');
 
-        $auth_extension_service = $this->app->make('auth\\IAuthenticationExtensionService');
+        $auth_extension_service = App::make('auth\\IAuthenticationExtensionService');
 
         if(!is_null($auth_extension_service)){
-            $memento_service              = $this->app->make(OpenIdServiceCatalog::MementoService);
-            $server_configuration_service = $this->app->make(UtilsServiceCatalog::ServerConfigurationService);
+            $memento_service              = App::make(OpenIdServiceCatalog::MementoService);
+            $server_configuration_service = App::make(UtilsServiceCatalog::ServerConfigurationService);
             $auth_extension_service->addExtension(new OpenIdAuthenticationExtension($memento_service,$server_configuration_service));
         }
     }

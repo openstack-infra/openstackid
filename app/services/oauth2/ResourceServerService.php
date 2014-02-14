@@ -41,12 +41,17 @@ class ResourceServerService implements IResourceServerService {
      */
     public function update($id, array $params){
 
-        $res = false;
-        DB::transaction(function () use ($id,$params,&$res) {
+        $res      = false;
+	    $this_var = $this;
+
+        DB::transaction(function () use ($id,$params,&$res, &$this_var) {
+
             $resource_server = ResourceServer::find($id);
-            if(is_null($resource_server))
+
+	        if(is_null($resource_server))
                 throw new InvalidResourceServer(sprintf('resource server id %s does not exists!',$id));
             $allowed_update_params = array('host','ip','active','friendly_name');
+
             foreach($allowed_update_params as $param){
                 if(array_key_exists($param,$params)){
 
@@ -54,14 +59,16 @@ class ResourceServerService implements IResourceServerService {
                         if(ResourceServer::where('host','=',$params[$param])->where('id','<>',$id)->count()>0)
                             throw new InvalidResourceServer(sprintf('there is already another resource server with that hostname (%s).',$params[$param]));
                     }
+
                     if($param =='friendly_name'){
                         if(ResourceServer::where('friendly_name','=',$params[$param])->where('id','<>',$id)->count()>0)
                             throw new InvalidResourceServer(sprintf('there is already another resource server with that friendly name (%s).',$params[$param]));
                     }
+
                     $resource_server->{$param} = $params[$param];
                 }
             }
-            $res = $this->save($resource_server);
+            $res = $this_var->save($resource_server);
         });
         return $res;
     }
@@ -81,12 +88,12 @@ class ResourceServerService implements IResourceServerService {
     /**
      * sets resource server status (active/deactivated)
      * @param $id id of resource server
-     * @param bool $status status (active/non active)
+     * @param bool $active status (active/non active)
      * @return bool
      */
-    public function setStatus($id, $status)
+    public function setStatus($id, $active)
     {
-        return ResourceServer::find($id)->update(array('active'=>$status));
+        return ResourceServer::find($id)->update(array('active'=>$active));
     }
 
     /**
@@ -96,13 +103,17 @@ class ResourceServerService implements IResourceServerService {
      */
     public function delete($id)
     {
-        $res = false;
-        DB::transaction(function () use ($id,&$res) {
+        $res            = false;
+	    $client_service = $this->client_service;
+
+        DB::transaction(function () use ($id,&$res,&$client_service) {
+
             $resource_server = ResourceServer::find($id);
+
             if(!is_null($resource_server)){
                 $client = $resource_server->client()->first();
                 if(!is_null($client)){
-                    $this->client_service->deleteClientByIdentifier($client->id);
+	                $client_service->deleteClientByIdentifier($client->id);
                 }
                 $resource_server->delete();
                 $res = true;
@@ -130,11 +141,14 @@ class ResourceServerService implements IResourceServerService {
      */
     public function add($host, $ip, $friendly_name, $active)
     {
-        $instance = null;
+        $instance       = null;
+	    $client_service = $this->client_service;
+
         if(is_string($active)){
-            $active = $active==='true'?true:false;
+            $active = $active ==='true'?true:false;
         }
-        DB::transaction(function () use ($host, $ip, $friendly_name, $active, &$instance) {
+
+        DB::transaction(function () use ($host, $ip, $friendly_name, $active, &$instance, &$client_service) {
 
             if(ResourceServer::where('host','=',$host)->count()>0)
                 throw new InvalidResourceServer(sprintf('there is already another resource server with that hostname (%s).',$host));
@@ -154,7 +168,7 @@ class ResourceServerService implements IResourceServerService {
             $instance->Save();
 
             // creates a new client for this brand new resource server
-            $new_client = $this->client_service->addClient(IClient::ApplicationType_Service,null,$host.'.confidential.application',$friendly_name.' confidential oauth2 application');
+            $new_client = $client_service->addClient(IClient::ApplicationType_Service,null,$host.'.confidential.application',$friendly_name.' confidential oauth2 application','');
             $new_client->resource_server()->associate($instance);
             $new_client->Save();
         });
@@ -166,13 +180,17 @@ class ResourceServerService implements IResourceServerService {
      * @return bool
      */
     public function regenerateClientSecret($id){
-        $res = null;
-        DB::transaction(function () use ($id,&$res) {
+        $res      = null;
+	    $client_service = $this->client_service;
+
+        DB::transaction(function () use ($id,&$res,&$client_service) {
+
             $resource_server = ResourceServer::find($id);
+
             if(!is_null($resource_server)){
                 $client = $resource_server->client()->first();
                 if(!is_null($client)){
-                    $res = $this->client_service->regenerateClientSecret($client->id);
+                    $res = $client_service->regenerateClientSecret($client->id);
                 }
             }
         });
