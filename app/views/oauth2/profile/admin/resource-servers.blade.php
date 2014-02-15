@@ -110,8 +110,7 @@
                                 'td.ip':'resource_server.ip',
                                 '.resource-server-active-checkbox@value':'resource_server.id',
                                 '.resource-server-active-checkbox@checked':function(arg){
-                                    var active = parseInt(arg.item.active);
-                                    return active===1?'true':'';
+                                    return arg.item.active?'true':'';
                                 },
                                 '.resource-server-active-checkbox@data-resource-server-id':'resource_server.id',
                                 '.resource-server-active-checkbox@id':function(arg){
@@ -183,15 +182,14 @@
       $("body").on('click',".resource-server-active-checkbox",function(event){
           var active = $(this).is(':checked');
           var resource_server_id = $(this).attr('data-resource-server-id');
-          var url    = '{{ URL::action("ApiResourceServerController@updateStatus",array("id"=>"@id","active"=>"@active")) }}';
+          var url    = active? '{{ URL::action("ApiResourceServerController@activate",array("id"=>"@id")) }}':'{{ URL::action("ApiResourceServerController@deactivate",array("id"=>"@id")) }}';
           url        = url.replace('@id',resource_server_id);
-          url        = url.replace('@active',active);
+          var verb   = active?'PUT':'DELETE';
           $.ajax(
               {
-                  type: "PUT",
+                  type: verb,
                   url: url,
                   contentType: "application/json; charset=utf-8",
-                  timeout:60000,
                   success: function (data,textStatus,jqXHR) {
                       //load data...
                   },
@@ -201,7 +199,6 @@
               }
           );
       });
-
 
       $("body").on('click',"#save-resource-server",function(event){
         var is_valid = resource_server_form.valid();

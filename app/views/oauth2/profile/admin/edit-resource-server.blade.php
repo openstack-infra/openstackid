@@ -173,8 +173,7 @@
                             'td.name':'api.name',
                             '.api-active-checkbox@value':'api.id',
                             '.api-active-checkbox@checked':function(arg){
-                                var active = parseInt(arg.item.active);
-                                return active===1?'true':'';
+                                return arg.item.active?'true':'';
                             },
                             '.api-active-checkbox@id':function(arg){
                                 var id = arg.item.id;
@@ -317,12 +316,12 @@
         $("body").on('click',".api-active-checkbox",function(event){
             var active = $(this).is(':checked');
             var api_id = $(this).attr('data-api-id');
-            var url    = '{{ URL::action("ApiController@updateStatus",array("id"=>"@id","active"=>"@active")) }}';
+            var url    = active?'{{ URL::action("ApiController@activate",array("id"=>"@id")) }}':'{{ URL::action("ApiController@deactivate",array("id"=>"@id")) }}';
             url        = url.replace('@id',api_id);
-            url        = url.replace('@active',active);
+            var verb   = active?'PUT':'DELETE';
             $.ajax(
                 {
-                    type: "PUT",
+                    type: verb,
                     url: url,
                     contentType: "application/json; charset=utf-8",
                     timeout:60000,

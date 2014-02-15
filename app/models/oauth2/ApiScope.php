@@ -7,6 +7,26 @@ class ApiScope extends BaseModelEloquent implements IApiScope {
 
     protected $fillable = array('name' ,'short_description', 'description','active','default','system', 'api_id');
 
+	public function getActiveAttribute(){
+		return (bool) $this->attributes['active'];
+	}
+
+	public function getDefaultAttribute(){
+		return (bool) $this->attributes['default'];
+	}
+
+	public function getSystemAttribute(){
+		return (bool) $this->attributes['system'];
+	}
+
+	public function getIdAttribute(){
+		return (int) $this->attributes['id'];
+	}
+
+	public function getApiIdAttribute(){
+		return (int) $this->attributes['api_id'];
+	}
+
     protected $table = 'oauth2_api_scope';
 
     protected $hidden = array('pivot');

@@ -93,7 +93,7 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
 {
 
     Route::group(array('prefix' => 'users'), function(){
-        Route::delete('/{id}/lock',array('before' => 'openstackid.server.admin.json', 'uses' => 'UserApiController@unlock'));
+        Route::delete('/{id}/locked',array('before' => 'openstackid.server.admin.json', 'uses' => 'UserApiController@unlock'));
         Route::delete('/{id}/token/{value}',array('before' => 'is.current.user', 'uses' => 'UserApiController@revokeToken'));
     });
 
@@ -127,10 +127,11 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
         Route::get('/{id}/access-token',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@getAccessTokens'));
         Route::get('/{id}/refresh-token',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@getRefreshTokens'));
         Route::delete('/{id}/token/{value}/{hint}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@revokeToken'));
-        Route::put('/{id}/status/{active}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@updateStatus'));
-
         Route::put('/{id}/scopes/{scope_id}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@addAllowedScope'));
         Route::delete('/{id}/scopes/{scope_id}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@removeAllowedScope'));
+
+	    Route::put('/{id}/active',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@activate'));
+	    Route::delete('/{id}/active',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@deactivate'));
 
     });
 
@@ -141,7 +142,8 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
         Route::delete('/{id}',"ApiResourceServerController@delete");
         Route::put('/',"ApiResourceServerController@update");
         Route::put('/{id}/client-secret',"ApiResourceServerController@regenerateClientSecret");
-        Route::put('/{id}/status/{active}',"ApiResourceServerController@updateStatus");
+        Route::put('/{id}/active',"ApiResourceServerController@activate");
+	    Route::delete('/{id}/active',"ApiResourceServerController@deactivate");
     });
 
     Route::group(array('prefix' => 'apis', 'before' => 'oauth2.server.admin.json'), function(){
@@ -150,7 +152,8 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
         Route::post('/',"ApiController@create");
         Route::delete('/{id}',"ApiController@delete");
         Route::put('/',"ApiController@update");
-        Route::put('/{id}/status/{active}',"ApiController@updateStatus");
+	    Route::put('/{id}/active',"ApiController@activate");
+	    Route::delete('/{id}/active',"ApiController@deactivate");
     });
 
     Route::group(array('prefix' => 'scopes', 'before' => 'oauth2.server.admin.json'), function(){
@@ -159,7 +162,8 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
         Route::post('/',"ApiScopeController@create");
         Route::delete('/{id}',"ApiScopeController@delete");
         Route::put('/',"ApiScopeController@update");
-        Route::put('/{id}/status/{active}',"ApiScopeController@updateStatus");
+	    Route::put('/{id}/active',"ApiScopeController@activate");
+	    Route::delete('/{id}/active',"ApiScopeController@deactivate");
     });
 
     Route::group(array('prefix' => 'endpoints', 'before' => 'oauth2.server.admin.json'), function(){
@@ -168,9 +172,10 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
         Route::post('/',"ApiEndpointController@create");
         Route::delete('/{id}',"ApiEndpointController@delete");
         Route::put('/',"ApiEndpointController@update");
-        Route::put('/{id}/status/{active}',"ApiEndpointController@updateStatus");
         Route::put('/{id}/scope/{scope_id}',"ApiEndpointController@addRequiredScope");
         Route::delete('/{id}/scope/{scope_id}',"ApiEndpointController@removeRequiredScope");
+	    Route::put('/{id}/active',"ApiEndpointController@activate");
+	    Route::delete('/{id}/active',"ApiEndpointController@deactivate");
     });
 });
 

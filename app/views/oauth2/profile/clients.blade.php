@@ -139,8 +139,7 @@ Service Account : The OpenstackId OAuth 2.0 Authorization Server supports server
                                 'td.client-modified':'client.updated_at',
                                 '.app-active-checkbox@value':'client.id',
                                 '.app-active-checkbox@checked':function(arg){
-                                    var client_active = parseInt(arg.item.active);
-                                    return client_active===1?'true':'';
+                                    return arg.item.active?'true':'';
                                 },
                                 '.app-active-checkbox@id':function(arg){
                                     var client_id = arg.item.id;
@@ -152,8 +151,7 @@ Service Account : The OpenstackId OAuth 2.0 Authorization Server supports server
                                     return 'app-locked_'+client_id;
                                 },
                                 '.app-locked-checkbox@checked':function(arg){
-                                    var client_locked = parseInt(arg.item.locked);
-                                    return client_locked===1?'true':'';
+                                    return arg.item.locked?'true':'';
                                 },
                                 'a.edit-client@href':function(arg){
                                     var client_id = arg.item.id;
@@ -261,16 +259,17 @@ Service Account : The OpenstackId OAuth 2.0 Authorization Server supports server
         });
 
         $("body").on('click',".app-active-checkbox",function(event){
+	        var active    = $(this).is(':checked');
             var client_id = $(this).attr('value');
-            var url       = '{{ URL::action("ClientApiController@updateStatus",array("id"=>"@id","active"=>"@active")) }}'
+            var url       = active? '{{ URL::action("ClientApiController@activate",array("id"=>"@id")) }}':'{{ URL::action("ClientApiController@deactivate",array("id"=>"@id")) }}';
             url           = url.replace('@id',client_id);
-            url           = url.replace('@active',$(this).is(':checked'));
+	        var verb      = active?'PUT':'DELETE';
+
             $.ajax(
                 {
-                    type: "PUT",
+                    type: verb,
                     url: url,
                     contentType: "application/json; charset=utf-8",
-                    timeout:60000,
                     success: function (data,textStatus,jqXHR) {
                         //load data...
                     },

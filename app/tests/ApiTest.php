@@ -182,41 +182,33 @@ class ApiTest extends TestCase {
             'resource_server_id' => $resource_server->id,
         );
 
-        $response = $this->action("POST", "ApiController@create",
-            $data,
-            array(),
-            array(),
-            array());
+        $response = $this->action("POST", "ApiController@create",$data);
+	    $this->assertResponseStatus(201);
 
         $content = $response->getContent();
         $json_response = json_decode($content);
 
-        $this->assertResponseStatus(201);
         $this->assertTrue(isset($json_response->api_id) && !empty($json_response->api_id));
 
         $new_id = $json_response->api_id;
         //update status
 
-        $response = $this->action("PUT", "ApiController@updateStatus",array(
-                'id'     => $new_id,
-                'active' => 'false'), array(),
-            array(),
-            array());
+        $response = $this->action("PUT", "ApiController@activate",array('id'     => $new_id));
+	    $this->assertResponseStatus(200);
 
         $content = $response->getContent();
 
         $json_response = json_decode($content);
 
         $this->assertTrue($json_response==='ok');
-        $this->assertResponseStatus(200);
 
-        $response = $this->action("GET", "ApiController@get",$parameters = array('id' => $new_id), array(),
-            array(),
-            array());
+
+        $response = $this->action("GET", "ApiController@get",$parameters = array('id' => $new_id));
+
 	    $this->assertResponseStatus(200);
         $content = $response->getContent();
 	    $updated_values = json_decode($content);
-        $this->assertTrue($updated_values->active == '0');
+        $this->assertTrue($updated_values->active == true);
     }
 
     public function testDeleteExisting(){

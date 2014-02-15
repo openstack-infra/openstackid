@@ -9,6 +9,15 @@ class ResourceServer extends BaseModelEloquent implements IResourceServer {
 
     protected $table = 'oauth2_resource_server';
 
+
+	public function getActiveAttribute(){
+		return (bool) $this->attributes['active'];
+	}
+
+	public function getIdAttribute(){
+		return (int) $this->attributes['id'];
+	}
+
     public function apis()
     {
         return $this->hasMany('Api','resource_server_id');

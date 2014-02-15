@@ -165,19 +165,25 @@ class ApiScopeController extends AbstractRESTController implements ICRUDControll
         }
     }
 
-    /**
-     * @param $id
-     * @param $active
-     * @return mixed
-     */
-    public function updateStatus($id, $active){
+
+    public function activate($id){
         try {
-            $res    = $this->api_scope_service->setStatus($id,$active);
+            $res    = $this->api_scope_service->setStatus($id,true);
             return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
         }
     }
+
+	public function deactivate($id){
+		try {
+			$res    = $this->api_scope_service->setStatus($id,false);
+			return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
+		} catch (Exception $ex) {
+			$this->log_service->error($ex);
+			return $this->error500($ex);
+		}
+	}
 
 }

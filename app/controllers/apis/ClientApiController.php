@@ -281,10 +281,10 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
     }
 
 
-    public function updateStatus($id,$active)
+    public function activate($id)
     {
         try {
-            $res = $this->client_service->activateClient($id, $active);
+            $res = $this->client_service->activateClient($id, true);
             return $res ? $this->ok() : $this->error404(array('error' => 'operation failed'));
         } catch (AbsentClientException $ex1) {
             $this->log_service->error($ex1);
@@ -295,7 +295,22 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
         }
     }
 
-    public function regenerateClientSecret($id)
+	public function deactivate($id)
+	{
+		try {
+			$res = $this->client_service->activateClient($id, false);
+			return $res ? $this->ok() : $this->error404(array('error' => 'operation failed'));
+		} catch (AbsentClientException $ex1) {
+			$this->log_service->error($ex1);
+			return $this->error404(array('error' => $ex1->getMessage()));
+		} catch (Exception $ex) {
+			$this->log_service->error($ex);
+			return $this->error500($ex);
+		}
+	}
+
+
+	public function regenerateClientSecret($id)
     {
         try {
             $res = $this->client_service->regenerateClientSecret($id);

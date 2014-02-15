@@ -7,7 +7,19 @@ class Client extends BaseModelEloquent implements IClient {
 
     protected $table = 'oauth2_client';
 
-    public function access_tokens()
+	public function getActiveAttribute(){
+		return (bool) $this->attributes['active'];
+	}
+
+	public function getIdAttribute(){
+		return (int) $this->attributes['id'];
+	}
+
+	public function getLockedAttribute(){
+		return (int) $this->attributes['locked'];
+	}
+
+	public function access_tokens()
     {
         return $this->hasMany('AccessToken');
     }

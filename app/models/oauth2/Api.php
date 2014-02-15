@@ -9,6 +9,18 @@ class Api extends BaseModelEloquent implements IApi {
 
     protected $table = 'oauth2_api';
 
+	public function getActiveAttribute(){
+		return (bool) $this->attributes['active'];
+	}
+
+	public function getIdAttribute(){
+		return (int) $this->attributes['id'];
+	}
+
+	public function getResourceServerIdAttribute(){
+		return (int) $this->attributes['resource_server_id'];
+	}
+
     public function scopes()
     {
         return $this->hasMany('ApiScope','api_id');

@@ -250,41 +250,21 @@ class ResourceServerApiTest extends TestCase {
             'active' => true,
         );
 
-        $response = $this->action("POST", "ApiResourceServerController@create",
-            $parameters = $data, array(),
-            array(),
-            array());
-
+        $response = $this->action("POST", "ApiResourceServerController@create", $data);
+	    $this->assertResponseStatus(201);
         $content = $response->getContent();
-
         $json_response = json_decode($content);
-
         $new_id = $json_response->resource_server_id;
-
-
-        $response = $this->action("PUT", "ApiResourceServerController@updateStatus",array(
-            'id'     => $new_id,
-            'active' => 'false'), array(),
-            array(),
-            array());
-
+        $response = $this->action("DELETE", "ApiResourceServerController@deactivate",array('id'=> $new_id));
+	    $this->assertResponseStatus(200);
         $content = $response->getContent();
-
         $json_response = json_decode($content);
-
         $this->assertTrue($json_response==='ok');
-        $this->assertResponseStatus(200);
-
-        $response = $this->action("GET", "ApiResourceServerController@get",$parameters = array('id' => $new_id), array(),
-            array(),
-            array());
-
+        $response = $this->action("GET", "ApiResourceServerController@get",$parameters = array('id' => $new_id));
+	    $this->assertResponseStatus(200);
         $content = $response->getContent();
-
         $updated_values = json_decode($content);
-        $this->assertTrue($updated_values->active == '0');
-        $this->assertResponseStatus(200);
-
+        $this->assertTrue($updated_values->active === false);
     }
 
 }

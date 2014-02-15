@@ -7,9 +7,25 @@ class ApiEndpoint extends BaseModelEloquent implements IApiEndpoint{
 
     protected $table = 'oauth2_api_endpoint';
 
-    protected $fillable = array('active' , 'description','active','allow_cors', 'name','route', 'http_method', 'api_id');
+    protected $fillable = array( 'description','active','allow_cors', 'name','route', 'http_method', 'api_id');
 
-    public function api()
+	public function getActiveAttribute(){
+		return (bool) $this->attributes['active'];
+	}
+
+	public function getAllowCorsAttribute(){
+		return (bool) $this->attributes['allow_cors'];
+	}
+
+	public function getApiIdAttribute(){
+		return (int) $this->attributes['api_id'];
+	}
+
+	public function getIdAttribute(){
+		return (int) $this->attributes['id'];
+	}
+
+	public function api()
     {
         return $this->belongsTo('Api');
     }

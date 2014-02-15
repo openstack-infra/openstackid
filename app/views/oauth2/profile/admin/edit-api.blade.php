@@ -290,8 +290,7 @@
                                 //active
                                 '.scope-active-checkbox@value':'scope.id',
                                 '.scope-active-checkbox@checked':function(arg){
-                                    var active = parseInt(arg.item.active);
-                                    return active===1?'true':'';
+                                    return arg.item.active?'true':'';
                                 },
                                 '.scope-active-checkbox@id':function(arg){
                                     var id = arg.item.id;
@@ -301,8 +300,7 @@
                                 //default
                                 '.scope-default-checkbox@value':'scope.id',
                                 '.scope-default-checkbox@checked':function(arg){
-                                    var active = parseInt(arg.item.default);
-                                    return active===1?'true':'';
+                                    return arg.item.default?'true':'';
                                 },
                                 '.scope-default-checkbox@id':function(arg){
                                     var id = arg.item.id;
@@ -312,8 +310,7 @@
                                 //system
                                 '.scope-system-checkbox@value':'scope.id',
                                 '.scope-system-checkbox@checked':function(arg){
-                                    var active = parseInt(arg.item.system);
-                                    return active===1?'true':'';
+                                    return arg.item.system?'true':'';
                                 },
                                 '.scope-system-checkbox@id':function(arg){
                                     var id = arg.item.id;
@@ -377,8 +374,7 @@
                                 //active
                                 '.endpoint-active-checkbox@value':'scope.id',
                                 '.endpoint-active-checkbox@checked':function(arg){
-                                    var active = parseInt(arg.item.active);
-                                    return active===1?'true':'';
+                                    return arg.item.active?'true':'';
                                 },
                                 '.endpoint-active-checkbox@id':function(arg){
                                     var id = arg.item.id;
@@ -464,16 +460,15 @@
             var id     = $(this).attr('data-scope-id');
             var active = $(this).is(':checked');
 
-            var url       = '{{ URL::action("ApiScopeController@updateStatus",array("id"=>"@id","active"=>"@active")) }}';
+            var url       = active?'{{ URL::action("ApiScopeController@activate",array("id"=>"@id")) }}':'{{ URL::action("ApiScopeController@deactivate",array("id"=>"@id")) }}';
             url           = url.replace('@id',id);
-            url           = url.replace('@active',active);
+			var verb      = active?'PUT':'DELETE'
 
             $.ajax(
                 {
-                    type: "PUT",
+                    type: verb,
                     url: url,
                     contentType: "application/json; charset=utf-8",
-                    timeout:60000,
                     success: function (data,textStatus,jqXHR) {
                         //load data...
                     },
@@ -629,15 +624,14 @@
         $("body").on('click','.endpoint-active-checkbox',function(event){
             var id     = $(this).attr('data-endpoint-id');
             var active = $(this).is(':checked');
-            var url       = '{{ URL::action("ApiEndpointController@updateStatus",array("id"=>"@id","active"=>"@active")) }}';
-            url           = url.replace('@id',id);
-            url           = url.replace('@active',active);
+            var url    = active?'{{ URL::action("ApiEndpointController@activate",array("id"=>"@id")) }}':'{{ URL::action("ApiEndpointController@deactivate",array("id"=>"@id")) }}';
+            url        = url.replace('@id',id);
+	        var verb   = active?'PUT':'DELETE';
             $.ajax(
                 {
-                    type: "PUT",
+                    type: verb,
                     url: url,
                     contentType: "application/json; charset=utf-8",
-                    timeout:60000,
                     success: function (data,textStatus,jqXHR) {
                         //load data...
                     },

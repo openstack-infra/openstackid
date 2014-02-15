@@ -132,7 +132,6 @@ class ApiEndpointTest extends TestCase {
 
         $api = Api::where('name','=','api-endpoint')->first();
         $this->assertTrue(!is_null($api));
-
         $data = array(
             'name'               => 'test-api-endpoint',
             'description'        => 'test api endpoint, allows test api endpoints.',
@@ -143,44 +142,25 @@ class ApiEndpointTest extends TestCase {
 	        'allow_cors'        => true
         );
 
-        $response = $this->action("POST", "ApiEndpointController@create",
-            $data,
-            array(),
-            array(),
-            array());
-
+        $response = $this->action("POST", "ApiEndpointController@create", $data);
+	    $this->assertResponseStatus(201);
         $content = $response->getContent();
         $json_response = json_decode($content);
-
-        $this->assertResponseStatus(201);
         $this->assertTrue(isset($json_response->api_endpoint_id) && !empty($json_response->api_endpoint_id));
-
         $new_id = $json_response->api_endpoint_id;
         //update status
 
-        $response = $this->action(
-	        $method='PUT',
-	        $action="ApiEndpointController@updateStatus",
-	        array('id'     => $new_id, 'active' => 'false')
-	        );
-
-        $content = $response->getContent();
-
-        $json_response = json_decode($content);
-
-        $this->assertTrue($json_response==='ok');
-        $this->assertResponseStatus(200);
-
-        $response = $this->action("GET", "ApiEndpointController@get",$parameters = array('id' => $new_id), array(),
-            array(),
-            array());
-
-        $content = $response->getContent();
+        $response = $this->action('DELETE',"ApiEndpointController@deactivate", array('id' => $new_id) );
 	    $this->assertResponseStatus(200);
+        $content = $response->getContent();
+        $json_response = json_decode($content);
+        $this->assertTrue($json_response==='ok');
 
+        $response = $this->action("GET", "ApiEndpointController@get",array('id' => $new_id));
+	    $this->assertResponseStatus(200);
+        $content = $response->getContent();
         $updated_values = json_decode($content);
-        $this->assertTrue($updated_values->active == '0');
-
+        $this->assertTrue($updated_values->active == false);
     }
 
     public function testDeleteExisting(){
@@ -264,25 +244,6 @@ class ApiEndpointTest extends TestCase {
         $response_api_endpoint = json_decode($content);
         $this->assertTrue(is_array($response_api_endpoint->scopes) && count($response_api_endpoint->scopes)==1);
         $this->assertResponseStatus(200);
-    }
-
-    public function testRemoveRequiredScopeMustFail(){
-
-        $api_endpoint = ApiEndpoint::where('name','=','update-api-endpoint-status')->first();
-        $this->assertTrue(!is_null($api_endpoint));
-        $scope        = ApiScope::where('name','=',sprintf('%s/api-endpoint/read',$this->current_realm))->first();
-        $this->assertTrue(!is_null($scope));
-
-        $response = $this->action("DELETE", "ApiEndpointController@removeRequiredScope",array(
-                'id'       => $api_endpoint->id,
-                'scope_id' => $scope->id), array(),
-            array(),
-            array());
-
-        $this->assertResponseStatus(400);
-        $content = $response->getContent();
-        $response = json_decode($content);
-        $this->assertTrue(isset($response->error));
     }
 
 } 

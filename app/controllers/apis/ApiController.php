@@ -149,9 +149,9 @@ class ApiController extends AbstractRESTController implements ICRUDController
         }
     }
 
-    public function updateStatus($id, $active){
+    public function activate($id){
         try {
-	        $res    = $this->api_service->setStatus($id,$active);
+	        $res    = $this->api_service->setStatus($id,true);
             return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
         }
         catch(InvalidApi $ex1){
@@ -163,4 +163,19 @@ class ApiController extends AbstractRESTController implements ICRUDController
             return $this->error500($ex);
         }
     }
+
+	public function deactivate($id){
+		try {
+			$res    = $this->api_service->setStatus($id,false);
+			return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
+		}
+		catch(InvalidApi $ex1){
+			$this->log_service->error($ex1);
+			return $this->error404(array('error'=>$ex1->getMessage()));
+		}
+		catch (Exception $ex) {
+			$this->log_service->error($ex);
+			return $this->error500($ex);
+		}
+	}
 }
