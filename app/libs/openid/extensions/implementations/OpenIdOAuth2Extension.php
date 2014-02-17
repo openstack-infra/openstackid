@@ -2,8 +2,10 @@
 
 namespace openid\extensions\implementations;
 
+use oauth2\IOAuth2Protocol;
+use oauth2\services\IApiScopeService;
+use oauth2\services\IClientService;
 use openid\requests\contexts\PartialView;
-use oauth2\services\OAuth2ServiceCatalog;
 use openid\extensions\OpenIdExtension;
 use openid\OpenIdProtocol;
 use openid\requests\contexts\RequestContext;
@@ -12,8 +14,7 @@ use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
 use Exception;
 
-use utils\services\ServiceLocator;
-use utils\services\UtilsServiceCatalog;
+use utils\services\ICheckPointService;
 use utils\services\ILogService;
 
 use oauth2\requests\OAuth2AuthorizationRequest;
@@ -48,20 +49,30 @@ class OpenIdOAuth2Extension extends OpenIdExtension
     private $client_service;
     private $scope_service;
 
-    /**
-     * @param $name
-     * @param $namespace
-     * @param $view
-     * @param $description
-     */
-    public function __construct($name, $namespace, $view, $description, ILogService $log_service)
+	/**
+	 * @param                    $name
+	 * @param                    $namespace
+	 * @param                    $view_name
+	 * @param                    $description
+	 * @param IOAuth2Protocol    $oauth2_protocol
+	 * @param IClientService     $client_service
+	 * @param IApiScopeService   $scope_service
+	 * @param ICheckPointService $checkpoint_service
+	 * @param ILogService        $log_service
+	 */
+	public function __construct($name, $namespace, $view_name, $description,
+	                            IOAuth2Protocol $oauth2_protocol,
+	                            IClientService $client_service,
+	                            IApiScopeService $scope_service,
+	                            ICheckPointService $checkpoint_service,
+	                            ILogService $log_service)
     {
-        parent::__construct($name, $namespace, $view, $description,$log_service);
+        parent::__construct($name, $namespace, $view_name, $description,$log_service);
 
-        $this->oauth2_protocol     = ServiceLocator::getInstance()->getService('oauth2\IOAuth2Protocol');
-        $this->checkpoint_service  = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
-        $this->client_service      = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ClientService);
-        $this->scope_service       = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ScopeService);
+        $this->oauth2_protocol     = $oauth2_protocol;
+	    $this->client_service      = $client_service;
+	    $this->scope_service       = $scope_service;
+        $this->checkpoint_service  = $checkpoint_service;
     }
 
     /**

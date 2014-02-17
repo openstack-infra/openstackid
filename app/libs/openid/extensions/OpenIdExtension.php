@@ -21,19 +21,21 @@ abstract class OpenIdExtension
     protected $name;
     protected $description;
     protected $view;
+
     protected $log_service;
 
-    /**
-     * @param $name
-     * @param $namespace
-     * @param $view
-     * @param $description
-     */
-    public function __construct($name, $namespace, $view, $description, ILogService $log_service)
+	/**
+	 * @param             $name
+	 * @param             $namespace
+	 * @param             $view_name
+	 * @param             $description
+	 * @param ILogService $log_service
+	 */
+	public function __construct($name, $namespace, $view_name, $description, ILogService $log_service)
     {
-        $this->namespace = $namespace;
-        $this->name = $name;
-        $this->view = $view;
+        $this->namespace   = $namespace;
+        $this->name        = $name;
+        $this->view        = $view_name;
         $this->description = $description;
         $this->log_service = $log_service;
     }

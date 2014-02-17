@@ -27,18 +27,9 @@ class RevokeAuthorizationCodeRelatedTokens implements ISecurityPolicyCounterMeas
         try {
 
             if (!isset($params["auth_code"])) return;
-            //if (!isset($params["client_id"])) return;
-
             $auth_code      = $params["auth_code"];
-            //$client_id      = $params["client_id"];
-
             $token_service   = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::TokenService);
-            //$client_service  = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ClientService);
-
             $token_service->revokeAuthCodeRelatedTokens($auth_code);
-
-            //$client_service->lockClient($client_id);
-
         } catch (Exception $ex) {
             Log::error($ex);
         }
