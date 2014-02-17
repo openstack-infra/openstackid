@@ -27,7 +27,7 @@ class AccessToken extends Token {
         $instance->client_id    = $auth_code->getClientId();
         $instance->auth_code    = $auth_code->getValue();
         $instance->audience     = $auth_code->getAudience();
-        $instance->lifetime     = $lifetime;
+        $instance->lifetime     = intval($lifetime);
         $instance->is_hashed    = false;
         return $instance;
     }
@@ -41,7 +41,7 @@ class AccessToken extends Token {
         $instance->auth_code     = null;
         $instance->audience      = $audience;
         $instance->refresh_token = null;
-        $instance->lifetime      = $lifetime;
+        $instance->lifetime      = intval($lifetime);
         $instance->is_hashed     = false;
         return $instance;
     }
@@ -56,7 +56,7 @@ class AccessToken extends Token {
         $instance->auth_code     = null;
         $instance->refresh_token = $refresh_token;
         $instance->audience      = $refresh_token->getAudience();
-        $instance->lifetime      = $lifetime;
+        $instance->lifetime      = intval($lifetime);
         $instance->is_hashed    =  false;
         return $instance;
     }
@@ -71,7 +71,7 @@ class AccessToken extends Token {
         $instance->audience     = $auth_code->getAudience();
         $instance->from_ip      = $auth_code->getFromIp();
         $instance->issued       = $issued;
-        $instance->lifetime     = $lifetime;
+        $instance->lifetime     = intval($lifetime);
         $instance->is_hashed    = $is_hashed;
         return $instance;
     }

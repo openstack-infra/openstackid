@@ -38,10 +38,10 @@ class AuthorizationCode extends Token {
         $instance = new self();
         $instance->value        = Rand::getString($instance->len, OAuth2Protocol::VsChar, true);
         $instance->scope        = $scope;
-        $instance->user_id     = $user_id;
+        $instance->user_id      = $user_id;
         $instance->redirect_uri = $redirect_uri;
         $instance->client_id    = $client_id;
-        $instance->lifetime     = $lifetime;
+        $instance->lifetime     = intval($lifetime);
         $instance->audience     = $audience;
         $instance->is_hashed    = false;
         $instance->from_ip      = IPHelper::getUserIp();
@@ -69,17 +69,17 @@ class AuthorizationCode extends Token {
      */
     public static function load($value, $user_id, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600, $from_ip = '127.0.0.1',$access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,$approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,$has_previous_user_consent=false,$is_hashed = false){
         $instance = new self();
-        $instance->value        = $value;
-        $instance->user_id      = $user_id;
-        $instance->scope        = $scope;
-        $instance->redirect_uri = $redirect_uri;
-        $instance->client_id    = $client_id;
-        $instance->audience     = $audience;
-        $instance->issued       = $issued;
-        $instance->lifetime     = $lifetime;
-        $instance->from_ip      = $from_ip;
-        $instance->is_hashed    = $is_hashed;
-        $instance->access_type  = $access_type;
+        $instance->value           = $value;
+        $instance->user_id         = $user_id;
+        $instance->scope           = $scope;
+        $instance->redirect_uri    = $redirect_uri;
+        $instance->client_id       = $client_id;
+        $instance->audience        = $audience;
+        $instance->issued          = $issued;
+        $instance->lifetime        = intval($lifetime);
+        $instance->from_ip         = $from_ip;
+        $instance->is_hashed       = $is_hashed;
+        $instance->access_type     = $access_type;
         $instance->approval_prompt = $approval_prompt;
         $instance->has_previous_user_consent = $has_previous_user_consent;
         return $instance;

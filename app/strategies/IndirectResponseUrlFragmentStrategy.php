@@ -27,7 +27,7 @@ class IndirectResponseUrlFragmentStrategy implements IHttpResponseStrategy
             return \View::make('404');
         }
 
-        $return_to = (strpos($return_to, "#") === false) ? $return_to . "#" . $fragment : $return_to . "&" . $fragment;
+        $return_to = (strpos($return_to, "#") == false) ? $return_to . "#" . $fragment : $return_to . "&" . $fragment;
         return Redirect::to($return_to);
     }
 }

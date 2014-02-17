@@ -8,10 +8,11 @@ use openid\helpers\OpenIdCryptoHelper;
 use openid\model\IAssociation;
 use openid\requests\OpenIdDHAssociationSessionRequest;
 use openid\responses\OpenIdDiffieHellmanAssociationSessionResponse;
-use openid\services\OpenIdServiceCatalog;
-use utils\services\ServiceLocator;
-use utils\services\UtilsServiceCatalog;
 use Zend\Crypt\PublicKey\DiffieHellman;
+//services
+use openid\services\IAssociationService;
+use openid\services\IServerConfigurationService;
+use utils\services\ILogService;
 
 class SessionAssociationDHStrategy implements ISessionAssociationStrategy
 {
@@ -19,17 +20,23 @@ class SessionAssociationDHStrategy implements ISessionAssociationStrategy
     private $association_service;
     private $server_configuration_service;
     private $current_request;
-    private $log;
+    private $log_service;
 
-    /**
-     * @param OpenIdDHAssociationSessionRequest $request
-     */
-    public function __construct(OpenIdDHAssociationSessionRequest $request)
+	/**
+	 * @param OpenIdDHAssociationSessionRequest $request
+	 * @param IAssociationService               $association_service
+	 * @param IServerConfigurationService       $server_configuration_service
+	 * @param ILogService                       $log_service
+	 */
+	public function __construct(OpenIdDHAssociationSessionRequest $request,
+                                IAssociationService $association_service,
+                                IServerConfigurationService $server_configuration_service,
+								ILogService $log_service)
     {
-        $this->current_request = $request;
-        $this->association_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::AssociationService);
-        $this->server_configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog:: ServerConfigurationService);
-        $this->log = ServiceLocator::getInstance()->getService(UtilsServiceCatalog:: LogService);
+        $this->current_request              = $request;
+        $this->association_service          = $association_service;
+        $this->server_configuration_service = $server_configuration_service;
+        $this->log_service                  = $log_service;
     }
 
     /**
@@ -64,14 +71,14 @@ class SessionAssociationDHStrategy implements ISessionAssociationStrategy
 
         } catch (InvalidDHParam $exDH) {
             $response = new OpenIdDirectGenericErrorResponse($exDH->getMessage());
-            $this->log->error($exDH);
+            $this->log_service->error($exDH);
         } catch (InvalidArgumentException $exDH1) {
             $response = new OpenIdDirectGenericErrorResponse($exDH1->getMessage());
-            $this->log->error($exDH1);
+            $this->log_service->error($exDH1);
 
         } catch (RuntimeException $exDH2) {
             $response = new OpenIdDirectGenericErrorResponse($exDH2->getMessage());
-            $this->log->error($exDH2);
+            $this->log_service->error($exDH2);
         }
         return $response;
     }

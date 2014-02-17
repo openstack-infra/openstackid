@@ -23,7 +23,7 @@ class CustomValidator extends Validator {
             return true;
         if(is_int($value))
             return true;
-        return strtoupper(trim($value))==='TRUE' || strtoupper(trim($value))==='FALSE' || strtoupper(trim($value))==='1' || strtoupper(trim($value))==='0' ;
+        return strtoupper(trim($value)) =='TRUE' || strtoupper(trim($value))=='FALSE' || strtoupper(trim($value))=='1' || strtoupper(trim($value))=='0' ;
     }
 
     public function validateText($attribute, $value, $parameters)
@@ -81,11 +81,11 @@ class CustomValidator extends Validator {
         if(filter_var($value, FILTER_VALIDATE_URL)){
             $parts = @parse_url($value);
 
-            if ($parts === false) {
+            if ($parts == false) {
                 return false;
             }
 
-            if($parts['scheme']!=='https')
+            if($parts['scheme']!= 'https')
                 return false;
 
             if(isset($parts['query']))

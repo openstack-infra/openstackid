@@ -19,11 +19,10 @@ use oauth2\services\IApiScopeService;
 use oauth2\services\IApiScope;
 use oauth2\services\IClientService;
 use oauth2\services\id;
-use oauth2\services\OAuth2ServiceCatalog;
 use Request;
 use utils\services\IAuthService;
-use utils\services\ServiceLocator;
 use Zend\Math\Rand;
+use Event;
 
 /**
  * Class ClientService
@@ -176,8 +175,7 @@ class ClientService implements IClientService
             if (!is_null($client)) {
                 $client->authorized_uris()->delete();
                 $client->scopes()->detach();
-                $token_service = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::TokenService);
-                $token_service->revokeClientRelatedTokens($client->client_id);
+	            Event::fire('oauth2.client.delete', array($client->client_id));
                 $res = $client->delete();
             }
         });
@@ -205,8 +203,7 @@ class ClientService implements IClientService
             $client_secret         = Rand::getString(24, OAuth2Protocol::VsChar, true);
             $client->client_secret = $client_secret;
             $client->Save();
-            $token_service         = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::TokenService);
-            $token_service->revokeClientRelatedTokens($client->client_id);
+	        Event::fire('oauth2.client.regenerate.secret', array($client->client_id));
             $new_secret            = $client->client_secret;
 
         });

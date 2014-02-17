@@ -10,9 +10,8 @@ use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
-use utils\services\ServiceLocator;
-use utils\services\UtilsServiceCatalog;
 use utils\services\ILogService;
+use utils\services\IAuthService;
 /**
  * Class OpenIdAXExtension
  * Implements
@@ -36,9 +35,22 @@ class OpenIdAXExtension extends OpenIdExtension
     const FetchRequest = "fetch_request";
     public static $available_properties;
 
-    public function __construct($name, $namespace, $view, $description, ILogService $log_service)
+	private $auth_service;
+
+	/**
+	 * @param              $name
+	 * @param              $namespace
+	 * @param              $view_name
+	 * @param              $description
+	 * @param IAuthService $auth_service
+	 * @param ILogService  $log_service
+	 */
+	public function __construct($name, $namespace, $view_name, $description,
+                                IAuthService $auth_service,
+                                ILogService $log_service)
     {
-        parent::__construct($name, $namespace, $view, $description, $log_service);
+        parent::__construct($name, $namespace, $view_name, $description, $log_service);
+	    $this->auth_service = $auth_service;
         self::$available_properties[OpenIdAXExtension::Country] = "http://axschema.org/contact/country/home";
         self::$available_properties[OpenIdAXExtension::Email] = "http://axschema.org/contact/email";
         self::$available_properties[OpenIdAXExtension::FirstMame] = "http://axschema.org/namePerson/first";
@@ -74,8 +86,7 @@ class OpenIdAXExtension extends OpenIdExtension
             $context->addSignParam(self::param(self::Mode));
 
             $attributes   = $ax_request->getRequiredAttributes();
-            $auth_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::AuthenticationService);
-            $user         = $auth_service->getCurrentUser();
+            $user         = $this->auth_service->getCurrentUser();
 
             foreach ($attributes as $attr) {
                 $response->addParam(self::param(self::Type) . "." . $attr, self::$available_properties[$attr]);

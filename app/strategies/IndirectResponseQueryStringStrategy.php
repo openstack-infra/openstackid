@@ -27,7 +27,7 @@ class IndirectResponseQueryStringStrategy implements IHttpResponseStrategy
         if (is_null($return_to) || empty($return_to)) {
             return \View::make('404');
         }
-        $return_to = (strpos($return_to, "?") === false) ? $return_to . "?" . $query_string : $return_to . "&" . $query_string;
+        $return_to = (strpos($return_to, "?") == false) ? $return_to . "?" . $query_string : $return_to . "&" . $query_string;
         return Redirect::to($return_to);
     }
 }

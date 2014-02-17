@@ -143,9 +143,9 @@ class OpenIdCryptoHelper
             return openssl_digest($data, $func, true);
         } else if (function_exists('hash')) {
             return hash($func, $data, true);
-        } else if ($func === 'sha1') {
+        } else if ($func == 'sha1') {
             return sha1($data, true);
-        } else if ($func === 'sha256') {
+        } else if ($func == 'sha256') {
             if (function_exists('mhash')) {
                 return mhash(MHASH_SHA256, $data);
             }

@@ -56,7 +56,7 @@ class OpenIdSignatureBuilder
         $params = $context->getSignParams();
 
         foreach ($params as $key) {
-            if (strpos($key, 'openid.') === 0) {
+            if (strpos($key, 'openid.') == 0) {
                 $val = $response[$key];
                 $key = substr($key, strlen('openid.'));
                 if (!empty($signed)) {

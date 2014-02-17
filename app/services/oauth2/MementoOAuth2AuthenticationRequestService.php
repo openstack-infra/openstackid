@@ -21,7 +21,7 @@ class MementoOAuth2AuthenticationRequestService implements IMementoOAuth2Authent
         $input         = Input::all();
         $oauth2_params = array();
         foreach ($input as $key => $value) {
-            if (array_key_exists($key, OAuth2AuthorizationRequest::$params) === true) {
+            if (array_key_exists($key, OAuth2AuthorizationRequest::$params) == true) {
                 array_push($oauth2_params, $key);
             }
         }
@@ -33,7 +33,7 @@ class MementoOAuth2AuthenticationRequestService implements IMementoOAuth2Authent
             $old_data = Input::old();
             $oauth2_params = array();
             foreach ($old_data as $key => $value) {
-                if (array_key_exists($key, OAuth2AuthorizationRequest::$params) === true) {
+                if (array_key_exists($key, OAuth2AuthorizationRequest::$params) == true) {
                     array_push($oauth2_params, $key);
                 }
             }
@@ -59,7 +59,7 @@ class MementoOAuth2AuthenticationRequestService implements IMementoOAuth2Authent
             $old_data = Input::old();
             $oauth2_params = array();
             foreach ($old_data as $key => $value) {
-                if (array_key_exists($key, OAuth2AuthorizationRequest::$params) === true) {
+                if (array_key_exists($key, OAuth2AuthorizationRequest::$params) == true) {
                     $oauth2_params[$key] = $value;
                 }
             }
@@ -76,7 +76,7 @@ class MementoOAuth2AuthenticationRequestService implements IMementoOAuth2Authent
         $oauth2_params = array();
 
         foreach ($old_data as $key => $value) {
-            if (array_key_exists($key, OAuth2AuthorizationRequest::$params) === true){
+            if (array_key_exists($key, OAuth2AuthorizationRequest::$params) == true){
                 array_push($oauth2_params, $key);
             }
         }

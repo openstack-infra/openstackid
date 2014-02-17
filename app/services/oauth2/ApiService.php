@@ -53,7 +53,7 @@ class ApiService implements  IApiService {
     {
         $instance = null;
         if(is_string($active)){
-            $active = $active==='true'?true:false;
+            $active =  strtoupper($active) == 'TRUE'?true:false;
         }
 
         DB::transaction(function () use ($name, $description, $active, $resource_server_id, &$instance) {

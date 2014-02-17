@@ -22,7 +22,7 @@ class OAuth2IndirectErrorResponseFactoryMethod {
         $response = null;
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
-        if($class_name ==='oauth2\requests\OAuth2AuthorizationRequest'){
+        if($class_name =='oauth2\requests\OAuth2AuthorizationRequest'){
             $response_type = $request->getResponseType();
             switch($response_type){
                 case OAuth2Protocol::OAuth2Protocol_ResponseType_Token:

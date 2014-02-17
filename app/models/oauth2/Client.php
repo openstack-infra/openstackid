@@ -116,7 +116,7 @@ class Client extends BaseModelEloquent implements IClient {
     {
         if(!filter_var($uri, FILTER_VALIDATE_URL)) return false;
         $parts = @parse_url($uri);
-        if ($parts === false) {
+        if ($parts == false) {
             return false;
         }
         if($parts['scheme']!=='https')
@@ -227,7 +227,7 @@ class Client extends BaseModelEloquent implements IClient {
     {
         if(!filter_var($origin, FILTER_VALIDATE_URL)) return false;
         $parts = @parse_url($origin);
-        if ($parts === false) {
+        if ($parts == false) {
             return false;
         }
         if($parts['scheme']!=='https')

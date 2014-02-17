@@ -82,7 +82,7 @@ class RevokeBearerTokenGrantType extends AbstractGrantType
 
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
-        if ($class_name === 'oauth2\requests\OAuth2TokenRevocationRequest') {
+        if ($class_name == 'oauth2\requests\OAuth2TokenRevocationRequest') {
 
             parent::completeFlow($request);
             $token_value = $request->getToken();

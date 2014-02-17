@@ -35,7 +35,7 @@ class AuthorizationCodeRedeemPolicy extends AbstractBlacklistSecurityPolicy {
     {
         try {
             $exception_class = get_class($ex);
-            if($exception_class === 'oauth2\exceptions\ReplayAttackException'){
+            if($exception_class == 'oauth2\exceptions\ReplayAttackException'){
                $auth_code = $ex->getAuthCode();
                $this->counter_measure->trigger(array('auth_code'=>$auth_code));
             }

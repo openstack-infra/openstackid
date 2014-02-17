@@ -30,7 +30,7 @@ class OpenIdAssociation extends Eloquent implements IAssociation
 
     public function getLifetime()
     {
-        return $this->lifetime;
+        return intval($this->lifetime);
     }
 
     public function setLifetime($lifetime)
@@ -76,7 +76,7 @@ class OpenIdAssociation extends Eloquent implements IAssociation
     public function getRemainingLifetime()
     {
         $created_at = new DateTime($this->issued);
-        $created_at->add(new DateInterval('PT' . $this->lifetime . 'S'));
+        $created_at->add(new DateInterval('PT' . intval($this->lifetime) . 'S'));
         $now        = new DateTime(gmdate("Y-m-d H:i:s", time()));
         //check validity...
         if ($now > $created_at)

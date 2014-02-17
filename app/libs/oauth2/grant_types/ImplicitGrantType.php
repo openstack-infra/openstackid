@@ -76,7 +76,7 @@ class ImplicitGrantType extends AbstractGrantType
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
         return
-            ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest' && $request->isValid() && $request->getResponseType() === $this->getResponseType());
+            ($class_name == 'oauth2\requests\OAuth2AuthorizationRequest' && $request->isValid() && $request->getResponseType() == $this->getResponseType());
     }
 
     /** get grant type response type

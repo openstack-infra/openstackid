@@ -22,6 +22,12 @@ class OAuth2UserServiceApiTest  extends TestCase {
 
         $this->current_realm = Config::get('app.url');
 
+	    $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
+
+	    $this->be($user);
+
+	    Session::start();
+
         $scope = array(
             IUserService::UserProfileScope_Address,
             IUserService::UserProfileScope_Email,
@@ -39,9 +45,6 @@ class OAuth2UserServiceApiTest  extends TestCase {
             OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
         );
 
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-
-        Auth::login($user);
 
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 

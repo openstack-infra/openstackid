@@ -145,7 +145,7 @@ class ResourceServerService implements IResourceServerService {
 	    $client_service = $this->client_service;
 
         if(is_string($active)){
-            $active = $active ==='true'?true:false;
+            $active = strtoupper($active) =='TRUE' ?true:false;
         }
 
         DB::transaction(function () use ($host, $ip, $friendly_name, $active, &$instance, &$client_service) {

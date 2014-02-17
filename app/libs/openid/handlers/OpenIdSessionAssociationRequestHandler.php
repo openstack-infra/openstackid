@@ -22,7 +22,9 @@ use utils\services\ICheckPointService;
 class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler
 {
 
-    public function __construct(ILogService $log,ICheckPointService $checkpoint_service, $successor)
+    public function __construct(ILogService $log,
+                                ICheckPointService $checkpoint_service,
+                                $successor)
     {
         parent::__construct($successor, $log,$checkpoint_service);
     }

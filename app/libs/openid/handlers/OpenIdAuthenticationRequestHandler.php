@@ -86,7 +86,8 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     {
         $this->current_request = null;
         try {
-            $this->current_request = new OpenIdAuthenticationRequest($message);
+
+            $this->current_request = new OpenIdAuthenticationRequest($message,$this->server_configuration_service->getUserIdentityEndpointURL('@identifier'));
 
             if (!$this->current_request->isValid()){
                 throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidOpenIdAuthenticationRequestMessage);
@@ -189,7 +190,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         $requested_data = $this->current_request_context->getTrustedData();
         $sites          = $this->trusted_sites_service->getTrustedSites($currentUser, $this->current_request->getRealm(), $requested_data);
         //check trusted sites
-        if (is_null($sites) || count($sites) === 0)
+        if (is_null($sites) || count($sites) == 0)
             return $this->doConsentProcess();
         //there are trusted sites ... check the former authorization decision
         $site   = $sites[0];

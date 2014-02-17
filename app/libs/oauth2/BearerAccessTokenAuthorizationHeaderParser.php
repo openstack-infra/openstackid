@@ -22,7 +22,7 @@ class BearerAccessTokenAuthorizationHeaderParser
 
     public static function getInstance()
     {
-        if (self::$instance === null) {
+        if (self::$instance == null) {
             self::$instance = new BearerAccessTokenAuthorizationHeaderParser();
         }
         return self::$instance;
@@ -49,7 +49,7 @@ class BearerAccessTokenAuthorizationHeaderParser
             } else {
                 $accessTokenValue = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $http_auth_header_value));
             }
-            $accessTokenValue = ($accessTokenValue === 'Bearer') ? '' : $accessTokenValue;
+            $accessTokenValue = ($accessTokenValue == 'Bearer') ? '' : $accessTokenValue;
         }
 
         if (empty($accessTokenValue)) {

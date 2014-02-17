@@ -19,20 +19,28 @@ use oauth2\IResourceServerContext;
 class OAuth2BearerAccessTokenRequestValidator {
 
 
-    protected function headers()
+    protected function getHeaders()
     {
+	    $headers = array();
+
         if (function_exists('getallheaders')) {
             // @codeCoverageIgnoreStart
-            $headers = getallheaders();
+	        foreach(getallheaders() as $name => $value){
+		        $headers[strtolower($name)] = $value;
+	        }
         } else {
             // @codeCoverageIgnoreEnd
-            $headers = array();
-            foreach ($this->server() as $name => $value) {
+            foreach ($_SERVER  as $name => $value) {
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
-                    $headers[$name] = $value;
+                    $headers[strtolower($name)] = $value;
                 }
             }
+
+	        foreach(Request::header() as $name => $value){
+				if(!array_key_exists($name,$headers))
+					$headers[strtolower($name)] = $value[0];
+	        }
         }
         return $headers;
     }
@@ -50,7 +58,7 @@ class OAuth2BearerAccessTokenRequestValidator {
         $this->log_service             = $log_service;
         $this->checkpoint_service      = $checkpoint_service;
         $this->resource_server_context = $resource_server_context;
-        $this->headers                 = $this->headers();
+        $this->headers                 = $this->getHeaders();
     }
 
     /**
@@ -76,7 +84,7 @@ class OAuth2BearerAccessTokenRequestValidator {
             }
 
             //check first http basic auth header
-            $auth_header = isset($this->headers['Authorization'])?$this->headers['Authorization']:null;
+            $auth_header = isset($this->headers['authorization'])?$this->headers['authorization']:null;
             if(!is_null($auth_header) && !empty($auth_header))
                 $access_token_value = BearerAccessTokenAuthorizationHeaderParser::getInstance()->parse($auth_header);
             else{
@@ -103,7 +111,7 @@ class OAuth2BearerAccessTokenRequestValidator {
             $endpoint_scopes = explode(' ',$endpoint->getScope());
             $token_scopes    = explode(' ',$access_token->getScope());
             //check token available scopes vs. endpoint scopes
-            if (count(array_intersect($endpoint_scopes, $token_scopes)) === 0)
+            if (count(array_intersect($endpoint_scopes, $token_scopes)) == 0)
             {
                 $this->log_service->error_msg(sprintf('access token scopes (%s) does not allow to access to api url %s , needed scopes %s',$access_token->getScope(),$url,implode(' OR ',$endpoint_scopes) ));
 

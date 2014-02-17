@@ -5,6 +5,7 @@ namespace services;
 use DB;
 use Exception;
 use Log;
+use oauth2\services\IClientService;
 use oauth2\services\OAuth2ServiceCatalog;
 use utils\services\ISecurityPolicy;
 use utils\services\ISecurityPolicyCounterMeasure;
@@ -24,10 +25,11 @@ class OAuth2SecurityPolicy  implements ISecurityPolicy{
     private $server_configuration_service;
     private $client_service;
 
-    public function __construct(IServerConfigurationService $server_configuration_service)
+    public function __construct(IServerConfigurationService $server_configuration_service, IClientService $client_service)
     {
         $this->server_configuration_service = $server_configuration_service;
-        ;
+	    $this->client_service               = $client_service;
+
         $this->exception_dictionary = array(
             'auth2\exceptions\BearerTokenDisclosureAttemptException' => array('OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts'),
             'auth2\exceptions\InvalidClientException'                => array('OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts'),
@@ -53,7 +55,6 @@ class OAuth2SecurityPolicy  implements ISecurityPolicy{
     {
         try {
             if(get_parent_class($ex)=='oauth2\\exceptions\\OAuth2ClientBaseException'){
-                $this->client_service               = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ClientService);
                 $client_id = $ex->getClientId();
                 //save oauth2 exception by client id
                 if (!is_null($client_id) && !empty($client_id)){

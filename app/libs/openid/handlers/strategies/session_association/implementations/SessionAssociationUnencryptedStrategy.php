@@ -10,11 +10,13 @@ use openid\model\IAssociation;
 use openid\requests\OpenIdAssociationSessionRequest;
 use openid\responses\OpenIdAssociationSessionResponse;
 use openid\responses\OpenIdUnencryptedAssociationSessionResponse;
-use openid\services\OpenIdServiceCatalog;
-use utils\services\ServiceLocator;
-use utils\services\UtilsServiceCatalog;
 use Zend\Crypt\Exception\InvalidArgumentException;
 use Zend\Crypt\Exception\RuntimeException;
+
+//services
+use openid\services\IAssociationService;
+use openid\services\IServerConfigurationService;
+use utils\services\ILogService;
 
 class SessionAssociationUnencryptedStrategy implements ISessionAssociationStrategy {
 
@@ -24,12 +26,15 @@ class SessionAssociationUnencryptedStrategy implements ISessionAssociationStrate
     private $current_request;
     private $log_service;
 
-    public function __construct(OpenIdAssociationSessionRequest $request)
+    public function __construct(OpenIdAssociationSessionRequest $request,
+                                IAssociationService $association_service,
+                                IServerConfigurationService $server_configuration_service,
+                                ILogService $log_service)
     {
         $this->current_request               = $request;
-        $this->association_service           = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::AssociationService);
-        $this->server_configuration_service  = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog:: ServerConfigurationService);
-        $this->log_service                   = ServiceLocator::getInstance()->getService(UtilsServiceCatalog:: LogService);
+        $this->association_service           = $association_service;
+        $this->server_configuration_service  = $server_configuration_service;
+        $this->log_service                   = $log_service;
     }
 
     /**

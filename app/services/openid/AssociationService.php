@@ -67,8 +67,7 @@ class AssociationService implements IAssociationService
                     "mac_function" => $assoc->mac_function,
                     "issued"       => $assoc->issued,
                     "lifetime"     => $assoc->lifetime,
-                    //"secret"       => \bin2hex($assoc->secret),
-		            "secret"       =>  \unpack('H*',$secret_unpack ),
+		            "secret"       => \unpack('H*',$secret_unpack ),
                     "realm"        => $assoc->realm),
                     $remaining_lifetime);
             }
@@ -96,8 +95,7 @@ class AssociationService implements IAssociationService
             $assoc->type         = $cache_values['type'];
             $assoc->mac_function = $cache_values['mac_function'];
             $assoc->issued       = $cache_values['issued'];
-            $assoc->lifetime     = $cache_values['lifetime'];
-            //$assoc->secret       = \hex2bin($cache_values['secret']);
+            $assoc->lifetime     = intval($cache_values['lifetime']);
 	        $assoc->secret       = $secret;
             $realm               = $cache_values['realm'];
             if (!empty($realm))
@@ -146,7 +144,7 @@ class AssociationService implements IAssociationService
             $assoc->secret       = $secret;
             $assoc->type         = $type;
             $assoc->mac_function = $mac_function;
-            $assoc->lifetime     = $lifetime;
+            $assoc->lifetime     = intval($lifetime);
             $assoc->issued       = $issued;
 
             if (!is_null($realm))
@@ -159,14 +157,14 @@ class AssociationService implements IAssociationService
             if (is_null($realm))
                 $realm = '';
 
-	        $secret_unpack  = \unpack('H*', $secret);
+	        $secret_unpack = \unpack('H*', $secret);
 	        $secret_unpack = array_shift($secret_unpack);
+
             $this->cache_service->storeHash($handle, array(
                 "type"         => $type,
                 "mac_function" => $mac_function,
                 "issued"       => $issued,
                 "lifetime"     => $lifetime,
-                //"secret"       => \bin2hex($secret),
 	            "secret"       => $secret_unpack,
 	            "realm"        => $realm),$lifetime);
 

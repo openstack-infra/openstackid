@@ -185,7 +185,7 @@ class CORSMiddleware {
             $preflight = false;
 
             //preflight checks
-            if ($method === 'OPTIONS') {
+            if ($method == 'OPTIONS') {
                 $request_method  = $request->headers->get('Access-Control-Request-Method');
                 if(!is_null($request_method)){
                     // sets the original method on request in order to be able to find the

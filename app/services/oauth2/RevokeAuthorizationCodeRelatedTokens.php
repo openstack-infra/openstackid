@@ -4,8 +4,7 @@ namespace services\oauth2;
 
 use Exception;
 use Log;
-use oauth2\services\OAuth2ServiceCatalog;
-use utils\services\ServiceLocator;
+use oauth2\services\ITokenService;
 use utils\services\ISecurityPolicyCounterMeasure;
 
 
@@ -22,23 +21,22 @@ use utils\services\ISecurityPolicyCounterMeasure;
  */
 class RevokeAuthorizationCodeRelatedTokens implements ISecurityPolicyCounterMeasure {
 
+
+	private $token_service;
+
+	/**
+	 * @param ITokenService $token_service
+	 */
+	public function __construct(ITokenService $token_service){
+		$this->token_service = $token_service;
+	}
+
     public function trigger(array $params = array())
     {
         try {
-
             if (!isset($params["auth_code"])) return;
-            //if (!isset($params["client_id"])) return;
-
             $auth_code      = $params["auth_code"];
-            //$client_id      = $params["client_id"];
-
-            $token_service   = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::TokenService);
-            //$client_service  = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ClientService);
-
-            $token_service->revokeAuthCodeRelatedTokens($auth_code);
-
-            //$client_service->lockClient($client_id);
-
+	        $this->token_service->revokeAuthCodeRelatedTokens($auth_code);
         } catch (Exception $ex) {
             Log::error($ex);
         }

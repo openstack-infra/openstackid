@@ -195,7 +195,7 @@ class ApiEndpointService implements IApiEndpointService {
 
             $res = $api_endpoint->scopes()->where('id','=',$scope_id)->count();
 
-            if($res===0)
+            if($res==0)
                 throw new InvalidApiScope(sprintf("api scope id %s does not belongs to endpoint id %s !.",$scope_id,$api_endpoint->id));
 
             $api_endpoint->scopes()->detach($scope_id);

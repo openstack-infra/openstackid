@@ -39,7 +39,7 @@ class RefreshBearerTokenGrantType extends AbstractGrantType {
     {
         $reflector = new ReflectionClass($request);
         $class_name = $reflector->getName();
-        return $class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() === $this->getType();
+        return $class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() && $request->getGrantType() == $this->getType();
     }
 
     /** Not implemented , there is no first process phase on this grant type

@@ -819,7 +819,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'create-resource-server',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-servers',
+                'route'           => '/api/v1/resource-servers',
                 'http_method'     => 'POST'
             )
         );
@@ -829,7 +829,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'get-resource-server',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-servers/{id}',
+                'route'           => '/api/v1/resource-servers/{id}',
                 'http_method'     => 'GET'
             )
         );
@@ -839,7 +839,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-regenerate-secret',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-servers/{id}/client-secret',
+                'route'           => '/api/v1/resource-servers/{id}/client-secret',
                 'http_method'     => 'PUT'
             )
         );
@@ -849,7 +849,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-get-page',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-servers',
+                'route'           => '/api/v1/resource-servers',
                 'http_method'     => 'GET'
             )
         );
@@ -859,7 +859,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-delete',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-servers/{id}',
+                'route'           => '/api/v1/resource-servers/{id}',
                 'http_method'     => 'DELETE'
             )
         );
@@ -869,7 +869,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-update',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-servers',
+                'route'           => '/api/v1/resource-servers',
                 'http_method'     => 'PUT'
             )
         );
@@ -879,7 +879,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'resource-server-update-status',
                 'active'          =>  true,
                 'api_id'          => $resource_server->id,
-                'route'           => 'api/v1/resource-servers/{id}/status/{active}',
+                'route'           => '/api/v1/resource-servers/{id}/status/{active}',
                 'http_method'     => 'PUT'
             )
         );
@@ -941,7 +941,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'get-api',
                 'active'          =>  true,
                 'api_id'          => $api_api->id,
-                'route'           => 'api/v1/api/{id}',
+                'route'           => '/api/v1/api/{id}',
                 'http_method'     => 'GET'
             )
         );
@@ -952,7 +952,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'delete-api',
                 'active'          =>  true,
                 'api_id'          => $api_api->id,
-                'route'           => 'api/v1/api/{id}',
+                'route'           => '/api/v1/api/{id}',
                 'http_method'     => 'DELETE'
             )
         );
@@ -962,7 +962,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'create-api',
                 'active'          =>  true,
                 'api_id'          => $api_api->id,
-                'route'           => 'api/v1/api',
+                'route'           => '/api/v1/api',
                 'http_method'     => 'POST'
             )
         );
@@ -972,7 +972,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'update-api',
                 'active'          =>  true,
                 'api_id'          => $api_api->id,
-                'route'           => 'api/v1/api',
+                'route'           => '/api/v1/api',
                 'http_method'     => 'PUT'
             )
         );
@@ -982,7 +982,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'update-api-status',
                 'active'          =>  true,
                 'api_id'          => $api_api->id,
-                'route'           => 'api/v1/api/status/{id}/{active}',
+                'route'           => '/api/v1/api/status/{id}/{active}',
                 'http_method'     => 'GET'
             )
         );
@@ -992,7 +992,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'api-get-page',
                 'active'          =>  true,
                 'api_id'          => $api_api->id,
-                'route'           => 'api/v1/api/{page_nbr}/{page_size}',
+                'route'           => '/api/v1/api/{page_nbr}/{page_size}',
                 'http_method'     => 'GET'
             )
         );
@@ -1037,7 +1037,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'get-api-endpoint',
                 'active'          =>  true,
                 'api_id'          => $api_api_endpoint->id,
-                'route'           => 'api/v1/api-endpoint/{id}',
+                'route'           => '/api/v1/api-endpoint/{id}',
                 'http_method'     => 'GET'
             )
         );
@@ -1047,7 +1047,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'delete-api-endpoint',
                 'active'          =>  true,
                 'api_id'          => $api_api_endpoint->id,
-                'route'           => 'api/v1/api-endpoint/{id}',
+                'route'           => '/api/v1/api-endpoint/{id}',
                 'http_method'     => 'DELETE'
             )
         );
@@ -1057,7 +1057,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'create-api-endpoint',
                 'active'          =>  true,
                 'api_id'          => $api_api_endpoint->id,
-                'route'           => 'api/v1/api-endpoint',
+                'route'           => '/api/v1/api-endpoint',
                 'http_method'     => 'POST'
             )
         );
@@ -1067,7 +1067,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'update-api-endpoint',
                 'active'          =>  true,
                 'api_id'          => $api_api_endpoint->id,
-                'route'           => 'api/v1/api-endpoint',
+                'route'           => '/api/v1/api-endpoint',
                 'http_method'     => 'PUT'
             )
         );
@@ -1077,7 +1077,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'update-api-endpoint-status',
                 'active'          =>  true,
                 'api_id'          => $api_api_endpoint->id,
-                'route'           => 'api/v1/api-endpoint/status/{id}/{active}',
+                'route'           => '/api/v1/api-endpoint/status/{id}/{active}',
                 'http_method'     => 'GET'
             )
         );
@@ -1087,7 +1087,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'api-endpoint-get-page',
                 'active'          =>  true,
                 'api_id'          => $api_api_endpoint->id,
-                'route'           => 'api/v1/api-endpoint/{page_nbr}/{page_size}',
+                'route'           => '/api/v1/api-endpoint/{page_nbr}/{page_size}',
                 'http_method'     => 'GET'
             )
         );
@@ -1098,7 +1098,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'add-api-endpoint-scope',
                 'active'          =>  true,
                 'api_id'          => $api_api_endpoint->id,
-                'route'           => 'api/v1/api-endpoint/scope/add/{id}/{scope_id}',
+                'route'           => '/api/v1/api-endpoint/scope/add/{id}/{scope_id}',
                 'http_method'     => 'GET'
             )
         );
@@ -1108,7 +1108,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'remove-api-endpoint-scope',
                 'active'          =>  true,
                 'api_id'          => $api_api_endpoint->id,
-                'route'           => 'api/v1/api-endpoint/scope/remove/{id}/{scope_id}',
+                'route'           => '/api/v1/api-endpoint/scope/remove/{id}/{scope_id}',
                 'http_method'     => 'GET'
             )
         );
@@ -1165,7 +1165,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'get-scope',
                 'active'          =>  true,
                 'api_id'          => $api_scope->id,
-                'route'           => 'api/v1/api-scope/{id}',
+                'route'           => '/api/v1/api-scope/{id}',
                 'http_method'     => 'GET'
             )
         );
@@ -1176,7 +1176,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'delete-scope',
                 'active'          =>  true,
                 'api_id'          => $api_scope->id,
-                'route'           => 'api/v1/api-scope/{id}',
+                'route'           => '/api/v1/api-scope/{id}',
                 'http_method'     => 'DELETE'
             )
         );
@@ -1186,7 +1186,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'create-scope',
                 'active'          =>  true,
                 'api_id'          => $api_scope->id,
-                'route'           => 'api/v1/api-scope',
+                'route'           => '/api/v1/api-scope',
                 'http_method'     => 'POST'
             )
         );
@@ -1196,7 +1196,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'update-scope',
                 'active'          =>  true,
                 'api_id'          => $api_scope->id,
-                'route'           => 'api/v1/api-scope',
+                'route'           => '/api/v1/api-scope',
                 'http_method'     => 'PUT'
             )
         );
@@ -1206,7 +1206,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'update-scope-status',
                 'active'          =>  true,
                 'api_id'          => $api_scope->id,
-                'route'           => 'api/v1/api-scope/status/{id}/{active}',
+                'route'           => '/api/v1/api-scope/status/{id}/{active}',
                 'http_method'     => 'GET'
             )
         );
@@ -1216,7 +1216,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'scope-get-page',
                 'active'          =>  true,
                 'api_id'          => $api_scope->id,
-                'route'           => 'api/v1/api-scope/{page_nbr}/{page_size}',
+                'route'           => '/api/v1/api-scope/{page_nbr}/{page_size}',
                 'http_method'     => 'GET'
             )
         );
@@ -1260,7 +1260,7 @@ class TestSeeder extends Seeder {
                 'name'            => 'get-user-info',
                 'active'          =>  true,
                 'api_id'          => $users->id,
-                'route'           => 'api/v1/users/me',
+                'route'           => '/api/v1/users/me',
                 'http_method'     => 'GET'
             )
         );

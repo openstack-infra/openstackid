@@ -27,7 +27,7 @@ class AccessToken extends Eloquent {
     public function isVoid(){
         //check lifetime...
         $created_at = $this->created_at;
-        $created_at->add(new DateInterval('PT' . $this->lifetime . 'S'));
+        $created_at->add(new DateInterval('PT' . intval($this->lifetime) . 'S'));
         $now        = new DateTime(gmdate("Y-m-d H:i:s", time()));
         return ($now > $created_at);
     }
@@ -43,9 +43,9 @@ class AccessToken extends Eloquent {
     public function getRemainingLifetime()
     {
         //check is refresh token is stills alive... (ZERO is infinite lifetime)
-        if ($this->lifetime === 0) return 0;
+        if (intval($this->lifetime) == 0) return 0;
         $created_at = new DateTime($this->created_at);
-        $created_at->add(new DateInterval('PT' . $this->lifetime . 'S'));
+        $created_at->add(new DateInterval('PT' . intval($this->lifetime) . 'S'));
         $now = new DateTime(gmdate("Y-m-d H:i:s", time()));
         //check validity...
         if ($now > $created_at)

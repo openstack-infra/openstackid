@@ -3,19 +3,18 @@
 namespace openid\requests;
 
 use openid\OpenIdMessage;
-use utils\services\ServiceLocator;
-use utils\services\UtilsServiceCatalog;
 
+/**
+ * Class OpenIdRequest
+ * @package openid\requests
+ */
 abstract class OpenIdRequest
 {
 
     protected $message;
-    protected $log_service;
-
     public function __construct(OpenIdMessage $message)
     {
         $this->message     = $message;
-        $this->log_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::LogService);
     }
 
     public function getMessage()
