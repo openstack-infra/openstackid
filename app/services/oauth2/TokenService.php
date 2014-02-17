@@ -32,6 +32,8 @@ use Zend\Crypt\Hash;
 
 use utils\services\ICacheService;
 use  utils\services\IAuthService;
+
+use Event;
 /**
  * Class TokenService
  * Provides all Tokens related operations (create, get and revoke)
@@ -68,6 +70,18 @@ class TokenService implements ITokenService
         $this->cache_service         = $cache_service;
         $this->auth_service          = $auth_service;
         $this->user_consent_service  = $user_consent_service;
+
+	    $this_var = $this;
+	    
+	    Event::listen('oauth2.client.delete', function($client_id) use (&$this_var)
+	    {
+		    $this_var->revokeClientRelatedTokens($client_id);
+	    });
+
+	    Event::listen('oauth2.client.regenerate.secret', function($client_id) use (&$this_var)
+	    {
+		    $this_var->revokeClientRelatedTokens($client_id);
+	    });
     }
 
     /**

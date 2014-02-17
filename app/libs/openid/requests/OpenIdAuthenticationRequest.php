@@ -2,22 +2,32 @@
 
 namespace openid\requests;
 
+use openid\exceptions\InvalidOpenIdMessageException;
 use openid\helpers\OpenIdUriHelper;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
-
-use openid\services\OpenIdServiceCatalog;
-use utils\services\ServiceLocator;
-use Exception;
-
-
+/**
+ * Class OpenIdAuthenticationRequest
+ * @package openid\requests
+ */
 class OpenIdAuthenticationRequest extends OpenIdRequest
 {
 
+	private $user_identity_endpoint;
 
-    public function __construct(OpenIdMessage $message)
+	/**
+	 * @param OpenIdMessage $message
+	 * @param null          $user_identity_endpoint
+	 */
+	public function __construct(OpenIdMessage $message, $user_identity_endpoint = null)
     {
         parent::__construct($message);
+	    $this->user_identity_endpoint = $user_identity_endpoint;
+	    if(!empty($this->user_identity_endpoint)){
+		    if(!str_contains($this->user_identity_endpoint,'@identifier')){
+			    throw new InvalidOpenIdMessageException("user_identity_endpoint value  must contain @identifier placeholder!.");
+		    }
+	    }
     }
 
     public static function IsOpenIdAuthenticationRequest(OpenIdMessage $message)
@@ -34,24 +44,24 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
 
     public function isValid()
     {
-        $res = true;
-        try{
-            $return_to   = $this->getReturnTo();
-            $claimed_id  = $this->getClaimedId();
-            $identity    = $this->getIdentity();
-            $mode        = $this->getMode();
-            $realm       = $this->getRealm();
-            $valid_realm = OpenIdUriHelper::checkRealm($realm, $return_to);
-            $valid_id    = $this->isValidIdentifier($claimed_id, $identity);
 
-            $res = !empty($return_to)
+        $return_to   = $this->getReturnTo();
+        $claimed_id  = $this->getClaimedId();
+        $identity    = $this->getIdentity();
+        $mode        = $this->getMode();
+        $realm       = $this->getRealm();
+	    $valid_id    = $this->isValidIdentifier($claimed_id, $identity);
+	    $valid_realm = OpenIdUriHelper::checkRealm($realm, $return_to);
+
+	    $res = !empty($return_to)
             && !empty($realm)
             && $valid_realm
             && !empty($claimed_id)
             && !empty($identity)
             && $valid_id
             && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
-            if(!$res){
+
+        if(!$res){
                 $msg = sprintf("return_to is empty? %b.",empty($return_to)).PHP_EOL;
                 $msg = $msg.sprintf("realm is empty? %b.",empty($realm)).PHP_EOL;
                 $msg = $msg.sprintf("claimed_id is empty? %b.",empty($claimed_id)).PHP_EOL;
@@ -59,13 +69,9 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
                 $msg = $msg.sprintf("mode is empty? %b.",empty($mode)).PHP_EOL;
                 $msg = $msg.sprintf("is valid realm? %b.",$valid_realm).PHP_EOL;
                 $msg = $msg.sprintf("is valid identifier? %b.",$valid_id).PHP_EOL;
-                $this->log_service->warning_msg($msg);
-            }
+                throw new InvalidOpenIdMessageException($msg);
         }
-        catch(Exception $ex){
-            $this->log_service->error($ex);
-            $res = false;
-        }
+
         return $res;
     }
 
@@ -100,12 +106,13 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
         return false;
     }
 
-    /**
-     * @param $claimed_id The Claimed Identifier.
-     * @param $identity The OP-Local Identifier.
-     * @return bool
-     */
-    private function isValidIdentifier($claimed_id, $identity)
+	/**
+	 * @param $claimed_id
+	 * @param $identity
+	 * @return bool
+	 * @throws \openid\exceptions\InvalidOpenIdMessageException
+	 */
+	private function isValidIdentifier($claimed_id, $identity)
     {
         /*
          * openid.claimed_id" and "openid.identity" SHALL be either both present or both absent.
@@ -113,7 +120,9 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
          * other information in its payload, using extensions.
          */
 
-        $server_configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::ServerConfigurationService);
+		if(empty($this->user_identity_endpoint))
+			throw new InvalidOpenIdMessageException("user_identity_endpoint is not set");
+
         if (is_null($claimed_id) && is_null($identity))
             return false;
         //http://specs.openid.net/auth/2.0/identifier_select
@@ -121,7 +130,7 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
             return true;
 
         if (OpenIdUriHelper::isValidUrl($claimed_id) && OpenIdUriHelper::isValidUrl($identity)) {
-            $identity_url_pattern = $server_configuration_service->getUserIdentityEndpointURL("@identifier");
+            $identity_url_pattern = $this->user_identity_endpoint;
             $url_parts = explode("@", $identity_url_pattern, 2);
             $base_identity_url = $url_parts[0];
             if (strpos($identity, $base_identity_url) !== false)

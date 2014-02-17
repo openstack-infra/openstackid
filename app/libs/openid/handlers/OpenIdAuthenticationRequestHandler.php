@@ -86,7 +86,8 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     {
         $this->current_request = null;
         try {
-            $this->current_request = new OpenIdAuthenticationRequest($message);
+
+            $this->current_request = new OpenIdAuthenticationRequest($message,$this->server_configuration_service->getUserIdentityEndpointURL('@identifier'));
 
             if (!$this->current_request->isValid()){
                 throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidOpenIdAuthenticationRequestMessage);

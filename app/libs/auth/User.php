@@ -6,8 +6,6 @@ use Illuminate\Auth\UserInterface;
 use Member;
 use MemberPhoto;
 use openid\model\IOpenIdUser;
-use openid\services\OpenIdServiceCatalog;
-use utils\services\ServiceLocator;
 use oauth2\models\IOAuth2User;
 use Eloquent;
 use utils\model\BaseModelEloquent;
@@ -214,8 +212,7 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
         if (!is_null($photoId) && is_numeric($photoId) && $photoId > 0) {
             $photo                            = MemberPhoto::where('ID', '=', $photoId)->first();
             if(!is_null($photo)){
-                $server_configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::ServerConfigurationService);
-                $url                          = $server_configuration_service->getConfigValue("Assets.Url").$photo->Filename;
+                $url                          = $photo->Filename;
             }
         }
         return $url;

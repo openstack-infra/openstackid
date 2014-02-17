@@ -9,11 +9,9 @@ use openid\requests\contexts\RequestContext;
 use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
-use utils\services\ServiceLocator;
-use utils\services\UtilsServiceCatalog;
-use Exception;
+use utils\services\IAuthService;
 use utils\services\ILogService;
-
+use Exception;
 /**
  * Class OpenIdSREGExtension
  * Implements http://openid.net/specs/openid-simple-registration-extension-1_0.html
@@ -42,9 +40,22 @@ class OpenIdSREGExtension extends OpenIdExtension
 
     public static $available_properties;
 
-    public function __construct($name, $namespace, $view, $description, ILogService $log_service)
+	private $auth_service;
+
+	/**
+	 * @param              $name
+	 * @param              $namespace
+	 * @param              $view_name
+	 * @param              $description
+	 * @param IAuthService $auth_service
+	 * @param ILogService  $log_service
+	 */
+	public function __construct($name, $namespace, $view_name , $description,
+                                IAuthService $auth_service,
+                                ILogService $log_service)
     {
-        parent::__construct($name, $namespace, $view, $description,$log_service);
+        parent::__construct($name, $namespace, $view_name, $description,$log_service);
+	    $this->auth_service = $auth_service;
         self::$available_properties[OpenIdSREGExtension::Nickname] = OpenIdSREGExtension::Nickname;
         self::$available_properties[OpenIdSREGExtension::Email] = OpenIdSREGExtension::Email;
         self::$available_properties[OpenIdSREGExtension::FullName] = OpenIdSREGExtension::FullName;
@@ -91,8 +102,7 @@ class OpenIdSREGExtension extends OpenIdExtension
             $opt_attributes = $simple_reg_request->getOptionalAttributes();
             $attributes = array_merge($attributes, $opt_attributes);
 
-            $auth_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::AuthenticationService);
-            $user = $auth_service->getCurrentUser();
+            $user = $this->auth_service->getCurrentUser();
 
             foreach ($attributes as $attr => $value) {
                 $context->addSignParam(self::param($attr));
