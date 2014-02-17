@@ -19,6 +19,7 @@ use openid\services\IAssociationService;
 use openid\services\INonceService;
 use utils\services\ILogService;
 use utils\services\ICheckPointService;
+use utils\services\IServerConfigurationService;
 
 /**
  * Class OpenIdCheckAuthenticationRequestHandler
@@ -34,16 +35,28 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
 
     private $association_service;
     private $nonce_service;
+	private $configuration_service;
 
-    public function __construct(IAssociationService $association_service,
+	/**
+	 * @param IAssociationService         $association_service
+	 * @param INonceService               $nonce_service
+	 * @param ILogService                 $log_service
+	 * @param ICheckPointService          $checkpoint_service
+	 * @param IServerConfigurationService $configuration_service
+	 * @param                             $successor
+	 */
+	public function __construct(IAssociationService $association_service,
                                 INonceService $nonce_service,
                                 ILogService $log_service,
                                 ICheckPointService $checkpoint_service,
+	                            IServerConfigurationService $configuration_service,
                                 $successor)
     {
         parent::__construct($successor, $log_service, $checkpoint_service);
-        $this->association_service = $association_service;
-        $this->nonce_service =   $nonce_service;
+
+        $this->association_service   = $association_service;
+        $this->nonce_service         = $nonce_service;
+	    $this->configuration_service = $configuration_service;
     }
 
     protected function internalHandle(OpenIdMessage $message)
@@ -75,6 +88,9 @@ class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
                 throw new InvalidAssociationTypeException(OpenIdErrorMessages::InvalidAssociationTypeMessage);
 
             $claimed_nonce = new OpenIdNonce($this->current_request->getNonce());
+
+	        if(!$claimed_nonce->isValid(intval($this->configuration_service->getConfigValue('Nonce.Lifetime'))))
+				throw new InvalidNonce();
 
             $this->nonce_service->lockNonce($claimed_nonce);
 

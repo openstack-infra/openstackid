@@ -19,6 +19,8 @@ use openid\services\IServerConfigurationService;
 use openid\services\INonceService;
 use utils\services\IAuthService;
 use utils\services\ICheckPointService;
+use utils\services\IServerConfigurationService as IUtilsServerConfigurationService;
+
 
 
 
@@ -139,10 +141,11 @@ class OpenIdProtocol implements IOpenIdProtocol
                                 IServerConfigurationService $server_config_service,
                                 INonceService $nonce_service,
                                 ILogService $log_service,
-                                ICheckPointService $checkpoint_service)
+                                ICheckPointService $checkpoint_service,
+                                IUtilsServerConfigurationService $utils_configuration_service)
     {
         //create chain of responsibility
-        $check_auth                     = new OpenIdCheckAuthenticationRequestHandler($association_service, $nonce_service, $log_service,$checkpoint_service,  null);
+        $check_auth                     = new OpenIdCheckAuthenticationRequestHandler($association_service, $nonce_service, $log_service,$checkpoint_service,$utils_configuration_service,  null);
         $session_assoc                  = new OpenIdSessionAssociationRequestHandler($log_service,$checkpoint_service, $check_auth);
         $this->request_handlers         = new OpenIdAuthenticationRequestHandler($auth_service, $memento_request_service, $auth_strategy, $server_extension_service, $association_service, $trusted_sites_service, $server_config_service, $nonce_service, $log_service,$checkpoint_service, $session_assoc);
         $this->server_extension_service = $server_extension_service;

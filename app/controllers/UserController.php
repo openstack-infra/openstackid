@@ -5,9 +5,7 @@ use oauth2\services\IClientService;
 use oauth2\services\IMementoOAuth2AuthenticationRequestService;
 use oauth2\services\ITokenService;
 use oauth2\services\IResourceServerService;
-use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\IMementoOpenIdRequestService;
-use openid\services\IServerConfigurationService;
 use openid\services\ITrustedSitesService;
 use openid\services\IUserService;
 use openid\XRDS\XRDSDocumentBuilder;
@@ -16,10 +14,8 @@ use services\IUserActionService;
 use strategies\DefaultLoginStrategy;
 use strategies\OAuth2ConsentStrategy;
 use strategies\OAuth2LoginStrategy;
-use strategies\OpenIdConsentStrategy;
-use strategies\OpenIdLoginStrategy;
 use utils\services\IAuthService;
-
+use utils\services\IServerConfigurationService as IUtilsServerConfigurationService;
 
 class UserController extends BaseController
 {
@@ -37,6 +33,7 @@ class UserController extends BaseController
     private $scope_service;
     private $token_service;
     private $resource_server_service;
+	private $utils_configuration_service;
 
     public function __construct(IMementoOpenIdRequestService $openid_memento_service,
                                 IMementoOAuth2AuthenticationRequestService $oauth2_memento_service,
@@ -49,7 +46,9 @@ class UserController extends BaseController
                                 IClientService $client_service,
                                 IApiScopeService $scope_service,
                                 ITokenService $token_service,
-                                IResourceServerService $resource_server_service)
+                                IResourceServerService $resource_server_service,
+                                IUtilsServerConfigurationService $utils_configuration_service
+								)
     {
         $this->openid_memento_service = $openid_memento_service;
         $this->oauth2_memento_service = $oauth2_memento_service;
@@ -63,6 +62,7 @@ class UserController extends BaseController
         $this->scope_service = $scope_service;
         $this->token_service = $token_service;
         $this->resource_server_service = $resource_server_service;
+	    $this->utils_configuration_service = $utils_configuration_service;
         //filters
         $this->beforeFilter('csrf', array('only' => array('postLogin', 'postConsent')));
 
@@ -183,6 +183,11 @@ class UserController extends BaseController
             if ($current_user && $current_user->getIdentifier() != $user->getIdentifier()) {
                 $another_user = true;
             }
+
+	        $assets_url                   = $this->utils_configuration_service->getConfigValue("Assets.Url");
+	        $pic_url                      = $user->getPic();
+	        $pic_url = str_contains($pic_url,'http')?$pic_url:$assets_url.$pic_url;
+
             $params = array(
                 'show_fullname' => $user->getShowProfileFullName(),
                 'username' => $user->getFullName(),
@@ -190,7 +195,7 @@ class UserController extends BaseController
                 'email' => $user->getEmail(),
                 'identifier' => $user->getIdentifier(),
                 'show_pic' => $user->getShowProfilePic(),
-                'pic' => $user->getPic(),
+                'pic' => $pic_url,
                 'another_user' => $another_user,
             );
             return View::make("identity", $params);

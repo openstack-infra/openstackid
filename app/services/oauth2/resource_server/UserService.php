@@ -8,7 +8,7 @@ use oauth2\IResourceServerContext;
 use utils\services\ILogService;
 use openid\services\IUserService as IAPIUserService;
 use Exception;
-
+use utils\services\IServerConfigurationService;
 /**
  * Class UserService
  * OAUTH2 Protected Endpoint
@@ -17,10 +17,15 @@ use Exception;
 class UserService extends OAuth2ProtectedService implements IUserService {
 
     private $user_service;
+	private $configuration_service;
 
-    public function __construct(IAPIUserService $user_service, IResourceServerContext $resource_server_context, ILogService $log_service){
+    public function __construct(IAPIUserService $user_service,
+                                IResourceServerContext $resource_server_context,
+                                IServerConfigurationService $configuration_service,
+                                ILogService $log_service){
         parent::__construct($resource_server_context,$log_service);
-        $this->user_service = $user_service;
+        $this->user_service         = $user_service;
+	    $this->configuration_service = $configuration_service;
     }
 
     /**
@@ -52,10 +57,13 @@ class UserService extends OAuth2ProtectedService implements IUserService {
             }
             if(in_array(self::UserProfileScope_Profile, $scopes)){
                 // Address Claim
-                $data['name']         = $current_user->getFirstName();
+	            $assets_url                   = $this->configuration_service->getConfigValue('Assets.Url');
+	            $pic_url                      = $current_user->getPic();
+	            $pic_url = str_contains($pic_url,'http')?$pic_url:$assets_url.$pic_url;
+	            $data['name']         = $current_user->getFirstName();
                 $data['family_name']  = $current_user->getLastName();
                 $data['nickname']     = $current_user->getNickName();
-                $data['picture']      = $current_user->getPic();
+                $data['picture']      = $pic_url;
                 $data['birthdate']    = $current_user->getDateOfBirth();
                 $data['gender']       = $current_user->getGender();
             }

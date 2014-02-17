@@ -4,8 +4,6 @@ namespace openid\model;
 
 use openid\exceptions\InvalidNonce;
 use openid\helpers\OpenIdErrorMessages;
-use utils\services\ServiceLocator;
-use utils\services\UtilsServiceCatalog;
 
 class OpenIdNonce
 {
@@ -63,18 +61,18 @@ class OpenIdNonce
         return $this->$unique_id;
     }
 
-    /**
-     * The time-stamp MAY be used to reject responses that are too far away from the current time,
-     * limiting the amount of time that nonces must be stored to prevent attacks.
-     * The acceptable range is out of the scope of this specification.
-     * A larger range requires storing more nonces for a longer time.
-     * A shorter range increases the chance that clock-skew and transaction time will cause
-     * a spurious rejection.
-     */
-    public function isValid()
+   	/**
+	 * The time-stamp MAY be used to reject responses that are too far away from the current time,
+	 * limiting the amount of time that nonces must be stored to prevent attacks.
+	 * The acceptable range is out of the scope of this specification.
+	 * A larger range requires storing more nonces for a longer time.
+	 * A shorter range increases the chance that clock-skew and transaction time will cause
+	 * a spurious rejection.
+	 * @param $allowed_skew
+	 * @return bool
+	 */
+	public function isValid($allowed_skew)
     {
-        $server_configuration_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::ServerConfigurationService);
-        $allowed_skew                 = $server_configuration_service->getConfigValue("Nonce.Lifetime");
         $now = time();
         // Time after which we should not use the nonce
         $past = $now - $allowed_skew;
