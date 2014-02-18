@@ -111,38 +111,37 @@ Route::filter('ajax', function()
 
 Route::filter("openid.needs.auth.request", function () {
 
-    $memento_service = App::make(OpenIdServiceCatalog::MementoService);
+    $memento_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::MementoService);
     $openid_message = $memento_service->getCurrentRequest();
 
     if ($openid_message == null || !$openid_message->isValid())
         throw new InvalidOpenIdMessageException();
-
-    $auth_request = new OpenIdAuthenticationRequest($openid_message);
+	$configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::ServerConfigurationService);
+    $auth_request          = new OpenIdAuthenticationRequest($openid_message, $configuration_service->getUserIdentityEndpointURL('@identifier'));
     if (!$auth_request->isValid())
         throw new InvalidOpenIdMessageException();
 });
 
 Route::filter("openid.save.request", function () {
 
-    $memento_service = App::make(OpenIdServiceCatalog::MementoService);
+    $memento_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::MementoService);
     $memento_service->saveCurrentRequest();
 
 });
 
 Route::filter("oauth2.save.request", function () {
 
-    $memento_service = App::make(OAuth2ServiceCatalog::MementoService);
+    $memento_service = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::MementoService);
     $memento_service->saveCurrentAuthorizationRequest();
 });
 
 Route::filter("oauth2.needs.auth.request", function () {
 
-    $memento_service = App::make(OAuth2ServiceCatalog::MementoService);
-    $oauth2_message = $memento_service->getCurrentAuthorizationRequest();
+    $memento_service = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::MementoService);
+    $oauth2_message  = $memento_service->getCurrentAuthorizationRequest();
 
     if ($oauth2_message == null || !$oauth2_message->isValid())
         throw new InvalidAuthorizationRequestException();
-
 });
 
 Route::filter("ssl", function () {
@@ -150,7 +149,7 @@ Route::filter("ssl", function () {
         $openid_memento_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::MementoService);
         $openid_memento_service->saveCurrentRequest();
 
-        $oauth2_memento_service = App::make(OAuth2ServiceCatalog::MementoService);
+        $oauth2_memento_service = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::MementoService);
         $oauth2_memento_service->saveCurrentAuthorizationRequest();
 
         return Redirect::secure(Request::getRequestUri());
@@ -159,8 +158,8 @@ Route::filter("ssl", function () {
 
 Route::filter('user.owns.client.policy',function($route, $request){
     try{
-        $authentication_service = App::make(UtilsServiceCatalog::AuthenticationService);
-        $client_service         = App::make(OAuth2ServiceCatalog::ClientService);
+        $authentication_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::AuthenticationService);
+        $client_service         = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ClientService);
         $client_id              = $route->getParameter('id');
         $client                 = $client_service->getClientByIdentifier($client_id);
         $user                   = $authentication_service->getCurrentUser();
@@ -175,7 +174,7 @@ Route::filter('user.owns.client.policy',function($route, $request){
 
 Route::filter('is.current.user',function($route, $request){
     try{
-        $authentication_service = App::make(UtilsServiceCatalog::AuthenticationService);
+        $authentication_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::AuthenticationService);
         $used_id                = Input::get('user_id',null);
 
         if(is_null($used_id))

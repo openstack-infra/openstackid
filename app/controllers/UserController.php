@@ -9,7 +9,10 @@ use openid\services\IMementoOpenIdRequestService;
 use openid\services\ITrustedSitesService;
 use openid\services\IUserService;
 use openid\services\IServerConfigurationService;
+use openid\requests\OpenIdAuthenticationRequest;
 use openid\XRDS\XRDSDocumentBuilder;
+use strategies\OpenIdLoginStrategy;
+use strategies\OpenIdConsentStrategy;
 use utils\IPHelper;
 use services\IUserActionService;
 use strategies\DefaultLoginStrategy;
@@ -73,16 +76,16 @@ class UserController extends BaseController
             //openid stuff
             $this->beforeFilter('openid.save.request');
             $this->beforeFilter('openid.needs.auth.request', array('only' => array('getConsent')));
-            $this->login_strategy = new OpenIdLoginStrategy($openid_memento_service, $user_action_service, $auth_service);
+            $this->login_strategy   = new OpenIdLoginStrategy($openid_memento_service, $user_action_service, $auth_service);
             $this->consent_strategy = new OpenIdConsentStrategy($openid_memento_service, $auth_service, $server_configuration_service, $user_action_service);
         } else if (!is_null($oauth2_msg) && $oauth2_msg->isValid()) {
             $this->beforeFilter('oauth2.save.request');
             $this->beforeFilter('oauth2.needs.auth.request', array('only' => array('getConsent')));
-            $this->login_strategy = new OAuth2LoginStrategy();
+            $this->login_strategy   = new OAuth2LoginStrategy();
             $this->consent_strategy = new OAuth2ConsentStrategy($auth_service, $oauth2_memento_service, $scope_service, $client_service);
         } else {
             //default stuff
-            $this->login_strategy = new DefaultLoginStrategy($user_action_service, $auth_service);
+            $this->login_strategy   = new DefaultLoginStrategy($user_action_service, $auth_service);
             $this->consent_strategy = null;
         }
     }
