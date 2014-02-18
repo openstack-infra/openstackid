@@ -61,11 +61,15 @@ class TrustedSitesService implements ITrustedSitesService
             //get current scheme
             $schema      = $this->getScheme($realm);
             //build query....
-            $query = OpenIdTrustedSite::where("user_id", "=", $user->getId());
+            $query       = OpenIdTrustedSite::where("user_id", "=", $user->getId());
             //add or condition for all given sub-domains
-            foreach ($sub_domains as $sub_domain) {
-                $query = $query->orWhere(function ($query_aux) use ($sub_domain,$schema) {
-                    $query_aux->where('realm', '=', $schema.$sub_domain);
+            if(count($sub_domains)){
+                $query = $query->where(function($query) use($sub_domains,$schema){
+                    foreach ($sub_domains as $sub_domain) {
+                        $query = $query->orWhere(function ($query_aux) use ($sub_domain,$schema) {
+                            $query_aux->where('realm', '=', $schema.$sub_domain);
+                        });
+                    }
                 });
             }
             //add conditions for all possible pre approved data

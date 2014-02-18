@@ -342,9 +342,17 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
             break;
             case IAuthService::AuthorizationResponse_DenyForever:
             {
+
+                $this->current_request_context->cleanTrustedData();
+                foreach ($this->extensions as $ext) {
+                    $data = $ext->getTrustedData($this->current_request);
+                    $this->current_request_context->setTrustedData($data);
+                }
+
+                $this->trusted_sites_service->addTrustedSite($currentUser, $this->current_request->getRealm(), IAuthService::AuthorizationResponse_DenyForever,$this->current_request_context->getTrustedData());
                 $this->memento_service->clearCurrentRequest();
                 $this->auth_service->clearUserAuthorizationResponse();
-                $this->trusted_sites_service->addTrustedSite($currentUser, $this->current_request->getRealm(), IAuthService::AuthorizationResponse_DenyForever);
+
                 return new OpenIdNonImmediateNegativeAssertion($this->current_request->getReturnTo());
             }
                 break;
