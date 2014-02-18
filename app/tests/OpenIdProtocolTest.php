@@ -23,7 +23,7 @@ class OpenIdProtocolTest extends TestCase
     private $mod;
     private $oauth2_client_id;
     private $oauth2_client_secret;
-
+	private $user;
     public function __construct(){
         //DH openid values
         $this->g                    = '2';
@@ -40,8 +40,9 @@ class OpenIdProtocolTest extends TestCase
         Route::enableFilters();
         $this->current_realm = Config::get('app.url');
 
-	    $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
-	    $this->be($user);
+	    $this->user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
+
+	    $this->be($this->user);
 	    Session::start();
     }
 
@@ -304,9 +305,17 @@ class OpenIdProtocolTest extends TestCase
     }
 
 
-    public function testAuthenticationCheckImmediateAuthenticationPrivateSession(){
+	public function testAuthenticationCheckImmediateAuthenticationPrivateSession(){
         //set login info
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+
+	    //add trusted site
+	    $site          = new OpenIdTrustedSite;
+	    $site->realm   = 'https://www.test.com/';
+	    $site->policy  = IAuthService::AuthorizationResponse_AllowForever;
+	    $site->user_id = $this->user->getId();
+	    $site->data    = json_encode(array());
+	    $site->Save();
 
         $params = array(
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
@@ -350,6 +359,40 @@ class OpenIdProtocolTest extends TestCase
         $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]));
         $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]));
     }
+
+
+	/**
+	 */
+	public function testAuthenticationCheckImmediateAuthenticationPrivateSession_SetupNeeded(){
+		//set login info
+		Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+		$this->user->trusted_sites()->delete();
+		$params = array(
+			OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
+			OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)      => OpenIdProtocol::ImmediateMode,
+			OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)     => "https://www.test.com/",
+			OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)  => "https://www.test.com/oauth2",
+			OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)  => "http://specs.openid.net/auth/2.0/identifier_select",
+			OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
+		);
+
+		$response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
+
+		$this->assertResponseStatus(302);
+
+		$openid_response = $this->parseOpenIdResponse($response->getTargetUrl());
+
+		$this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)]));
+		$this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)]));
+
+		$this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)]));
+		$this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)]));
+		$this->assertTrue($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)]==OpenIdProtocol::SetupNeededMode );
+
+		$this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]));
+		$this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]));
+		$this->assertTrue($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]=='https://www.test.com/oauth2');
+	}
 
 
     //extension tests

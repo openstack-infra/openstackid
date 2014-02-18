@@ -58,16 +58,14 @@ class TrustedSitesService implements ITrustedSitesService
         try {
             //get all possible sub-domains
             $sub_domains = $this->getSubDomains($realm);
-            //get current scheme
-            $schema      = $this->getScheme($realm);
             //build query....
-            $query       = OpenIdTrustedSite::where("user_id", "=", $user->getId());
+            $query       = OpenIdTrustedSite::where("user_id", "=", intval($user->getId()));
             //add or condition for all given sub-domains
             if(count($sub_domains)){
-                $query = $query->where(function($query) use($sub_domains,$schema){
+                $query = $query->where(function($query) use($sub_domains){
                     foreach ($sub_domains as $sub_domain) {
-                        $query = $query->orWhere(function ($query_aux) use ($sub_domain,$schema) {
-                            $query_aux->where('realm', '=', $schema.$sub_domain);
+                        $query = $query->orWhere(function ($query_aux) use ($sub_domain) {
+                            $query_aux->where('realm', '=', $sub_domain);
                         });
                     }
                 });
@@ -120,19 +118,25 @@ class TrustedSitesService implements ITrustedSitesService
      */
     private function getSubDomains($url)
     {
-        $res = array();
-        $url = strtolower($url);
-        $url = parse_url($url);
-        $authority = $url['host'];
-        $components = explode('.', $authority);
-        $len = count($components);
+        $res             = array();
+        $url             = strtolower($url);
+	    $scheme          = $this->getScheme($url);
+		//add entire url as first domain
+	    array_push($res,$url);
+	    $ends_with_slash = substr($url, -1) == '/';
+        $url             = parse_url($url);
+        $authority       = $url['host'];
+        $components      = explode('.', $authority);
+        $len             = count($components);
+
         for ($i = 0; $i < $len; $i++) {
             if ($components[$i] == '*') continue;
             $str = '';
             for ($j = $i; $j < $len; $j++)
                 $str .= $components[$j] . '.';
             $str = trim($str, '.');
-            array_push($res, '*.' . $str);
+	        $str = $ends_with_slash?$str.'/':$str ;
+            array_push($res,$scheme. '*.' . $str);
         }
         return $res;
     }
