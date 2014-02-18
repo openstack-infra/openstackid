@@ -18,11 +18,13 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
     }
 
     public static $params = array(
-        OAuth2Protocol::OAuth2Protocol_ResponseType => OAuth2Protocol::OAuth2Protocol_ResponseType,
-        OAuth2Protocol::OAuth2Protocol_ClientId     => OAuth2Protocol::OAuth2Protocol_ClientId,
-        OAuth2Protocol::OAuth2Protocol_RedirectUri  => OAuth2Protocol::OAuth2Protocol_RedirectUri,
-        OAuth2Protocol::OAuth2Protocol_Scope        => OAuth2Protocol::OAuth2Protocol_Scope,
-        OAuth2Protocol::OAuth2Protocol_State        => OAuth2Protocol::OAuth2Protocol_State
+        OAuth2Protocol::OAuth2Protocol_ResponseType     => OAuth2Protocol::OAuth2Protocol_ResponseType,
+        OAuth2Protocol::OAuth2Protocol_ClientId         => OAuth2Protocol::OAuth2Protocol_ClientId,
+        OAuth2Protocol::OAuth2Protocol_RedirectUri      => OAuth2Protocol::OAuth2Protocol_RedirectUri,
+        OAuth2Protocol::OAuth2Protocol_Scope            => OAuth2Protocol::OAuth2Protocol_Scope,
+        OAuth2Protocol::OAuth2Protocol_State            => OAuth2Protocol::OAuth2Protocol_State,
+	    OAuth2Protocol::OAuth2Protocol_Approval_Prompt  => OAuth2Protocol::OAuth2Protocol_Approval_Prompt,
+	    OAuth2Protocol::OAuth2Protocol_AccessType       => OAuth2Protocol::OAuth2Protocol_AccessType,
     );
 
     /**

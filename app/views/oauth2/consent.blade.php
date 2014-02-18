@@ -37,7 +37,7 @@
             <p class="privacy-policy">
                 ** <b>{{$app_name}}</b> Application and <b>Openstack</b> will use this information in accordance with their respective terms of service and privacy policies.
             </p>
-            {{ Form::open(array('url' => '/accounts/user/consent','id'=>'authorization_form', 'method' => 'post',  "autocomplete" => "off")) }}
+            {{ Form::open(array('url' => URL::action("UserController@postConsent") ,'id'=>'authorization_form', 'method' => 'post',  "autocomplete" => "off")) }}
                 <input type="hidden"  name='trust' id='trust' value=""/>
                 <button class="btn" id="cancel-authorization" type="button">Cancel</button>
                 <button class="btn btn-primary" id="approve-authorization" type="button">Accept</button>

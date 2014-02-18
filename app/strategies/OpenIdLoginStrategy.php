@@ -60,10 +60,7 @@ class OpenIdLoginStrategy implements ILoginStrategy
 
     public function  cancelLogin()
     {
-        $msg = $this->memento_service->getCurrentRequest();
-        $cancel_response = new OpenIdNonImmediateNegativeAssertion();
-        $cancel_response->setReturnTo($msg->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo));
-        $strategy = OpenIdResponseStrategyFactoryMethod::buildStrategy($cancel_response);
-        return $strategy->handle($cancel_response);
+	    $this->auth_service->setUserAuthenticationResponse(IAuthService::AuthenticationResponse_Cancel);
+	    return Redirect::action("OpenIdProviderController@endpoint");
     }
 }

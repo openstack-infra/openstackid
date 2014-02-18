@@ -61,7 +61,6 @@ class AuthService implements IAuthService
 
     public function setUserAuthorizationResponse($auth_response)
     {
-        //todo : check valid response
         Session::set("openid.authorization.response", $auth_response);
     }
 
@@ -81,4 +80,27 @@ class AuthService implements IAuthService
     {
         return User::find($id);
     }
+
+	// Authentication
+
+	public function getUserAuthenticationResponse()
+	{
+		if (Session::has("openstackid.authentication.response")) {
+			$value = Session::get("openstackid.authentication.response");
+			return $value;
+		}
+		return IAuthService::AuthenticationResponse_None;
+	}
+
+	public function setUserAuthenticationResponse($auth_response)
+	{
+		Session::set("openstackid.authentication.response", $auth_response);
+	}
+
+	public function clearUserAuthenticationResponse()
+	{
+		if (Session::has("openstackid.authentication.response")) {
+			Session::remove("openstackid.authentication.response");
+		}
+	}
 }

@@ -145,6 +145,17 @@ class AuthorizationCodeGrantType extends AbstractGrantType
                 throw new ScopeNotAllowedException(sprintf("scope %s", $scope));
 
             $state = $request->getState();
+
+	        $authentication_response = $this->auth_service->getUserAuthenticationResponse();
+
+	        if($authentication_response == IAuthService::AuthenticationResponse_Cancel){
+		        //clear saved data ...
+		        $this->memento_service->clearCurrentRequest();
+		        $this->auth_service->clearUserAuthenticationResponse();
+		        $this->auth_service->clearUserAuthorizationResponse();
+		        throw new AccessDeniedException;
+	        }
+
             //check user logged
             if (!$this->auth_service->isUserLogged()) {
                 $this->memento_service->saveCurrentAuthorizationRequest();

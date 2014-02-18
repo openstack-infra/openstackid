@@ -72,6 +72,7 @@ class UserController extends BaseController
 
         $openid_msg = $this->openid_memento_service->getCurrentRequest();
         $oauth2_msg = $this->oauth2_memento_service->getCurrentAuthorizationRequest();
+
         if (!is_null($openid_msg) && $openid_msg->isValid() && OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($openid_msg)) {
             //openid stuff
             $this->beforeFilter('openid.save.request');
@@ -81,7 +82,7 @@ class UserController extends BaseController
         } else if (!is_null($oauth2_msg) && $oauth2_msg->isValid()) {
             $this->beforeFilter('oauth2.save.request');
             $this->beforeFilter('oauth2.needs.auth.request', array('only' => array('getConsent')));
-            $this->login_strategy   = new OAuth2LoginStrategy();
+            $this->login_strategy   = new OAuth2LoginStrategy($auth_service, $oauth2_memento_service ,$user_action_service);
             $this->consent_strategy = new OAuth2ConsentStrategy($auth_service, $oauth2_memento_service, $scope_service, $client_service);
         } else {
             //default stuff

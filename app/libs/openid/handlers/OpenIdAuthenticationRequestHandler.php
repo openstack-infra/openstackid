@@ -151,7 +151,16 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
     private function doSetupMode()
     {
 
-        if (!$this->auth_service->isUserLogged())
+	    $authentication_response = $this->auth_service->getUserAuthenticationResponse();
+	    if($authentication_response == IAuthService::AuthenticationResponse_Cancel){
+		    //clear saved data ...
+		    $this->memento_service->clearCurrentRequest();
+		    $this->auth_service->clearUserAuthenticationResponse();
+		    $this->auth_service->clearUserAuthorizationResponse();
+		    return new OpenIdNonImmediateNegativeAssertion($this->current_request->getReturnTo());
+	    }
+
+	    if (!$this->auth_service->isUserLogged())
             return $this->doLogin();
 
         //user already logged
@@ -163,7 +172,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         $current_identity   = $this->current_request->getIdentity();
         // check is claimed identity match with current one
         // if not logs out and do re login
-        $current_user = $this->auth_service->getCurrentUser();
+        $current_user       = $this->auth_service->getCurrentUser();
         if (is_null($current_user))
             throw new Exception("User not set!");
 
@@ -372,6 +381,7 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         if (!$this->auth_service->isUserLogged()) {
             return new OpenIdImmediateNegativeAssertion($this->current_request->getReturnTo());
         }
+
         $currentUser = $this->auth_service->getCurrentUser();
 
         $this->current_request_context->cleanTrustedData();

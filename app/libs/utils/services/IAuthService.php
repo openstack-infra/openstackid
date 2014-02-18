@@ -11,6 +11,9 @@ interface IAuthService
     const AuthorizationResponse_DenyForever  = "DenyForever";
     const AuthorizationResponse_DenyOnce     = "DenyOnce";
 
+	const AuthenticationResponse_None         = "None";
+	const AuthenticationResponse_Cancel       = "Cancel";
+
     /**
      * @return bool
      */
@@ -33,7 +36,13 @@ interface IAuthService
 
     public function setUserAuthorizationResponse($auth_response);
 
-    public function clearUserAuthorizationResponse();
+	public function clearUserAuthorizationResponse();
+
+	public function getUserAuthenticationResponse();
+
+	public function setUserAuthenticationResponse($auth_response);
+
+	public function clearUserAuthenticationResponse();
 
     public function logout();
 

@@ -140,6 +140,17 @@ class ImplicitGrantType extends AbstractGrantType
 
             $state = $request->getState();
             //check user logged
+
+	        $authentication_response = $this->auth_service->getUserAuthenticationResponse();
+
+	        if($authentication_response == IAuthService::AuthenticationResponse_Cancel){
+		        //clear saved data ...
+		        $this->memento_service->clearCurrentRequest();
+		        $this->auth_service->clearUserAuthenticationResponse();
+		        $this->auth_service->clearUserAuthorizationResponse();
+		        throw new AccessDeniedException;
+	        }
+
             if (!$this->auth_service->isUserLogged()) {
                 $this->memento_service->saveCurrentAuthorizationRequest();
                 return $this->auth_strategy->doLogin($this->memento_service->getCurrentAuthorizationRequest());
@@ -161,6 +172,9 @@ class ImplicitGrantType extends AbstractGrantType
                     return $this->auth_strategy->doConsent($this->memento_service->getCurrentAuthorizationRequest());
                 }
                 else if ($authorization_response == IAuthService::AuthorizationResponse_DenyOnce) {
+	                //clear saved data ...
+	                $this->memento_service->clearCurrentRequest();
+	                $this->auth_service->clearUserAuthorizationResponse();
                     throw new AccessDeniedException;
                 }
                 //save possitive consent

@@ -12,7 +12,7 @@ Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()
 @section('content')
 <div class="container">
     <h4>OpenstackId - Openid verification</h4>
-    {{ Form::open(array('url' => '/accounts/user/consent','id'=>'authorization_form', 'method' => 'post',  "autocomplete" => "off")) }}
+    {{ Form::open(array('url' => URL::action("UserController@postConsent"),'id'=>'authorization_form', 'method' => 'post',  "autocomplete" => "off")) }}
     <fieldset>
     <legend>
         Sign in to <b>{{ $realm }}</b> using your openstackid
