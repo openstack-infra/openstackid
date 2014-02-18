@@ -24,7 +24,11 @@ class AssociationService implements IAssociationService
     private $lock_manager_service;
     private $cache_service;
 
-    public function __construct(ILockManagerService $lock_manager_service, ICacheService $cache_service)
+	/**
+	 * @param ILockManagerService $lock_manager_service
+	 * @param ICacheService       $cache_service
+	 */
+	public function __construct(ILockManagerService $lock_manager_service, ICacheService $cache_service)
     {
         $this->lock_manager_service = $lock_manager_service;
         $this->cache_service        = $cache_service;
@@ -58,7 +62,8 @@ class AssociationService implements IAssociationService
                     $this->deleteAssociation($handle);
                     return null;
                 }
-
+				//convert secret to hexa representation
+	            // bin2hex
 	            $secret_unpack  = \unpack('H*', $assoc->secret);
 	            $secret_unpack  = array_shift($secret_unpack);
                 //repopulate cache
@@ -67,7 +72,7 @@ class AssociationService implements IAssociationService
                     "mac_function" => $assoc->mac_function,
                     "issued"       => $assoc->issued,
                     "lifetime"     => $assoc->lifetime,
-		            "secret"       => \unpack('H*',$secret_unpack ),
+		            "secret"       => $secret_unpack,
                     "realm"        => $assoc->realm),
                     $remaining_lifetime);
             }
@@ -89,6 +94,7 @@ class AssociationService implements IAssociationService
                 $this->lock_manager_service->acquireLock($lock_name);
             }
 
+	        //convert hex 2 bin
 	        $secret = \pack('H*', $cache_values['secret']);
             $assoc  = new OpenIdAssociation();
 
@@ -156,7 +162,8 @@ class AssociationService implements IAssociationService
 
             if (is_null($realm))
                 $realm = '';
-
+	        //convert secret to hexa representation
+	        // bin2hex
 	        $secret_unpack = \unpack('H*', $secret);
 	        $secret_unpack = array_shift($secret_unpack);
 

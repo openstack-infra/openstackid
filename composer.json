@@ -8,7 +8,10 @@
      	"laravel/framework": "4.1.*",
         "phpunit/phpunit": "3.7.*",
         "zendframework/zend-crypt":"2.2.*",
-        "greggilbert/recaptcha": "1.0.*"
+        "greggilbert/recaptcha": "1.0.*",
+        "mockery/mockery": "dev-master",
+        "doctrine/dbal": "~2.3",
+        "way/laravel-test-helpers": "dev-master"
 	},
 	"autoload": {
 		"classmap": [

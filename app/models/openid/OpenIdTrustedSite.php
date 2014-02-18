@@ -5,6 +5,8 @@ use openid\model\ITrustedSite;
 class OpenIdTrustedSite extends Eloquent implements ITrustedSite
 {
 
+	protected $fillable = array('realm','user_id', 'policy', 'data');
+
     public $timestamps = false;
     protected $table = 'openid_trusted_sites';
 

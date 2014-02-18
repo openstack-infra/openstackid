@@ -17,7 +17,8 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
 
 	/**
 	 * @param OpenIdMessage $message
-	 * @param null          $user_identity_endpoint
+	 * @param string|null          $user_identity_endpoint
+	 * @throws InvalidOpenIdMessageException
 	 */
 	public function __construct(OpenIdMessage $message, $user_identity_endpoint = null)
     {
@@ -30,19 +31,30 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
 	    }
     }
 
-    public static function IsOpenIdAuthenticationRequest(OpenIdMessage $message)
+	/**
+	 * @param OpenIdMessage $message
+	 * @return bool
+	 */
+	public static function IsOpenIdAuthenticationRequest(OpenIdMessage $message)
     {
         $mode = $message->getMode();
         if ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode) return true;
         return false;
     }
 
-    public function getAssocHandle()
+	/**
+	 * @return string
+	 */
+	public function getAssocHandle()
     {
         return $this->getParam(OpenIdProtocol::OpenIDProtocol_AssocHandle);
     }
 
-    public function isValid()
+	/**
+	 * @return bool
+	 * @throws InvalidOpenIdMessageException
+	 */
+	public function isValid()
     {
 
         $return_to   = $this->getReturnTo();
@@ -53,26 +65,31 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
 	    $valid_id    = $this->isValidIdentifier($claimed_id, $identity);
 	    $valid_realm = OpenIdUriHelper::checkRealm($realm, $return_to);
 
-	    $res = !empty($return_to)
-            && !empty($realm)
-            && $valid_realm
-            && !empty($claimed_id)
-            && !empty($identity)
-            && $valid_id
-            && !empty($mode) && ($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode);
+	    if(empty($return_to))
+		    throw new InvalidOpenIdMessageException('return_to is empty.');
 
-        if(!$res){
-                $msg = sprintf("return_to is empty? %b.",empty($return_to)).PHP_EOL;
-                $msg = $msg.sprintf("realm is empty? %b.",empty($realm)).PHP_EOL;
-                $msg = $msg.sprintf("claimed_id is empty? %b.",empty($claimed_id)).PHP_EOL;
-                $msg = $msg.sprintf("identity is empty? %b.",empty($identity)).PHP_EOL;
-                $msg = $msg.sprintf("mode is empty? %b.",empty($mode)).PHP_EOL;
-                $msg = $msg.sprintf("is valid realm? %b.",$valid_realm).PHP_EOL;
-                $msg = $msg.sprintf("is valid identifier? %b.",$valid_id).PHP_EOL;
-                throw new InvalidOpenIdMessageException($msg);
-        }
+        if(empty($realm))
+	        throw new InvalidOpenIdMessageException('realm is empty.');
 
-        return $res;
+	    if(!$valid_realm)
+		    throw new InvalidOpenIdMessageException(sprintf('realm check is not valid realm %s - return_to %s.',$realm,$return_to));
+
+	    if(empty($claimed_id))
+		    throw new InvalidOpenIdMessageException('claimed_id is empty.');
+
+	    if(empty($identity))
+		    throw new InvalidOpenIdMessageException('identity is empty.');
+
+	    if(!$valid_id)
+		    throw new InvalidOpenIdMessageException(sprintf('identity check is not valid claimed_id %s - identity %s.',$claimed_id,$identity));
+
+	    if(empty($mode))
+		    throw new InvalidOpenIdMessageException('mode is empty.');
+
+		if(!($mode == OpenIdProtocol::ImmediateMode || $mode == OpenIdProtocol::SetupMode))
+			throw new InvalidOpenIdMessageException(sprintf('mode %s is invalid.',$mode));
+
+        return true;
     }
 
     public function getReturnTo()
@@ -121,7 +138,7 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
          */
 
 		if(empty($this->user_identity_endpoint))
-			throw new InvalidOpenIdMessageException("user_identity_endpoint is not set");
+			throw new InvalidOpenIdMessageException("user_identity_endpoint is not set.");
 
         if (is_null($claimed_id) && is_null($identity))
             return false;

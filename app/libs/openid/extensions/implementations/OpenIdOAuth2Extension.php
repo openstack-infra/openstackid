@@ -104,9 +104,8 @@ class OpenIdOAuth2Extension extends OpenIdExtension
         try {
 
             $oauth2_request = new OpenIdOAuth2Request($request->getMessage());
-            if (!$oauth2_request->isValid()){
 
-                $this->log_service->warning_msg('OpenIdOAuth2Extension: Invalid OAuth2 Request');
+            if (!$oauth2_request->isValid()){
                 return;
             }
 

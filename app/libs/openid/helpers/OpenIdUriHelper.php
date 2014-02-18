@@ -225,6 +225,17 @@ class OpenIdUriHelper
         return true;
     }
 
+	/**
+	 * @param $trust_root
+	 * @return bool|mixed
+	 */
+	public static function isValidRealm($trust_root){
+		if (!self::_isSane($trust_root)) return false;
+
+		$trust_root_parsed = self::_parse($trust_root);
+		return $trust_root_parsed;
+	}
+
     /**
      * Does this URL match the given trust root?
      *
