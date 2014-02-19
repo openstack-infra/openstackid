@@ -1,150 +1,223 @@
 <?php
-
 namespace services\openid;
 
+use auth\IUserRepository;
 use auth\User;
+use openid\model\IOpenIdUser;
 use DB;
 use Exception;
-use Log;
 use openid\services\IUserService;
+use utils\services\ILogService;
 
+/**
+ * Class UserService
+ * @package services\openid
+ */
 class UserService implements IUserService
 {
 
-    public function associateUser($id, $proposed_username)
+	private $repository;
+	private $log_service;
+
+	/**
+	 * @param IUserRepository $repository
+	 * @param ILogService     $log_service
+	 */
+	public function __construct(IUserRepository $repository, ILogService $log_service){
+		$this->repository  = $repository;
+		$this->log_service = $log_service;
+	}
+
+
+	/**
+	 * @param IOpenIdUser $user
+	 * @param             $proposed_username
+	 * @return bool|IOpenIdUser
+	 * @throws \Exception
+	 */
+	public function associateUser(IOpenIdUser &$user, $proposed_username)
     {
         try {
-            $user = User::where('id', '=', $id)->first();
-            if (!is_null($user)) {
-                DB::transaction(function () use ($id, $proposed_username) {
-                    $done = false;
+	        $repository = $this->repository;
+            if (!is_null($user) && $user->identifier === $user->external_id) {
+                DB::transaction(function () use ($proposed_username,&$user,&$repository) {
+
+                    $done         = false;
                     $fragment_nbr = 1;
                     $aux_proposed_username = $proposed_username;
                     do {
-                        $old_user = \DB::table('openid_users')
-                            ->where('identifier', '=', $aux_proposed_username)
-                            ->where('id', '<>', $id)
-                            ->first();
+
+                        $old_user = $repository->getOneByCriteria(array(
+							array('name' => 'identifier','op' => '=','value' => $aux_proposed_username),
+	                        array('name' => 'id','op' => '<>','value' => $user->id) ));
+
                         if (is_null($old_user)) {
-                            \DB::table('openid_users')->where('id', '=', $id)->update(array('identifier' => $aux_proposed_username));
-                            $done = true;
+
+	                        $user->identifier = $aux_proposed_username;
+	                        $done = $repository->update($user);
                         } else {
                             $aux_proposed_username = $proposed_username . "." . $fragment_nbr;
                             $fragment_nbr++;
                         }
 
                     } while (!$done);
-                    return $aux_proposed_username;
+                    return $user;
                 });
             }
         } catch (Exception $ex) {
-            Log::error($ex);
+            $this->log_service->error($ex);
+	        throw $ex;
         }
         return false;
     }
 
-    public function updateLastLoginDate($identifier)
+	/**
+	 * @param $identifier
+	 * @return mixed|void
+	 * @throws \Exception
+	 */
+	public function updateLastLoginDate($identifier)
     {
         try {
-            $user = User::where('id', '=', $identifier)->first();
+	        $user = $this->repository->get($identifier);
             if (!is_null($user)) {
-                DB::transaction(function () use ($identifier) {
-                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('last_login_date' => gmdate("Y-m-d H:i:s", time())));
-                });
+	            $user->last_login_date = gmdate("Y-m-d H:i:s", time());
+	            $this->repository->update($user);
             }
         } catch (Exception $ex) {
-            Log::error($ex);
+	        $this->log_service->error($ex);
+	        throw $ex;
         }
     }
 
-    public function updateFailedLoginAttempts($identifier)
+	/**
+	 * @param $identifier
+	 * @return mixed|void
+	 * @throws \Exception
+	 */
+	public function updateFailedLoginAttempts($identifier)
     {
         try {
-            $user = User::where('id', '=', $identifier)->first();
+	        $user = $this->repository->get($identifier);
             if (!is_null($user)) {
-                $attempts = $user->login_failed_attempt;
-                ++$attempts;
-                DB::transaction(function () use ($identifier, $attempts) {
-                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('login_failed_attempt' => $attempts));
-                });
+                $user->login_failed_attempt+=1;
+                $this->repository->update($user);
             }
         } catch (Exception $ex) {
-            Log::error($ex);
+	        $this->log_service->error($ex);
+	        throw $ex;
         }
     }
 
-    public function lockUser($identifier)
+	/**
+	 * @param $identifier
+	 * @return mixed|void
+	 * @throws \Exception
+	 */
+	public function lockUser($identifier)
     {
         try {
-            $user = User::where('id', '=', $identifier)->first();
+	        $user = $this->repository->get($identifier);
             if (!is_null($user)) {
-                DB::transaction(function () use ($identifier) {
-                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => true));
-                });
+
+	            $user->lock = true;
+	            $this->repository->update($user);
+
                 Log::warning(sprintf("User %d locked ", $identifier));
             }
         } catch (Exception $ex) {
-            Log::error($ex);
+	        $this->log_service->error($ex);
+	        throw $ex;
         }
     }
 
-    public function unlockUser($identifier)
+	/**
+	 * @param $identifier
+	 * @return mixed|void
+	 * @throws \Exception
+	 */
+	public function unlockUser($identifier)
     {
-        $res = false;
-        DB::transaction(function () use ($identifier, &$res) {
-            $user = User::where('id', '=', $identifier)->first();
-            if (!is_null($user)) {
-                $res = DB::table('openid_users')->where('id', '=', $identifier)->update(array('lock' => false));
-            }
-        });
-        return $res;
+	    try {
+		    $user = $this->repository->get($identifier);
+		    if (!is_null($user)) {
+
+			    $user->lock = false;
+			    $this->repository->update($user);
+
+			    Log::warning(sprintf("User %d unlocked ", $identifier));
+		    }
+	    } catch (Exception $ex) {
+		    $this->log_service->error($ex);
+		    throw $ex;
+	    }
     }
 
-    public function activateUser($identifier)
+	/**
+	 * @param $identifier
+	 * @return mixed|void
+	 * @throws \Exception
+	 */
+	public function activateUser($identifier)
     {
         try {
-            $user = User::where('id', '=', $identifier)->first();
+	        $user = $this->repository->get($identifier);
             if (!is_null($user)) {
-                DB::transaction(function () use ($identifier) {
-                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('active' => 1));
-                });
+	            $user->active = true;
+	            $this->repository->update($user);
             }
         } catch (Exception $ex) {
-            Log::error($ex);
+	        $this->log_service->error($ex);
+	        throw $ex;
         }
     }
 
-    public function deActivateUser($identifier)
+	/**
+	 * @param $identifier
+	 * @return mixed|void
+	 * @throws \Exception
+	 */
+	public function deActivateUser($identifier)
     {
-        try {
-            $user = User::where('id', '=', $identifier)->first();
-            if (!is_null($user)) {
-                DB::transaction(function () use ($identifier) {
-                    DB::table('openid_users')->where('id', '=', $identifier)->update(array('active' => 0));
-                });
-            }
-        } catch (Exception $ex) {
-            Log::error($ex);
-        }
+	    try {
+		    $user = $this->repository->get($identifier);
+		    if (!is_null($user)) {
+			    $user->active = false;
+			    $this->repository->update($user);
+		    }
+	    } catch (Exception $ex) {
+		    $this->log_service->error($ex);
+		    throw $ex;
+	    }
     }
 
-    public function saveProfileInfo($identifier, $show_pic, $show_full_name, $show_email)
+	/**
+	 * @param $identifier
+	 * @param $show_pic
+	 * @param $show_full_name
+	 * @param $show_email
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public function saveProfileInfo($identifier, $show_pic, $show_full_name, $show_email)
     {
         try {
-            $user = User::where('id', '=', $identifier)->first();
+	        $user = $this->repository->get($identifier);
             if (!is_null($user)) {
                 $user->public_profile_show_photo = $show_pic;
                 $user->public_profile_show_fullname = $show_full_name;
                 $user->public_profile_show_email = $show_email;
-                $user->Save();
+	            return $this->repository->update($user);
             }
         } catch (Exception $ex) {
-            Log::error($ex);
+	        $this->log_service->error($ex);
+	        throw $ex;
         }
+	    return false;
     }
 
     public function get($id){
-        return User::find($id);
+        return $this->repository->get($id);
     }
     /**
      * @param int $page_nbr
@@ -155,7 +228,6 @@ class UserService implements IUserService
      */
     public function getAll($page_nbr = 1, $page_size = 10, array $filters = array(), array $fields = array('*'))
     {
-        DB::getPaginator()->setCurrentPage($page_nbr);
-        return User::Filter($filters)->paginate($page_size, $fields);
+	    return $this->repository->getByPage($page_nbr, $page_size, $filters,$fields);
     }
 }

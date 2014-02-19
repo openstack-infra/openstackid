@@ -291,4 +291,9 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
         }
         return $this->member->Postcode;
     }
+
+	public function getTrustedSites()
+	{
+		return $this->trusted_sites()->get();
+	}
 }

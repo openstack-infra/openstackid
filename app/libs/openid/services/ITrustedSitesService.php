@@ -7,9 +7,21 @@ use openid\model\IOpenIdUser;
 
 interface ITrustedSitesService
 {
+	/**
+	 * @param IOpenIdUser $user
+	 * @param             $realm
+	 * @param             $policy
+	 * @param array       $data
+	 * @return bool1|ITrustedSite
+	 * @throws \Exception
+	 */
     public function addTrustedSite(IOpenIdUser $user, $realm, $policy, $data = array());
 
-    public function delTrustedSite($id);
+	/**
+	 * @param $id
+	 * @return bool
+	 */
+	public function delTrustedSite($id);
 
     /**
      * @param IOpenIdUser $user
@@ -19,5 +31,4 @@ interface ITrustedSitesService
      */
     public function getTrustedSites(IOpenIdUser $user, $realm, $data = array());
 
-    public function getAllTrustedSitesByUser(IOpenIdUser $user);
 }

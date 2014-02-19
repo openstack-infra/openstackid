@@ -1,5 +1,4 @@
 <?php
-
 namespace services\openid;
 
 use Exception;
@@ -10,6 +9,7 @@ use openid\services\ITrustedSitesService;
 use OpenIdTrustedSite;
 use utils\services\IAuthService;
 use utils\services\ILogService;
+use openid\repositories\IOpenIdTrustedSiteRepository;
 
 /**
  * Class TrustedSitesService
@@ -17,17 +17,18 @@ use utils\services\ILogService;
  */
 class TrustedSitesService implements ITrustedSitesService
 {
+
+	private $repository;
 	private $log_service;
-	private $openid_trusted_site;
 
 	/**
-	 * @param OpenIdTrustedSite $openid_trusted_site
-	 * @param ILogService       $log_service
+	 * @param IOpenIdTrustedSiteRepository $repository
+	 * @param ILogService                  $log_service
 	 */
-	public function __construct(OpenIdTrustedSite $openid_trusted_site, ILogService $log_service)
+	public function __construct(IOpenIdTrustedSiteRepository $repository,  ILogService $log_service)
 	{
-		$this->log_service = $log_service;
-		$this->openid_trusted_site = $openid_trusted_site;
+		$this->repository          = $repository;
+		$this->log_service         = $log_service;
 	}
 
 	/**
@@ -35,7 +36,7 @@ class TrustedSitesService implements ITrustedSitesService
 	 * @param             $realm
 	 * @param             $policy
 	 * @param array       $data
-	 * @return bool
+	 * @return bool1|ITrustedSite
 	 * @throws \Exception
 	 */
 	public function addTrustedSite(IOpenIdUser $user, $realm, $policy, $data = array())
@@ -44,31 +45,28 @@ class TrustedSitesService implements ITrustedSitesService
 
 			if (!OpenIdUriHelper::isValidRealm($realm))
 				throw new OpenIdInvalidRealmException(sprintf('realm %s is invalid', $realm));
-
-			$res = $this->openid_trusted_site->create(
-				array(
-					'realm' => $realm,
-					'policy' => $policy,
-					'user_id' => $user->getId(),
-					'data' => json_encode($data)
-				)
-			);
+			$site          = new OpenIdTrustedSite;
+			$site->realm   = $realm;
+			$site->policy  = $policy;
+			$site->user_id = $user->getId();
+			$site->data    = json_encode($data);
+			return $this->repository->add($site)?$site:false;
 
 		} catch (Exception $ex) {
 			$this->log_service->error($ex);
 			throw $ex;
 		}
-		return $res;
+		return false;
 	}
 
 	/**
 	 * @param $id
+	 * @return bool
 	 */
 	public function delTrustedSite($id)
 	{
 		try {
-			$site = $this->openid_trusted_site->where("id", "=", $id)->first();
-			if (!is_null($site)) $site->delete();
+			return $this->repository->deleteById($id);
 		} catch (Exception $ex) {
 			$this->log_service->error($ex);
 		}
@@ -83,34 +81,14 @@ class TrustedSitesService implements ITrustedSitesService
 	 */
 	public function getTrustedSites(IOpenIdUser $user, $realm, $data = array())
 	{
-		$sites = null;
+		$res = array();
 		try {
 
 			if (!OpenIdUriHelper::isValidRealm($realm))
 				throw new OpenIdInvalidRealmException(sprintf('realm %s is invalid', $realm));
-
 			//get all possible sub-domains
 			$sub_domains = $this->getSubDomains($realm);
-			//build query....
-			$query = $this->openid_trusted_site->where("user_id", "=", intval($user->getId()));
-			//add or condition for all given sub-domains
-			if (count($sub_domains)) {
-				$query = $query->where(function ($query) use ($sub_domains) {
-					foreach ($sub_domains as $sub_domain) {
-						$query = $query->orWhere(function ($query_aux) use ($sub_domain) {
-							$query_aux->where('realm', '=', $sub_domain);
-						});
-					}
-				});
-			}
-			//add conditions for all possible pre approved data
-			foreach ($data as $value) {
-				$query = $query->where("data", "LIKE", '%"' . $value . '"%');
-			}
-			$sites = $query->get();
-
-
-			$res = array();
+			$sites       = $this->repository->getMatchingOnesByUserId($user->getId(),$sub_domains,$data);
 			//iterate over all retrieved sites and check the set policies by user
 			foreach ($sites as $site) {
 				$policy = $site->getAuthorizationPolicy();
@@ -179,15 +157,4 @@ class TrustedSitesService implements ITrustedSitesService
 		return $scheme;
 	}
 
-	public function getAllTrustedSitesByUser(IOpenIdUser $user)
-	{
-		$sites = null;
-		try {
-			$sites = $this->openid_trusted_site->where("user_id", "=", $user->getId())->get();
-		} catch (Exception $ex) {
-			$this->log_service->error($ex);
-			throw $ex;
-		}
-		return $sites;
-	}
 }

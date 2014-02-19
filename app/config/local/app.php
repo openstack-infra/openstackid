@@ -106,6 +106,7 @@ return array(
         'Illuminate\Workbench\WorkbenchServiceProvider',
         'Illuminate\Redis\RedisServiceProvider',
         'services\utils\UtilsProvider',
+		'repositories\RepositoriesProvider',
 		'services\oauth2\OAuth2ServiceProvider',
         'services\openid\OpenIdProvider',
         'auth\AuthenticationServiceProvider',

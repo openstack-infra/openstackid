@@ -1,12 +1,9 @@
 <?php
 
 namespace services\openid;
-
-use Log;
 use openid\exceptions\OpenIdInvalidRealmException;
 use openid\exceptions\ReplayAttackException;
 use openid\exceptions\InvalidAssociation;
-
 use openid\helpers\OpenIdErrorMessages;
 use openid\model\IAssociation;
 use openid\services\IAssociationService;
@@ -14,6 +11,8 @@ use OpenIdAssociation;
 use utils\exceptions\UnacquiredLockException;
 use utils\services\ILockManagerService;
 use utils\services\ICacheService;
+use openid\repositories\IOpenIdAssociationRepository;
+
 /**
  * Class AssociationService
  * @package services
@@ -23,15 +22,20 @@ class AssociationService implements IAssociationService
 
     private $lock_manager_service;
     private $cache_service;
+	private $repository;
 
 	/**
-	 * @param ILockManagerService $lock_manager_service
-	 * @param ICacheService       $cache_service
+	 * @param IOpenIdAssociationRepository $repository
+	 * @param ILockManagerService          $lock_manager_service
+	 * @param ICacheService                $cache_service
 	 */
-	public function __construct(ILockManagerService $lock_manager_service, ICacheService $cache_service)
+	public function __construct(IOpenIdAssociationRepository $repository,
+								ILockManagerService $lock_manager_service,
+	                            ICacheService $cache_service)
     {
         $this->lock_manager_service = $lock_manager_service;
         $this->cache_service        = $cache_service;
+	    $this->repository           = $repository;
     }
 
     /**
@@ -53,7 +57,7 @@ class AssociationService implements IAssociationService
             // check if association is on cache
             if (!$this->cache_service->exists($handle)) {
                 // if not , check on db
-                $assoc = OpenIdAssociation::where('identifier', '=', $handle)->first();
+                $assoc = $this->repository->getByHandle($handle);
                 if(is_null($assoc))
                     throw new InvalidAssociation(sprintf('openid association %s does not exists!',$handle));
                 //check association lifetime ...
@@ -120,81 +124,59 @@ class AssociationService implements IAssociationService
     public function deleteAssociation($handle)
     {
         $this->cache_service->delete($handle);
-        $assoc = OpenIdAssociation::where('identifier', '=', $handle)->first();
-        if (!is_null($assoc)) {
-            $assoc->delete();
-            return true;
+        $assoc = $this->repository->getByHandle($handle);
+	    if (!is_null($assoc)) {
+            return $this->repository->delete($assoc);
         }
         return false;
     }
 
-    /**
-     * @param $handle
-     * @param $secret
-     * @param $mac_function
-     * @param $lifetime
-     * @param $issued
-     * @param $type
-     * @param null $realm
-     * @return IAssociation
-     * @throws \openid\exceptions\ReplayAttackException
-     */
-    public function addAssociation($handle, $secret, $mac_function, $lifetime, $issued, $type, $realm = null)
+	/**
+	 * @param IAssociation $association
+	 * @return IAssociation|OpenIdAssociation
+	 * @throws \openid\exceptions\ReplayAttackException
+	 */
+	public function addAssociation(IAssociation $association)
     {
         $assoc = new OpenIdAssociation();
         try {
-            $lock_name = 'lock.add.assoc.' . $handle;
+            $lock_name = 'lock.add.assoc.' . $association->getHandle();
             $this->lock_manager_service->acquireLock($lock_name);
 
-            $assoc->identifier   = $handle;
-            $assoc->secret       = $secret;
-            $assoc->type         = $type;
-            $assoc->mac_function = $mac_function;
-            $assoc->lifetime     = intval($lifetime);
-            $assoc->issued       = $issued;
+            $assoc->identifier   = $association->getHandle();;
+            $assoc->secret       = $association->getSecret();
+            $assoc->type         = $association->getType();;
+            $assoc->mac_function = $association->getMacFunction();
+            $assoc->lifetime     = intval($association->getLifetime());
+            $assoc->issued       = $association->getIssued();
 
-            if (!is_null($realm))
-                $assoc->realm = $realm;
+            if (!is_null($association->getRealm()))
+                $assoc->realm = $association->getRealm();
 
-            if ($type == IAssociation::TypeSession) {
-                $assoc->Save();
+            if ($association->getType() == IAssociation::TypeSession) {
+                $this->repository->add($assoc);
             }
-
-            if (is_null($realm))
-                $realm = '';
 	        //convert secret to hexa representation
 	        // bin2hex
-	        $secret_unpack = \unpack('H*', $secret);
+	        $secret_unpack = \unpack('H*', $association->getSecret());
 	        $secret_unpack = array_shift($secret_unpack);
 
-            $this->cache_service->storeHash($handle, array(
-                "type"         => $type,
-                "mac_function" => $mac_function,
-                "issued"       => $issued,
-                "lifetime"     => $lifetime,
-	            "secret"       => $secret_unpack,
-	            "realm"        => $realm),$lifetime);
+            $this->cache_service->storeHash($association->getHandle(),
+	            array(
+	                "type"         => $association->getType(),
+	                "mac_function" => $association->getMacFunction(),
+	                "issued"       => $association->getIssued(),
+	                "lifetime"     => intval($association->getLifetime()),
+		            "secret"       => $secret_unpack,
+		            "realm"        => !is_null($association->getRealm())?$association->getRealm():''
+	            ),
+	            intval($association->getLifetime())
+            );
 
         } catch (UnacquiredLockException $ex1) {
-            throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackPrivateAssociationAlreadyUsed, $handle));
+            throw new ReplayAttackException(sprintf(OpenIdErrorMessages::ReplayAttackPrivateAssociationAlreadyUsed, $association->getHandle()));
         }
         return $assoc;
     }
 
-    /**
-     * For verifying signatures an OP MUST only use private associations and MUST NOT
-     * use associations that have shared keys. If the verification request contains a handle
-     * for a shared association, it means the Relying Party no longer knows the shared secret,
-     * or an entity other than the RP (e.g. an attacker) has established this association with the OP.
-     * @param $handle
-     * @return mixed
-     */
-    public function getAssociationType($handle)
-    {
-        $assoc = OpenIdAssociation::where('identifier', '=', $handle)->first();
-        if (!is_null($assoc)) {
-            return $assoc->type;
-        }
-        return false;
-    }
 }

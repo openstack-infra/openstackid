@@ -17,7 +17,12 @@ use Zend\Crypt\Exception\RuntimeException;
 use openid\services\IAssociationService;
 use openid\services\IServerConfigurationService;
 use utils\services\ILogService;
+use openid\helpers\AssociationFactory;
 
+/**
+ * Class SessionAssociationUnencryptedStrategy
+ * @package openid\handlers\strategies\implementations
+ */
 class SessionAssociationUnencryptedStrategy implements ISessionAssociationStrategy {
 
 
@@ -46,16 +51,8 @@ class SessionAssociationUnencryptedStrategy implements ISessionAssociationStrate
         try {
             $assoc_type   = $this->current_request->getAssocType();
             $session_type = $this->current_request->getSessionType();
-
-            $HMAC_secret_handle = OpenIdCryptoHelper::generateSecret($assoc_type);
-
-            $assoc_handle = AssocHandleGenerator::generate();
-
-            $expires_in = $this->server_configuration_service->getConfigValue("Session.Association.Lifetime");
-
-            $response = new OpenIdUnencryptedAssociationSessionResponse($assoc_handle, $session_type, $assoc_type, $expires_in, $HMAC_secret_handle);
-            $issued = gmdate("Y-m-d H:i:s", time());
-            $this->association_service->addAssociation($assoc_handle, $HMAC_secret_handle, $assoc_type, $expires_in, $issued, IAssociation::TypeSession, null);
+			$association  = $this->association_service->addAssociation(AssociationFactory::getInstance()->buildSessionAssociation($assoc_type,$this->server_configuration_service->getConfigValue("Session.Association.Lifetime")));
+	        $response     = new OpenIdUnencryptedAssociationSessionResponse($association->getHandle() , $session_type, $assoc_type, $association->getLifetime(), $association->getSecret());
 
         } catch (InvalidDHParam $exDH) {
             $response = new OpenIdDirectGenericErrorResponse($exDH->getMessage());

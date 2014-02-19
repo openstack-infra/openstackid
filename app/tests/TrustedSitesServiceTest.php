@@ -12,22 +12,23 @@ class TrustedSitesServiceTest extends TestCase {
 
 	}
 
-    public function tearDown()
+	protected function prepareForTests()
+	{
+		parent::prepareForTests();
+	}
+
+	public function tearDown()
     {
         Mockery::close();
     }
 
-	protected function prepareForTests()
-	{
-		parent::prepareForTests();
-
-	}
 
 	public function testBehaviorAdd(){
 
-		$trusted_site = Mockery::mock('Eloquent','OpenIdTrustedSite');
-		$trusted_site->shouldReceive('create')->andReturn($trusted_site)->once();
-        $this->app->instance('OpenIdTrustedSite', $trusted_site);
+		$repo_mock = Mockery::mock('repositories\EloquentOpenIdTrustedSiteRepository');
+
+		$repo_mock->shouldReceive('add')->andReturn(true)->once();
+	    $this->app->instance('openid\repositories\IOpenIdTrustedSiteRepository', $repo_mock);
 
 		$mock_user = Mockery::mock('openid\model\IOpenIdUser');
 		$mock_user->shouldReceive('getId')->andReturn(1);
@@ -39,7 +40,6 @@ class TrustedSitesServiceTest extends TestCase {
 			                            $data = array());
 
 		$this->assertTrue(!is_null($res));
-		$this->assertTrue($res===$trusted_site);
 	}
 
 	public function testAdd(){

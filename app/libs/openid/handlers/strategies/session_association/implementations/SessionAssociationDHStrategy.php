@@ -3,7 +3,6 @@
 namespace openid\handlers\strategies\implementations;
 
 use openid\handlers\strategies\ISessionAssociationStrategy;
-use openid\helpers\AssocHandleGenerator;
 use openid\helpers\OpenIdCryptoHelper;
 use openid\model\IAssociation;
 use openid\requests\OpenIdDHAssociationSessionRequest;
@@ -13,6 +12,7 @@ use Zend\Crypt\PublicKey\DiffieHellman;
 use openid\services\IAssociationService;
 use openid\services\IServerConfigurationService;
 use utils\services\ILogService;
+use openid\helpers\AssociationFactory;
 
 class SessionAssociationDHStrategy implements ISessionAssociationStrategy
 {
@@ -46,28 +46,25 @@ class SessionAssociationDHStrategy implements ISessionAssociationStrategy
     {
         $response = null;
         try {
-            $assoc_type = $this->current_request->getAssocType();
-            $session_type = $this->current_request->getSessionType();
+            $assoc_type       = $this->current_request->getAssocType();
+            $session_type     = $this->current_request->getSessionType();
             //DH parameters
-            $public_prime = $this->current_request->getDHModulus(); //p
+            $public_prime     = $this->current_request->getDHModulus(); //p
             $public_generator = $this->current_request->getDHGen(); //g
             //get (g ^ xa mod p) where xa is rp secret key
-            $rp_public_key = $this->current_request->getDHConsumerPublic();
+            $rp_public_key    = $this->current_request->getDHConsumerPublic();
+	        //create association
+	        $association      = $this->association_service->addAssociation(AssociationFactory::getInstance()->buildSessionAssociation($assoc_type, $this->server_configuration_service->getConfigValue("Session.Association.Lifetime")));
+	        $dh               = new DiffieHellman($public_prime, $public_generator);
+	        $dh->generateKeys();
+	        //server public key (g ^ xb mod p ), where xb is server private key
+	        // g ^ (xa * xb) mod p = (g ^ xa) ^ xb mod p = (g ^ xb) ^ xa mod p
+	        $shared_secret        = $dh->computeSecretKey($rp_public_key, DiffieHellman::FORMAT_NUMBER, DiffieHellman::FORMAT_BTWOC);
+	        $hashed_shared_secret = OpenIdCryptoHelper::digest($session_type, $shared_secret);
+	        $server_public_key    = base64_encode($dh->getPublicKey(DiffieHellman::FORMAT_BTWOC));
+	        $enc_mac_key          = base64_encode($association->getSecret()  ^ $hashed_shared_secret);
 
-            $dh = new DiffieHellman($public_prime, $public_generator);
-            $dh->generateKeys();
-            //server public key (g ^ xb mod p ), where xb is server private key
-            // g ^ (xa * xb) mod p = (g ^ xa) ^ xb mod p = (g ^ xb) ^ xa mod p
-            $shared_secret = $dh->computeSecretKey($rp_public_key, DiffieHellman::FORMAT_NUMBER, DiffieHellman::FORMAT_BTWOC);
-            $hashed_shared_secret = OpenIdCryptoHelper::digest($session_type, $shared_secret);
-            $HMAC_secret_handle = OpenIdCryptoHelper::generateSecret($assoc_type);
-            $server_public_key = base64_encode($dh->getPublicKey(DiffieHellman::FORMAT_BTWOC));
-            $enc_mac_key = base64_encode($HMAC_secret_handle ^ $hashed_shared_secret);
-            $assoc_handle = AssocHandleGenerator::generate();
-            $expires_in = $this->server_configuration_service->getConfigValue("Session.Association.Lifetime");
-            $response = new OpenIdDiffieHellmanAssociationSessionResponse($assoc_handle, $session_type, $assoc_type, $expires_in, $server_public_key, $enc_mac_key);
-            $issued = gmdate("Y-m-d H:i:s", time());
-            $this->association_service->addAssociation($assoc_handle, $HMAC_secret_handle, $assoc_type, $expires_in, $issued, IAssociation::TypeSession, null);
+	        $response             = new OpenIdDiffieHellmanAssociationSessionResponse($association->getHandle(), $session_type, $assoc_type, $association->getLifetime(), $server_public_key, $enc_mac_key);
 
         } catch (InvalidDHParam $exDH) {
             $response = new OpenIdDirectGenericErrorResponse($exDH->getMessage());

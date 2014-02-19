@@ -1,6 +1,5 @@
 <?php
 
-use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
 use openid\services\OpenIdServiceCatalog;
 /*
@@ -73,9 +72,11 @@ use auth\CustomAuthProvider;
 Auth::extend('custom', function($app) {
     return new Guard(
         new CustomAuthProvider(
-            ServiceLocator::getInstance()->getService('auth\\IAuthenticationExtensionService'),
-            ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::UserService),
-            ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService)
+	        App::make('auth\\IUserRepository'),
+	        App::make('auth\\IMemberRepository'),
+	        App::make('auth\\IAuthenticationExtensionService'),
+	        App::make(OpenIdServiceCatalog::UserService),
+	        App::make(UtilsServiceCatalog::CheckPointService)
             ),
         App::make('session.store')
     );
@@ -94,4 +95,5 @@ Auth::extend('custom', function($app) {
 */
 
 return $app;
+
 

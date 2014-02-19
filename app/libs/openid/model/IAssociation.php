@@ -36,4 +36,6 @@ interface IAssociation
 
     public function getRemainingLifetime();
 
+	public function getHandle();
+
 }

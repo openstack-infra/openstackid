@@ -2,7 +2,7 @@
 
 namespace services;
 
-use auth\User;
+use auth\IUserRepository;
 use Exception;
 use Log;
 use openid\services\IUserService;
@@ -13,10 +13,12 @@ class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
 {
 	private $server_configuration;
 	private $user_service;
+	private $repository;
 
-	public function __construct(IUserService $user_service, IServerConfigurationService $server_configuration){
+	public function __construct(IUserRepository $repository, IUserService $user_service, IServerConfigurationService $server_configuration){
 		$this->user_service         = $user_service;
 		$this->server_configuration = $server_configuration;
+		$this->repository           = $repository;
 	}
 
     public function trigger(array $params = array())
@@ -26,7 +28,7 @@ class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
             if (!isset($params["user_identifier"])) return;
             $user_identifier      = $params["user_identifier"];
 
-            $user = User::where('external_id', '=', $user_identifier)->first();
+	        $user = $this->repository->getByExternalId($user_identifier);
             if(is_null($user))
                 return;
             //apply lock policy

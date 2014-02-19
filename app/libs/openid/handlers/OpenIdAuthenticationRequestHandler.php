@@ -28,6 +28,7 @@ use openid\services\INonceService;
 use openid\services\IServerConfigurationService;
 use openid\services\IServerExtensionsService;
 use openid\services\ITrustedSitesService;
+use openid\helpers\AssociationFactory;
 use utils\services\IAuthService;
 use utils\services\ILogService;
 use utils\services\ICheckPointService;
@@ -271,14 +272,9 @@ class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
         //check former assoc handle...
 
         if (is_null($assoc_handle = $this->current_request->getAssocHandle()) || is_null($association = $this->association_service->getAssociation($assoc_handle))) {
-            // if not present or if it already void then enter on dumb mode
-            $new_secret = OpenIdCryptoHelper::generateSecret(OpenIdProtocol::SignatureAlgorithmHMAC_SHA256);
-            $new_handle = AssocHandleGenerator::generate();
-            $lifetime = $this->server_configuration_service->getConfigValue("Private.Association.Lifetime");
-            $issued = gmdate("Y-m-d H:i:s", time());
             //create private association ...
-            $association = $this->association_service->addAssociation($new_handle, $new_secret, OpenIdProtocol::SignatureAlgorithmHMAC_SHA256, $lifetime, $issued, IAssociation::TypePrivate, $realm);
-            $response->setAssocHandle($new_handle);
+            $association = $this->association_service->addAssociation(AssociationFactory::getInstance()->buildPrivateAssociation($realm,$this->server_configuration_service->getConfigValue("Private.Association.Lifetime")));
+            $response->setAssocHandle($association->getHandle());
             if (!empty($assoc_handle)) {
                 $response->setInvalidateHandle($assoc_handle);
             }

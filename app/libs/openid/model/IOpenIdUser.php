@@ -39,4 +39,5 @@ interface IOpenIdUser {
     public function getBio();
     public function getPic();
     public function getActions();
+	public function getTrustedSites();
 }

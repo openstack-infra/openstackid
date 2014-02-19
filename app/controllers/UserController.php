@@ -220,7 +220,7 @@ class UserController extends BaseController
     public function getProfile()
     {
         $user    = $this->auth_service->getCurrentUser();
-        $sites   = $this->trusted_sites_service->getAllTrustedSitesByUser($user);
+        $sites   = $user->getTrustedSites();
         $actions = $user->getActions();
 
         return View::make("profile", array(

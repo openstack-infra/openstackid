@@ -1,15 +1,19 @@
 <?php
-
 namespace openid\model;
 
 use openid\exceptions\InvalidNonce;
 use openid\helpers\OpenIdErrorMessages;
 
+/**
+ * Class OpenIdNonce
+ * @package openid\model
+ */
 class OpenIdNonce
 {
 
     const NonceRegexFormat = '/(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)Z(.*)/';
     const NonceTimeFormat = '%Y-%m-%dT%H:%M:%SZ';
+
     private $timestamp;
     private $unique_id;
     private $raw_format;

@@ -84,4 +84,9 @@ class OpenIdAssociation extends Eloquent implements IAssociation
         $seconds = abs($created_at->getTimestamp() - $now->getTimestamp());;
         return $seconds;
     }
+
+	public function getHandle()
+	{
+		return $this->identifier;
+	}
 }

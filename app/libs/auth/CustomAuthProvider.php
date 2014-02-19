@@ -24,13 +24,20 @@ class CustomAuthProvider implements UserProviderInterface
     private $auth_extension_service;
     private $user_service;
     private $checkpoint_service;
+	private $user_repository;
+	private $member_repository;
 
-    public function __construct(IAuthenticationExtensionService $auth_extension_service,
+    public function __construct(IUserRepository $user_repository,
+	                            IMemberRepository $member_repository,
+	                            IAuthenticationExtensionService $auth_extension_service,
                                 IUserService $user_service,
                                 ICheckPointService $checkpoint_service){
+
         $this->auth_extension_service = $auth_extension_service;
         $this->user_service           = $user_service;
         $this->checkpoint_service     = $checkpoint_service;
+	    $this->user_repository        = $user_repository;
+	    $this->member_repository      = $member_repository;
     }
 
     /**
@@ -67,18 +74,20 @@ class CustomAuthProvider implements UserProviderInterface
         $user                   = null;
 	    $user_service           = $this->user_service;
 	    $auth_extension_service = $this->auth_extension_service;
+	    $user_repository        = $this->user_repository;
+	    $member_repository      = $this->member_repository;
 
         try {
 
 
-            DB::transaction(function () use ($credentials, &$user,&$user_service,&$auth_extension_service) {
+            DB::transaction(function () use ($credentials, &$user,&$user_repository,&$member_repository, &$user_service,&$auth_extension_service) {
 
                 if (!isset($credentials['username']) || !isset($credentials['password']))
                     throw new AuthenticationException("invalid crendentials");
 
                 $identifier = $credentials['username'];
                 $password   = $credentials['password'];
-                $user       = User::where('external_id', '=', $identifier)->first();
+                $user       = $user_repository->getByExternalId($identifier);
 
                 //check user status...
                 if (!is_null($user) && ($user->lock || !$user->active)){
@@ -87,7 +96,9 @@ class CustomAuthProvider implements UserProviderInterface
                 }
 
                 //get SS member
-                $member = Member::where('Email', '=', $identifier)->first();
+
+	            $member = $member_repository->getByEmail($identifier);
+
                 if (is_null($member)) //member must exists
                     throw new AuthenticationException(sprintf("member %s does not exists!", $identifier));
 
@@ -103,23 +114,21 @@ class CustomAuthProvider implements UserProviderInterface
                     $user->external_id     = $member->Email;
                     $user->identifier      = $member->Email;
                     $user->last_login_date = gmdate("Y-m-d H:i:s", time());
-                    $user->Save();
-                    $user = User::where('external_id', '=', $identifier)->first();
+	                $user_repository->add($user);
                 }
 
                 $user_name = $member->FirstName . "." . $member->Surname;
                 //do association between user and member
-	            $user_service->associateUser($user->id, strtolower($user_name));
+	            $user_service->associateUser($user, strtolower($user_name));
 
                 //update user fields
                 $user->last_login_date      = gmdate("Y-m-d H:i:s", time());
                 $user->login_failed_attempt = 0;
                 $user->active               = true;
                 $user->lock                 = false;
-                $user->Save();
-
+	            $user_repository->update($user);
                 //reload user...
-                $user                       = User::where('external_id', '=', $identifier)->first();
+                //$user                        = $user_repository->getByExternalId($identifier);
                 $user->setMember($member);
 
                 $auth_extensions = $auth_extension_service->getExtensions();

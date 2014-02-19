@@ -1,7 +1,7 @@
 <?php
 
 namespace openid\services;
-
+use openid\model\IOpenIdUser;
 /**
  * Interface IUserService
  * @package openid\services
@@ -10,12 +10,13 @@ interface IUserService
 {
 
     public function get($id);
-    /**
-     * @param $id
-     * @param $proposed_username
-     * @return mixed
-     */
-    public function associateUser($id, $proposed_username);
+
+	/**
+	 * @param IOpenIdUser $user
+	 * @param             $proposed_username
+	 * @return bool|IOpenIdUser
+	 */
+	public function associateUser(IOpenIdUser &$user , $proposed_username);
 
     /**
      * @param $identifier
