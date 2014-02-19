@@ -12,7 +12,12 @@ use utils\services\ISecurityPolicy;
 use utils\services\ISecurityPolicyCounterMeasure;
 use utils\services\IServerConfigurationService;
 use utils\IPHelper;
+use utils\db\ITransactionService;
 
+/**
+ * Class AbstractBlacklistSecurityPolicy
+ * @package services
+ */
 abstract class AbstractBlacklistSecurityPolicy implements ISecurityPolicy
 {
 
@@ -20,13 +25,19 @@ abstract class AbstractBlacklistSecurityPolicy implements ISecurityPolicy
     protected $counter_measure;
     protected $lock_manager_service;
     protected $cache_service;
+	protected $tx_service;
 
-    public function __construct(IServerConfigurationService $server_configuration_service, ILockManagerService $lock_manager_service, ICacheService $cache_service)
-    {
-
+	/**
+	 * @param IServerConfigurationService $server_configuration_service
+	 * @param ILockManagerService         $lock_manager_service
+	 * @param ICacheService               $cache_service
+	 * @param ITransactionService         $tx_service
+	 */
+	public function __construct(IServerConfigurationService $server_configuration_service, ILockManagerService $lock_manager_service, ICacheService $cache_service,ITransactionService $tx_service) {
         $this->server_configuration_service = $server_configuration_service;
-        $this->lock_manager_service = $lock_manager_service;
-        $this->cache_service = $cache_service;
+        $this->lock_manager_service         = $lock_manager_service;
+        $this->cache_service                = $cache_service;
+	    $this->tx_service                   = $tx_service;
     }
 
     public function setCounterMeasure(ISecurityPolicyCounterMeasure $counter_measure)
@@ -49,7 +60,7 @@ abstract class AbstractBlacklistSecurityPolicy implements ISecurityPolicy
             Log::warning(sprintf("AbstractBlacklistSecurityPolicy: Banning ip %s by Exception %s", $remote_address, $exception_type));
             //try to create on db
 
-            DB::transaction(function () use ($remote_address, $exception_type, $initial_hits) {
+	        $this->tx_service->transaction(function () use ($remote_address, $exception_type, $initial_hits) {
 
                 $banned_ip         = BannedIP::where("ip", "=", $remote_address)->first();
 

@@ -16,8 +16,6 @@ class ServicesProvider extends ServiceProvider
     protected $defer = false;
 
     public function boot(){
-
-
     }
 
     public function register(){

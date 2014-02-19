@@ -37,6 +37,7 @@ class UtilsProvider extends ServiceProvider {
         App::singleton(UtilsServiceCatalog::LockManagerService, 'services\\utils\\LockManagerService');
         App::singleton(UtilsServiceCatalog::ServerConfigurationService, 'services\\utils\\ServerConfigurationService');
         App::singleton(UtilsServiceCatalog::BannedIpService, 'services\\utils\\BannedIPService');
+	    App::singleton(UtilsServiceCatalog::TransactionService, 'services\\utils\\EloquentTransactionService');
     }
 
     public function provides()

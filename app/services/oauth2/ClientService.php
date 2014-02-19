@@ -23,6 +23,7 @@ use Request;
 use utils\services\IAuthService;
 use Zend\Math\Rand;
 use Event;
+use utils\db\ITransactionService;
 
 /**
  * Class ClientService
@@ -33,10 +34,16 @@ class ClientService implements IClientService
     private $auth_service;
     private $scope_service;
 
-    public function __construct(IAuthService $auth_service, IApiScopeService $scope_service)
+	/**
+	 * @param IAuthService        $auth_service
+	 * @param IApiScopeService    $scope_service
+	 * @param ITransactionService $tx_service
+	 */
+	public function __construct(IAuthService $auth_service, IApiScopeService $scope_service,ITransactionService $tx_service)
     {
         $this->auth_service  = $auth_service;
         $this->scope_service = $scope_service;
+	    $this->tx_service    = $tx_service;
     }
 
     /**
@@ -84,7 +91,7 @@ class ClientService implements IClientService
 	    $this_var      = $this;
 	    $scope_service = $this_var->scope_service;
 
-        DB::transaction(function () use ($application_type, $user_id, $app_name,$app_url, $app_description, $app_logo, &$instance, &$this_var,&$scope_service) {
+	    $this->tx_service->transaction(function () use ($application_type, $user_id, $app_name,$app_url, $app_description, $app_logo, &$instance, &$this_var,&$scope_service) {
 
             //check $application_type vs client_type
             $client_type         = $application_type == IClient::ApplicationType_JS_Client? IClient::ClientType_Public : IClient::ClientType_Confidential;
@@ -122,7 +129,7 @@ class ClientService implements IClientService
     public function addClientAllowedUri($id, $uri)
     {
         $res = false;
-        DB::transaction(function () use ($id,$uri,&$res){
+	    $this->tx_service->transaction(function () use ($id,$uri,&$res){
             $client = Client::find($id);
 
             if (is_null($client))
@@ -170,7 +177,7 @@ class ClientService implements IClientService
     public function deleteClientByIdentifier($id)
     {
         $res = false;
-        DB::transaction(function () use ($id,&$res){
+	    $this->tx_service->transaction(function () use ($id,&$res){
             $client = Client::find($id);
             if (!is_null($client)) {
                 $client->authorized_uris()->delete();
@@ -190,7 +197,7 @@ class ClientService implements IClientService
     public function regenerateClientSecret($id)
     {
         $new_secret = '';
-        DB::transaction(function () use ($id, &$new_secret) {
+	    $this->tx_service->transaction(function () use ($id, &$new_secret) {
 
             $client = Client::find($id);
 
@@ -220,7 +227,7 @@ class ClientService implements IClientService
         $res      = false;
 	    $this_var = $this;
 
-        DB::transaction(function () use ($client_id, &$res, &$this_var) {
+	    $this->tx_service->transaction(function () use ($client_id, &$res, &$this_var) {
 
             $client = $this_var->getClientByIdentifier($client_id);
             if (is_null($client))
@@ -241,7 +248,7 @@ class ClientService implements IClientService
         $res      = false;
 	    $this_var = $this;
 
-        DB::transaction(function () use ($client_id, &$res, &$this_var) {
+	    $this->tx_service->transaction(function () use ($client_id, &$res, &$this_var) {
 
             $client = $this_var->getClientByIdentifier($client_id);
             if (is_null($client))
@@ -348,7 +355,7 @@ class ClientService implements IClientService
         $res      = false;
 	    $this_var = $this;
 
-        DB::transaction(function () use ($id,$params, &$res, &$this_var) {
+	    $this->tx_service->transaction(function () use ($id,$params, &$res, &$this_var) {
 
             $client = Client::find($id);
             if(is_null($client))
@@ -377,7 +384,8 @@ class ClientService implements IClientService
     public function addClientAllowedOrigin($id, $origin)
     {
         $res = false;
-        DB::transaction(function () use ($id, $origin, &$res) {
+
+	    $this->tx_service->transaction(function () use ($id, $origin, &$res) {
 
             $client = Client::find($id);
 

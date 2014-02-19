@@ -11,4 +11,5 @@ class UtilsServiceCatalog {
     const ServerConfigurationService = 'utils\\services\\IServerConfigurationService';
     const CacheService               = 'utils\\services\\ICacheService';
     const BannedIpService            = 'utils\\services\\IBannedIPService';
+	const TransactionService         = 'utils\\db\\ITransactionService';
 } 

@@ -11,13 +11,23 @@ use oauth2\services\IClientService;
 use ResourceServer;
 use DB;
 use \oauth2\exceptions\InvalidResourceServer;
+use utils\db\ITransactionService;
 
+/**
+ * Class ResourceServerService
+ * @package services\oauth2
+ */
 class ResourceServerService implements IResourceServerService {
 
     private $client_service;
 
-    public function __construct(IClientService $client_service){
+	/**
+	 * @param IClientService      $client_service
+	 * @param ITransactionService $tx_service
+	 */
+	public function __construct(IClientService $client_service,ITransactionService $tx_service){
         $this->client_service = $client_service;
+		$this->tx_service     = $tx_service;
     }
 
     /**
@@ -44,7 +54,7 @@ class ResourceServerService implements IResourceServerService {
         $res      = false;
 	    $this_var = $this;
 
-        DB::transaction(function () use ($id,$params,&$res, &$this_var) {
+	    $this->tx_service->transaction(function () use ($id,$params,&$res, &$this_var) {
 
             $resource_server = ResourceServer::find($id);
 
@@ -106,7 +116,7 @@ class ResourceServerService implements IResourceServerService {
         $res            = false;
 	    $client_service = $this->client_service;
 
-        DB::transaction(function () use ($id,&$res,&$client_service) {
+	    $this->tx_service->transaction(function () use ($id,&$res,&$client_service) {
 
             $resource_server = ResourceServer::find($id);
 
@@ -148,7 +158,7 @@ class ResourceServerService implements IResourceServerService {
             $active = strtoupper($active) =='TRUE' ?true:false;
         }
 
-        DB::transaction(function () use ($host, $ip, $friendly_name, $active, &$instance, &$client_service) {
+	    $this->tx_service->transaction(function () use ($host, $ip, $friendly_name, $active, &$instance, &$client_service) {
 
             if(ResourceServer::where('host','=',$host)->count()>0)
                 throw new InvalidResourceServer(sprintf('there is already another resource server with that hostname (%s).',$host));
@@ -183,7 +193,7 @@ class ResourceServerService implements IResourceServerService {
         $res      = null;
 	    $client_service = $this->client_service;
 
-        DB::transaction(function () use ($id,&$res,&$client_service) {
+	    $this->tx_service->transaction(function () use ($id,&$res,&$client_service) {
 
             $resource_server = ResourceServer::find($id);
 

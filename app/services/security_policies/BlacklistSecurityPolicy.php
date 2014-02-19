@@ -13,6 +13,7 @@ use utils\services\ICacheService;
 use utils\services\ILockManagerService;
 use utils\services\IServerConfigurationService;
 use utils\IPHelper;
+use utils\db\ITransactionService;
 /**
  * Class BlacklistSecurityPolicy
  * implements check point security pattern
@@ -23,9 +24,15 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
 
     private $exception_dictionary = array();
 
-    public function __construct(IServerConfigurationService $server_configuration_service, ILockManagerService $lock_manager_service, ICacheService $cache_service)
+	/**
+	 * @param IServerConfigurationService $server_configuration_service
+	 * @param ILockManagerService         $lock_manager_service
+	 * @param ICacheService               $cache_service
+	 * @param ITransactionService         $tx_service
+	 */
+	public function __construct(IServerConfigurationService $server_configuration_service, ILockManagerService $lock_manager_service, ICacheService $cache_service,ITransactionService $tx_service)
     {
-        parent::__construct($server_configuration_service, $lock_manager_service, $cache_service);
+        parent::__construct($server_configuration_service, $lock_manager_service, $cache_service,$tx_service);
         // here we configure on which exceptions are we interested and the max occurrence attempts and initial delay on tar pit for
         // offending IP address
         $this->exception_dictionary = array(

@@ -2,13 +2,11 @@
 namespace services\openid;
 
 use auth\IUserRepository;
-use auth\User;
 use openid\model\IOpenIdUser;
-use DB;
 use Exception;
 use openid\services\IUserService;
 use utils\services\ILogService;
-
+use utils\db\ITransactionService;
 /**
  * Class UserService
  * @package services\openid
@@ -18,14 +16,17 @@ class UserService implements IUserService
 
 	private $repository;
 	private $log_service;
+	private $tx_service;
 
 	/**
-	 * @param IUserRepository $repository
-	 * @param ILogService     $log_service
+	 * @param IUserRepository     $repository
+	 * @param ITransactionService $tx_service
+	 * @param ILogService         $log_service
 	 */
-	public function __construct(IUserRepository $repository, ILogService $log_service){
+	public function __construct(IUserRepository $repository, ITransactionService $tx_service, ILogService $log_service){
 		$this->repository  = $repository;
 		$this->log_service = $log_service;
+		$this->tx_service  = $tx_service;
 	}
 
 
@@ -40,7 +41,7 @@ class UserService implements IUserService
         try {
 	        $repository = $this->repository;
             if (!is_null($user) && $user->identifier === $user->external_id) {
-                DB::transaction(function () use ($proposed_username,&$user,&$repository) {
+	            $this->tx_service->transaction(function () use ($proposed_username,&$user,&$repository) {
 
                     $done         = false;
                     $fragment_nbr = 1;

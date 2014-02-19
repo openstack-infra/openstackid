@@ -6,9 +6,24 @@ use oauth2\services\IApiService;
 use Api;
 use DB;
 use oauth2\exceptions\InvalidApi;
+use utils\db\ITransactionService;
 
+/**
+ * Class ApiService
+ * @package services\oauth2
+ */
 class ApiService implements  IApiService {
-    /**
+
+	private $tx_service;
+
+	/**
+	 * @param ITransactionService $tx_service
+	 */
+	public function __construct(ITransactionService $tx_service){
+		$this->tx_service = $tx_service;
+	}
+
+	/**
      * @param $api_id
      * @return IApi
      */
@@ -33,7 +48,7 @@ class ApiService implements  IApiService {
     public function delete($id)
     {
         $res = false;
-        DB::transaction(function () use ($id,&$res) {
+	    $this->tx_service->transaction(function () use ($id,&$res) {
             $api = Api::find($id);
             if(!is_null($api)){
                 $res = $api->delete();
@@ -56,7 +71,7 @@ class ApiService implements  IApiService {
             $active =  strtoupper($active) == 'TRUE'?true:false;
         }
 
-        DB::transaction(function () use ($name, $description, $active, $resource_server_id, &$instance) {
+	    $this->tx_service->transaction(function () use ($name, $description, $active, $resource_server_id, &$instance) {
 
             $count = Api::where('name','=',$name)->count();
             if($count>0)
@@ -86,7 +101,7 @@ class ApiService implements  IApiService {
         $res      = false;
 	    $this_var = $this;
 
-        DB::transaction(function () use ($id,$params, &$res, &$this_var) {
+	    $this->tx_service->transaction(function () use ($id,$params, &$res, &$this_var) {
 
             $api = Api::find($id);
             if(is_null($api))

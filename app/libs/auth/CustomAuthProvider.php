@@ -7,11 +7,10 @@ use auth\exceptions\AuthenticationLockedUserLoginAttempt;
 use Exception;
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\UserProviderInterface;
-use Log;
-use Member;
-use DB;
 use openid\services\IUserService;
 use utils\services\ICheckPointService;
+use utils\db\ITransactionService;
+use utils\services\ILogService;
 
 /**
  * Class CustomAuthProvider
@@ -26,18 +25,24 @@ class CustomAuthProvider implements UserProviderInterface
     private $checkpoint_service;
 	private $user_repository;
 	private $member_repository;
+	private $tx_service;
+	private $log_service;
 
     public function __construct(IUserRepository $user_repository,
 	                            IMemberRepository $member_repository,
 	                            IAuthenticationExtensionService $auth_extension_service,
                                 IUserService $user_service,
-                                ICheckPointService $checkpoint_service){
+                                ICheckPointService $checkpoint_service,
+                                ITransactionService $tx_service,
+								ILogService         $log_service){
 
         $this->auth_extension_service = $auth_extension_service;
         $this->user_service           = $user_service;
         $this->checkpoint_service     = $checkpoint_service;
 	    $this->user_repository        = $user_repository;
 	    $this->member_repository      = $member_repository;
+	    $this->tx_service             = $tx_service;
+	    $this->log_service            = $log_service;
     }
 
     /**
@@ -50,15 +55,15 @@ class CustomAuthProvider implements UserProviderInterface
     {
         try {
             //here we do the manuel join between 2 DB, (openid and SS db)
-            $user   = User::where('external_id', '=', $identifier)->first();
-            $member = Member::where('Email', '=', $identifier)->first();
+            $user   = $this->user_repository->getByExternalId($identifier);
+            $member = $this->member_repository->getByEmail($identifier);
             if (!is_null($member) && !is_null($user)) {
                 $user->setMember($member);
                 return $user;
             }
             return null;
         } catch (Exception $ex) {
-            Log::error($ex);
+            $this->log_service->error($ex);
             return null;
         }
     }
@@ -80,7 +85,7 @@ class CustomAuthProvider implements UserProviderInterface
         try {
 
 
-            DB::transaction(function () use ($credentials, &$user,&$user_repository,&$member_repository, &$user_service,&$auth_extension_service) {
+            $this->tx_service->transaction(function () use ($credentials, &$user,&$user_repository,&$member_repository, &$user_service,&$auth_extension_service) {
 
                 if (!isset($credentials['username']) || !isset($credentials['password']))
                     throw new AuthenticationException("invalid crendentials");
@@ -139,7 +144,7 @@ class CustomAuthProvider implements UserProviderInterface
             });
          } catch (Exception $ex) {
             $this->checkpoint_service->trackException($ex);
-            Log::error($ex);
+	        $this->log_service->error($ex);
             $user = null;
         }
         return $user;
@@ -161,16 +166,13 @@ class CustomAuthProvider implements UserProviderInterface
         try {
             $identifier = $credentials['username'];
             $password   = $credentials['password'];
-            $user       = User::where('external_id', '=', $identifier)->first();
-
+            $user       = $this->user_repository->getByExternalId($identifier);
             if (is_null($user) || $user->lock || !$user->active)
                 return false;
-
-            $member = Member::where('Email', '=', $identifier)->first();
-
+            $member = $this->member_repository->getByEmail($identifier);
             return !is_null($member) ? $member->checkPassword($password) : false;
         } catch (Exception $ex) {
-            Log::error($ex);
+	        $this->log_service->error($ex);
             return false;
         }
     }

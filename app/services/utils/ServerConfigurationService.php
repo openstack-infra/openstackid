@@ -9,7 +9,7 @@ use openid\services\IServerConfigurationService as IOpenIdServerConfigurationSer
 use ServerConfiguration;
 use utils\services\ICacheService;
 use utils\services\IServerConfigurationService;
-
+use utils\db\ITransactionService;
 /**
  * Class ServerConfigurationService
  * @package services
@@ -25,14 +25,17 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
     const DefaultNonceLifetime = 360;
 
     private $default_config_params;
+	private $tx_service;
 
-    /**
-     * @param ICacheService $cache_service
-     */
-    public function __construct(ICacheService $cache_service)
+	/***
+	 * @param ICacheService       $cache_service
+	 * @param ITransactionService $tx_service
+	 */
+	public function __construct(ICacheService $cache_service, ITransactionService $tx_service)
     {
 
         $this->cache_service = $cache_service;
+	    $this->tx_service    = $tx_service;
         $this->default_config_params = array();
         //default config values
 
@@ -114,7 +117,7 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
 	    $cache_service         = $this->cache_service;
 	    $default_config_params = $this->default_config_params;
 
-        DB::transaction(function () use ($key, &$res,&$cache_service,&$default_config_params) {
+	    $this->tx_service->transaction(function () use ($key, &$res,&$cache_service,&$default_config_params) {
             try {
 
                 if (!$cache_service->exists($key)) {
@@ -152,7 +155,7 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
         $res           = false;
 	    $cache_service = $this->cache_service;
 
-	    DB::transaction(function () use ($key, $value, &$res,&$cache_service) {
+	    $this->tx_service->transaction(function () use ($key, $value, &$res,&$cache_service) {
 
             $conf = ServerConfiguration::where('key', '=', $key)->first();
 

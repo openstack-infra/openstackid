@@ -11,7 +11,7 @@ use utils\services\IServerConfigurationService;
 use utils\services\IBannedIPService;
 use utils\services\IAuthService;
 use utils\services\ILogService;
-
+use utils\db\ITransactionService;
 /**
  * Class BannedIPService
  * @package utils\services
@@ -22,22 +22,25 @@ class BannedIPService implements IBannedIPService {
     private $server_configuration_service;
     private $log_service;
     private $auth_service;
-
-    /**
-     * @param ICacheService $cache_service
-     * @param IServerConfigurationService $server_configuration_service
-     * @param IAuthService $auth_service
-     * @param ILogService $log_service
-     */
-    public function __construct(ICacheService $cache_service,
+	private $tx_service;
+	/**
+	 * @param ICacheService               $cache_service
+	 * @param IServerConfigurationService $server_configuration_service
+	 * @param IAuthService                $auth_service
+	 * @param ILogService                 $log_service
+	 * @param ITransactionService         $tx_service
+	 */
+	public function __construct(ICacheService $cache_service,
                                 IServerConfigurationService $server_configuration_service,
                                 IAuthService $auth_service,
-                                ILogService $log_service){
+                                ILogService $log_service,
+                                ITransactionService $tx_service){
 
         $this->cache_service                = $cache_service;
         $this->server_configuration_service = $server_configuration_service;
         $this->log_service                  = $log_service;
         $this->auth_service                 = $auth_service;
+		$this->tx_service                   = $tx_service;
     }
 
     /**
@@ -53,7 +56,7 @@ class BannedIPService implements IBannedIPService {
             //try to create on cache
             $this->cache_service->addSingleValue($remote_address, $initial_hits, intval($this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.BannedIpLifeTimeSeconds")));
 
-            DB::transaction(function () use ($remote_address, $exception_type, $initial_hits,&$res) {
+	        $this->tx_service->transaction(function () use ($remote_address, $exception_type, $initial_hits,&$res) {
 
                 $banned_ip = BannedIP::where("ip", "=", $remote_address)->first();
                 if (!$banned_ip) {
@@ -82,7 +85,7 @@ class BannedIPService implements IBannedIPService {
         $res           = false;
 	    $cache_service = $this->cache_service;
 		$this_var      = $this;
-	    DB::transaction(function () use ($ip,&$res,&$cache_service,&$this_var) {
+	    $this->tx_service->transaction(function () use ($ip,&$res,&$cache_service,&$this_var) {
 
             if($banned_ip = $this_var->getByIP($ip)){
                 $res = $banned_ip->delete();

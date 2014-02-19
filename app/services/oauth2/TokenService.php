@@ -34,6 +34,7 @@ use utils\services\ICacheService;
 use  utils\services\IAuthService;
 
 use Event;
+use utils\db\ITransactionService;
 /**
  * Class TokenService
  * Provides all Tokens related operations (create, get and revoke)
@@ -61,8 +62,9 @@ class TokenService implements ITokenService
     private $cache_service;
     private $auth_service;
     private $user_consent_service;
+	private $tx_service;
 
-    public function __construct(IClientService $client_service, ILockManagerService $lock_manager_service, IServerConfigurationService $configuration_service, ICacheService $cache_service, IAuthService $auth_service, IUserConsentService $user_consent_service)
+    public function __construct(IClientService $client_service, ILockManagerService $lock_manager_service, IServerConfigurationService $configuration_service, ICacheService $cache_service, IAuthService $auth_service, IUserConsentService $user_consent_service,ITransactionService $tx_service)
     {
         $this->client_service        = $client_service;
         $this->lock_manager_service  = $lock_manager_service;
@@ -70,7 +72,7 @@ class TokenService implements ITokenService
         $this->cache_service         = $cache_service;
         $this->auth_service          = $auth_service;
         $this->user_consent_service  = $user_consent_service;
-
+	    $this->tx_service            = $tx_service;
 	    $this_var = $this;
 
 	    Event::listen('oauth2.client.delete', function($client_id) use (&$this_var)
@@ -179,7 +181,7 @@ class TokenService implements ITokenService
 	    $auth_service   = $this->auth_service;
 	    $this_var       = $this;
 
-        DB::transaction(function () use ($auth_code, $redirect_uri, &$access_token,&$cache_service,&$client_service,&$auth_service,&$this_var) {
+	    $this->tx_service->transaction(function () use ($auth_code, $redirect_uri, &$access_token,&$cache_service,&$client_service,&$auth_service,&$this_var) {
 
             $value        = $access_token->getValue();
             $hashed_value = Hash::compute('sha256', $value);
@@ -239,7 +241,7 @@ class TokenService implements ITokenService
 	    $auth_service   = $this->auth_service;
 	    $this_var       = $this;
 
-	    DB::transaction(function () use ($client_id,$scope, $audience,$user_id, &$access_token,&$this_var,&$cache_service,&$client_service,&$auth_service) {
+	    $this->tx_service->transaction(function () use ($client_id,$scope, $audience,$user_id, &$access_token,&$this_var,&$cache_service,&$client_service,&$auth_service) {
 
 
             $value        = $access_token->getValue();
@@ -297,7 +299,7 @@ class TokenService implements ITokenService
 
 
         //preserve entire operation on db transaction...
-        DB::transaction(function () use ($refresh_token, $scope, &$access_token, &$this_var,&$cache_service,&$client_service,&$auth_service,&$configuration_service) {
+	    $this->tx_service->transaction(function () use ($refresh_token, $scope, &$access_token, &$this_var,&$cache_service,&$client_service,&$auth_service,&$configuration_service) {
 
             $refresh_token_value        = $refresh_token->getValue();
             $refresh_token_hashed_value = Hash::compute('sha256', $refresh_token_value);
@@ -538,7 +540,7 @@ class TokenService implements ITokenService
 	    $cache_service  = $this->cache_service;
 	    $this_var       = $this;
 
-        DB::transaction(function () use (&$refresh_token, &$access_token, &$this_var,&$client_service,&$auth_service,&$cache_service) {
+	    $this->tx_service->transaction(function () use (&$refresh_token, &$access_token, &$this_var,&$client_service,&$auth_service,&$cache_service) {
             $value         = $refresh_token->getValue();
             //hash the given value, bc tokens values are stored hashed on DB
             $hashed_value = Hash::compute('sha256', $value);
@@ -625,7 +627,7 @@ class TokenService implements ITokenService
         $auth_code_hashed_value = Hash::compute('sha256', $auth_code);
 	    $cache_service  = $this->cache_service;
 
-        DB::transaction(function () use ($auth_code_hashed_value,&$cache_service) {
+	    $this->tx_service->transaction(function () use ($auth_code_hashed_value,&$cache_service) {
             //get related access tokens
             $db_access_tokens = DBAccessToken::where('associated_authorization_code', '=', $auth_code_hashed_value)->get();
 
@@ -660,7 +662,7 @@ class TokenService implements ITokenService
         $res            = 0;
 	    $cache_service  = $this->cache_service;
 
-	    DB::transaction(function () use ($value, $is_hashed, &$res,&$cache_service) {
+	    $this->tx_service->transaction(function () use ($value, $is_hashed, &$res,&$cache_service) {
             //hash the given value, bc tokens values are stored hashed on DB
             $hashed_value = !$is_hashed?Hash::compute('sha256', $value):$value;
 
@@ -690,7 +692,7 @@ class TokenService implements ITokenService
 	    $cache_service  = $this->cache_service;
 
 
-	    DB::transaction(function () use ($client_id, $auth_codes, $access_tokens,&$cache_service,&$client_service) {
+	    $this->tx_service->transaction(function () use ($client_id, $auth_codes, $access_tokens,&$cache_service,&$client_service) {
             $client = $client_service->getClientById($client_id);
             if(is_null($client)) return;
             //revoke on cache
@@ -730,7 +732,7 @@ class TokenService implements ITokenService
         $res      = false;
 	    $this_var = $this;
 
-        DB::transaction(function () use ($value,$is_hashed, &$res,&$this_var) {
+	    $this->tx_service->transaction(function () use ($value,$is_hashed, &$res,&$this_var) {
             $res  = $this_var->invalidateRefreshToken($value,$is_hashed);
             $res  = $res && $this_var->clearAccessTokensForRefreshToken($value,$is_hashed);
         });
@@ -749,7 +751,7 @@ class TokenService implements ITokenService
         $res            = false;
 	    $cache_service  = $this->cache_service;
 
-        DB::transaction(function () use ($hashed_value, &$res,&$cache_service) {
+	    $this->tx_service->transaction(function () use ($hashed_value, &$res,&$cache_service) {
 
             $refresh_token_db = DBRefreshToken::where('value','=',$hashed_value)->first();
             if(!is_null($refresh_token_db)){

@@ -65,7 +65,7 @@ $framework = $app['path.base'].'/vendor/laravel/framework/src';
 require $framework.'/Illuminate/Foundation/start.php';
 
 
-//custom authenticationbootstrap/start.php
+//custom authentication
 use Illuminate\Auth\Guard;
 use auth\CustomAuthProvider;
 
@@ -76,7 +76,9 @@ Auth::extend('custom', function($app) {
 	        App::make('auth\\IMemberRepository'),
 	        App::make('auth\\IAuthenticationExtensionService'),
 	        App::make(OpenIdServiceCatalog::UserService),
-	        App::make(UtilsServiceCatalog::CheckPointService)
+	        App::make(UtilsServiceCatalog::CheckPointService),
+	        App::make(UtilsServiceCatalog::TransactionService),
+	        App::make(UtilsServiceCatalog::LogService)
             ),
         App::make('session.store')
     );

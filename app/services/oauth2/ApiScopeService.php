@@ -9,12 +9,21 @@ use oauth2\services\IApiScopeService;
 use ApiScope;
 use Api;
 use DB;
-
+use utils\db\ITransactionService;
 /**
  * Class ApiScopeService
  * @package services\oauth2
  */
 class ApiScopeService implements IApiScopeService {
+
+	private $tx_service;
+
+	/**
+	 * @param ITransactionService $tx_service
+	 */
+	public function __construct(ITransactionService $tx_service){
+		$this->tx_service = $tx_service;
+	}
 
     /**
      * @param array $scopes_names
@@ -134,7 +143,7 @@ class ApiScopeService implements IApiScopeService {
         $res      = false;
 	    $this_var = $this;
 
-        DB::transaction(function () use ($id,$params,&$res,&$this_var) {
+	    $this->tx_service->transaction(function () use ($id,$params,&$res,&$this_var) {
 
             //check that scope exists...
             $scope = ApiScope::find($id);
@@ -184,7 +193,7 @@ class ApiScopeService implements IApiScopeService {
     public function delete($id)
     {
         $res = false;
-        DB::transaction(function () use ($id,&$res) {
+	    $this->tx_service->transaction(function () use ($id,&$res) {
 
             $scope = ApiScope::find($id);
             if(is_null($scope))
@@ -210,7 +219,7 @@ class ApiScopeService implements IApiScopeService {
     public function add($name, $short_description, $description, $active, $default, $system, $api_id)
     {
         $instance = null;
-        DB::transaction(function () use ($name, $short_description, $description, $active, $default, $system, $api_id, &$instance) {
+	    $this->tx_service->transaction(function () use ($name, $short_description, $description, $active, $default, $system, $api_id, &$instance) {
 
             // check if api exists...
             if(is_null(Api::find($api_id)))

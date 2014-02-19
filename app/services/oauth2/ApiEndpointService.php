@@ -9,12 +9,21 @@ use ApiScope;
 use DB;
 use  oauth2\exceptions\InvalidApiEndpoint;
 use  oauth2\exceptions\InvalidApiScope;
-
+use utils\db\ITransactionService;
 /**
  * Class ApiEndpointService
  * @package services\oauth2
  */
 class ApiEndpointService implements IApiEndpointService {
+
+	private $tx_service;
+
+	/**
+	 * @param ITransactionService $tx_service
+	 */
+	public function __construct(ITransactionService $tx_service){
+		$this->tx_service = $tx_service;
+	}
 
     /**
      * @param $url
@@ -71,7 +80,7 @@ class ApiEndpointService implements IApiEndpointService {
     {
         $instance = null;
 
-        DB::transaction(function () use ($name, $description, $active,$allow_cors, $route, $http_method, $api_id, &$instance) {
+	    $this->tx_service->transaction(function () use ($name, $description, $active,$allow_cors, $route, $http_method, $api_id, &$instance) {
 
             //check that does not exists an endpoint with same http method and same route
             if(ApiEndpoint::where('http_method','=',$http_method)->where('route','=',$route)->count()>0)
@@ -104,7 +113,7 @@ class ApiEndpointService implements IApiEndpointService {
         $res = false;
 	    $this_var = $this;
 
-        DB::transaction(function () use ($id,$params, &$res,&$this_var){
+	    $this->tx_service->transaction(function () use ($id,$params, &$res,&$this_var){
             $endpoint = ApiEndpoint::find($id);
             if(is_null($endpoint))
                 throw new InvalidApiEndpoint(sprintf('api endpoint id %s does not exists!',$id));
@@ -136,7 +145,7 @@ class ApiEndpointService implements IApiEndpointService {
     {
         $res = false;
 
-        DB::transaction(function () use($api_endpoint_id, $scope_id,&$res){
+	    $this->tx_service->transaction(function () use($api_endpoint_id, $scope_id,&$res){
 
             $api_endpoint = ApiEndpoint::find($api_endpoint_id);
 
@@ -178,7 +187,7 @@ class ApiEndpointService implements IApiEndpointService {
 
         $res = false;
 
-        DB::transaction(function () use($api_endpoint_id, $scope_id,&$res){
+	    $this->tx_service->transaction(function () use($api_endpoint_id, $scope_id,&$res){
 
             $api_endpoint = ApiEndpoint::find($api_endpoint_id);
 
@@ -213,7 +222,7 @@ class ApiEndpointService implements IApiEndpointService {
     public function delete($id)
     {
         $res = false;
-        DB::transaction(function () use ($id,&$res) {
+	    $this->tx_service->transaction(function () use ($id,&$res) {
             $endpoint = ApiEndpoint::find($id);
             if(!is_null($endpoint)){
                 $res = $endpoint->delete();
