@@ -1,5 +1,4 @@
 <?php
-
 namespace services\utils;
 
 use BannedIP;
