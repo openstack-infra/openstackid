@@ -7,7 +7,7 @@ class XRDSDocumentBuilder
 
     const ContentType = 'application/xrds+xml';
     const XRDNamespace = 'xri://$xrd*($v*2.0)';
-    const XRDSNamespace = 'xXRDSServiceri://$xrds';
+    const XRDSNamespace = 'xri://$xrds';
     private $elements;
     private $canonical_id;
 
