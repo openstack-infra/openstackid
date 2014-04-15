@@ -22,7 +22,7 @@
         {{ Form::open(array('url' => URL::action('UserController@postLogin'), 'method' => 'post',  "autocomplete" => "off")) }}
         <fieldset>
             <legend>Login</legend>
-            {{ Form::text('username',null, array('placeholder' => 'Username','class'=>'input-block-level')) }}
+	        {{ Form::text('username',Session::has('username')? Session::get('username'):null, array('placeholder' => 'Username','class'=>'input-block-level')) }}
             {{ Form::password('password', array('placeholder' => 'Password','class'=>'input-block-level')) }}
             @if(Session::has('login_attempts') && Session::has('max_login_attempts_2_show_captcha') && Session::get('login_attempts') > Session::get('max_login_attempts_2_show_captcha'))
                 {{ Form::captcha(array('id'=>'captcha','class'=>'input-block-level')) }}

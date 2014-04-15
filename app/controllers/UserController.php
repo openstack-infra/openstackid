@@ -118,13 +118,14 @@ class UserController extends BaseController
             // Create a new validator instance.
             $validator = Validator::make($data, $rules);
 
+
+
             if ($validator->passes()) {
+	            $username = Input::get("username");
+	            $password = Input::get("password");
+	            $remember = Input::get("remember");
 
-                $username = Input::get("username");
-                $password = Input::get("password");
-                $remember = Input::get("remember");
                 $remember = !is_null($remember);
-
                 if ($this->auth_service->login($username, $password, $remember)) {
                     return $this->login_strategy->postLogin();
                 }
@@ -133,9 +134,14 @@ class UserController extends BaseController
                 if ($user) {
                     $login_attempts = $user->login_failed_attempt;
                 }
-                return Redirect::action('UserController@getLogin')->with('max_login_attempts_2_show_captcha', $max_login_attempts_2_show_captcha)->with('login_attempts', $login_attempts)->with('flash_notice', "We're sorry, your username or password does not match an existing record.");
+                return Redirect::action('UserController@getLogin')
+	                ->with('max_login_attempts_2_show_captcha', $max_login_attempts_2_show_captcha)
+	                ->with('login_attempts', $login_attempts)
+	                ->with('username',$username)
+	                ->with('flash_notice', "We're sorry, your username or password does not match an existing record.");
             }
-            return Redirect::action('UserController@getLogin')->withErrors($validator);
+            return Redirect::action('UserController@getLogin')
+	            ->withErrors($validator);
         } catch (Exception $ex) {
             Log::error($ex);
             return Redirect::action('UserController@getLogin');
