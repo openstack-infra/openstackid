@@ -133,7 +133,7 @@ class UserController extends BaseController
                 if ($user) {
                     $login_attempts = $user->login_failed_attempt;
                 }
-                return Redirect::action('UserController@getLogin')->with('max_login_attempts_2_show_captcha', $max_login_attempts_2_show_captcha)->with('login_attempts', $login_attempts)->with('flash_notice', 'Authentication Failed!');
+                return Redirect::action('UserController@getLogin')->with('max_login_attempts_2_show_captcha', $max_login_attempts_2_show_captcha)->with('login_attempts', $login_attempts)->with('flash_notice', "We're sorry, your username or password does not match an existing record.");
             }
             return Redirect::action('UserController@getLogin')->withErrors($validator);
         } catch (Exception $ex) {
