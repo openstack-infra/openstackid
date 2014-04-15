@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-<title>Welcome to openstackId - Edit Profile</title>
+<title>Welcome to openstackId - OpenStack ID Account Settings</title>
 @stop
 
 @section('content')
@@ -21,7 +21,7 @@
             <div class="row-fluid">
                 <div class="span12">
                     {{ Form::open(array('url' => URL::action('UserController@postUserProfileOptions'), 'method' => 'post')) }}
-                    <legend><i class="icon-info-sign accordion-toggle" title="this information will be public on your profile page"></i>&nbsp;Edit your profile options:</legend>
+                    <legend><i class="icon-info-sign accordion-toggle" title="this information will be public on your profile page"></i>&nbsp;OpenStack ID Account Settings:</legend>
                     <fieldset>
                         <label class="checkbox">
                             {{ Form::checkbox('show_full_name', '1', $show_full_name) }}Show Full Name
@@ -110,7 +110,6 @@
     &nbsp;
 </div>
 @stop
-
 @section('scripts')
 <script type="application/javascript">
     $(document).ready(function() {
@@ -118,4 +117,3 @@
     });
 </script>
 @stop
-

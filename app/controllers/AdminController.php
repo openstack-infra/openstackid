@@ -188,12 +188,12 @@ class AdminController extends BaseController {
         $clients = $user->getClients();
 
         return View::make("oauth2.profile.clients", array(
-            "username" => $user->getFullName(),
-            "user_id" => $user->getId(),
-            "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
+            "username"             => $user->getFullName(),
+            "user_id"              => $user->getId(),
+            "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
             "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
-            "use_system_scopes" => $user->canUseSystemScopes(),
-            'clients' => $clients,
+            "use_system_scopes"    => $user->canUseSystemScopes(),
+            'clients'              => $clients,
         ));
     }
 

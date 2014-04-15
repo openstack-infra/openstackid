@@ -4,7 +4,7 @@
 @stop
 @section('content')
 
-<h4>Welcome to OpenstackId!!!</h4>
+<h4>Please use your OpenStack ID to log in</h4>
 @if(isset($identity_select))
     @if(!$identity_select)
         <legend>
@@ -31,16 +31,29 @@
                 {{ Form::hidden('login_attempts', '0') }}
             @endif
             <label class="checkbox">
-                {{ Form::checkbox('remember', '1', false) }}Remember me
+	              {{ Form::checkbox('remember', '1', false) }}Remember me for @if(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")<60) }}
+		                                                                        {{ ServerConfigurationService::getConfigValue("Remember.ExpirationTime") }} Minutes
+	                                                                        @elseif(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")>60 && ServerConfigurationService::getConfigValue("Remember.ExpirationTime")< (24*60))
+	                                                                            {{ intval(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")/60) }} Hours
+	                                                                        @elseif(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")> (24*60) )
+	                                                                            {{ intval(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")/(24*60)) }} Days
+	                                                                        @endif
             </label>
             <div class="pull-right">
                 {{ Form::submit('Sign In',array('id'=>'login','class'=>'btn btn-primary')) }}
                 <a class="btn btn-primary" href="{{ URL::action('UserController@cancelLogin') }}">Cancel</a>
             </div>
+	        <div style="clear:both;padding-top:15px;" class="row-fluid">
+		        <div class="span5">
+		        <a title="forgot password" href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}Security/lostpassword">Forgot password?</a>
+		        </div>
+		        <div class="span7">
+		        <a title="register new account" href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}join/register">Register for an OpenStack ID</a>
+		        </div>
+	        </div>
         </fieldset>
         {{ Form::close() }}
     </div>
-
     @if(Session::has('flash_notice'))
     <div class="alert alert-error">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -54,10 +67,7 @@
     </div>
     @endforeach
     @endif
-
 </div>
 <div class="span8">
-
 </div>
-
 @stop

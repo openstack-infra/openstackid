@@ -43,35 +43,10 @@
 @section('scripts')
 @parent
 <script type="application/javascript">
-
-    $(document).ready(function() {
-
-        $("body").on('click',".scope-checkbox",function(event){
-            var add_url    = '{{URL::action("ClientApiController@addAllowedScope",array("id"=>$client->id,"scope_id"=>"@scope_id"))}}';
-            var remove_url = '{{URL::action("ClientApiController@removeAllowedScope",array("id"=>$client->id,"scope_id"=>"@scope_id"))}}';
-            var scope_id   = $(this).attr('value');
-            var checked    = $(this).is(':checked');
-            var url        = checked?add_url:remove_url;
-            url            = url.replace('@scope_id',scope_id);
-            var verb       = checked?'PUT':'DELETE';
-            $.ajax(
-                {
-                    type: verb,
-                    url: url,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    timeout:60000,
-                    success: function (data,textStatus,jqXHR) {
-                        //load data...
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        ajaxError(jqXHR, textStatus, errorThrown);
-                    }
-                }
-            );
-        });
-
-    });
-
+	var clientScopesUrls = {
+		add:'{{URL::action("ClientApiController@addAllowedScope",array("id"=>$client->id,"scope_id"=>"@scope_id"))}}',
+		delete:'{{URL::action("ClientApiController@removeAllowedScope",array("id"=>$client->id,"scope_id"=>"@scope_id"))}}'
+	};
 </script>
+{{ HTML::script('js/oauth2/profile/edit-client-scopes.js') }}
 @stop

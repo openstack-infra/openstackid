@@ -1,7 +1,8 @@
 <div class="navbar">
     <div class="navbar-inner">
         <ul id='main-menu' class="nav">
-            <li id="profile"><a href='{{ URL::action("UserController@getProfile") }}'>Profile</a></li>
+            <li id="profile"><a href='{{ URL::action("UserController@getProfile") }}'>Settings</a></li>
+	        @if( ServerConfigurationService::getConfigValue("OAuth2.Enable") == true)
             <li id="oauth2-console" class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                     OAUTH2 Console
@@ -12,6 +13,7 @@
                     <li><a href='{{URL::action("AdminController@editIssuedGrants")}}'>Issued OAUTH2 Grants</a></li>
                 </ul>
             </li>
+	        @endif
             @if($is_oauth2_admin || $is_openstackid_admin)
             <li id='server-admin' class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">

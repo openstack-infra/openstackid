@@ -42,7 +42,7 @@ Route::group(array("before" => "ssl"), function () {
 });
 
 //oauth2 endpoints
-Route::group(array('prefix' => 'oauth2', 'before' => 'ssl'), function()
+Route::group(array('prefix' => 'oauth2', 'before' => 'ssl|oauth2.enabled'), function()
 {
     //authorization endpoint
     Route::any('/auth',"OAuth2ProviderController@authorize");
@@ -66,12 +66,12 @@ Route::group(array("before" => array("ssl", "auth")), function () {
 
 Route::group(array('prefix' => 'admin','before' => 'ssl|auth'), function(){
     //client admin UI
-    Route::get('clients/edit/{id}',array('before' => 'user.owns.client.policy', 'uses' => 'AdminController@editRegisteredClient'));
-    Route::get('clients',array('uses' => 'AdminController@listOAuth2Clients'));
+    Route::get('clients/edit/{id}',array('before' => 'oauth2.enabled|user.owns.client.policy', 'uses' => 'AdminController@editRegisteredClient'));
+    Route::get('clients',array('before' => 'oauth2.enabled', 'uses' => 'AdminController@listOAuth2Clients'));
 
-    Route::get('/grants','AdminController@editIssuedGrants');
+    Route::get('/grants',array('before' => 'oauth2.enabled', 'uses' => 'AdminController@editIssuedGrants'));
      //oauth2 server admin UI
-    Route::group(array('before' => 'oauth2.server.admin'), function(){
+    Route::group(array('before' => 'oauth2.enabled|oauth2.server.admin'), function(){
         Route::get('/resource-servers','AdminController@listResourceServers');
         Route::get('/resource-server/{id}','AdminController@editResourceServer');
         Route::get('/api/{id}','AdminController@editApi');
@@ -180,7 +180,7 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
 });
 
 //OAuth2 Protected API
-Route::group(array('prefix' => 'api/v1', 'before' => 'ssl|oauth2.cors.before|oauth2.protected.endpoint'), function()
+Route::group(array('prefix' => 'api/v1', 'before' => 'ssl|oauth2.enabled|oauth2.cors.before|oauth2.protected.endpoint'), function()
 {
     Route::group(array('prefix' => 'users'), function(){
         Route::get('/me','OAuth2UserApiController@me');

@@ -1,9 +1,7 @@
 <?php
-
 use Illuminate\Routing\Controller;
 
-class BaseController extends Controller
-{
+class BaseController extends Controller {
 
     /**
      * Setup the layout used by the controller.

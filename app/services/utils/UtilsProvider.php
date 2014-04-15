@@ -17,6 +17,7 @@ class UtilsProvider extends ServiceProvider {
     public function register()
     {
         App::singleton(UtilsServiceCatalog::CacheService, 'services\\utils\\RedisCacheService');
+	    App::singleton(UtilsServiceCatalog::TransactionService, 'services\\utils\\EloquentTransactionService');
 
         App::resolving('redis',function($redis){
             $cache_service = App::make(UtilsServiceCatalog::CacheService);
@@ -24,7 +25,7 @@ class UtilsProvider extends ServiceProvider {
         });
 
         $this->app['serverconfigurationservice'] = App::share(function ($app) {
-            return new ServerConfigurationService(App::make(UtilsServiceCatalog::CacheService));
+            return new ServerConfigurationService(App::make(UtilsServiceCatalog::CacheService),App::make(UtilsServiceCatalog::TransactionService));
         });
 
         // Shortcut so developers don't need to add an Alias in app/config/app.php
@@ -37,7 +38,7 @@ class UtilsProvider extends ServiceProvider {
         App::singleton(UtilsServiceCatalog::LockManagerService, 'services\\utils\\LockManagerService');
         App::singleton(UtilsServiceCatalog::ServerConfigurationService, 'services\\utils\\ServerConfigurationService');
         App::singleton(UtilsServiceCatalog::BannedIpService, 'services\\utils\\BannedIPService');
-	    App::singleton(UtilsServiceCatalog::TransactionService, 'services\\utils\\EloquentTransactionService');
+
     }
 
     public function provides()

@@ -47,19 +47,6 @@ Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()
 
 </div>
 @stop
-
 @section('scripts')
-<script type="application/javascript">
-    $(document).ready(function() {
-        $("body").on('click',"#cancel_authorization",function(event){
-            $form = $('#authorization_form');
-            $("#deny_once").prop("checked", true)
-            $form.submit();
-            event.preventDefault();
-            return false;
-        });
-    });
-</script>
+{{ HTML::script('js/openid/consent.js') }}
 @stop
-
-

@@ -40,17 +40,18 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
         //default config values
 
         //general
-        $this->default_config_params["MaxFailed.Login.Attempts"] = Config::get('server.MaxFailed_Login_Attempts', 10);
+        $this->default_config_params["MaxFailed.Login.Attempts"]             = Config::get('server.MaxFailed_Login_Attempts', 10);
         $this->default_config_params["MaxFailed.LoginAttempts.2ShowCaptcha"] = Config::get('server.MaxFailed_LoginAttempts_2ShowCaptcha', 3);
-        $this->default_config_params["Assets.Url"] = Config::get('server.Assets_Url', 'http://www.openstack.org/');
+        $this->default_config_params["Assets.Url"]                           = Config::get('server.Assets_Url', 'http://www.openstack.org/');
+	    // remember me cookie lifetime (minutes)
+	    $this->default_config_params["Remember.ExpirationTime"]              = Config::get('Remember.ExpirationTime',120);
 
         //openid
         $this->default_config_params["OpenId.Private.Association.Lifetime"] = Config::get('server.OpenId_Private_Association_Lifetime', 240);
         $this->default_config_params["OpenId.Session.Association.Lifetime"] = Config::get('server.OpenId_Session_Association_Lifetime', 21600);
-        $this->default_config_params["OpenId.Nonce.Lifetime"] = Config::get('server.OpenId_Nonce_Lifetime', 360);
+        $this->default_config_params["OpenId.Nonce.Lifetime"]               = Config::get('server.OpenId_Nonce_Lifetime', 360);
 
         //policies
-
         $this->default_config_params["BlacklistSecurityPolicy.BannedIpLifeTimeSeconds"] = Config::get('server.BlacklistSecurityPolicy_BannedIpLifeTimeSeconds', 21600);
         $this->default_config_params["BlacklistSecurityPolicy.MinutesWithoutExceptions"] = Config::get('server.BlacklistSecurityPolicy_MinutesWithoutExceptions', 5);;
         $this->default_config_params["BlacklistSecurityPolicy.ReplayAttackExceptionInitialDelay"] = Config::get('server.BlacklistSecurityPolicy_ReplayAttackExceptionInitialDelay', 10);
@@ -70,8 +71,8 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
         $this->default_config_params["BlacklistSecurityPolicy.InvalidAssociationInitialDelay"] = Config::get('server.BlacklistSecurityPolicy_InvalidAssociationInitialDelay', 20);
 
         //oauth2
-
-        $this->default_config_params["BlacklistSecurityPolicy.OAuth2.MaxAuthCodeReplayAttackAttempts"] = Config::get('server.BlacklistSecurityPolicy_OAuth2_MaxAuthCodeReplayAttackAttempts', 3);
+	    $this->default_config_params["OAuth2.Enable"]                                                   = Config::get('OAuth2.Enable', false);
+        $this->default_config_params["BlacklistSecurityPolicy.OAuth2.MaxAuthCodeReplayAttackAttempts"]  = Config::get('server.BlacklistSecurityPolicy_OAuth2_MaxAuthCodeReplayAttackAttempts', 3);
         $this->default_config_params["BlacklistSecurityPolicy.OAuth2.AuthCodeReplayAttackInitialDelay"] = Config::get('server.BlacklistSecurityPolicy_OAuth2_AuthCodeReplayAttackInitialDelay', 10);
 
         $this->default_config_params["BlacklistSecurityPolicy.OAuth2.MaxInvalidAuthorizationCodeAttempts"] = Config::get('server.BlacklistSecurityPolicy_OAuth2_MaxInvalidAuthorizationCodeAttempts', 3);
