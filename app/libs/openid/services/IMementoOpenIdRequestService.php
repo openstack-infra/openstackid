@@ -2,11 +2,13 @@
 
 namespace openid\services;
 
-
 use openid\OpenIdMessage;
 
-interface IMementoOpenIdRequestService
-{
+/**
+ * Interface IMementoOpenIdRequestService
+ * @package openid\services
+ */
+interface IMementoOpenIdRequestService {
 
     /**
      * Save current OpenIdRequest till next request

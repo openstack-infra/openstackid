@@ -2,7 +2,7 @@
 
 namespace oauth2\exceptions;
 
-use \Exception;
+use Exception;
 
 class AccessDeniedException extends Exception
 {

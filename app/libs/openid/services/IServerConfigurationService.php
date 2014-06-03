@@ -1,11 +1,12 @@
 <?php
 
-
 namespace openid\services;
 
-
-interface IServerConfigurationService
-{
+/**
+ * Interface IServerConfigurationService
+ * @package openid\services
+ */
+interface IServerConfigurationService {
     /**
      *
      * @return mixed

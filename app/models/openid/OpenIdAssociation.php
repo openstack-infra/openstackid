@@ -2,6 +2,9 @@
 
 use openid\model\IAssociation;
 
+/**
+ * Class OpenIdAssociation
+ */
 class OpenIdAssociation extends Eloquent implements IAssociation
 {
 
@@ -75,9 +78,9 @@ class OpenIdAssociation extends Eloquent implements IAssociation
 
     public function getRemainingLifetime()
     {
-        $created_at = new DateTime($this->issued);
+        $created_at = new DateTime($this->issued, new DateTimeZone("UTC"));
         $created_at->add(new DateInterval('PT' . intval($this->lifetime) . 'S'));
-        $now        = new DateTime(gmdate("Y-m-d H:i:s", time()));
+        $now        = new DateTime(gmdate("Y-m-d H:i:s", time()), new DateTimeZone("UTC"));
         //check validity...
         if ($now > $created_at)
             return -1;

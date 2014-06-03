@@ -2,11 +2,11 @@
 
 namespace openid\handlers;
 
-use openid\exceptions\InvalidOpenIdMessageException;
 use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdMessage;
 use utils\services\ILogService;
 use utils\services\ICheckPointService;
+use openid\exceptions\InvalidOpenIdMessageException;
 
 /**
  * Class OpenIdMessageHandler
@@ -17,15 +17,32 @@ use utils\services\ICheckPointService;
 abstract class OpenIdMessageHandler
 {
 
-    protected $successor;
-    protected $current_request;
-    protected $log_service;
-    protected $checkpoint_service;
+	/**
+	 * @var OpenIdMessageHandler
+	 */
+	protected $successor;
+	/**
+	 * @var OpenIdMessage
+	 */
+	protected $current_request;
+	/**
+	 * @var ILogService
+	 */
+	protected $log_service;
+	/**
+	 * @var ICheckPointService
+	 */
+	protected $checkpoint_service;
 
-    public function __construct($successor, ILogService $log_service, ICheckPointService $checkpoint_service)
+	/**
+	 * @param                    $successor
+	 * @param ILogService        $log_service
+	 * @param ICheckPointService $checkpoint_service
+	 */
+	public function __construct($successor, ILogService $log_service, ICheckPointService $checkpoint_service)
     {
-        $this->successor = $successor;
-        $this->log_service = $log_service;
+        $this->successor          = $successor;
+        $this->log_service        = $log_service;
         $this->checkpoint_service = $checkpoint_service;
     }
 
@@ -34,7 +51,7 @@ abstract class OpenIdMessageHandler
      * manage the current message then do it, if not, then pass msg to next sibling
      * @param OpenIdMessage $message
      * @return mixed
-     * @throws \openid\exceptions\InvalidOpenIdMessageException
+     * @throws InvalidOpenIdMessageException
      */
     public function handleMessage(OpenIdMessage $message)
     {
@@ -42,7 +59,7 @@ abstract class OpenIdMessageHandler
             //handle request
             return $this->internalHandle($message);
         } else if (isset($this->successor) && !is_null($this->successor)) {
-            return $this->successor->HandleMessage($message);
+            return $this->successor->handleMessage($message);
         }
         $this->log_service->warning_msg(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
         $ex = new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));

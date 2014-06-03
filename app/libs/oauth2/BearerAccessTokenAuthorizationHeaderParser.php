@@ -3,7 +3,6 @@
 namespace oauth2;
 
 use oauth2\exceptions\OAuth2MissingBearerAccessTokenException;
-use string;
 
 /**
  * Class BearerAccessTokenAuthorizationHeaderParser

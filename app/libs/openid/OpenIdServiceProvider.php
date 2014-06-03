@@ -13,13 +13,9 @@ use App;
  * Register dependencies with IOC container for package openid
  * @package openid
  */
-class OpenIdServiceProvider extends ServiceProvider
-{
+class OpenIdServiceProvider extends ServiceProvider {
 
-
-    public function boot()
-    {
-
+    public function boot(){
     }
 
     /**

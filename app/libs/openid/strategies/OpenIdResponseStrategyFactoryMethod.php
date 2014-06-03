@@ -8,7 +8,11 @@ use openid\responses\OpenIdResponse;
 use utils\IHttpResponseStrategy;
 use utils\services\ServiceLocator;
 
-class OpenIdResponseStrategyFactoryMethod
+/**
+ * Class OpenIdResponseStrategyFactoryMethod
+ * @package openid\strategies
+ */
+final class OpenIdResponseStrategyFactoryMethod
 {
     /**
      * @param OpenIdResponse $response

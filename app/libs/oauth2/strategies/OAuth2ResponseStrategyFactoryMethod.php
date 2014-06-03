@@ -8,7 +8,11 @@ use oauth2\responses\OAuth2IndirectResponse;
 use oauth2\responses\OAuth2Response;
 use utils\services\ServiceLocator;
 
-class OAuth2ResponseStrategyFactoryMethod {
+/**
+ * Class OAuth2ResponseStrategyFactoryMethod
+ * @package oauth2\strategies
+ */
+final class OAuth2ResponseStrategyFactoryMethod {
 
     public static function buildStrategy(OAuth2Response $response)
     {

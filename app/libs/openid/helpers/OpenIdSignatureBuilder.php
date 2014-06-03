@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/17/13
- * Time: 5:26 PM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\helpers;
 
@@ -13,7 +6,11 @@ use openid\requests\OpenIdCheckAuthenticationRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdPositiveAssertionResponse;
 
-class OpenIdSignatureBuilder
+/**
+ * Class OpenIdSignatureBuilder
+ * @package openid\helpers
+ */
+final class OpenIdSignatureBuilder
 {
 
 

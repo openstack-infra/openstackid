@@ -8,8 +8,11 @@ use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
 
-class OpenIdAssociationSessionRequest extends OpenIdRequest
-{
+/**
+ * Class OpenIdAssociationSessionRequest
+ * @package openid\requests
+ */
+class OpenIdAssociationSessionRequest extends OpenIdRequest {
 
 
     public function __construct(OpenIdMessage $message)

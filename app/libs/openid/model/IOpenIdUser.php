@@ -1,6 +1,7 @@
 <?php
 
 namespace openid\model;
+
 /**
  * Interface IOpenIdUser
  * @package openid\model

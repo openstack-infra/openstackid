@@ -2,8 +2,11 @@
 
 namespace openid\model;
 
-interface IAssociation
-{
+/**
+ * Interface IAssociation
+ * @package openid\model
+ */
+interface IAssociation {
 
     const TypePrivate = 1;
     const TypeSession = 2;

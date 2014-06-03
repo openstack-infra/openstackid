@@ -1,6 +1,5 @@
 <?php
 
-
 namespace oauth2\grant_types;
 
 use oauth2\requests\OAuth2Request;

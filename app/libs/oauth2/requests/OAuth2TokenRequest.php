@@ -1,4 +1,5 @@
 <?php
+
 namespace oauth2\requests;
 
 use oauth2\OAuth2Message;

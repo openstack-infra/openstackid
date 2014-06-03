@@ -2,9 +2,11 @@
 
 namespace utils\services;
 
-
-interface IAuthService
-{
+/**
+ * Interface IAuthService
+ * @package utils\services
+ */
+interface IAuthService {
     const AuthorizationResponse_None         = "None";
     const AuthorizationResponse_AllowOnce    = "AllowOnce";
     const AuthorizationResponse_AllowForever = "AllowForever";

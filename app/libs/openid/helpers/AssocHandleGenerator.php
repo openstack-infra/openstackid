@@ -11,7 +11,7 @@ use Zend\Math\Rand;
  * range 33-126 inclusive (printable non-whitespace characters).
  * @package openid\helpers
  */
-class AssocHandleGenerator
+final class AssocHandleGenerator
 {
 
     const PrintableNonWhitespaceCharacters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-_~';

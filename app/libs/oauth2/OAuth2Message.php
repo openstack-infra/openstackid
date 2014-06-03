@@ -1,8 +1,13 @@
 <?php
+
 namespace oauth2;
 
 use utils\http\HttpMessage;
 
+/**
+ * Class OAuth2Message
+ * @package oauth2
+ */
 class OAuth2Message extends HttpMessage
 {
     public function __construct(array $values)

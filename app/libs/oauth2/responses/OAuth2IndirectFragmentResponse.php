@@ -2,7 +2,6 @@
 
 namespace oauth2\responses;
 
-
 class OAuth2IndirectFragmentResponse extends OAuth2IndirectResponse {
 
     const OAuth2IndirectFragmentResponse ='OAuth2IndirectFragmentResponse';

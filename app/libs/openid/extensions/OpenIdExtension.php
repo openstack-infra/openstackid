@@ -7,7 +7,7 @@ use openid\requests\OpenIdRequest;
 use openid\responses\contexts\ResponseContext;
 use openid\responses\OpenIdResponse;
 use utils\services\ILogService;
-
+use openid\Exceptions\InvalidOpenIdMessageException;
 /**
  * Class OpenIdExtension
  * Abstract implementation of OpenId Extensions

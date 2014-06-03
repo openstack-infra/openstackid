@@ -2,7 +2,6 @@
 
 namespace oauth2\grant_types;
 
-
 use oauth2\exceptions\InvalidGrantTypeException;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\ScopeNotAllowedException;

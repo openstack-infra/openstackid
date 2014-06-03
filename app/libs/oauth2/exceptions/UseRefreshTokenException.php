@@ -1,7 +1,7 @@
 <?php
 
-
 namespace oauth2\exceptions;
+
 use Exception;
 
 class UseRefreshTokenException extends Exception

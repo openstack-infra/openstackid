@@ -4,7 +4,6 @@ namespace openid\handlers\factories;
 
 use openid\handlers\strategies\implementations\SessionAssociationDHStrategy;
 use openid\handlers\strategies\implementations\SessionAssociationUnencryptedStrategy;
-use openid\handlers\strategies\ISessionAssociationStrategy;
 use openid\OpenIdMessage;
 use openid\requests\OpenIdAssociationSessionRequest;
 use openid\requests\OpenIdDHAssociationSessionRequest;
@@ -12,7 +11,11 @@ use openid\services\OpenIdServiceCatalog;
 use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
 
-class SessionAssociationRequestFactory
+/**
+ * Class SessionAssociationRequestFactory
+ * @package openid\handlers\factories
+ */
+final class SessionAssociationRequestFactory
 {
 
     public static function buildRequest(OpenIdMessage $message)
@@ -26,8 +29,7 @@ class SessionAssociationRequestFactory
      * @param OpenIdMessage $message
      * @return null|SessionAssociationDHStrategy|SessionAssociationUnencryptedStrategy
      */
-    public static function buildSessionAssociationStrategy(OpenIdMessage $message)
-    {
+    public static function buildSessionAssociationStrategy(OpenIdMessage $message) {
 
 	    $association_service    = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::AssociationService);
 	    $configuration_service  = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::ServerConfigurationService);

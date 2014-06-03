@@ -4,7 +4,10 @@ namespace utils\db;
 
 use Closure;
 
-
+/**
+ * Interface ITransactionService
+ * @package utils\db
+ */
 interface ITransactionService {
 	/**
 	 * Execute a Closure within a transaction.

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace oauth2\exceptions;
 
 use Exception;

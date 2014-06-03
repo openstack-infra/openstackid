@@ -2,7 +2,10 @@
 
 namespace utils\http;
 
-
+/**
+ * Class HttpResponse
+ * @package utils\http
+ */
 abstract class HttpResponse extends HttpMessage
 {
     const HttpOkResponse = 200;

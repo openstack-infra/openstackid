@@ -4,12 +4,10 @@ namespace openid\handlers\strategies\implementations;
 
 use openid\exceptions\InvalidDHParam;
 use openid\handlers\strategies\ISessionAssociationStrategy;
-use openid\helpers\AssocHandleGenerator;
-use openid\helpers\OpenIdCryptoHelper;
-use openid\model\IAssociation;
 use openid\requests\OpenIdAssociationSessionRequest;
 use openid\responses\OpenIdAssociationSessionResponse;
 use openid\responses\OpenIdUnencryptedAssociationSessionResponse;
+use openid\responses\OpenIdDirectGenericErrorResponse;
 use Zend\Crypt\Exception\InvalidArgumentException;
 use Zend\Crypt\Exception\RuntimeException;
 

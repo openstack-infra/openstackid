@@ -1,6 +1,7 @@
 <?php
 
 namespace oauth2\responses;
+
 use oauth2\OAuth2Protocol;
 
 /**

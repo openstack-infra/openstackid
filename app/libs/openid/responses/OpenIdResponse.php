@@ -1,17 +1,16 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: smarcet
- * Date: 10/15/13
- * Time: 10:25 AM
- * To change this template use File | Settings | File Templates.
- */
 
 namespace openid\responses;
+
 use openid\OpenIdProtocol;
 use utils\http\HttpResponse;
 use openid\exceptions\InvalidOpenIdMessageMode;
+use openid\helpers\OpenIdErrorMessages;
 
+/**
+ * Class OpenIdResponse
+ * @package openid\responses
+ */
 abstract class OpenIdResponse extends HttpResponse
 {
 

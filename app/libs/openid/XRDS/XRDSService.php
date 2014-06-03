@@ -7,7 +7,7 @@ namespace openid\XRDS;
  * XRDS Service Element
  * @package openid\XRDS
  */
-class XRDSService
+final class XRDSService
 {
 
     private $priority;

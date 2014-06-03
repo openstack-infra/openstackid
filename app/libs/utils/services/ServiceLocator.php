@@ -4,7 +4,11 @@ namespace utils\services;
 
 use App;
 
-class ServiceLocator {
+/**
+ * Class ServiceLocator
+ * @package utils\services
+ */
+final class ServiceLocator {
 
     private static $instance = null;
 

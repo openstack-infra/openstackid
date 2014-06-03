@@ -19,7 +19,7 @@ use utils\services\ICheckPointService;
  * Implements http://openid.net/specs/openid-authentication-2_0.html#associations
  * @package openid\handlers
  */
-class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler
+final class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler
 {
 
     public function __construct(ILogService $log,
@@ -76,8 +76,7 @@ class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler
      * @param OpenIdMessage $message
      * @return bool
      */
-    protected function canHandle(OpenIdMessage $message)
-    {
+    protected function canHandle(OpenIdMessage $message) {
         $res = OpenIdAssociationSessionRequest::IsOpenIdAssociationSessionRequest($message);
         return $res;
     }

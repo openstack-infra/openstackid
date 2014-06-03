@@ -2,7 +2,10 @@
 
 namespace utils\services;
 
-
+/**
+ * Interface IServerConfigurationService
+ * @package utils\services
+ */
 interface IServerConfigurationService {
     /**
      * get server configuration param

@@ -2,18 +2,23 @@
 
 namespace openid\XRDS;
 
-class XRDSDocumentBuilder
+/**
+ * Class XRDSDocumentBuilder
+ * @package openid\XRDS
+ */
+final class XRDSDocumentBuilder
 {
 
     const ContentType = 'application/xrds+xml';
     const XRDNamespace = 'xri://$xrd*($v*2.0)';
     const XRDSNamespace = 'xri://$xrds';
+
     private $elements;
     private $canonical_id;
 
     public function __construct($elements, $canonical_id = null)
     {
-        $this->elements = $elements;
+        $this->elements     = $elements;
         $this->canonical_id = $canonical_id;
     }
 

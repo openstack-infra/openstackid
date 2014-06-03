@@ -4,7 +4,10 @@ namespace oauth2\services;
 
 use oauth2\models\IApi;
 
-
+/**
+ * Interface IApiService
+ * @package oauth2\services
+ */
 interface IApiService {
 
     /**

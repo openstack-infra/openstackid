@@ -1,9 +1,13 @@
 <?php
 
 namespace oauth2\services;
-use oauth2\requests\OAuth2AuthorizationRequest;
-use oauth2\requests\OAuth2AccessTokenRequest;
 
+use oauth2\requests\OAuth2AuthorizationRequest;
+
+/**
+ * Interface IMementoOAuth2AuthenticationRequestService
+ * @package oauth2\services
+ */
 interface IMementoOAuth2AuthenticationRequestService {
     /**
      * Save current OAuth2AuthorizationRequest till next request

@@ -4,6 +4,10 @@ namespace openid\responses;
 
 use openid\OpenIdProtocol;
 
+/**
+ * Class OpenIdAssociationSessionResponse
+ * @package openid\responses
+ */
 abstract class OpenIdAssociationSessionResponse extends OpenIdDirectResponse
 {
 

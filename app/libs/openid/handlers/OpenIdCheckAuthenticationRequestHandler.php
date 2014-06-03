@@ -31,7 +31,7 @@ use utils\services\IServerConfigurationService;
  * the positive assertion.
  * @package openid\handlers
  */
-class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
+final class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
 {
 
     private $association_service;

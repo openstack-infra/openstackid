@@ -1,6 +1,7 @@
 <?php
 
 namespace oauth2\endpoints;
+
 use oauth2\requests\OAuth2Request;
 
 /**

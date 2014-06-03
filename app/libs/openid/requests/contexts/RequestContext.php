@@ -2,7 +2,10 @@
 
 namespace openid\requests\contexts;
 
-
+/**
+ * Class RequestContext
+ * @package openid\requests\contexts
+ */
 class RequestContext
 {
     private $trusted_data;

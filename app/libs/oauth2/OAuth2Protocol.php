@@ -4,7 +4,6 @@ namespace oauth2;
 
 //endpoints
 use oauth2\endpoints\AuthorizationEndpoint;
-use oauth2\endpoints\RevocationEndpoint;
 use oauth2\endpoints\TokenEndpoint;
 use oauth2\endpoints\TokenIntrospectionEndpoint;
 use oauth2\endpoints\TokenRevocationEndpoint;

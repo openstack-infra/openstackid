@@ -2,7 +2,6 @@
 
 namespace oauth2\exceptions;
 
-
 class InvalidApplicationType extends OAuth2ClientBaseException
 {
     public function __construct($client_id, $message = "")

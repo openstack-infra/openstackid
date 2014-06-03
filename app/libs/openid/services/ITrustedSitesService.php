@@ -1,19 +1,23 @@
 <?php
 
-
 namespace openid\services;
 
 use openid\model\IOpenIdUser;
+use Exception;
+use openid\model\ITrustedSite;
 
-interface ITrustedSitesService
-{
+/**
+ * Interface ITrustedSitesService
+ * @package openid\services
+ */
+interface ITrustedSitesService {
 	/**
 	 * @param IOpenIdUser $user
 	 * @param             $realm
 	 * @param             $policy
 	 * @param array       $data
-	 * @return bool1|ITrustedSite
-	 * @throws \Exception
+	 * @return bool|ITrustedSite
+	 * @throws Exception
 	 */
     public function addTrustedSite(IOpenIdUser $user, $realm, $policy, $data = array());
 

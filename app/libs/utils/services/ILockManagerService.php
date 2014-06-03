@@ -3,6 +3,10 @@
 namespace utils\services;
 use utils\exceptions\UnacquiredLockException;
 
+/**
+ * Interface ILockManagerService
+ * @package utils\services
+ */
 interface ILockManagerService {
     /**
      * @param $name

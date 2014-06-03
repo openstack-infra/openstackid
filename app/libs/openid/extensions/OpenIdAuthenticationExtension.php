@@ -9,6 +9,7 @@ use openid\helpers\OpenIdErrorMessages;
 use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\IServerConfigurationService;
 use openid\services\IMementoOpenIdRequestService;
+use Log;
 
 /**
  * Class OpenIdAuthenticationExtension

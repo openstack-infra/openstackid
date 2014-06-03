@@ -2,7 +2,11 @@
 
 namespace utils\services;
 
-class UtilsServiceCatalog {
+/**
+ * Class UtilsServiceCatalog
+ * @package utils\services
+ */
+final class UtilsServiceCatalog {
 
     const CheckPointService          = 'utils\\services\\ICheckPointService';
     const LogService                 = 'utils\\services\\ILogService';

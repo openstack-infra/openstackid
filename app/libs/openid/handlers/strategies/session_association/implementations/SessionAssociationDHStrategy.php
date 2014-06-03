@@ -4,15 +4,19 @@ namespace openid\handlers\strategies\implementations;
 
 use openid\handlers\strategies\ISessionAssociationStrategy;
 use openid\helpers\OpenIdCryptoHelper;
-use openid\model\IAssociation;
 use openid\requests\OpenIdDHAssociationSessionRequest;
 use openid\responses\OpenIdDiffieHellmanAssociationSessionResponse;
+use openid\responses\OpenIdDirectGenericErrorResponse;
 use Zend\Crypt\PublicKey\DiffieHellman;
 //services
 use openid\services\IAssociationService;
 use openid\services\IServerConfigurationService;
 use utils\services\ILogService;
 use openid\helpers\AssociationFactory;
+
+use openid\Exceptions\InvalidDHParam;
+use Zend\Crypt\Exception\InvalidArgumentException;
+use Zend\Crypt\Exception\RuntimeException;
 
 class SessionAssociationDHStrategy implements ISessionAssociationStrategy
 {

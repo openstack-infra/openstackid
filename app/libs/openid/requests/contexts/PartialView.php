@@ -2,9 +2,11 @@
 
 namespace openid\requests\contexts;
 
-use string;
-
-class PartialView
+/**
+ * Class PartialView
+ * @package openid\requests\contexts
+ */
+final class PartialView
 {
 
     private $name;

@@ -10,7 +10,7 @@ use openid\OpenIdProtocol;
  * Singleton Factory that creates OpenId Associations
  * @package openid\helpers
  */
-class AssociationFactory {
+final class AssociationFactory {
 
 	private static $instance = null;
 

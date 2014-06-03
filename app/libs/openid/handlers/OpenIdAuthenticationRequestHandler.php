@@ -8,8 +8,6 @@ use openid\exceptions\InvalidOpenIdAuthenticationRequestMode;
 use openid\exceptions\InvalidOpenIdMessageException;
 use openid\exceptions\OpenIdInvalidRealmException;
 use openid\exceptions\ReplayAttackException;
-use openid\helpers\AssocHandleGenerator;
-use openid\helpers\OpenIdCryptoHelper;
 use openid\helpers\OpenIdErrorMessages;
 use openid\helpers\OpenIdSignatureBuilder;
 use openid\model\IAssociation;
@@ -40,8 +38,7 @@ use utils\services\ICheckPointService;
  * http://openid.net/specs/openid-authentication-2_0.html#responding_to_authentication
  * @package openid\handlers
  */
-
-class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
+final class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
 {
     private $auth_service;
     private $memento_service;

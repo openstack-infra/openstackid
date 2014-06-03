@@ -5,8 +5,7 @@ namespace openid\extensions\implementations;
 use Exception;
 use openid\OpenIdMessage;
 use openid\requests\OpenIdRequest;
-use utils\services\ServiceLocator;
-use utils\services\UtilsServiceCatalog;
+use openid\exceptions\InvalidOpenIdMessageException;
 
 /**
  * Class OpenIdSREGRequest
@@ -75,7 +74,7 @@ class OpenIdSREGRequest extends OpenIdRequest
                 return true;
             }
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
+            throw $ex;
         }
         return false;
     }

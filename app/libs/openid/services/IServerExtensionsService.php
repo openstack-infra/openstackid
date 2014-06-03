@@ -1,10 +1,11 @@
 <?php
 
-
 namespace openid\services;
 
-
-interface IServerExtensionsService
-{
+/**
+ * Interface IServerExtensionsService
+ * @package openid\services
+ */
+interface IServerExtensionsService {
     public function getAllActiveExtensions();
 }

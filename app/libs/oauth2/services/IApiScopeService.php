@@ -1,4 +1,5 @@
 <?php
+
 namespace oauth2\services;
 
 use oauth2\models\IApiScope;

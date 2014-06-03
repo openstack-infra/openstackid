@@ -6,6 +6,7 @@ use openid\exceptions\InvalidOpenIdMessageException;
 use openid\helpers\OpenIdUriHelper;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
+
 /**
  * Class OpenIdAuthenticationRequest
  * @package openid\requests

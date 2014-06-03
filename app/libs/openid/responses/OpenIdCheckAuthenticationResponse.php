@@ -1,17 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/24/13
- * Time: 10:08 PM
- */
 
 namespace openid\responses;
 
 use openid\OpenIdProtocol;
 
-class OpenIdCheckAuthenticationResponse extends OpenIdDirectResponse
-{
+/**
+ * Class OpenIdCheckAuthenticationResponse
+ * @package openid\responses
+ */
+class OpenIdCheckAuthenticationResponse extends OpenIdDirectResponse {
     /**
      * 11.4.2.2. Response Parameters
      *  ns :As specified in Section 5.1.2.

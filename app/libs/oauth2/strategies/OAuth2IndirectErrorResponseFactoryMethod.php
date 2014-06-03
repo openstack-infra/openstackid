@@ -5,11 +5,15 @@ namespace oauth2\strategies;
 use oauth2\requests\OAuth2Request;
 use oauth2\responses\OAuth2IndirectErrorResponse;
 use oauth2\responses\OAuth2IndirectFragmentErrorResponse;
-use oauth2\responses\OAuth2IndirectResponse;
 use oauth2\OAuth2Protocol;
 use ReflectionClass;
+use Exception;
 
-class OAuth2IndirectErrorResponseFactoryMethod {
+/**
+ * Class OAuth2IndirectErrorResponseFactoryMethod
+ * @package oauth2\strategies
+ */
+final class OAuth2IndirectErrorResponseFactoryMethod {
 
     /**
      * @param OAuth2Request $request

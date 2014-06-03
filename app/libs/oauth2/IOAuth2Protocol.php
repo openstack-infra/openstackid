@@ -1,8 +1,13 @@
 <?php
 
 namespace oauth2;
+
 use oauth2\requests\OAuth2Request;
 
+/**
+ * Interface IOAuth2Protocol
+ * @package oauth2
+ */
 interface IOAuth2Protocol {
     /**
      * Authorize endpoint

@@ -2,9 +2,11 @@
 
 namespace openid\model;
 
-
-interface ITrustedSite
-{
+/**
+ * Interface ITrustedSite
+ * @package openid\model
+ */
+interface ITrustedSite {
     public function getRealm();
 
     public function getData();

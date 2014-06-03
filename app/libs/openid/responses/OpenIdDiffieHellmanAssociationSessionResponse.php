@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/25/13
- * Time: 7:01 PM
- */
 
 namespace openid\responses;
 

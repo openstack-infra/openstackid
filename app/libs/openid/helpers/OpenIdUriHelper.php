@@ -26,8 +26,11 @@ define('OpenIdUriHelper_TLDs',
 
 define('OpenIdUriHelper_HostSegmentRe', "/^(?:[-a-zA-Z0-9!$&'\\(\\)\\*+,;=._~]|%[a-zA-Z0-9]{2})*$/");
 
-
-class OpenIdUriHelper
+/**
+ * Class OpenIdUriHelper
+ * @package openid\helpers
+ */
+final class OpenIdUriHelper
 {
 
     const AuthorityPattern = "/^([^@]*@)?([^:]*)(:.*)?/";

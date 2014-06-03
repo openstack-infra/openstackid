@@ -1,7 +1,9 @@
 <?php
 
 namespace openid\services;
+
 use openid\model\IOpenIdUser;
+
 /**
  * Interface IUserService
  * @package openid\services

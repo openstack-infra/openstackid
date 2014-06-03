@@ -30,7 +30,7 @@ class RefreshToken extends Eloquent {
         //check lifetime...
         $created_at = $this->created_at;
         $created_at->add(new DateInterval('PT' . intval($this->lifetime) . 'S'));
-        $now        = new DateTime(gmdate("Y-m-d H:i:s", time()));
+        $now        = new DateTime(gmdate("Y-m-d H:i:s", time()), new DateTimeZone("UTC"));
         return ($now > $created_at);
     }
 
@@ -39,9 +39,9 @@ class RefreshToken extends Eloquent {
     {
         //check is refresh token is stills alive... (ZERO is infinite lifetime)
         if (intval($this->lifetime) == 0) return 0;
-        $created_at = new DateTime($this->created_at);
+        $created_at = new DateTime($this->created_at, new DateTimeZone("UTC"));
         $created_at->add(new DateInterval('PT' . intval($this->lifetime) . 'S'));
-        $now = new DateTime(gmdate("Y-m-d H:i:s", time()));
+        $now = new DateTime(gmdate("Y-m-d H:i:s", time()), new DateTimeZone("UTC"));
         //check validity...
         if ($now > $created_at)
             return -1;

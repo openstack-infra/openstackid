@@ -4,8 +4,11 @@ namespace openid\services;
 
 use openid\model\OpenIdNonce;
 
-interface INonceService
-{
+/**
+ * Interface INonceService
+ * @package openid\services
+ */
+interface INonceService {
 
     /**
      * @return OpenIdNonce

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 11/13/13
- * Time: 12:32 PM
- */
 
 namespace auth\exceptions;
 

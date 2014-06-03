@@ -1,15 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: smarcet
- * Date: 10/28/13
- * Time: 7:18 PM
- */
 
 namespace openid\responses;
 
 use openid\OpenIdProtocol;
 
+/**
+ * Class OpenIdAssociationSessionUnsuccessfulResponse
+ * @package openid\responses
+ */
 class OpenIdAssociationSessionUnsuccessfulResponse extends OpenIdDirectResponse
 {
 

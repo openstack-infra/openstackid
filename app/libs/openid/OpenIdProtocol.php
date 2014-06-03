@@ -21,9 +21,6 @@ use utils\services\IAuthService;
 use utils\services\ICheckPointService;
 use utils\services\IServerConfigurationService as IUtilsServerConfigurationService;
 
-
-
-
 /**
  * Class OpenIdProtocol
  * OpenId Protocol Implementation

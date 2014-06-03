@@ -4,6 +4,8 @@ namespace oauth2\models;
 
 use DateTime;
 use DateInterval;
+use DateTimeZone;
+use utils\IPHelper;
 
 /**
  * Class Token
@@ -31,6 +33,7 @@ abstract class Token
         $this->len       = $len;
         $this->is_hashed = false;
         $this->issued    = gmdate("Y-m-d H:i:s", time());
+	    $this->from_ip   = IPHelper::getUserIp();
     }
 
     public function getIssued()
@@ -76,9 +79,9 @@ abstract class Token
     {
         //check is refresh token is stills alive... (ZERO is infinite lifetime)
         if (intval($this->lifetime) == 0) return 0;
-        $created_at = new DateTime($this->issued);
+        $created_at = new DateTime($this->issued, new DateTimeZone("UTC"));
         $created_at->add(new DateInterval('PT' . intval($this->lifetime) . 'S'));
-        $now = new DateTime(gmdate("Y-m-d H:i:s", time()));
+        $now = new DateTime(gmdate("Y-m-d H:i:s", time()), new DateTimeZone("UTC"));
         //check validity...
         if ($now > $created_at)
             return -1;

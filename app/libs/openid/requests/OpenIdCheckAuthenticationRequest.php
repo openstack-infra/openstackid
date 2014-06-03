@@ -6,6 +6,10 @@ use openid\helpers\OpenIdUriHelper;
 use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
 
+/**
+ * Class OpenIdCheckAuthenticationRequest
+ * @package openid\requests
+ */
 class OpenIdCheckAuthenticationRequest extends OpenIdAuthenticationRequest
 {
 

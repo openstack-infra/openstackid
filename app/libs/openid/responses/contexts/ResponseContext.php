@@ -2,8 +2,11 @@
 
 namespace openid\responses\contexts;
 
-class ResponseContext
-{
+/**
+ * Class ResponseContext
+ * @package openid\responses\contexts
+ */
+class ResponseContext {
 
     private $sign_params;
 

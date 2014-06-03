@@ -8,7 +8,11 @@ use Zend\Crypt\PublicKey\DiffieHellman;
 use Zend\Math\Rand;
 use Zend\Math;
 
-class OpenIdCryptoHelper
+/**
+ * Class OpenIdCryptoHelper
+ * @package openid\helpers
+ */
+final class OpenIdCryptoHelper
 {
 
 

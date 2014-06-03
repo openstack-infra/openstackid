@@ -2,9 +2,11 @@
 
 namespace openid\services;
 
-
-class OpenIdServiceCatalog
-{
+/**
+ * Class OpenIdServiceCatalog
+ * @package openid\services
+ */
+final class OpenIdServiceCatalog {
     const MementoService = 'openid\\services\\IMementoOpenIdRequestService';
     const AuthenticationStrategy = 'openid\\handlers\\IOpenIdAuthenticationStrategy';
     const ServerExtensionsService = 'openid\\services\\IServerExtensionsService';

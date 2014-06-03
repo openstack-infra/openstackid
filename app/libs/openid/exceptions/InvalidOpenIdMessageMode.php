@@ -4,8 +4,11 @@ namespace openid\exceptions;
 
 use Exception;
 
-class InvalidOpenIdMessageMode extends Exception
-{
+/**
+ * Class InvalidOpenIdMessageMode
+ * @package openid\exceptions
+ */
+class InvalidOpenIdMessageMode extends Exception {
     public function __construct($message = "")
     {
         $message = "Invalid OpenId Message Mode : " . $message;

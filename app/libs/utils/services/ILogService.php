@@ -1,12 +1,14 @@
 <?php
 
-
 namespace utils\services;
 
 use Exception;
 
-interface ILogService
-{
+/**
+ * Interface ILogService
+ * @package utils\services
+ */
+interface ILogService {
     public function error(Exception $exception);
 
     public function warning(Exception $exception);
@@ -16,6 +18,4 @@ interface ILogService
     public function error_msg($msg);
 
     public function info(Exception $exception);
-
-
-} 
+}

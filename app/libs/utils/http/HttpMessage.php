@@ -2,7 +2,10 @@
 
 namespace utils\http;
 
-
+/**
+ * Class HttpMessage
+ * @package utils\http
+ */
 class HttpMessage implements \ArrayAccess
 {
 

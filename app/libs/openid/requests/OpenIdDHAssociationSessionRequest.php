@@ -9,6 +9,10 @@ use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
 use Zend\Crypt\PublicKey\DiffieHellman;
 
+/**
+ * Class OpenIdDHAssociationSessionRequest
+ * @package openid\requests
+ */
 class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest
 {
 
