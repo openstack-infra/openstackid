@@ -11,6 +11,7 @@ class EloquentUserRepository implements IUserRepository {
 
 	private $user;
 	private $log_service;
+
 	public function __construct(User $user,ILogService $log_service){
 		$this->user        = $user;
 		$this->log_service = $log_service;
@@ -79,5 +80,15 @@ class EloquentUserRepository implements IUserRepository {
 	public function getByExternalId($external_id)
 	{
 		return $this->user->where('external_id', '=', $external_id)->first();
+	}
+
+	/**
+	 * @param mixed  $identifier
+	 * @param string $token
+	 * @return User
+	 */
+	public function getByToken($identifier, $token)
+	{
+		return $this->user->where('id', '=', $identifier)->where('remember_token', '=', $token)->first();
 	}
 }

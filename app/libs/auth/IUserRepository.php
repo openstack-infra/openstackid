@@ -59,4 +59,12 @@ interface IUserRepository {
 	 * @return int
 	 */
 	public function getCount(array $filters = array());
+
+	/**
+	 * @param mixed $identifier
+	 * @param string $token
+	 * @return User
+	 */
+	public function getByToken($identifier, $token);
+
 } 
