@@ -71,7 +71,7 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
         $this->default_config_params["BlacklistSecurityPolicy.InvalidAssociationInitialDelay"] = Config::get('server.BlacklistSecurityPolicy_InvalidAssociationInitialDelay', 20);
 
         //oauth2
-	    $this->default_config_params["OAuth2.Enable"]                                                   = Config::get('OAuth2.Enable', false);
+	    $this->default_config_params["OAuth2.Enable"]                                                   = Config::get('server.OAuth2_Enable', false);
         $this->default_config_params["BlacklistSecurityPolicy.OAuth2.MaxAuthCodeReplayAttackAttempts"]  = Config::get('server.BlacklistSecurityPolicy_OAuth2_MaxAuthCodeReplayAttackAttempts', 3);
         $this->default_config_params["BlacklistSecurityPolicy.OAuth2.AuthCodeReplayAttackInitialDelay"] = Config::get('server.BlacklistSecurityPolicy_OAuth2_AuthCodeReplayAttackInitialDelay', 10);
 
