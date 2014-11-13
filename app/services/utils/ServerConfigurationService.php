@@ -93,6 +93,9 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
         $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts"] = Config::get('server.OAuth2SecurityPolicy_MaxInvalidClientExceptionAttempts', 10);
         $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts"] = Config::get('server.OAuth2SecurityPolicy_MaxInvalidRedeemAuthCodeAttempts', 10);
         $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidInvalidClientCredentialsAttempts"] = Config::get('server.OAuth2SecurityPolicy_MaxInvalidInvalidClientCredentialsAttempts', 5);
+
+        //ssl
+        $this->default_config_params["SSL.Enable"] = Config::get('server.SSL_Enable', true);
     }
 
     public function getUserIdentityEndpointURL($identifier)

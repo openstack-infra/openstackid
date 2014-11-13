@@ -152,7 +152,7 @@ Route::filter("oauth2.needs.auth.request", function () {
 });
 
 Route::filter("ssl", function () {
-    if (!Request::secure()) {
+    if ((!Request::secure()) && (ServerConfigurationService::getConfigValue("SSL.Enable"))) {
         $openid_memento_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::MementoService);
         $openid_memento_service->saveCurrentRequest();
 
