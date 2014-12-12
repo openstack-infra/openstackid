@@ -119,7 +119,7 @@ class Client extends BaseModelEloquent implements IClient {
         if ($parts == false) {
             return false;
         }
-        if($parts['scheme']!=='https')
+        if(($parts['scheme']!=='https') && (ServerConfigurationService::getConfigValue("SSL.Enable")))
             return false;
         $client_authorized_uri = ClientAuthorizedUri::where('client_id', '=', $this->id)->where('uri','=',$uri)->first();
         if(!is_null($client_authorized_uri)) return true;
