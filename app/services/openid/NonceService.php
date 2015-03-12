@@ -12,6 +12,7 @@ use utils\exceptions\UnacquiredLockException;
 use utils\services\ILockManagerService;
 use utils\services\ICacheService;
 use utils\services\IServerConfigurationService;
+use Zend\Math\Rand;
 
 class NonceService implements INonceService
 {
@@ -20,6 +21,14 @@ class NonceService implements INonceService
     private $cache_service;
     private $lock_manager_service;
     private $configuration_service;
+    /*
+     * MAY contain additional ASCII characters in the range 33-126 inclusive (printable non-whitespace characters), as necessary to make each response unique
+     */
+    const NoncePopulation = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    /**
+     * Nonce Salt Length
+     */
+    const NonceSaltLength = 16;
 
     public function __construct(ILockManagerService $lock_manager_service,
                                 ICacheService $cache_service,
@@ -53,12 +62,27 @@ class NonceService implements INonceService
     }
 
     /**
+     * Value: A string 255 characters or less in length, that MUST be unique to this particular successful
+     * authentication response. The nonce MUST start with the current time on the server, and MAY contain additional
+     * ASCII characters in the range 33-126 inclusive (printable non-whitespace characters), as necessary to make each
+     * response unique. The date and time MUST be formatted as specified in section 5.6 of [RFC3339], with the following
+     * restrictions:
+     * All times must be in the UTC timezone, indicated with a "Z".
+     * No fractional seconds are allowed
+     * For example: 2005-05-15T17:11:51ZUNIQUE
      * @return OpenIdNonce
      */
     public function generateNonce()
     {
-        $raw_nonce = gmdate('Y-m-d\TH:i:s\Z') . uniqid();
+        $raw_nonce = gmdate('Y-m-d\TH:i:s\Z') . $this->makeNonceSalt();
         return new OpenIdNonce($raw_nonce);
+    }
+
+    /**
+     * @return string
+     */
+    private function makeNonceSalt(){
+        return Rand::getString(self::NonceSaltLength, self::NoncePopulation, true);
     }
 
     /**
