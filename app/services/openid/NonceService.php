@@ -28,7 +28,7 @@ class NonceService implements INonceService
     /**
      * Nonce Salt Length
      */
-    const NonceSaltLength = 16;
+    const NonceSaltLength = 32;
 
     public function __construct(ILockManagerService $lock_manager_service,
                                 ICacheService $cache_service,
@@ -61,6 +61,7 @@ class NonceService implements INonceService
         $this->lock_manager_service->releaseLock('lock.nonce.' . $raw_nonce);
     }
 
+
     /**
      * Value: A string 255 characters or less in length, that MUST be unique to this particular successful
      * authentication response. The nonce MUST start with the current time on the server, and MAY contain additional
@@ -74,7 +75,12 @@ class NonceService implements INonceService
      */
     public function generateNonce()
     {
-        $raw_nonce = gmdate('Y-m-d\TH:i:s\Z') . $this->makeNonceSalt();
+        $raw_nonce = null;
+
+        do {
+            $raw_nonce = gmdate('Y-m-d\TH:i:s\Z') . $this->makeNonceSalt();
+        } while(!$this->cache_service->addSingleValue($raw_nonce.'.mk_nonce', $raw_nonce.'.mk_nonce'));
+
         return new OpenIdNonce($raw_nonce);
     }
 

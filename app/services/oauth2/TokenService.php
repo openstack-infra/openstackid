@@ -101,8 +101,13 @@ class TokenService implements ITokenService
     public function createAuthorizationCode($user_id, $client_id, $scope, $audience='' , $redirect_uri = null,$access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online, $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto, $has_previous_user_consent=false)
     {
         //create model
-        $code         = AuthorizationCode::create($user_id,$client_id, $scope, $audience, $redirect_uri,$access_type,$approval_prompt,$has_previous_user_consent, $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime'));
-        $value        = $code->getValue();
+        $code  = null;
+        $value = null;
+        do {
+            $code = AuthorizationCode::create($user_id, $client_id, $scope, $audience, $redirect_uri, $access_type, $approval_prompt, $has_previous_user_consent, $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime'));
+            $value = $code->getValue();
+        } while(!$this->cache_service->addSingleValue($value.'.mk_auth_code', $value.'.mk_auth_code'));
+
         $hashed_value = Hash::compute('sha256', $value);
         //stores on cache
         $this->cache_service->storeHash($hashed_value,
