@@ -216,6 +216,12 @@ Route::filter('is.current.user',function($route, $request){
 
 Route::filter('oauth2.protected.endpoint','OAuth2BearerAccessTokenRequestValidator');
 
+Route::filter('oauth2.rate.limiter','ApiEndpointRateLimiter');
+
+Route::filter('oauth2.rate.limiter.headers','ApiEndpointRateLimiterHeaders');
+
+Route::filter('oauth2.etag','ETagChecker');
+
 //oauth2 server admin filter
 
 Route::filter('oauth2.server.admin.json',function(){

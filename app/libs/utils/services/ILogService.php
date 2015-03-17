@@ -9,6 +9,7 @@ use Exception;
  * @package utils\services
  */
 interface ILogService {
+
     public function error(Exception $exception);
 
     public function warning(Exception $exception);

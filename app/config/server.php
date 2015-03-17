@@ -42,6 +42,7 @@ return array(
     'OAuth2_AuthorizationCode_Lifetime' => 240,
     'OAuth2_AccessToken_Lifetime' => 3600,
     'OAuth2_RefreshToken_Lifetime' => 0,
+    'OAuth2_Enable' => true,
     //oauth2 security policy configuration
     'OAuth2SecurityPolicy_MinutesWithoutExceptions' => 2,
     'OAuth2SecurityPolicy_MaxBearerTokenDisclosureAttempts' => 5,

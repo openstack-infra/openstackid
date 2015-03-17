@@ -32,6 +32,13 @@
                 </div>
 
                 <div class="control-group">
+                    <label  class="control-label" for="rate_limit">Rate Limit (Per Hour)</label>
+                    <div class="controls">
+                        <input type="text" name="rate_limit" id="rate_limit" value="{{ $endpoint->rate_limit }}">
+                    </div>
+                </div>
+
+                <div class="control-group">
                     <label  class="control-label" for="http_method">HTTP Method</label>
                     <div class="controls">
                        {{ Form::select('http_method', array('GET' => 'GET', 'POST' => 'POST', 'PUT' => 'PUT', 'DELETE' => 'DELETE'), $endpoint->http_method); }}

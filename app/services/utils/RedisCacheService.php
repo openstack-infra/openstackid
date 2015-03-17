@@ -130,4 +130,13 @@ class RedisCacheService implements ICacheService {
     public function setKeyExpiration($key, $ttl){
         $this->redis->expire($key, intval($ttl));
     }
+
+    /**Returns the remaining time to live of a key that has a timeout.
+     * @param string $key
+     * @return int
+     */
+    public function ttl($key)
+    {
+        return (int)$this->redis->ttl($key);
+    }
 }

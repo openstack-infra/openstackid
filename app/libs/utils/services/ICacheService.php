@@ -88,4 +88,10 @@ interface ICacheService {
     public function setKeyExpiration($key, $ttl);
 
     public function boot();
+
+    /**Returns the remaining time to live of a key that has a timeout.
+     * @param string $key
+     * @return int
+     */
+    public function ttl($key);
 } 

@@ -16,26 +16,57 @@ abstract class JsonController extends BaseController  {
 
     protected function error500(Exception $ex){
         $this->log_service->error($ex);
-        return Response::json(array('error' => 'server error'), 500);
+        return Response::json(array('message' => 'server error'), 500);
     }
 
     protected function created($data='ok'){
-        return Response::json($data, 201);
+        $res = Response::json($data, 201);
+        //jsonp
+        if(Input::has('callback'))
+            $res->setCallback(Input::get('callback'));
+        return $res;
     }
 
     protected function deleted($data='ok'){
-        return Response::json($data, 204);
+        $res =  Response::json($data, 204);
+        //jsonp
+        if(Input::has('callback'))
+            $res->setCallback(Input::get('callback'));
+        return $res;
     }
 
     protected function ok($data='ok'){
-        return Response::json($data, 200);
+        $res = Response::json($data, 200);
+        //jsonp
+        if(Input::has('callback'))
+            $res->setCallback(Input::get('callback'));
+        return $res;
     }
 
     protected function error400($data){
         return Response::json($data, 400);
     }
 
-    protected function error404($data){
+    protected function error404($data = array('message' => 'Entity Not Found')){
         return Response::json($data, 404);
+    }
+
+    /**
+     *  {
+        "message": "Validation Failed",
+        "errors": [
+        {
+        "resource": "Issue",
+        "field": "title",
+        "code": "missing_field"
+        }
+        ]
+        }
+     * @param $messages
+     * @return mixed
+     */
+    protected function error412($messages){
+
+        return Response::json(array('message' => 'Validation Failed', 'errors' => $messages), 412);
     }
 } 

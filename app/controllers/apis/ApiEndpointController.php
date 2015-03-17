@@ -75,6 +75,7 @@ class ApiEndpointController extends AbstractRESTController implements ICRUDContr
                 'route'              => 'required|route',
                 'http_method'        => 'required|httpmethod',
                 'api_id'             => 'required|integer',
+                'rate_limit'         => 'required|integer',
             );
 
             // Creates a Validator instance and validates the data.
@@ -92,7 +93,8 @@ class ApiEndpointController extends AbstractRESTController implements ICRUDContr
                 $new_api_endpoint['allow_cors'],
                 $new_api_endpoint['route'],
                 $new_api_endpoint['http_method'],
-                $new_api_endpoint['api_id']
+                $new_api_endpoint['api_id'],
+                $new_api_endpoint['rate_limit']
             );
             return $this->created(array('api_endpoint_id' => $new_api_endpoint_model->id));
         }
@@ -135,6 +137,7 @@ class ApiEndpointController extends AbstractRESTController implements ICRUDContr
                 'allow_cors'         => 'sometimes|required|boolean',
                 'route'              => 'sometimes|required|route',
                 'http_method'        => 'sometimes|required|httpmethod',
+                'rate_limit'         => 'required|integer',
             );
 
             // Creates a Validator instance and validates the data.

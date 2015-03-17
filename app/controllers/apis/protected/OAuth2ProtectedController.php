@@ -11,6 +11,8 @@ abstract class OAuth2ProtectedController extends JsonController {
 
     protected $resource_server_context;
 
+    protected $repository;
+
     public function __construct(IResourceServerContext $resource_server_context, ILogService $log_service)
     {
         parent::__construct($log_service);

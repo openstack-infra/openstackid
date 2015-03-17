@@ -230,6 +230,9 @@
                 <label for="route">Route</label>
                 <input type="text" name="route" id="route">
 
+                <label for="rate_limit">Rate Limit (Per Hour)</label>
+                <input type="text" name="rate_limit" id="rate_limit">
+
                 <label for="http_method">HTTP Method</label>
                 <select name="http_method" id="http_method">
                     <option value="GET">GET</option>

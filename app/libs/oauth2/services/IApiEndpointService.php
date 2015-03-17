@@ -48,9 +48,10 @@ interface IApiEndpointService {
      * @param string $route
      * @param string $http_method
      * @param int $api_id
+     * @param int $rate_limit
      * @return IApiEndpoint
      */
-    public function add($name, $description, $active, $allow_cors, $route, $http_method, $api_id);
+    public function add($name, $description, $active, $allow_cors, $route, $http_method, $api_id, $rate_limit);
 
 
     /**

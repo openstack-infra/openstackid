@@ -26,7 +26,7 @@ function updateAccessTokenList(){
                                 'td.lifetime':'token.lifetime',
                                 'a@href':function(arg){
                                     var token_value = arg.item.value;
-                                    var href = TokensUrls.AccessTokenUrls.de.ete;
+                                    var href = TokensUrls.AccessTokenUrls.delete;
                                     return href.replace('-1',token_value);
                                 },
                                 'a@data-value' :'token.value'

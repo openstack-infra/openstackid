@@ -74,13 +74,14 @@ class ApiEndpointService implements IApiEndpointService {
      * @param string $route
      * @param string $http_method
      * @param integer $api_id
+     * @param integer $rate_limit
      * @return IApiEndpoint
      */
-    public function add($name, $description, $active,$allow_cors, $route, $http_method, $api_id)
+    public function add($name, $description, $active,$allow_cors, $route, $http_method, $api_id, $rate_limit)
     {
         $instance = null;
 
-	    $this->tx_service->transaction(function () use ($name, $description, $active,$allow_cors, $route, $http_method, $api_id, &$instance) {
+	    $this->tx_service->transaction(function () use ($name, $description, $active,$allow_cors, $route, $http_method, $api_id, $rate_limit, &$instance) {
 
             //check that does not exists an endpoint with same http method and same route
             if(ApiEndpoint::where('http_method','=',$http_method)->where('route','=',$route)->count()>0)
@@ -94,7 +95,8 @@ class ApiEndpointService implements IApiEndpointService {
                     'route'              => $route,
                     'http_method'        => $http_method,
                     'api_id'             => $api_id,
-                    'allow_cors'         => $allow_cors
+                    'allow_cors'         => $allow_cors,
+                    'rate_limit'         => (int)$rate_limit,
                 )
             );
             $instance->Save();
@@ -118,7 +120,7 @@ class ApiEndpointService implements IApiEndpointService {
             if(is_null($endpoint))
                 throw new InvalidApiEndpoint(sprintf('api endpoint id %s does not exists!',$id));
 
-            $allowed_update_params = array('name','description','active','route','http_method','allow_cors');
+            $allowed_update_params = array('name','description','active','route','http_method','allow_cors', 'rate_limit');
             foreach($allowed_update_params as $param){
                 if(array_key_exists($param,$params)){
                     $endpoint->{$param} = $params[$param];
