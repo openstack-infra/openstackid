@@ -1,0 +1,272 @@
+OAuth 2.0 Rest API
+==================
+
+Schema
+++++++
+
+All API access is over HTTPS, and accessed from the `https://openstackid.org/`
+domain. All data is sent and received as JSON.
+
+Parameters
+++++++++++
+
+Many API methods take optional parameters. For GET requests, any parameters not
+specified as a segment in the path can be passed as an HTTP query string
+
+Pagination
+++++++++++
+
+Requests that return multiple items will be paginated to 10 items by
+default.  You can specify further pages with the `?page` parameter. For some
+resources, you can also set a custom page size up to 100 with the `?per_page` parameter.
+
+Rate Limiting
++++++++++++++
+
+This is configured per API endpoint.
+You can check the returned HTTP headers of any API request to see your current
+rate limit status:
+
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 56
+X-RateLimit-Reset: 1372700873
+
+The headers tell you everything you need to know about your current rate limit status:
+
+Header Name | Description
+------------|-----------|
+`X-RateLimit-Limit` | The maximum number of requests that the consumer is permitted to make per hour.
+`X-RateLimit-Remaining` | The number of requests remaining in the current rate limit window.
+`X-RateLimit-Reset` | the number os seconds remaining until the current rate limit window resets.
+
+If your application triggers this rate limit, you'll receive an informative
+response:
+
+<pre class="terminal">
+HTTP/1.1 403 Forbidden
+Content-Type: application/json; charset=utf-8
+Connection: close
+
+{
+  "message": "You have triggered an abuse detection mechanism and have been temporarily blocked from content creation. Please retry your request again later.",
+}
+</pre>
+
+Conditional requests
+++++++++++++++++++++
+
+Most responses return an `ETag` header. You can use the values
+of this headers to make subsequent requests to those resources using the
+`If-None-Match` header, respectively. If the resource
+has not changed, the server will return a `304 Not Modified`.
+
+
+Cross Origin Resource Sharing
++++++++++++++++++++++++++++++
+
+The API supports Cross Origin Resource Sharing (CORS) for AJAX requests from
+any origin.
+You can read the [CORS W3C Recommendation](http://www.w3.org/TR/cors), or
+[this intro](http://code.google.com/p/html5security/wiki/CrossOriginRequestSecurity) from the
+HTML 5 Security Guide.
+
+JSON-P Callbacks
+++++++++++++++++
+
+You can send a `?callback` parameter to any GET call to have the results
+wrapped in a JSON function.  This is typically used when browsers want
+to embed OpenStack content in web pages by getting around cross domain
+issues.  The response includes the same data output as the regular API,
+plus the relevant HTTP Header information.
+
+
+User API
+********
+
+    Allows to get additional info about current user (Me)
+
+Examples
+++++++++
+
+
+Request
+
+GET /api/v1/users/me HTTP/1.1
+
+Response
+
+{
+    "name":"Sebastian",
+    "family_name":"Marcet",
+    "nickname":"Sebastian Marcet",
+    "picture":"http:\/\/www.openstack.org\/assets\/profile-images\/IMG-20140912-WA0003.jpg",
+    "birthdate":"",
+    "gender":"Male",
+    "email":"sebastian@tipit.net"
+}
+
+MarketPlace API
+***************
+
+Public Clouds Endpoints
++++++++++++++++++++++++
+
+    Allows to get read only access to public clouds related data ( clouds and data centers locations)
+
+* api/v1/marketplace/public-clouds (GET): get a list of public clouds
+
+Query string params:
+
+- page:
+    used in conjunction with `per_page` query string parameter. indicates the desired page number, when we want paginate
+    over results
+- per_page:
+    used in conjunction with `page` query string parameter. indicates the desired page size
+- status:
+    (optional filter) allow us to get active, non active or all public clouds
+- order_by:
+    (optional) used in conjunction with query string parameter `order_dir`, point out the desired order of the result
+    (date or name)
+- order_dir:
+    (optional) used in conjunction with query string parameter `order`, point out the desired order direction of the result
+    (asc or desc)
+
+Response:
+
+{
+    "total":20,
+    "per_page":10,
+    "current_page":1,
+    "last_page":2,
+    "from":1,
+    "to":10,
+    "data":[
+        {
+          "ID":"YYYY",
+          "Created":"2014-04-23 05:36:10",
+          "LastEdited":"2015-02-04 11:13:58",
+          "Name":"Next-Generation AgileCLOUD",
+          "Slug":"next-generation-agilecloud",
+          "Overview":"....",
+          "Call2ActionUri":"http:\/\/....",
+          "Active":"1",
+          "CompanyID":"XXX"
+          }
+          ,{...}
+          ]
+}
+
+* api/v1/marketplace/public-clouds/{ID} (GET): get desired public cloud point out by ID param
+
+Path params:
+
+- ID:
+  Public Cloud ID
+
+Response:
+
+* api/v1/marketplace/public-clouds/{ID}/data-centers (GET): get data center locations for public cloud pointed out by
+ID param
+
+Path params:
+
+- ID:
+  Public Cloud ID
+
+Response:
+
+Private Clouds Endpoints
+++++++++++++++++++++++++
+
+    Allows to get read only access to private clouds related data ( clouds and data centers locations)
+
+* api/v1/marketplace/private-clouds (GET): get a list of private clouds
+
+Query string params:
+
+- page:
+    used in conjunction with `per_page` query string parameter. indicates the desired page number, when we want paginate
+    over results
+- per_page:
+    used in conjunction with `page` query string parameter. indicates the desired page size
+- status:
+    (optional filter) allow us to get active, non active or all public clouds
+- order_by:
+    (optional) used in conjunction with query string parameter `order_dir`, point out the desired order of the result
+    (date or name)
+- order_dir:
+    (optional) used in conjunction with query string parameter `order`, point out the desired order direction of the result
+    (asc or desc)
+
+Response:
+
+{
+    "total":20,
+    "per_page":10,
+    "current_page":1,
+    "last_page":2,
+    "from":1,
+    "to":10,
+    "data":[
+        {
+          "ID":"YYYY",
+          "Created":"2014-04-23 05:36:10",
+          "LastEdited":"2015-02-04 11:13:58",
+          "Name":"Next-Generation AgileCLOUD",
+          "Slug":"next-generation-agilecloud",
+          "Overview":"....",
+          "Call2ActionUri":"http:\/\/....",
+          "Active":"1",
+          "CompanyID":"XXX"
+          }
+          ,{...}
+          ]
+}
+
+
+* api/v1/marketplace/private-clouds/{ID} (GET): get desired private cloud point out by ID param
+
+Path params:
+
+- ID:
+  Private Cloud ID
+
+Response:
+
+* api/v1/marketplace/private-clouds/{ID}/data-centers (GET): get data center locations for private cloud pointed out by
+ID param
+
+Path params:
+
+- ID:
+  Private Cloud ID
+
+Response:
+
+Consultants Endpoints
++++++++++++++++++++++
+
+ Allows to get read only access to consultants related data ( consultants and offices locations)
+
+* api/v1/marketplace/consultants (GET): get a list of consultants
+
+Query string params:
+
+- page:
+    used in conjunction with `per_page` query string parameter. indicates the desired page number, when we want paginate
+    over results
+- per_page:
+    used in conjunction with `page` query string parameter. indicates the desired page size
+- status:
+    (optional filter) allow us to get active, non active or all public clouds
+- order_by:
+    (optional) used in conjunction with query string parameter `order_dir`, point out the desired order of the result
+    (date or name)
+- order_dir:
+    (optional) used in conjunction with query string parameter `order`, point out the desired order direction of the result
+    (asc or desc)
+
+
+* api/v1/marketplace/consultants/{CONSULTANT-ID} (GET):
+
+* api/v1/marketplace/consultants/{CONSULTANT-ID}/offices (GET):
