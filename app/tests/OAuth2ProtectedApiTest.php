@@ -35,7 +35,7 @@ abstract class OAuth2ProtectedApiTest extends OpenStackIDBaseTest {
 
         $this->current_realm = Config::get('app.url');
 
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
+        $user =  User::where('identifier','=','sebastian.marcet')->first();
 
         $this->be($user);
 

@@ -153,8 +153,8 @@ class Client extends BaseModelEloquent implements IClient {
 
     public function getDeveloperEmail()
     {
-        $user = $this->user()->first();
-        $email = $user->external_id;
+        $user  = $this->user()->first();
+        $email = $user->getEmail();
         return $email;
     }
 

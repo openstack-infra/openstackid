@@ -56,16 +56,17 @@ class CustomAuthProvider implements UserProviderInterface
 		try {
 			//here we do the manuel join between 2 DB, (openid and SS db)
 			$user   = $this->user_repository->getByExternalId($identifier);
-			$member = $this->member_repository->getByEmail($identifier);
+			$member = $this->member_repository->get($identifier);
 			if (!is_null($member) && !is_null($user)) {
 				$user->setMember($member);
 				return $user;
 			}
-			return null;
+
 		} catch (Exception $ex) {
 			$this->log_service->error($ex);
 			return null;
 		}
+        return null;
 	}
 
 	/**
@@ -90,35 +91,36 @@ class CustomAuthProvider implements UserProviderInterface
 				if (!isset($credentials['username']) || !isset($credentials['password']))
 					throw new AuthenticationException("invalid crendentials");
 
-				$identifier = $credentials['username'];
-				$password   = $credentials['password'];
-				$user       = $user_repository->getByExternalId($identifier);
+				$email    = $credentials['username'];
+				$password = $credentials['password'];
+
+                //get SS member
+
+                $member = $member_repository->getByEmail($email);
+
+                if (is_null($member)) //member must exists
+                    throw new AuthenticationException(sprintf("member %s does not exists!", $email));
+
+                $user       = $user_repository->getByExternalId($member->ID);
 
 				//check user status...
 				if (!is_null($user) && ($user->lock || !$user->active)){
-					Log::warning(sprintf("user %s is on lock state",$identifier));
-					throw new AuthenticationLockedUserLoginAttempt($identifier,sprintf("user %s is on lock state",$identifier));
+					Log::warning(sprintf("user %s is on lock state",$email));
+					throw new AuthenticationLockedUserLoginAttempt($email, sprintf("user %s is on lock state",$email));
 				}
-
-				//get SS member
-
-				$member = $member_repository->getByEmail($identifier);
-
-				if (is_null($member)) //member must exists
-					throw new AuthenticationException(sprintf("member %s does not exists!", $identifier));
 
 				$valid_password = $member->checkPassword($password);
 
 				if(!$valid_password)
-					throw new AuthenticationInvalidPasswordAttemptException($identifier,sprintf("invalid login attempt for user %s ",$identifier));
+					throw new AuthenticationInvalidPasswordAttemptException($email, sprintf("invalid login attempt for user %s ", $email));
 
 				//if user does not exists, then create it
 				if (is_null($user)) {
 					//create user
 					$user = new User();
-					$user->external_id     = $member->Email;
-					$user->identifier      = $member->Email;
-					$user->last_login_date = gmdate("Y-m-d H:i:s", time());
+					$user->external_identifier = $member->ID;
+					$user->identifier          = $member->ID;
+					$user->last_login_date     = gmdate("Y-m-d H:i:s", time());
 					$user_repository->add($user);
 				}
 
@@ -162,19 +164,19 @@ class CustomAuthProvider implements UserProviderInterface
 	{
 		if (!isset($credentials['username']) || !isset($credentials['password']))
 			throw new AuthenticationException("invalid crendentials");
-
 		try {
-			$identifier = $credentials['username'];
-			$password   = $credentials['password'];
-			$user       = $this->user_repository->getByExternalId($identifier);
+			$email    = $credentials['username'];
+			$password = $credentials['password'];
+            $member =  $this->member_repository->getByEmail($email);
+            if(!$member ||  !$member->checkPassword($password)) return false;
+            $user   = $this->user_repository->getByExternalId($member->ID);
 			if (is_null($user) || $user->lock || !$user->active)
 				return false;
-			$member = $this->member_repository->getByEmail($identifier);
-			return !is_null($member) ? $member->checkPassword($password) : false;
-		} catch (Exception $ex) {
+    	} catch (Exception $ex) {
 			$this->log_service->error($ex);
 			return false;
 		}
+        return true;
 	}
 
 	/**

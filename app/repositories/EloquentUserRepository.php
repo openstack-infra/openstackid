@@ -79,7 +79,7 @@ class EloquentUserRepository implements IUserRepository {
 	 */
 	public function getByExternalId($external_id)
 	{
-		return $this->user->where('external_id', '=', $external_id)->first();
+		return $this->user->where('external_identifier', '=', $external_id)->first();
 	}
 
 	/**

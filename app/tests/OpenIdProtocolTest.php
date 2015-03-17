@@ -40,7 +40,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
         Route::enableFilters();
         $this->current_realm = Config::get('app.url');
 
-	    $this->user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
+	    $this->user = User::where('identifier','=','sebastian.marcet')->first();
 
 	    $this->be($this->user);
 	    Session::start();
@@ -721,7 +721,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     public function testCheckSetupOAuth2ExtensionSubView(){
 
         //set login info
-        $user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
+        $user =  User::where('identifier','=','sebastian.marcet')->first();
         Auth::login($user);
 
         $scope = array(

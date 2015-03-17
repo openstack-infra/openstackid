@@ -5,6 +5,7 @@ namespace auth;
 use Auth;
 use Session;
 use utils\services\IAuthService;
+use \Member;
 
 class AuthService implements IAuthService
 {
@@ -72,8 +73,10 @@ class AuthService implements IAuthService
 
     public function getUserByUsername($username)
     {
-        $user = User::where('external_id', '=', $username)->first();
-        return $user;
+        $member = Member::where('Email', '=', $username)->first();
+        if(!is_null($member))
+            return  User::where('external_identifier', '=', $member->ID)->first();
+        return false;
     }
 
     public function getUserById($id)

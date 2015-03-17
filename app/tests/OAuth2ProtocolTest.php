@@ -18,7 +18,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 		parent::prepareForTests();
 		//Route::enableFilters();
 		$this->current_realm = Config::get('app.url');
-		$user = User::where('external_id', '=', 'smarcet@gmail.com')->first();
+		$user =  User::where('identifier','=','sebastian.marcet')->first();
 		$this->be($user);
 		Session::start();
 	}

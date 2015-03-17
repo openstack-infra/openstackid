@@ -305,13 +305,13 @@ class TestSeeder extends Seeder {
         // create users and clients ...
         User::create(
             array(
-                'identifier'=>'sebastian.marcet',
-                'external_id'=>'smarcet@gmail.com',
-                'last_login_date'=>gmdate("Y-m-d H:i:s", time())
+                'identifier'          => 'sebastian.marcet',
+                'external_identifier' => 13867,
+                'last_login_date'     => gmdate("Y-m-d H:i:s", time())
             )
         );
 
-        $user = User::where('external_id','=','smarcet@gmail.com')->first();
+        $user = User::where('identifier','=','sebastian.marcet')->first();
 
         OpenIdTrustedSite::create(
             array(

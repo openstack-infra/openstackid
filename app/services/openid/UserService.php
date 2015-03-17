@@ -31,6 +31,7 @@ class UserService implements IUserService
 
 
 	/**
+     * Associate openid url with given user
 	 * @param IOpenIdUser $user
 	 * @param             $proposed_username
 	 * @return bool|IOpenIdUser
@@ -40,7 +41,7 @@ class UserService implements IUserService
     {
         try {
 	        $repository = $this->repository;
-            if (!is_null($user) && $user->identifier === $user->external_id) {
+            if (!is_null($user) && $user->identifier === strval($user->external_identifier)) {
 	            $this->tx_service->transaction(function () use ($proposed_username,&$user,&$repository) {
 
                     $done         = false;

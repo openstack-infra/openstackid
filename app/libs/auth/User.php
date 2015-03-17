@@ -59,17 +59,20 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 		$this->member = $member;
 	}
 
+
+    private function getAssociatedMember(){
+        if (is_null($this->member)) {
+            $this->member =  Member::where('ID', '=', $this->external_identifier)->first();
+        }
+        return $this->member;
+    }
 	/**
 	 * Get the unique identifier for the user.
-	 *
+	 * the one that is saved as session id on vendor/laravel/framework/src/Illuminate/Auth/Guard.php
 	 * @return mixed
 	 */
-	public function getAuthIdentifier()
-	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
-		return $this->external_id;
+	public function getAuthIdentifier()	{
+  		return $this->external_identifier;
 	}
 
 	/**
@@ -79,26 +82,20 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 	 */
 	public function getAuthPassword()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->Password;
 	}
 
 	public function getIdentifier()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->identifier;
 	}
 
 	public function getEmail()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
-		return $this->external_id;
+        $this->getAssociatedMember();
+		return $this->member->Email;
 	}
 
 	public function getFullName()
@@ -108,17 +105,13 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 
 	public function getFirstName()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->FirstName;
 	}
 
 	public function getLastName()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->Surname;
 	}
 
@@ -129,41 +122,31 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 
 	public function getGender()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->Gender;
 	}
 
 	public function getCountry()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->Country;
 	}
 
 	public function getLanguage()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->Locale;
 	}
 
 	public function getTimeZone()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return "";
 	}
 
 	public function getDateOfBirth()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return "";
 	}
 
@@ -194,25 +177,19 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 
 	public function getBio()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->Bio;
 	}
 
 	public function getPic()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		$url     = asset('img/generic-profile-photo.png');
-
 		$photoId = $this->member->PhotoID;
-
 		if (!is_null($photoId) && is_numeric($photoId) && $photoId > 0) {
-			$photo                            = MemberPhoto::where('ID', '=', $photoId)->first();
+			$photo   = MemberPhoto::where('ID', '=', $photoId)->first();
 			if(!is_null($photo)){
-				$url                          = $photo->Filename;
+				$url = $photo->Filename;
 			}
 		}
 		return $url;
@@ -228,9 +205,7 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 	 */
 	public function canUseSystemScopes()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		$group = $this->member->groups()->where('code','=',IOAuth2User::OAuth2SystemScopeAdminGroup)->first();
 		return !is_null($group);
 	}
@@ -241,9 +216,7 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 	 */
 	public function isOAuth2ServerAdmin()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		$group = $this->member->groups()->where('code','=',IOAuth2User::OAuth2ServerAdminGroup)->first();
 		return !is_null($group);
 	}
@@ -253,42 +226,32 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 	 */
 	public function isOpenstackIdAdmin()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		$group = $this->member->groups()->where('code','=',IOpenIdUser::OpenstackIdServerAdminGroup)->first();
 		return !is_null($group);
 	}
 
 	public function getStreetAddress()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return sprintf("%s, %s ",$this->member->Address,$this->member->Suburb);
 	}
 
 	public function getRegion()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->State;
 	}
 
 	public function getLocality()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->City;
 	}
 
 	public function getPostalCode()
 	{
-		if (is_null($this->member)) {
-			$this->member = Member::where('Email', '=', $this->external_id)->first();
-		}
+        $this->getAssociatedMember();
 		return $this->member->Postcode;
 	}
 
