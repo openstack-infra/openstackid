@@ -15,3 +15,9 @@ app/config/packages/greggilbert/recaptcha/production/*
 app/config/packages/greggilbert/recaptcha/staging/*
 /bootstrap/compiled.php
 /bootstrap/environment.php
+.tox
+AUTHORS
+ChangeLog
+doc/build
+*.egg
+*.egg-info
