@@ -178,8 +178,7 @@ class UserController extends BaseController
             //This field contains a semicolon-separated list of representation schemes
             //which will be accepted in the response to this request.
             $accept = Request::header('Accept');
-            $accept_values = explode(",", $accept);
-            if (in_array(XRDSDocumentBuilder::ContentType, $accept_values)) {
+            if (strstr($accept, XRDSDocumentBuilder::ContentType)) {
                 /*
                 * If the Claimed Identifier was not previously discovered by the Relying Party
                 * (the "openid.identity" in the request was "http://specs.openid.net/auth/2.0/identifier_select"

@@ -28,8 +28,7 @@ class DiscoveryController extends BaseController
         //This field contains a semicolon-separated list of representation schemes
         //which will be accepted in the response to this request.
         $accept = Request::header('Accept');
-        $accept_values = explode(",", $accept);
-        if (in_array(XRDSDocumentBuilder::ContentType, $accept_values)) {
+        if (strstr($accept, XRDSDocumentBuilder::ContentType)) {
             $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeIdp), 200);
             $response->header('Content-Type', "application/xrds+xml; charset=UTF-8");
         } else {
@@ -56,8 +55,7 @@ class DiscoveryController extends BaseController
         //which will be accepted in the response to this request.
         $accept = Request::header('Accept');
         $local_identifier = $this->server_config_service->getUserIdentityEndpointURL($identifier);
-        $accept_values = explode(",", $accept);
-        if (in_array(XRDSDocumentBuilder::ContentType, $accept_values)) {
+        if (strstr($accept, XRDSDocumentBuilder::ContentType)) {
             $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeUser, $local_identifier), 200);
             $response->header('Content-Type', "application/xrds+xml; charset=UTF-8");
         } else {
