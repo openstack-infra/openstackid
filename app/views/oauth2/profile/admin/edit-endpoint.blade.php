@@ -105,7 +105,7 @@
 @section('scripts')
 <script type="application/javascript">
    var editEndpointMessages = {
-	   success: '{{ Lang::get("messages.global_successfull_save_entity", array("entity" => "Endpoint")) }}'
+	   success: '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "Endpoint")) }}'
    };
 </script>
 {{ HTML::script('js/oauth2/profile/admin/edit-endpoint.js') }}

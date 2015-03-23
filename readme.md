@@ -14,4 +14,5 @@ run following commands on root folder
    * php composer.phar dump-autoload --optimize
    * php artisan migrate --env=YOUR_ENVIRONMENT
    * php artisan db:seed --env=YOUR_ENVIRONMENT
+   * phpunit --bootstrap vendor/autoload.php
 

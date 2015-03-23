@@ -8,5 +8,5 @@ return array(
     'edit_endpoint_title' => "Edit API Endpoint - Id :id",
     'edit_endpoint_scope_info_title' => "You set here all needed scopes to access to this endpoint",
     'edit_endpoint_scope_title' => "Required Scopes",
-    'global_successfull_save_entity' => ":entity successfully saved!.",
+    'global_successfully_save_entity' => ":entity successfully saved!.",
 );

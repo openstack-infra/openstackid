@@ -122,7 +122,7 @@ interface ITokenService {
 
     public function getAccessTokenByUserId($user_id);
 
-    public function getRefreshTokeByUserId($user_id);
+    public function getRefreshTokenByUserId($user_id);
 
     /**
      * Revokes a given access token

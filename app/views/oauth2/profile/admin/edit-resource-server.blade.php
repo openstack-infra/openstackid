@@ -159,7 +159,7 @@
 	};
 
 	var resourceServerMessages = {
-		success : '{{ Lang::get("messages.global_successfull_save_entity", array("entity" => "Resource Server")) }}'
+		success : '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "Resource Server")) }}'
 	};
 </script>
 {{ HTML::script('js/oauth2/profile/admin/edit-resource-server.js') }}

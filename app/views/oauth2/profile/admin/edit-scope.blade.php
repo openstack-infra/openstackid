@@ -77,7 +77,7 @@
 @section('scripts')
 <script type="application/javascript">
 	var editScopeMessages = {
-		success : '{{ Lang::get("messages.global_successfull_save_entity", array("entity" => "Scope")) }}'
+		success : '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "Scope")) }}'
 	};
 </script>
 {{ HTML::script('js/oauth2/profile/admin/edit-scope.js') }}
