@@ -15,6 +15,6 @@ class ExceptionTest extends TestCase{
     public function testExceptionTypes(){
         $ex1 = new ReplayAttackException();
         $class_name = $this->getExName($ex1);
-        $this->assertTrue($class_name == 'ReplayAttackException');
+        $this->assertTrue($class_name == 'openid\exceptions\ReplayAttackException');
     }
 } 

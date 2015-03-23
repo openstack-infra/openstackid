@@ -36,19 +36,10 @@ App::before(function($request){
 });
 
 App::after(function($request, $response){
-
     $response->headers->set('X-content-type-options','nosniff');
     $response->headers->set('X-xss-protection','1; mode=block');
     $cors = ServiceLocator::getInstance()->getService('CORSMiddleware');
     $cors->modifyResponse($request, $response);
-
-	if ( Auth::check()){
-		//Get the name of the cookie, where remember me expiration time is stored
-		$ckname = Auth::getRecallerName();
-		//Get the value of the cookie
-		$ckval = Cookie::get($ckname);
-		return $response->withCookie(Cookie::make($ckname,$ckval,ServerConfigurationService::getConfigValue("Remember.ExpirationTime"))); //change the expiration time
-	}
 });
 
 /*
@@ -123,7 +114,7 @@ Route::filter("openid.needs.auth.request", function () {
 
     if ($openid_message == null || !$openid_message->isValid())
         throw new InvalidOpenIdMessageException();
-	$configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::ServerConfigurationService);
+    $configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::ServerConfigurationService);
     $auth_request          = new OpenIdAuthenticationRequest($openid_message, $configuration_service->getUserIdentityEndpointURL('@identifier'));
     if (!$auth_request->isValid())
         throw new InvalidOpenIdMessageException();
@@ -164,9 +155,9 @@ Route::filter("ssl", function () {
 });
 
 Route::filter("oauth2.enabled",function(){
-	if(!ServerConfigurationService::getConfigValue("OAuth2.Enable")){
-		return View::make('404');
-	}
+    if(!ServerConfigurationService::getConfigValue("OAuth2.Enable")){
+        return View::make('404');
+    }
 });
 
 Route::filter('user.owns.client.policy',function($route, $request){

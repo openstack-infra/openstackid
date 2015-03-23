@@ -66,7 +66,8 @@ class ApiEndpointTest extends TestCase {
             'route'              => '/api/v1/api-endpoint/test',
             'http_method'        => 'POST',
             'api_id'             => $api->id,
-	        'allow_cors'        => true
+            'allow_cors'        => true,
+            'rate_limit'        => 60,
         );
 
         $response = $this->action("POST", "ApiEndpointController@create",
@@ -94,7 +95,8 @@ class ApiEndpointTest extends TestCase {
             'route'              => '/api/v1/api-endpoint/test',
             'http_method'        => 'POST',
             'api_id'             => $api->id,
-	        'allow_cors'        => true
+            'allow_cors'        => true,
+            'rate_limit'        => 60,
         );
 
         $response = $this->action("POST", "ApiEndpointController@create",
@@ -139,11 +141,12 @@ class ApiEndpointTest extends TestCase {
             'route'              => '/api/v1/api-endpoint/test',
             'http_method'        => 'POST',
             'api_id'             => $api->id,
-	        'allow_cors'        => true
+            'allow_cors'        => true,
+            'rate_limit'        => 60,
         );
 
         $response = $this->action("POST", "ApiEndpointController@create", $data);
-	    $this->assertResponseStatus(201);
+        $this->assertResponseStatus(201);
         $content = $response->getContent();
         $json_response = json_decode($content);
         $this->assertTrue(isset($json_response->api_endpoint_id) && !empty($json_response->api_endpoint_id));
@@ -151,13 +154,13 @@ class ApiEndpointTest extends TestCase {
         //update status
 
         $response = $this->action('DELETE',"ApiEndpointController@deactivate", array('id' => $new_id) );
-	    $this->assertResponseStatus(200);
+        $this->assertResponseStatus(200);
         $content = $response->getContent();
         $json_response = json_decode($content);
         $this->assertTrue($json_response==='ok');
 
         $response = $this->action("GET", "ApiEndpointController@get",array('id' => $new_id));
-	    $this->assertResponseStatus(200);
+        $this->assertResponseStatus(200);
         $content = $response->getContent();
         $updated_values = json_decode($content);
         $this->assertTrue($updated_values->active == false);
@@ -195,8 +198,8 @@ class ApiEndpointTest extends TestCase {
         $this->assertTrue(!is_null($scope));
 
         $response = $this->action("PUT", "ApiEndpointController@addRequiredScope",array(
-                'id'       => $api_endpoint->id,
-                'scope_id' => $scope->id), array(),
+            'id'       => $api_endpoint->id,
+            'scope_id' => $scope->id), array(),
             array(),
             array());
 
@@ -224,8 +227,8 @@ class ApiEndpointTest extends TestCase {
         $this->assertTrue(!is_null($scope));
 
         $response = $this->action("DELETE", "ApiEndpointController@removeRequiredScope",array(
-                'id'       => $api_endpoint->id,
-                'scope_id' => $scope->id), array(),
+            'id'       => $api_endpoint->id,
+            'scope_id' => $scope->id), array(),
             array(),
             array());
 

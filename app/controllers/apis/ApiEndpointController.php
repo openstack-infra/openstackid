@@ -137,7 +137,7 @@ class ApiEndpointController extends AbstractRESTController implements ICRUDContr
                 'allow_cors'         => 'sometimes|required|boolean',
                 'route'              => 'sometimes|required|route',
                 'http_method'        => 'sometimes|required|httpmethod',
-                'rate_limit'         => 'required|integer',
+                'rate_limit'         => 'sometimes|integer',
             );
 
             // Creates a Validator instance and validates the data.
@@ -162,37 +162,37 @@ class ApiEndpointController extends AbstractRESTController implements ICRUDContr
         }
     }
 
-	public function activate($id){
-		try {
-			$res    = $this->api_endpoint_service->setStatus($id,true);
-			return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
-		}
-		catch (InvalidApiEndpoint $ex1) {
-			$this->log_service->error($ex1);
-			return $this->error404(array('error'=>$ex1->getMessage()));
-		}
-		catch (Exception $ex) {
-			$this->log_service->error($ex);
-			return $this->error500($ex);
-		}
-	}
+    public function activate($id){
+        try {
+            $res    = $this->api_endpoint_service->setStatus($id,true);
+            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
+        }
+        catch (InvalidApiEndpoint $ex1) {
+            $this->log_service->error($ex1);
+            return $this->error404(array('error'=>$ex1->getMessage()));
+        }
+        catch (Exception $ex) {
+            $this->log_service->error($ex);
+            return $this->error500($ex);
+        }
+    }
 
-	public function deactivate($id){
-		try {
-			$res    = $this->api_endpoint_service->setStatus($id,false);
-			return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
-		}
-		catch (InvalidApiEndpoint $ex1) {
-			$this->log_service->error($ex1);
-			return $this->error404(array('error'=>$ex1->getMessage()));
-		}
-		catch (Exception $ex) {
-			$this->log_service->error($ex);
-			return $this->error500($ex);
-		}
-	}
+    public function deactivate($id){
+        try {
+            $res    = $this->api_endpoint_service->setStatus($id,false);
+            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
+        }
+        catch (InvalidApiEndpoint $ex1) {
+            $this->log_service->error($ex1);
+            return $this->error404(array('error'=>$ex1->getMessage()));
+        }
+        catch (Exception $ex) {
+            $this->log_service->error($ex);
+            return $this->error500($ex);
+        }
+    }
 
-	public function addRequiredScope($id, $scope_id){
+    public function addRequiredScope($id, $scope_id){
         try {
             $res = $this->api_endpoint_service->addRequiredScope($id,$scope_id);
             return $res?$this->ok():$this->error400(array('error'=>'operation failed'));

@@ -151,4 +151,13 @@ class CacheServiceStub implements ICacheService{
 	{
 		// TODO: Implement boot() method.
 	}
+
+	/**Returns the remaining time to live of a key that has a timeout.
+	 * @param string $key
+	 * @return int
+	 */
+	public function ttl($key)
+	{
+		// TODO: Implement ttl() method.
+	}
 }
