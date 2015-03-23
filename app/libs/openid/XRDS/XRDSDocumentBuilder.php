@@ -9,8 +9,9 @@ namespace openid\XRDS;
 final class XRDSDocumentBuilder
 {
 
-    const ContentType = 'application/xrds+xml';
-    const XRDNamespace = 'xri://$xrd*($v*2.0)';
+    const ContentType   = 'application/xrds+xml';
+    const Charset       = 'charset=UTF-8';
+    const XRDNamespace  = 'xri://$xrd*($v*2.0)';
     const XRDSNamespace = 'xri://$xrds';
 
     private $elements;

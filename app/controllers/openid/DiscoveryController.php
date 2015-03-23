@@ -5,7 +5,7 @@ use openid\services\IServerConfigurationService;
 use openid\XRDS\XRDSDocumentBuilder;
 use utils\services\IAuthService;
 
-class DiscoveryController extends BaseController
+class DiscoveryController extends OpenIdController
 {
 
     private $openid_protocol;
@@ -25,12 +25,10 @@ class DiscoveryController extends BaseController
      */
     public function idp()
     {
-        //This field contains a semicolon-separated list of representation schemes
-        //which will be accepted in the response to this request.
-        $accept = Request::header('Accept');
-        if (strstr($accept, XRDSDocumentBuilder::ContentType)) {
+
+        if ($this->isDiscoveryRequest()) {
             $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeIdp), 200);
-            $response->header('Content-Type', "application/xrds+xml; charset=UTF-8");
+            $this->setDiscoveryResponseType($response);
         } else {
             $response = View::make("home");
         }
@@ -51,13 +49,11 @@ class DiscoveryController extends BaseController
         $user = $this->auth_service->getUserByOpenId($identifier);
         if (is_null($user))
             return View::make("404");
-        //This field contains a semicolon-separated list of representation schemes
-        //which will be accepted in the response to this request.
-        $accept = Request::header('Accept');
+
         $local_identifier = $this->server_config_service->getUserIdentityEndpointURL($identifier);
-        if (strstr($accept, XRDSDocumentBuilder::ContentType)) {
+        if ($this->isDiscoveryRequest()) {
             $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeUser, $local_identifier), 200);
-            $response->header('Content-Type', "application/xrds+xml; charset=UTF-8");
+            $this->setDiscoveryResponseType($response);
         } else {
             $response = View::make("identity");
         }

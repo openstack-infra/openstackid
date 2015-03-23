@@ -13,8 +13,9 @@ class InsertMarketplaceApiEndpointsScopes extends Migration {
 	public function up()
 	{
 
-			$resource_server = ResourceServer::first();
+		$resource_server = ResourceServer::first();
 
+		if(!$resource_server) return;
 		// public clouds
 		Api::create(
 			array(

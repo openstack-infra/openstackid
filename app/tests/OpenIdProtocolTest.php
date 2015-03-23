@@ -14,7 +14,7 @@ use Zend\Crypt\PublicKey\DiffieHellman;
  * Class OpenIdProtocolTest
  * Test Suite for OpenId Protocol
  */
-class OpenIdProtocolTest extends TestCase
+class OpenIdProtocolTest extends OpenStackIDBaseTest
 {
     private $current_realm;
     private $g;
@@ -753,6 +753,24 @@ class OpenIdProtocolTest extends TestCase
         $this->assertResponseStatus(302);
 
         $content = $response->getContent();
+    }
+
+    public function testDiscovery(){
+        $response = $this->action("GET", "HomeController@index",
+            array(),
+            array(),
+            array(),
+            // Symfony interally prefixes headers with "HTTP", so
+            array('HTTP_Accept' => 'text/html; q=0.3, application/xhtml+xml; q=0.5, application/xrds+xml'));
+        $this->assertResponseStatus(200);
+        // I just needed to access the public
+        // headers var (which is a Symfony ResponseHeaderBag object)
+        $this->assertEquals('application/xrds+xml; charset=UTF-8', $response->headers->get('Content-Type'));
+
+        $content = $response->getContent();
+
+        $this->assertTrue(strpos($content,'<xrds:XRDS')!==false);
+        $this->assertTrue(strpos($content,'http://specs.openid.net/auth/2.0/server')!==false);
     }
 
 }

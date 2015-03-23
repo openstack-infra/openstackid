@@ -6,6 +6,9 @@ use openid\IOpenIdProtocol;
 use openid\services\IMementoOpenIdRequestService;
 use openid\strategies\OpenIdResponseStrategyFactoryMethod;
 
+/**
+ * Class OpenIdProviderController
+ */
 class OpenIdProviderController extends BaseController
 {
     private $openid_protocol;

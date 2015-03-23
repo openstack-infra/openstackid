@@ -19,7 +19,7 @@ use utils\services\IAuthService;
 /**
  * Class OAuth2ProtectedApiTest
  */
-abstract class OAuth2ProtectedApiTest extends TestCase {
+abstract class OAuth2ProtectedApiTest extends OpenStackIDBaseTest {
 
     protected $access_token;
     protected $client_id;

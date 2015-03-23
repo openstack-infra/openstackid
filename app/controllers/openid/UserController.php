@@ -21,7 +21,10 @@ use strategies\OAuth2LoginStrategy;
 use utils\services\IAuthService;
 use utils\services\IServerConfigurationService as IUtilsServerConfigurationService;
 
-class UserController extends BaseController
+/**
+ * Class UserController
+ */
+class UserController extends OpenIdController
 {
 
     private $openid_memento_service;
@@ -175,10 +178,8 @@ class UserController extends BaseController
             $user = $this->auth_service->getUserByOpenId($identifier);
             if (is_null($user))
                 return View::make("404");
-            //This field contains a semicolon-separated list of representation schemes
-            //which will be accepted in the response to this request.
-            $accept = Request::header('Accept');
-            if (strstr($accept, XRDSDocumentBuilder::ContentType)) {
+
+            if ($this->isDiscoveryRequest()) {
                 /*
                 * If the Claimed Identifier was not previously discovered by the Relying Party
                 * (the "openid.identity" in the request was "http://specs.openid.net/auth/2.0/identifier_select"
