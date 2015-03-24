@@ -84,6 +84,7 @@ class CORSMiddleware {
 
         if (!$this->checkOrigin($request)) {
             $response->headers->set('Access-Control-Allow-Origin', 'null');
+            $response->setStatusCode(403);
             return $response;
         }
 

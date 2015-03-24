@@ -10,6 +10,8 @@ use oauth2\exceptions\OAuth2ResourceServerException;
 use oauth2\exceptions\InvalidGrantTypeException;
 use utils\services\ICheckPointService;
 use oauth2\IResourceServerContext;
+use oauth2\services\IClientService;
+use oauth2\models\IClient;
 /**
  * Class OAuth2BearerAccessTokenRequestValidator
  * this class implements the logic to Accessing to Protected Resources
@@ -21,13 +23,13 @@ class OAuth2BearerAccessTokenRequestValidator {
 
     protected function getHeaders()
     {
-	    $headers = array();
+        $headers = array();
 
         if (function_exists('getallheaders')) {
             // @codeCoverageIgnoreStart
-	        foreach(getallheaders() as $name => $value){
-		        $headers[strtolower($name)] = $value;
-	        }
+            foreach(getallheaders() as $name => $value){
+                $headers[strtolower($name)] = $value;
+            }
         } else {
             // @codeCoverageIgnoreEnd
             foreach ($_SERVER  as $name => $value) {
@@ -37,10 +39,10 @@ class OAuth2BearerAccessTokenRequestValidator {
                 }
             }
 
-	        foreach(Request::header() as $name => $value){
-				if(!array_key_exists($name,$headers))
-					$headers[strtolower($name)] = $value[0];
-	        }
+            foreach(Request::header() as $name => $value){
+                if(!array_key_exists($name,$headers))
+                    $headers[strtolower($name)] = $value[0];
+            }
         }
         return $headers;
     }
@@ -51,14 +53,16 @@ class OAuth2BearerAccessTokenRequestValidator {
     private $checkpoint_service;
     private $resource_server_context;
     private $headers;
+    private $client_service;
 
-    public function __construct(IResourceServerContext $resource_server_context,IApiEndpointService $api_endpoint_service, ITokenService $token_service, ILogService $log_service, ICheckPointService $checkpoint_service){
+    public function __construct(IResourceServerContext $resource_server_context, IApiEndpointService $api_endpoint_service, ITokenService $token_service, ILogService $log_service, ICheckPointService $checkpoint_service, IClientService $client_service){
         $this->api_endpoint_service    = $api_endpoint_service;
         $this->token_service           = $token_service;
         $this->log_service             = $log_service;
         $this->checkpoint_service      = $checkpoint_service;
         $this->resource_server_context = $resource_server_context;
         $this->headers                 = $this->getHeaders();
+        $this->client_service          = $client_service;
     }
 
     /**
@@ -74,6 +78,8 @@ class OAuth2BearerAccessTokenRequestValidator {
         }
         $method    = $request->getMethod();
         $realm     = $request->getHost();
+        // http://tools.ietf.org/id/draft-abarth-origin-03.html
+        $origin    = $request->headers->has('Origin') ? $request->headers->get('Origin') : null;
 
         try{
             $endpoint  = $this->api_endpoint_service->getApiEndpointByUrlAndMethod($url, $method);
@@ -107,6 +113,18 @@ class OAuth2BearerAccessTokenRequestValidator {
             if((!in_array($realm,$audience)))
                 throw new OAuth2ResourceServerException(401,OAuth2Protocol::OAuth2Protocol_Error_InvalidToken,'access token audience does not match');
 
+            //check client existence
+            $client_id = $access_token->getClientId();
+            $client    = $this->client_service->getClientById($client_id);
+
+            if(is_null($client))
+                throw new OAuth2ResourceServerException(400,OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest, 'invalid client');
+
+            //if js client , then check if the origin is allowed ....
+            if($client->getApplicationType() == IClient::ApplicationType_JS_Client){
+                if(!$client->isOriginAllowed($origin))
+                    throw new OAuth2ResourceServerException(403,OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient, 'invalid origin');
+            }
             //check scopes
             $endpoint_scopes = explode(' ',$endpoint->getScope());
             $token_scopes    = explode(' ',$access_token->getScope());
@@ -123,7 +141,7 @@ class OAuth2BearerAccessTokenRequestValidator {
             $context = array(
                 'access_token' => $access_token_value,
                 'expires_in'   => $access_token->getRemainingLifetime(),
-                'client_id'    => $access_token->getClientId(),
+                'client_id'    => $client_id,
                 'scope'        => $access_token->getScope()
             );
 

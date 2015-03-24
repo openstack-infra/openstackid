@@ -7,19 +7,19 @@ class Client extends BaseModelEloquent implements IClient {
 
     protected $table = 'oauth2_client';
 
-	public function getActiveAttribute(){
-		return (bool) $this->attributes['active'];
-	}
+    public function getActiveAttribute(){
+        return (bool) $this->attributes['active'];
+    }
 
-	public function getIdAttribute(){
-		return (int) $this->attributes['id'];
-	}
+    public function getIdAttribute(){
+        return (int) $this->attributes['id'];
+    }
 
-	public function getLockedAttribute(){
-		return (int) $this->attributes['locked'];
-	}
+    public function getLockedAttribute(){
+        return (int) $this->attributes['locked'];
+    }
 
-	public function access_tokens()
+    public function access_tokens()
     {
         return $this->hasMany('AccessToken');
     }
@@ -202,13 +202,13 @@ class Client extends BaseModelEloquent implements IClient {
         switch($this->application_type){
             case IClient::ApplicationType_JS_Client:
                 return 'Client Side (JS)';
-            break;
+                break;
             case IClient::ApplicationType_Service:
                 return 'Service Account';
-            break;
+                break;
             case IClient::ApplicationType_Web_App:
                 return 'Web Server Application';
-            break;
+                break;
         }
         throw new Exception('Invalid Application Type');
     }
@@ -232,13 +232,13 @@ class Client extends BaseModelEloquent implements IClient {
         }
         if($parts['scheme']!=='https')
             return false;
-        $origin_without_port = sprinf("%sː//%s",$parts['scheme'],$parts['host']);
+        $origin_without_port = $parts['scheme'].'://'.$parts['host'];
         $client_allowed_origin  = $this->allowed_origins()->where('allowed_origin','=',$origin_without_port)->first();
         if(!is_null($client_allowed_origin)) return true;
         if(isset($parts['port'])){
-           $origin_with_port    = sprinf("%sː//%s:%s",$parts['scheme'],$parts['host'],$parts['port']);
-           $client_authorized_uri = $this->allowed_origins()->where('allowed_origin','=',$origin_with_port)->first();;
-           return !is_null($client_authorized_uri);
+            $origin_with_port    = $parts['scheme'].'://'.$parts['host'].':'.$parts['port'];
+            $client_authorized_uri = $this->allowed_origins()->where('allowed_origin','=',$origin_with_port)->first();;
+            return !is_null($client_authorized_uri);
         }
         return false;
     }

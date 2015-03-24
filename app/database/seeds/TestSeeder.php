@@ -409,8 +409,16 @@ class TestSeeder extends Seeder {
         //add uris
         ClientAuthorizedUri::create(
             array(
-                'uri'=>'https://www.test.com/oauth2',
-                'client_id'=>$client_confidential->id
+                'uri' => 'https://www.test.com/oauth2',
+                'client_id' => $client_confidential->id
+            )
+        );
+
+        //add uris
+        ClientAllowedOrigin::create(
+            array(
+                'allowed_origin' => 'https://www.test.com/oauth2',
+                'client_id' => $client_confidential->id
             )
         );
 

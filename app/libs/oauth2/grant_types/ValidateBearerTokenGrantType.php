@@ -126,7 +126,17 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
                         throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('access token current audience does not match with current request ip %s', $current_ip));
                 }
 
-                return new OAuth2AccessTokenValidationResponse( $token_value, $access_token->getScope(), $access_token->getAudience(), $access_token->getClientId(), $access_token->getRemainingLifetime(), $access_token->getUserId());
+                $allowed_origins = array();
+                foreach($this->current_client->getClientAllowedOrigins() as $origin){
+                    array_push($allowed_origins, $origin->allowed_origin);
+                }
+
+                $allowed_urls = array();
+                foreach($this->current_client->getClientRegisteredUris() as $url){
+                    array_push($allowed_urls, $url->uri);
+                }
+
+                return new OAuth2AccessTokenValidationResponse($token_value, $access_token->getScope(), $access_token->getAudience(), $access_token->getClientId(), $access_token->getRemainingLifetime(), $access_token->getUserId(), $allowed_urls, $allowed_origins);
             }
             catch(InvalidAccessTokenException $ex1){
                 $this->log_service->error($ex1);

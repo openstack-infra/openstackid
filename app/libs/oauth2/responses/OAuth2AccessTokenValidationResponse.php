@@ -6,7 +6,7 @@ use oauth2\OAuth2Protocol;
 
 class OAuth2AccessTokenValidationResponse extends OAuth2DirectResponse {
 
-    public function __construct($access_token,$scope, $audience,$client_id,$expires_in, $user_id = null)
+    public function __construct($access_token,$scope, $audience,$client_id,$expires_in, $user_id = null, $allowed_urls = array(), $allowed_origins = array())
     {
         // Successful Responses: A server receiving a valid request MUST send a
         // response with an HTTP status code of 200.
@@ -20,6 +20,14 @@ class OAuth2AccessTokenValidationResponse extends OAuth2DirectResponse {
 
         if(!is_null($user_id)){
             $this[OAuth2Protocol::OAuth2Protocol_UserId] = $user_id;
+        }
+
+        if(count($allowed_urls)){
+            $this['allowed_return_uris'] = implode(' ', $allowed_urls);
+        }
+
+        if(count($allowed_origins)){
+            $this['allowed_origins'] = implode(' ', $allowed_origins);
         }
     }
 } 
