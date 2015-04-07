@@ -9,7 +9,7 @@
         "phpunit/phpunit": "3.7.*",
         "zendframework/zend-crypt":"2.2.*",
         "greggilbert/recaptcha": "1.0.*",
-        "mockery/mockery": "dev-master",
+        "mockery/mockery": "0.9.*",
         "doctrine/dbal": "~2.3",
         "way/laravel-test-helpers": "dev-master"
 	},
