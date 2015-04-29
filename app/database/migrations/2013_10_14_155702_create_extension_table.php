@@ -14,12 +14,12 @@ class CreateExtensionTable extends Migration {
         Schema::create('server_extensions', function($table)
         {
             $table->bigIncrements('id');
-            $table->string('name',100);
-            $table->string('namespace',255);
+            $table->string('name',100)->nullable()->default('');
+            $table->string('namespace',255)->nullable()->default('');
             $table->boolean('active')->default(false);
-            $table->string('extension_class',255);
-            $table->string('description',255)->nullable();
-            $table->string('view_name',255);
+            $table->string('extension_class',255)->nullable()->default('');
+            $table->string('description',255)->nullable()->default('');
+            $table->string('view_name',255)->nullable()->default('');
             $table->timestamps();
         });
 	}

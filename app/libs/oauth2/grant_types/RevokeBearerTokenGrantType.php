@@ -6,6 +6,7 @@ use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\UnAuthorizedClientException;
 use oauth2\exceptions\BearerTokenDisclosureAttemptException;
 use oauth2\exceptions\InvalidGrantTypeException;
+use oauth2\exceptions\ExpiredAccessTokenException;
 
 use oauth2\OAuth2Protocol;
 use oauth2\requests\OAuth2Request;
@@ -96,6 +97,10 @@ class RevokeBearerTokenGrantType extends AbstractGrantType
                         {
                             //check ownership
                             $access_token = $this->token_service->getAccessToken($token_value);
+
+                            if(is_null($access_token))
+                                throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $token_value));
+
                             if ($access_token->getClientId() !== $this->current_client_id)
                                 throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('access token %s does not belongs to client id %s',$token_value, $this->current_client_id));
 
@@ -106,6 +111,7 @@ class RevokeBearerTokenGrantType extends AbstractGrantType
                         {
                             //check ownership
                             $refresh_token = $this->token_service->getRefreshToken($token_value);
+
                             if ($refresh_token->getClientId() !== $this->current_client_id)
                                 throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('refresh token %s does not belongs to client id %s',$token_value, $this->current_client_id));
 
@@ -125,8 +131,13 @@ class RevokeBearerTokenGrantType extends AbstractGrantType
                     try{
                         //check ownership
                         $access_token = $this->token_service->getAccessToken($token_value);
+
+                        if(is_null($access_token))
+                            throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $token_value));
+
                         if ($access_token->getClientId() !== $this->current_client_id)
                             throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('access token %s does not belongs to client id %s',$token_value, $this->current_client_id));
+
                         $this->token_service->revokeAccessToken($token_value, false);
                     }
                     catch(UnAuthorizedClientException $ex1){

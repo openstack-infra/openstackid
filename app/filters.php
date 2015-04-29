@@ -36,8 +36,22 @@ App::before(function($request){
 });
 
 App::after(function($request, $response){
+    // https://www.owasp.org/index.php/List_of_useful_HTTP_headers
     $response->headers->set('X-content-type-options','nosniff');
     $response->headers->set('X-xss-protection','1; mode=block');
+    // http://tools.ietf.org/html/rfc6797
+    /**
+     * The HSTS header field below stipulates that the HSTS Policy is to
+     * remain in effect for one year (there are approximately 31536000
+     * seconds in a year)
+     * applies to the domain of the issuing HSTS Host and all of its
+     * subdomains:
+     */
+    $response->headers->set('Strict-Transport-Security','max-age=31536000; includeSubDomains');
+    //cache
+    $response->headers->set('pragma','no-cache');
+    $response->headers->set('Expires','-1');
+    $response->headers->set('cache-control','no-store, must-revalidate, no-cache');
     $cors = ServiceLocator::getInstance()->getService('CORSMiddleware');
     $cors->modifyResponse($request, $response);
 });
@@ -206,12 +220,6 @@ Route::filter('is.current.user',function($route, $request){
 // filter to protect an api endpoint with oauth2
 
 Route::filter('oauth2.protected.endpoint','OAuth2BearerAccessTokenRequestValidator');
-
-Route::filter('oauth2.rate.limiter','ApiEndpointRateLimiter');
-
-Route::filter('oauth2.rate.limiter.headers','ApiEndpointRateLimiterHeaders');
-
-Route::filter('oauth2.etag','ETagChecker');
 
 //oauth2 server admin filter
 

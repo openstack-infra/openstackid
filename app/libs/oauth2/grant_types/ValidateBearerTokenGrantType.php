@@ -2,6 +2,7 @@
 
 namespace oauth2\grant_types;
 
+use oauth2\exceptions\ExpiredAccessTokenException;
 use oauth2\exceptions\InvalidApplicationType;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\InvalidAccessTokenException;
@@ -102,7 +103,8 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
             try{
 
                 $access_token = $this->token_service->getAccessToken($token_value);
-
+                if(is_null($access_token))
+                    throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $token_value));
                 if(!$this->current_client->isResourceServerClient()){
                     // if current client is not a resource server, then we could only access to our own tokens
                     if($access_token->getClientId()!== $this->current_client_id)
@@ -127,16 +129,21 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
                 }
 
                 $allowed_origins = array();
-                foreach($this->current_client->getClientAllowedOrigins() as $origin){
+                $allowed_urls    = array();
+                $issued_client   = $this->client_service->getClientById($access_token->getClientId());
+
+                if(is_null($issued_client))
+                    throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('access token %s does not belongs to client id %s',$token_value, $access_token->getClientId()));
+
+                foreach($issued_client->getClientAllowedOrigins() as $origin){
                     array_push($allowed_origins, $origin->allowed_origin);
                 }
 
-                $allowed_urls = array();
-                foreach($this->current_client->getClientRegisteredUris() as $url){
+                foreach($issued_client->getClientRegisteredUris() as $url){
                     array_push($allowed_urls, $url->uri);
                 }
 
-                return new OAuth2AccessTokenValidationResponse($token_value, $access_token->getScope(), $access_token->getAudience(), $access_token->getClientId(), $access_token->getRemainingLifetime(), $access_token->getUserId(), $allowed_urls, $allowed_origins);
+                return new OAuth2AccessTokenValidationResponse($token_value, $access_token->getScope(), $access_token->getAudience(), $access_token->getClientId(), $access_token->getRemainingLifetime(), $access_token->getUserId(), $issued_client->getApplicationType(), $allowed_urls, $allowed_origins);
             }
             catch(InvalidAccessTokenException $ex1){
                 $this->log_service->error($ex1);

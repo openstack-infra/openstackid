@@ -14,8 +14,8 @@ class CreateOauth2ClientsTable extends Migration {
         Schema::create('oauth2_client', function($table)
         {
             $table->bigIncrements('id')->unsigned();
-            $table->string('app_name',255);
-            $table->text('app_description');
+            $table->string('app_name',255)->nullable();
+            $table->text('app_description')->nullable();
             $table->string('app_logo',255)->nullable();
             $table->string('client_id',255)->unique();
             $table->string('client_secret',255)->nullable();
@@ -30,13 +30,13 @@ class CreateOauth2ClientsTable extends Migration {
             $table->timestamps();
 
             $table->integer('max_auth_codes_issuance_qty')->default(0);
-            $table->smallInteger('max_auth_codes_issuance_basis');
+            $table->smallInteger('max_auth_codes_issuance_basis')->default(0);
 
             $table->integer('max_access_token_issuance_qty')->default(0);
-            $table->smallInteger('max_access_token_issuance_basis');
+            $table->smallInteger('max_access_token_issuance_basis')->default(0);
 
             $table->integer('max_refresh_token_issuance_qty')->default(0);
-            $table->smallInteger('max_refresh_token_issuance_basis');
+            $table->smallInteger('max_refresh_token_issuance_basis')->default(0);
 
             $table->boolean('use_refresh_token')->default(false);
             $table->boolean('rotate_refresh_token')->default(false);
