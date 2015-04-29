@@ -84,7 +84,7 @@ class ApiEndpointService implements IApiEndpointService {
 	    $this->tx_service->transaction(function () use ($name, $description, $active,$allow_cors, $route, $http_method, $api_id, $rate_limit, &$instance) {
 
             //check that does not exists an endpoint with same http method and same route
-            if(ApiEndpoint::where('http_method','=',$http_method)->where('route','=',$route)->count()>0)
+            if(ApiEndpoint::where('http_method','=',$http_method)->where('route','=',$route)->where('api_id','=',$api_id)->count()>0)
                 throw new InvalidApiEndpoint(sprintf('there is already an endpoint api with route %s and http method %s',$route,$http_method));
 
             $instance = new ApiEndpoint(
@@ -127,7 +127,7 @@ class ApiEndpointService implements IApiEndpointService {
                 }
             }
             //check that does not exists an endpoint with same http method and same route
-            if(ApiEndpoint::where('http_method','=',$endpoint->http_method)->where('route','=',$endpoint->route)->where('id','<>',$endpoint->id)->count()>0)
+            if(ApiEndpoint::where('http_method', '=' , $endpoint->http_method)->where('route', '=', $endpoint->route)->where('id', '<>' ,$endpoint->id)->where('api_id','=',$endpoint->api_id)->count()>0)
                 throw new InvalidApiEndpoint(sprintf('there is already an endpoint api with route %s and http method %s',$endpoint->route,$endpoint->http_method));
             $res = $this_var->save($endpoint);
         });

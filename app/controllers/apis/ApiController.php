@@ -107,7 +107,7 @@ class ApiController extends AbstractRESTController implements ICRUDController
     {
         try {
             $res = $this->api_service->delete($id);
-            return $res?$this->deleted():$this->error404(array('error'=>'operation failed'));
+            return $res ? $this->deleted() : $this->error404(array('error'=>'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
