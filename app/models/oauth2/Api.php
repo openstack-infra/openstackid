@@ -92,4 +92,19 @@ class Api extends BaseModelEloquent implements IApi {
     {
         $this->active = $active;
     }
+
+    public function delete ()
+    {
+        $endpoints = ApiEndpoint::where('api_id','=', $this->id)->get();
+        foreach($endpoints as $endpoint){
+            $endpoint->delete();
+        }
+
+        $scopes = ApiScope::where('api_id','=', $this->id)->get();
+        foreach($scopes as $scope){
+            $scope->delete();
+        }
+
+        return parent::delete();
+    }
 }

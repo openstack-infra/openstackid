@@ -26,7 +26,7 @@ return array(
 	|
 	*/
 
-	'url' => 'https://dev.openstackid.com',
+	'url' => 'https://local.openstackid.openstack.org',
 
 	/*
 	|--------------------------------------------------------------------------

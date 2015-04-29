@@ -12,6 +12,7 @@ use oauth2\exceptions\AllowedClientUriAlreadyExistsException;
 use oauth2\exceptions\InvalidClientType;
 use oauth2\exceptions\MissingClientAuthorizationInfo;
 use oauth2\exceptions\AbsentClientException;
+use oauth2\exceptions\InvalidAllowedClientUriException;
 
 use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
@@ -135,9 +136,24 @@ class ClientService implements IClientService
             if (is_null($client))
                 throw new AbsentClientException(sprintf("client id %s does not exists!",$id));
 
-            $client_uri = ClientAuthorizedUri::where('uri', '=', $uri)->where('client_id', '=', $id)->first();
+            if(!filter_var($uri, FILTER_VALIDATE_URL)) return false;
+            $parts = @parse_url($uri);
+            if (!$parts) {
+                throw new InvalidAllowedClientUriException(sprintf('uri : %s', $uri));
+            }
+            if(($parts['scheme']!=='https') && (ServerConfigurationService::getConfigValue("SSL.Enable")))
+                throw new InvalidAllowedClientUriException(sprintf('uri : %s', $uri));
+            //normalize uri
+            $normalized_uri = $parts['scheme'].'://'.strtolower($parts['host']);
+            if(isset($parts['path'])) {
+                $normalized_uri .= strtolower($parts['path']);
+            }
+            // normalize url and remove trailing /
+            $normalized_uri = rtrim($normalized_uri, '/');
+
+            $client_uri = ClientAuthorizedUri::where('uri', '=', $normalized_uri)->where('client_id', '=', $id)->first();
             if (!is_null($client_uri)) {
-                throw new AllowedClientUriAlreadyExistsException(sprintf('uri : %s', $uri));
+                throw new AllowedClientUriAlreadyExistsException(sprintf('uri : %s', $normalized_uri));
             }
 
             $client_authorized_uri            = new ClientAuthorizedUri;

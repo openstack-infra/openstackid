@@ -16,6 +16,7 @@ use utils\services\UtilsServiceCatalog;
 use oauth2\exceptions\InvalidOAuth2Request;
 use Monolog\Logger;
 use Monolog\Handler\NativeMailerHandler;
+use Illuminate\Support\Facades\App;
 
 
 ClassLoader::addDirectories(array(
@@ -91,31 +92,37 @@ if (Config::get('database.log', false)){
 
 
 App::error(function (Exception $exception, $code) {
-    $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
     Log::error($exception);
-    if($checkpoint_service ){
-        $checkpoint_service->trackException($exception);
+    if(!App::runningInConsole()) {
+        $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
+        if ($checkpoint_service) {
+            $checkpoint_service->trackException($exception);
+        }
+        return View::make('404');
     }
-    return View::make('404');
 });
 
 
 App::error(function (InvalidOpenIdMessageException $exception, $code) {
-    $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
     Log::error($exception);
-    if($checkpoint_service ){
-        $checkpoint_service->trackException($exception);
+    if(!App::runningInConsole()) {
+        $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
+        if ($checkpoint_service) {
+            $checkpoint_service->trackException($exception);
+        }
+        return View::make('404');
     }
-    return View::make('404');
 });
 
 App::error(function (InvalidOAuth2Request $exception, $code) {
-    $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
     Log::error($exception);
-    if($checkpoint_service ){
-        $checkpoint_service->trackException($exception);
+    if(!App::runningInConsole()) {
+        $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
+        if ($checkpoint_service) {
+            $checkpoint_service->trackException($exception);
+        }
+        return View::make('404');
     }
-    return View::make('404');
 });
 
 

@@ -121,16 +121,15 @@ class Client extends BaseModelEloquent implements IClient {
         }
         if(($parts['scheme']!=='https') && (ServerConfigurationService::getConfigValue("SSL.Enable")))
             return false;
-        $client_authorized_uri = ClientAuthorizedUri::where('client_id', '=', $this->id)->where('uri','=',$uri)->first();
-        if(!is_null($client_authorized_uri)) return true;
-
-        if(isset($parts['path'])){
-            $aux_uri = $parts['scheme'].'://'.strtolower($parts['host']).strtolower($parts['path']);
-            $client_authorized_uri = ClientAuthorizedUri::where('client_id', '=', $this->id)->where('uri','=',$aux_uri)->first();
-            return !is_null($client_authorized_uri);
+        //normalize uri
+        $normalized_uri = $parts['scheme'].'://'.strtolower($parts['host']);
+        if(isset($parts['path'])) {
+            $normalized_uri .= strtolower($parts['path']);
         }
-        return false;
-
+        // normalize url and remove trailing /
+        $normalized_uri = rtrim($normalized_uri, '/');
+        $client_authorized_uri = ClientAuthorizedUri::where('client_id', '=', $this->id)->where('uri','=',$normalized_uri)->first();
+        return !is_null($client_authorized_uri);
     }
 
     public function getApplicationName()

@@ -30,4 +30,3 @@ class OAuth2UserApiController extends OAuth2ProtectedController {
         }
     }
 }
-
