@@ -1,4 +1,16 @@
 <?php
+/**
+ * Copyright 2015 OpenStack Foundation
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
 
 namespace services\oauth2;
 
@@ -9,6 +21,7 @@ use oauth2\exceptions\InvalidAccessTokenException;
 use oauth2\exceptions\InvalidAuthorizationCodeException;
 use oauth2\exceptions\InvalidGrantTypeException;
 use oauth2\exceptions\ReplayAttackException;
+use oauth2\exceptions\ExpiredAccessTokenException;
 
 use oauth2\models\AccessToken;
 use oauth2\models\IClient;
@@ -35,6 +48,7 @@ use  utils\services\IAuthService;
 
 use Event;
 use utils\db\ITransactionService;
+
 /**
  * Class TokenService
  * Provides all Tokens related operations (create, get and revoke)
@@ -42,16 +56,16 @@ use utils\db\ITransactionService;
  */
 class TokenService implements ITokenService
 {
-    const ClientAccessTokenPrefixList = '.atokens';
-    const ClientAuthCodePrefixList    = '.acodes';
+    const ClientAccessTokenPrefixList   = '.atokens';
+    const ClientAuthCodePrefixList      = '.acodes';
 
-    const ClientAuthCodeQty          = '.acodes.qty';
-    const ClientAuthCodeQtyLifetime  = 86400;
+    const ClientAuthCodeQty             = '.acodes.qty';
+    const ClientAuthCodeQtyLifetime     = 86400;
 
-    const ClientAccessTokensQty      = '.atokens.qty';
+    const ClientAccessTokensQty         = '.atokens.qty';
     const ClientAccessTokensQtyLifetime = 86400;
 
-    const ClientRefreshTokensQty = '.rtokens.qty';
+    const ClientRefreshTokensQty         = '.rtokens.qty';
     const ClientRefreshTokensQtyLifetime = 86400;
 
     //services
@@ -123,7 +137,7 @@ class TokenService implements ITokenService
             'access_type'  => $code->getAccessType(),
             'approval_prompt'            => $code->getApprovalPrompt(),
             'has_previous_user_consent'  => $code->getHasPreviousUserConsent()
-        ), $code->getLifetime());
+        ), intval($code->getLifetime()));
 
         //stores brand new auth code hash value on a set by client id...
         $this->cache_service->addMemberSet($client_id . self::ClientAuthCodePrefixList, $hashed_value);
@@ -397,9 +411,7 @@ class TokenService implements ITokenService
             'lifetime'      => $access_token->getLifetime(),
             'audience'      => $access_token->getAudience(),
             'from_ip'       => IPHelper::getUserIp(),
-            'refresh_token' => $refresh_token_value,
-            $access_token->getLifetime()
-        ));
+            'refresh_token' => $refresh_token_value), intval($access_token->getLifetime()));
     }
 
     /**
@@ -437,79 +449,102 @@ class TokenService implements ITokenService
 
     /**
      * @param $value
-     * @param $is_hashed
+     * @param bool $is_hashed
      * @return AccessToken
-     * @throws \oauth2\exceptions\InvalidAccessTokenException
-     * @throws \oauth2\exceptions\InvalidGrantTypeException
+     * @throws InvalidAccessTokenException
+     * @throws \Exception
      */
     public function getAccessToken($value, $is_hashed = false)
     {
+        $cache_service         = $this->cache_service;
+        $lock_manager_service  = $this->lock_manager_service;
+        $configuration_service = $this->configuration_service;
+        $this_var              = $this;
 
-        //hash the given value, bc tokens values are stored hashed on DB
-        $hashed_value = !$is_hashed ? Hash::compute('sha256', $value):$value;
-
-        try {
-            if (!$this->cache_service->exists($hashed_value)) {
-                //check on DB...
-                $access_token_db = DBAccessToken::where('value', '=', $hashed_value)->first();
-                if (is_null($access_token_db))
-                    throw new InvalidGrantTypeException(sprintf("Access token %s is invalid!", $value));
-                //lock ...
-                $lock_name = 'lock.get.accesstoken.' . $hashed_value;
-                $this->lock_manager_service->acquireLock($lock_name);
-
-
-                if ($access_token_db->isVoid()){
-                    //invalid one ...
-                    $access_token_db->delete();
-                    throw new InvalidGrantTypeException(sprintf('Access token %s is expired!', $value));
+        return $this->tx_service->transaction(function () use ($this_var, $value, $is_hashed, $cache_service, $lock_manager_service, $configuration_service){
+            //hash the given value, bc tokens values are stored hashed on DB
+            $hashed_value = !$is_hashed ? Hash::compute('sha256', $value):$value;
+            $lock_name    = '';
+            $access_token = null;
+            try {
+                // check cache ...
+                if (!$cache_service->exists($hashed_value)) {
+                    // check on DB...
+                    $access_token_db = DBAccessToken::where('value', '=', $hashed_value)->first();
+                    if (is_null($access_token_db)) {
+                        if($cache_service->exists('access.token:void:'.$hashed_value)) // check if its marked on cache as expired ...
+                            throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $value));
+                        else
+                            throw new InvalidGrantTypeException(sprintf("Access token %s is invalid!", $value));
+                    }
+                    // lock ...
+                    $lock_name = 'lock.get.accesstoken.' . $hashed_value;
+                    $lock_manager_service->acquireLock($lock_name);
+                    if ($access_token_db->isVoid()){
+                        // invalid one ...
+                        // add to cache as expired ...
+                        $cache_service->addSingleValue('access.token:void:'.$hashed_value, 'access.token:void:'.$hashed_value);
+                        // and deleted it from db
+                        $access_token_db->delete();
+                        throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $value));
+                    }
+                    //reload on cache
+                    $this_var->storesDBAccessTokenOnCache($access_token_db);
+                    //release lock
+                    $lock_manager_service->releaseLock($lock_name);
                 }
-                //reload on cache
-                $this->storesDBAccessTokenOnCache($access_token_db);
-                //release lock
-                $this->lock_manager_service->releaseLock($lock_name);
+
+                $cache_values = $cache_service->getHash($hashed_value, array(
+                    'user_id',
+                    'client_id',
+                    'scope',
+                    'auth_code',
+                    'issued',
+                    'lifetime',
+                    'from_ip',
+                    'audience',
+                    'refresh_token'
+                ));
+
+                // reload auth code ...
+                $auth_code = AuthorizationCode::load(
+                    $cache_values['auth_code'],
+                    intval($cache_values['user_id']) == 0 ? null : intval($cache_values['user_id']),
+                    $cache_values['client_id'],
+                    $cache_values['scope'],
+                    $cache_values['audience'],
+                    null,
+                    null,
+                    $configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime'),
+                    $cache_values['from_ip'],
+                    $access_type               = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
+                    $approval_prompt           = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
+                    $has_previous_user_consent = false,
+                    $is_hashed                 = true
+                );
+                // reload access token ...
+                $access_token        = AccessToken::load($value, $auth_code, $cache_values['issued'],$cache_values['lifetime']);
+                $refresh_token_value = $cache_values['refresh_token'];
+
+                if(!empty($refresh_token_value)){
+                    $refresh_token   = $this_var->getRefreshToken($refresh_token_value,true);
+                    $access_token->setRefreshToken($refresh_token);
+                }
             }
-
-            $cache_values = $this->cache_service->getHash($hashed_value, array(
-                'user_id',
-                'client_id',
-                'scope',
-                'auth_code',
-                'issued',
-                'lifetime',
-                'from_ip',
-                'audience',
-                'refresh_token'
-            ));
-
-            // reload auth code ...
-            $auth_code = AuthorizationCode::load(
-                $cache_values['auth_code'],
-                intval($cache_values['user_id'])==0?null:intval($cache_values['user_id']),
-                $cache_values['client_id'],
-                $cache_values['scope'],
-                $cache_values['audience'],
-                null,
-                null,
-                $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime'),
-                $cache_values['from_ip'],
-                $access_type     = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
-                $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
-                $has_previous_user_consent=false,
-                $is_hashed = true
-            );
-            // reload access token ...
-            $access_token        = AccessToken::load($value, $auth_code, $cache_values['issued'],$cache_values['lifetime']);
-            $refresh_token_value = $cache_values['refresh_token'];
-
-            if(!empty($refresh_token_value)){
-                $refresh_token   = $this->getRefreshToken($refresh_token_value,true);
-                $access_token->setRefreshToken($refresh_token);
+            catch (UnacquiredLockException $ex1) {
+                throw new InvalidAccessTokenException("access token %s ", $value);
             }
-        } catch (UnacquiredLockException $ex1) {
-            throw new InvalidAccessTokenException("access token %s ", $value);
-        }
-        return $access_token;
+            catch(ExpiredAccessTokenException $ex2){
+                if(!empty($lock_name))
+                    $lock_manager_service->releaseLock($lock_name);
+            }
+            catch(\Exception $ex){
+                if(!empty($lock_name))
+                    $lock_manager_service->releaseLock($lock_name);
+                throw $ex;
+            }
+            return $access_token;
+        });
     }
 
     /**

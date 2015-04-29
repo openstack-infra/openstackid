@@ -8,10 +8,12 @@ use oauth2\responses\OAuth2WWWAuthenticateErrorResponse;
 use utils\services\ILogService;
 use oauth2\exceptions\OAuth2ResourceServerException;
 use oauth2\exceptions\InvalidGrantTypeException;
+use oauth2\exceptions\ExpiredAccessTokenException;
 use utils\services\ICheckPointService;
 use oauth2\IResourceServerContext;
 use oauth2\services\IClientService;
 use oauth2\models\IClient;
+
 /**
  * Class OAuth2BearerAccessTokenRequestValidator
  * this class implements the logic to Accessing to Protected Resources
@@ -107,7 +109,8 @@ class OAuth2BearerAccessTokenRequestValidator {
 
             // get access token from service
             $access_token = $this->token_service->getAccessToken($access_token_value);
-
+            if(is_null($access_token))
+                throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $access_token_value));
             //check token audience
             $audience = explode(' ',$access_token->getAudience());
             if((!in_array($realm,$audience)))
@@ -167,6 +170,19 @@ class OAuth2BearerAccessTokenRequestValidator {
         catch(InvalidGrantTypeException $ex2){
             $this->log_service->error($ex2);
             $this->checkpoint_service->trackException($ex2);
+            $response = new OAuth2WWWAuthenticateErrorResponse($realm,
+                OAuth2Protocol::OAuth2Protocol_Error_InvalidToken,
+                'the access token provided is expired, revoked, malformed, or invalid for other reasons.',
+                null,
+                401
+            );
+            $http_response =  Response::json($response->getContent(), $response->getHttpCode());
+            $http_response->header('WWW-Authenticate',$response->getWWWAuthenticateHeaderValue());
+            return $http_response;
+        }
+        catch(ExpiredAccessTokenException $ex3){
+            $this->log_service->error($ex3);
+            $this->checkpoint_service->trackException($ex3);
             $response = new OAuth2WWWAuthenticateErrorResponse($realm,
                 OAuth2Protocol::OAuth2Protocol_Error_InvalidToken,
                 'the access token provided is expired, revoked, malformed, or invalid for other reasons.',

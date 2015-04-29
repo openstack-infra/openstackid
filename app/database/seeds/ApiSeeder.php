@@ -25,38 +25,5 @@ class ApiSeeder extends Seeder {
                 'logo'               => asset('img/apis/server.png')
             )
         );
-        // public clouds
-        Api::create(
-            array(
-                'name'            => 'public-clouds',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'Description'     => 'Marketplace Public Clouds',
-                'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
-            )
-        );
-        // private clouds
-        Api::create(
-            array(
-                'name'            => 'private-clouds',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'Description'     => 'Marketplace Private Clouds',
-                'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
-            )
-        );
-        // consultants
-        Api::create(
-            array(
-                'name'            => 'consultants',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'Description'     => 'Marketplace Consultants',
-                'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
-            )
-        );
     }
 }
