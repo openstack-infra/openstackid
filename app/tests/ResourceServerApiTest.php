@@ -9,16 +9,20 @@ class ResourceServerApiTest extends TestCase {
 
     private $current_realm;
 
+    private $current_host;
+
     protected function prepareForTests()
     {
         parent::prepareForTests();
         //Route::enableFilters();
         $this->current_realm = Config::get('app.url');
+        $parts = parse_url($this->current_realm);
+        $this->current_host = $parts['host'];
     }
 
     public function testGetById(){
 
-        $resource_server = ResourceServer::where('host','=','dev.openstackid.com')->first();
+        $resource_server = ResourceServer::where('host','=', $this->current_host)->first();
 
         $response = $this->action("GET", "ApiResourceServerController@get",
             $parameters = array('id' => $resource_server->id),
@@ -169,7 +173,7 @@ class ResourceServerApiTest extends TestCase {
 
     public function testDeleteExistingOne(){
 
-        $resource_server = ResourceServer::where('host','=','dev.openstackid.com')->first();
+        $resource_server = ResourceServer::where('host','=', $this->current_host)->first();
 
         $new_id = $resource_server->id;
 

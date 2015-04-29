@@ -31,6 +31,7 @@ use oauth2\exceptions\UriNotAllowedException;
 use oauth2\exceptions\MissingClientAuthorizationInfo;
 use oauth2\exceptions\InvalidRedeemAuthCodeException;
 use oauth2\exceptions\InvalidClientCredentials;
+use oauth2\exceptions\ExpiredAccessTokenException;
 
 //grant types
 use oauth2\grant_types\AuthorizationCodeGrantType;
@@ -120,7 +121,7 @@ class OAuth2Protocol implements IOAuth2Protocol
     const OAuth2Protocol_Error_ServerError = 'server_error';
     const OAuth2Protocol_Error_TemporallyUnavailable = 'temporally_unavailable';
     //http://tools.ietf.org/html/rfc7009#section-2.2.1
-    const OAuth2Protocol_Error_Unsupported_TokenType = ' unsupported_token_type';
+    const OAuth2Protocol_Error_Unsupported_TokenType = 'unsupported_token_type';
     //http://tools.ietf.org/html/rfc6750#section-3-1
     const OAuth2Protocol_Error_InvalidToken = 'invalid_token';
     const OAuth2Protocol_Error_InsufficientScope = 'insufficient_scope';
@@ -487,6 +488,11 @@ class OAuth2Protocol implements IOAuth2Protocol
             $this->log_service->error($ex3);
             $this->checkpoint_service->trackException($ex3);
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);
+        }
+        catch(ExpiredAccessTokenException $ex4){
+            $this->log_service->warning($ex4);
+            $this->checkpoint_service->trackException($ex4);
+            return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_InvalidToken);
         }
         catch (Exception $ex) {
             $this->log_service->error($ex);

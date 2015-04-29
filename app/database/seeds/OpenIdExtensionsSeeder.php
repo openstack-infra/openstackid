@@ -23,7 +23,7 @@ class OpenIdExtensionsSeeder extends Seeder {
                 'namespace'       => 'http://openid.net/extensions/sreg/1.1',
                 'active'          => true,
                 'extension_class' => 'openid\extensions\implementations\OpenIdSREGExtension',
-                'description'     => 'OpenID Simple Registation is an extension to the OpenID Authentication protocol that allows for very light-weight profile exchange. It is designed to pass eight commonly requested pieces of information when an End User goes to register a new account with a web service',
+                'description'     => 'OpenID Simple Registration is an extension to the OpenID Authentication protocol that allows for very light-weight profile exchange.',
                 'view_name'       => 'extensions.sreg',
             )
         );
@@ -35,7 +35,7 @@ class OpenIdExtensionsSeeder extends Seeder {
                 'namespace'       => 'http://specs.openid.net/extensions/oauth/2.0',
                 'active'          => true,
                 'extension_class' => 'openid\extensions\implementations\OpenIdOAuth2Extension',
-                'description'     => 'The OpenID OAuth2 Extension describes how to make the OpenID Authentication and OAuth2 Core specifications work well togethe',
+                'description'     => 'The OpenID OAuth2 Extension describes how to make the OpenID Authentication and OAuth2 Core specifications work well together.',
                 'view_name'       => 'extensions.oauth2',
             )
         );

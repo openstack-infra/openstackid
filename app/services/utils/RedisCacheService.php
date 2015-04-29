@@ -19,7 +19,6 @@ class RedisCacheService implements ICacheService {
 
     }
 
-
     public function boot(){
         if(is_null($this->redis)){
             $this->redis  = \RedisLV4::connection();
@@ -48,7 +47,7 @@ class RedisCacheService implements ICacheService {
      * @return bool
      */
     public function exists($key){
-        $res =  $this->redis->exists($key);
+        $res = $this->redis->exists($key);
         return $res>0;
     }
 
@@ -82,10 +81,12 @@ class RedisCacheService implements ICacheService {
 
     public function incCounter($counter_name, $ttl = 0)
     {
-        if($this->redis->setnx($counter_name,1))
-           $this->redis->expire($counter_name, $ttl);
+        if($this->redis->setnx($counter_name,1)) {
+            $this->redis->expire($counter_name, $ttl);
+            return 1;
+        }
         else
-           $this->redis->incr($counter_name);
+           return (int)$this->redis->incr($counter_name);
     }
 
     public function incCounterIfExists($counter_name){
@@ -122,7 +123,7 @@ class RedisCacheService implements ICacheService {
 
     public function addSingleValue($key, $value, $ttl = 0){
         $res = $this->redis->setnx($key , $value);
-        if($res>0 && $ttl>0)
+        if($res && $ttl>0)
             $this->redis->expire($key,$ttl);
         return $res;
     }
