@@ -13,7 +13,7 @@ use App;
 use Log;
 use Exception;
 use Config;
-
+use Illuminate\Support\Facades\Cache;
 /**
  * Class CORSMiddleware
  * @package services\oauth2
@@ -25,7 +25,7 @@ class CORSMiddleware {
     private $cache_service;
     private $origin_service;
     private $actual_request = false;
-    private $headers = array();
+    private $headers        = array();
     private $allowed_headers;
     private $allowed_methods;
     /**
