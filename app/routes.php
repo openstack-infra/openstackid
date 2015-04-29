@@ -187,26 +187,4 @@ Route::group(array('prefix' => 'api/v1',
     Route::group(array('prefix' => 'users'), function(){
         Route::get('/me','OAuth2UserApiController@me');
     });
-
-    Route::group(array('prefix' => 'marketplace'), function(){
-
-        Route::group(array('prefix' => 'public-clouds'), function(){
-            Route::get('','OAuth2PublicCloudApiController@getClouds');
-            Route::get('/{id}','OAuth2PublicCloudApiController@getCloud');
-            Route::get('/{id}/data-centers','OAuth2PublicCloudApiController@getCloudDataCenters');
-        });
-
-        Route::group(array('prefix' => 'private-clouds'), function(){
-            Route::get('','OAuth2PrivateCloudApiController@getClouds');
-            Route::get('/{id}','OAuth2PrivateCloudApiController@getCloud');
-            Route::get('/{id}/data-centers','OAuth2PrivateCloudApiController@getCloudDataCenters');
-        });
-
-        Route::group(array('prefix' => 'consultants'), function(){
-            Route::get('','OAuth2ConsultantsApiController@getConsultants');
-            Route::get('/{id}','OAuth2ConsultantsApiController@getConsultant');
-            Route::get('/{id}/offices','OAuth2ConsultantsApiController@getOffices');
-        });
-
-    });
 });

@@ -123,7 +123,7 @@ class TokenService implements ITokenService
             'access_type'  => $code->getAccessType(),
             'approval_prompt'            => $code->getApprovalPrompt(),
             'has_previous_user_consent'  => $code->getHasPreviousUserConsent()
-        ), $code->getLifetime());
+        ), intval($code->getLifetime()));
 
         //stores brand new auth code hash value on a set by client id...
         $this->cache_service->addMemberSet($client_id . self::ClientAuthCodePrefixList, $hashed_value);
@@ -397,9 +397,7 @@ class TokenService implements ITokenService
             'lifetime'      => $access_token->getLifetime(),
             'audience'      => $access_token->getAudience(),
             'from_ip'       => IPHelper::getUserIp(),
-            'refresh_token' => $refresh_token_value,
-            $access_token->getLifetime()
-        ));
+            'refresh_token' => $refresh_token_value), intval($access_token->getLifetime()));
     }
 
     /**
