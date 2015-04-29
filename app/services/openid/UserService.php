@@ -41,7 +41,7 @@ class UserService implements IUserService
     {
         try {
 	        $repository = $this->repository;
-            if (!is_null($user) && $user->identifier === strval($user->external_identifier)) {
+            if (!is_null($user) && strval($user->identifier) === strval($user->external_identifier)) {
 	            $this->tx_service->transaction(function () use ($proposed_username,&$user,&$repository) {
 
                     $done         = false;

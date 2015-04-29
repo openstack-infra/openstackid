@@ -456,7 +456,15 @@ Below is a table of the fields included in the non-error case:
 | userid                       | This field is only present if a resource owner (end-user) had approved access on the consent screen.                            |
 |                              |                                                                                                                                 |
 +------------------------------+---------------------------------------------------------------------------------------------------------------------------------+
-
+| application_type             | identifies the client type. (WEB_APPLICATION, JS_CLIENT OR SERVICE )                                                            |
+|                              |                                                                                                                                 |
++------------------------------+---------------------------------------------------------------------------------------------------------------------------------+
+| allowed_return_uris          | identifies the allowed return uris set for this client.                                                                         |
+|                              |                                                                                                                                 |
++------------------------------+---------------------------------------------------------------------------------------------------------------------------------+
+| allowed_origins              | This field is only present if application_type == JS_CLIENT.                                                                    |
+|                              | identifies the allowed origin uris set for this client.                                                                         |
++------------------------------+---------------------------------------------------------------------------------------------------------------------------------+
 
 A response from such a request is shown below::
 
@@ -467,9 +475,11 @@ A response from such a request is shown below::
       "expires_in":3600,
       "token_type":"Bearer",
       "scope":"profile email",
-      "audience": "resource.server1.com"
-      "user_id": 123456
-
+      "audience": "resource.server1.com",
+      "user_id": 123456,
+      "application_type": "WEB_APPLICATION",
+      "allowed_return_uris": "www.test.com",
+      "allowed_origins": "www.test1.com",
     }
 
 Using OAuth 2.0 for Client-side Applications
@@ -524,6 +534,40 @@ strings tend to be visible in server logs.
 
 Be sure that OpenStackID Endpoint API that your application wants to access
 it's been `CORS <http://www.w3.org/TR/cors/>`_ enabled
+
+
+User API
+--------
+
+Allows to get additional info about current user (Me)
+
+.. http:get:: api/v1/users/me
+
+   Gets additional information about the current user
+
+   **Example request**:
+
+   .. sourcecode:: http
+
+      GET /api/v1/users/me HTTP/1.1
+      Host: openstackid.org
+      Accept: application/json, text/javascript
+
+   **Example response**:
+
+   .. sourcecode:: http
+
+    {
+
+        "name":"Sebastian",
+        "family_name":"Marcet",
+        "nickname":"Sebastian Marcet",
+        "picture":"http:\/\/www.openstack.org\/assets\/profile-images\/IMG-20140912-WA0003.jpg",
+        "birthdate":"",
+        "gender":"Male",
+        "email":"sebastian@tipit.net"
+
+    }
 
 
 Using OAuth 2.0 for Server to Server Applications

@@ -10,11 +10,15 @@ class ApiTest extends TestCase {
 
     private $current_realm;
 
+    private $current_host;
+
     protected function prepareForTests()
     {
         parent::prepareForTests();
         //Route::enableFilters();
         $this->current_realm = Config::get('app.url');
+        $parts = parse_url($this->current_realm);
+        $this->current_host = $parts['host'];
     }
 
     public function testGetById(){
@@ -50,7 +54,7 @@ class ApiTest extends TestCase {
 
     public function testCreate(){
 
-        $resource_server = ResourceServer::where('host','=','dev.openstackid.com')->first();
+        $resource_server = ResourceServer::where('host','=', $this->current_host)->first();
 
         $data = array(
             'name'               => 'test-api',
@@ -74,7 +78,7 @@ class ApiTest extends TestCase {
 
     public function testDelete(){
 
-        $resource_server = ResourceServer::where('host','=','dev.openstackid.com')->first();
+        $resource_server = ResourceServer::where('host','=', $this->current_host)->first();
 
         $data = array(
             'name'               => 'test-api',
@@ -116,7 +120,7 @@ class ApiTest extends TestCase {
 
     public function testUpdate(){
 
-        $resource_server = ResourceServer::where('host','=','dev.openstackid.com')->first();
+        $resource_server = ResourceServer::where('host','=',$this->current_host)->first();
 
         $data = array(
             'name'               => 'test-api',
@@ -173,7 +177,7 @@ class ApiTest extends TestCase {
 
     public function testUpdateStatus(){
 
-        $resource_server = ResourceServer::where('host','=','dev.openstackid.com')->first();
+        $resource_server = ResourceServer::where('host','=',$this->current_host)->first();
 
         $data = array(
             'name'               => 'test-api',

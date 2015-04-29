@@ -10,13 +10,13 @@ namespace oauth2;
 interface IResourceServerContext {
 
     /**
-     * returns given scopes for current requewt
+     * returns given scopes for current request
      * @return array
      */
     public function getCurrentScope();
 
     /**
-     * gets current access token valaue
+     * gets current access token values
      * @return string
      */
     public function getCurrentAccessToken();

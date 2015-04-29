@@ -22,6 +22,6 @@ class EloquentTransactionService implements ITransactionService {
 	 */
 	public function transaction(Closure $callback)
 	{
-		DB::transaction($callback);
+		return DB::transaction($callback);
 	}
 }
