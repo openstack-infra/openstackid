@@ -24,7 +24,7 @@ class OAuth2UserServiceApiTest extends OAuth2ProtectedApiTest {
     }
 
     public function testGetInfoCORS(){
-        $response = $this->action("OPTION", "OAuth2UserApiController@me",
+        $response = $this->action("OPTIONS", "OAuth2UserApiController@me",
             array(),
             array(),
             array(),

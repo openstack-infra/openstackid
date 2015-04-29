@@ -3,7 +3,19 @@
 use auth\User;
 use oauth2\OAuth2Protocol;
 use utils\services\IAuthService;
+use utils\services\UtilsServiceCatalog;
+use Illuminate\Support\Facades\App;
+use services\utils\ServerConfigurationService;
 
+class StubServerConfigurationService extends ServerConfigurationService {
+
+    public function getConfigValue($value){
+        if($value === 'OAuth2.AccessToken.Lifetime' && isset( $_ENV['access.token.lifetime'])){
+            return  intval($_ENV['access.token.lifetime']);
+        }
+        return parent::getConfigValue($value);
+    }
+}
 /**
  * Class OAuth2ProtocolTest
  * Test Suite for OAuth2 Protocol
@@ -16,6 +28,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 	protected function prepareForTests()
 	{
 		parent::prepareForTests();
+        App::singleton(UtilsServiceCatalog::ServerConfigurationService, 'StubServerConfigurationService');
 		//Route::enableFilters();
 		$this->current_realm = Config::get('app.url');
 		$user =  User::where('identifier','=','sebastian.marcet')->first();
@@ -206,6 +219,112 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             //old token and new token should be equal
             $this->assertTrue(!empty($validate_access_token));
             $this->assertTrue($validate_access_token === $access_token);
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
+
+
+    /** test validate token grant
+     * @throws Exception
+     */
+    public function testValidateExpiredToken()
+    {
+
+        try {
+            // set token lifetime
+            $_ENV['access.token.lifetime'] = 1;
+
+            $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+            $client_secret = 'ITc/6Y5N7kOtGKhg';
+
+            Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+
+            //do authorization ...
+
+            $params = array(
+                'client_id' => $client_id,
+                'redirect_uri' => 'https://www.test.com/oauth2',
+                'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
+                OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
+                'scope' => sprintf('%s/resource-server/read', $this->current_realm),
+            );
+
+            $response = $this->action("POST", "OAuth2ProviderController@authorize",
+                $params,
+                array(),
+                array(),
+                array());
+
+            $status = $response->getStatusCode();
+            $url = $response->getTargetUrl();
+            $content = $response->getContent();
+
+            // get auth code ...
+            $comps = @parse_url($url);
+            $query = $comps['query'];
+            $output = array();
+            parse_str($query, $output);
+
+
+            //do get auth token...
+            $params = array(
+                'code' => $output['code'],
+                'redirect_uri' => 'https://www.test.com/oauth2',
+                'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
+            );
+
+
+            $response = $this->action("POST", "OAuth2ProviderController@token",
+                $params,
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+            $this->assertResponseStatus(200);
+
+            $content = $response->getContent();
+
+            $response = json_decode($content);
+            //get access token and refresh token...
+            $access_token = $response->access_token;
+            $refresh_token = $response->refresh_token;
+
+            $this->assertTrue(!empty($access_token));
+            $this->assertTrue(!empty($refresh_token));
+            sleep(2);
+            //do token validation ....
+            $params = array(
+                'token' => $access_token,
+            );
+
+            $response = $this->action("POST", "OAuth2ProviderController@introspection",
+                $params,
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+            $this->assertResponseStatus(400);
+
+            $content = $response->getContent();
+
+            $response = json_decode($content);
+
+            $response = $this->action("POST", "OAuth2ProviderController@introspection",
+                $params,
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+            $this->assertResponseStatus(400);
+
+            $content = $response->getContent();
+
+            $response = json_decode($content);
+
         } catch (Exception $ex) {
             throw $ex;
         }
