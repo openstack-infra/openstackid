@@ -171,7 +171,7 @@ $(document).ready(function() {
                     dataType: "json",
                     timeout:60000,
                     success: function (data,textStatus,jqXHR) {
-                        displaySuccessMessage('{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "API")) }}',api_form);
+                        displaySuccessMessage(editApiMessages.success,api_form);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         ajaxError(jqXHR, textStatus, errorThrown);

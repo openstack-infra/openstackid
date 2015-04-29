@@ -2,7 +2,8 @@
 
 ## Prerequisites
 
-    * LAMP environment
+    * LAMP/LEMP environment
+    * Redis
     * PHP >= 5.4.0
     * composer (https://getcomposer.org/)
 
@@ -15,4 +16,8 @@ run following commands on root folder
    * php artisan migrate --env=YOUR_ENVIRONMENT
    * php artisan db:seed --env=YOUR_ENVIRONMENT
    * phpunit --bootstrap vendor/autoload.php
+   * give proper rights to app/storage folder (775 and proper users)
 
+## Permissions
+   
+Laravel may require some permissions to be configured: folders within storage and vendor require write access by the web server.   
