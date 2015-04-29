@@ -38,11 +38,13 @@ class TestSeeder extends Seeder {
         $this->seedServerConfiguration();
         $this->seedServerExtensions();
 
+        $current_realm          = Config::get('app.url');
+        $components             = parse_url($current_realm);
 
         ResourceServer::create(
             array(
                 'friendly_name'   => 'test resource server',
-                'host'            => 'dev.openstackid.com',
+                'host'            => $components['host'],
                 'ip'              => '127.0.0.1'
             )
         );
