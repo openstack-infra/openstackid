@@ -30,7 +30,7 @@ extensions = [
 ]
 
 # Feed configuration for yasfb
-feed_base_url = 'http://ci.openstack.org/openstackid'
+feed_base_url = 'http://docs.openstack.org/infra/openstackid'
 feed_author = 'OpenStack Infrastructure Team'
 
 exclude_patterns = [
