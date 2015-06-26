@@ -73,7 +73,7 @@ class ApiService implements  IApiService {
 
 	    $this->tx_service->transaction(function () use ($name, $description, $active, $resource_server_id, &$instance) {
 
-            $count = Api::where('name','=',$name)->count();
+            $count = Api::where('name','=',$name)->where('resource_server_id','=',$resource_server_id)->count();
             if($count>0)
                 throw new InvalidApi(sprintf('api name %s already exists!',$name));
 
@@ -112,7 +112,7 @@ class ApiService implements  IApiService {
                 if(array_key_exists($param,$params)){
 
                     if($param=='name'){
-                        if(Api::where('name','=',$params[$param])->where('id','<>',$id)->count()>0)
+                        if(Api::where('name','=',$params[$param])->where('id','<>',$id)->where('resource_server_id','=',$api->resource_server_id)->count()>0)
                             throw new InvalidApi(sprintf('api name %s already exists!',$params[$param]));
                     }
 

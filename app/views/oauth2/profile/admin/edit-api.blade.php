@@ -283,6 +283,10 @@
 		deactivate: '{{ URL::action("ApiEndpointController@deactivate",array("id"=>"@id")) }}',
 		add : '{{ URL::action("ApiEndpointController@create") }}'
 	};
+
+    var editApiMessages = {
+        success: '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "API")) }}'
+    };
 </script>
 {{ HTML::script('js/oauth2/profile/admin/edit-api.js') }}
 @stop

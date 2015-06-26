@@ -58,11 +58,3 @@ Developer docs
 
    openid
    oauth2
-
-Client API Reference
---------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   restapi/v1

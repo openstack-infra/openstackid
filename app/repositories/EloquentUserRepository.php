@@ -89,6 +89,6 @@ class EloquentUserRepository implements IUserRepository {
 	 */
 	public function getByToken($identifier, $token)
 	{
-		return $this->user->where('id', '=', $identifier)->where('remember_token', '=', $token)->first();
+		return $this->user->where('external_identifier', '=', $identifier)->where('remember_token', '=', $token)->first();
 	}
 }

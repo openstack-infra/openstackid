@@ -5,16 +5,12 @@
  */
 class ApiScopeSeeder extends Seeder {
 
-
     public function run()
     {
         DB::table('oauth2_api_endpoint_api_scope')->delete();
         DB::table('oauth2_client_api_scope')->delete();
         DB::table('oauth2_api_scope')->delete();
         $this->seedUsersScopes();
-        $this->seedPublicCloudScopes();
-        $this->seedPrivateCloudScopes();
-        $this->seedConsultantScopes();
     }
 
     private function seedUsersScopes(){
@@ -51,55 +47,6 @@ class ApiScopeSeeder extends Seeder {
             )
         );
 
-    }
-
-    private function seedPublicCloudScopes(){
-
-        $current_realm = Config::get('app.url');
-        $public_clouds    = Api::where('name','=','public-clouds')->first();
-
-        ApiScope::create(
-            array(
-                'name'               => sprintf('%s/public-clouds/read',$current_realm),
-                'short_description'  => 'Get Public Clouds',
-                'description'        => 'Grants read only access for Public Clouds',
-                'api_id'             => $public_clouds->id,
-                'system'             => false,
-            )
-        );
-    }
-
-    private function seedPrivateCloudScopes(){
-
-        $current_realm  = Config::get('app.url');
-        $private_clouds = Api::where('name','=','private-clouds')->first();
-
-        ApiScope::create(
-            array(
-                'name'               => sprintf('%s/private-clouds/read',$current_realm),
-                'short_description'  => 'Get Private Clouds',
-                'description'        => 'Grants read only access for Private Clouds',
-                'api_id'             => $private_clouds->id,
-                'system'             => false,
-            )
-        );
-    }
-
-
-    private function seedConsultantScopes(){
-
-        $current_realm  = Config::get('app.url');
-        $consultants = Api::where('name','=','consultants')->first();
-
-        ApiScope::create(
-            array(
-                'name'               => sprintf('%s/consultants/read',$current_realm),
-                'short_description'  => 'Get Consultants',
-                'description'        => 'Grants read only access for Consultants',
-                'api_id'             => $consultants->id,
-                'system'             => false,
-            )
-        );
     }
 
 }
