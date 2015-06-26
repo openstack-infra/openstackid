@@ -1,0 +1,9 @@
+Verified+2: Jenkins
+Code-Review+2: Marton Kiss <marton.kiss@gmail.com>
+Code-Review+2: sebastian marcet <smarcet@gmail.com>
+Workflow+1: sebastian marcet <smarcet@gmail.com>
+Submitted-by: Jenkins
+Submitted-at: Fri, 26 Jun 2015 17:37:09 +0000
+Reviewed-on: https://review.openstack.org/178854
+Project: openstack-infra/openstackid
+Branch: refs/heads/master
