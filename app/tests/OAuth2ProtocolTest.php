@@ -1,21 +1,25 @@
 <?php
 
 use auth\User;
+use Illuminate\Support\Facades\App;
 use oauth2\OAuth2Protocol;
+use services\utils\ServerConfigurationService;
 use utils\services\IAuthService;
 use utils\services\UtilsServiceCatalog;
-use Illuminate\Support\Facades\App;
-use services\utils\ServerConfigurationService;
 
-class StubServerConfigurationService extends ServerConfigurationService {
+class StubServerConfigurationService extends ServerConfigurationService
+{
 
-    public function getConfigValue($value){
-        if($value === 'OAuth2.AccessToken.Lifetime' && isset( $_ENV['access.token.lifetime'])){
-            return  intval($_ENV['access.token.lifetime']);
+    public function getConfigValue($value)
+    {
+        if ($value === 'OAuth2.AccessToken.Lifetime' && isset($_ENV['access.token.lifetime'])) {
+            return intval($_ENV['access.token.lifetime']);
         }
+
         return parent::getConfigValue($value);
     }
 }
+
 /**
  * Class OAuth2ProtocolTest
  * Test Suite for OAuth2 Protocol
@@ -25,16 +29,16 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
     private $current_realm;
 
-	protected function prepareForTests()
-	{
-		parent::prepareForTests();
+    protected function prepareForTests()
+    {
+        parent::prepareForTests();
         App::singleton(UtilsServiceCatalog::ServerConfigurationService, 'StubServerConfigurationService');
-		//Route::enableFilters();
-		$this->current_realm = Config::get('app.url');
-		$user =  User::where('identifier','=','sebastian.marcet')->first();
-		$this->be($user);
-		Session::start();
-	}
+        //Route::enableFilters();
+        $this->current_realm = Config::get('app.url');
+        $user = User::where('identifier', '=', 'sebastian.marcet')->first();
+        $this->be($user);
+        Session::start();
+    }
 
     /**
      * Get Auth Code Test
@@ -80,7 +84,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             'redirect_uri' => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
             'scope' => sprintf('%s/resource-server/read', $this->current_realm),
-            OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
+            OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
         );
 
 
@@ -150,7 +154,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 'client_id' => $client_id,
                 'redirect_uri' => 'https://www.test.com/oauth2',
                 'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
-                OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
+                OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
                 'scope' => sprintf('%s/resource-server/read', $this->current_realm),
             );
 
@@ -246,7 +250,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 'client_id' => $client_id,
                 'redirect_uri' => 'https://www.test.com/oauth2',
                 'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
-                OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
+                OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
                 'scope' => sprintf('%s/resource-server/read', $this->current_realm),
             );
 
@@ -350,7 +354,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 OAuth2Protocol::OAuth2Protocol_RedirectUri => 'https://www.test.com/oauth2',
                 OAuth2Protocol::OAuth2Protocol_ResponseType => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
                 OAuth2Protocol::OAuth2Protocol_Scope => sprintf('%s/resource-server/read', $this->current_realm),
-                OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline
+                OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline
             );
 
             $response = $this->action("POST", "OAuth2ProviderController@authorize",
@@ -448,7 +452,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 'redirect_uri' => 'https://www.test.com/oauth2',
                 'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
                 'scope' => sprintf('%s/resource-server/read', $this->current_realm),
-                OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline
+                OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline
             );
 
             $response = $this->action("POST", "OAuth2ProviderController@authorize",
@@ -586,7 +590,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             'redirect_uri' => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
             'scope' => sprintf('%s/resource-server/read', $this->current_realm),
-            OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
+            OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
             'state' => '123456'
         );
 
@@ -640,7 +644,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             'redirect_uri' => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
             'scope' => sprintf('%s/resource-server/read', $this->current_realm),
-            OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
+            OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
             'state' => '123456'
         );
 
@@ -695,7 +699,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             'redirect_uri' => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
             'scope' => sprintf('%s/resource-server/read', $this->current_realm),
-            OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
+            OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
             'state' => '123456'
         );
 
@@ -750,7 +754,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             'redirect_uri' => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Token,
             'scope' => sprintf('%s/resource-server/read', $this->current_realm),
-            OAuth2Protocol::OAuth2Protocol_AccessType =>OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
+            OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
             'state' => '123456'
         );
 

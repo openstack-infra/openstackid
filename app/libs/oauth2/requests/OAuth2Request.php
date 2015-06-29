@@ -3,7 +3,7 @@ namespace oauth2\requests;
 
 use oauth2\OAuth2Message;
 
-abstract class OAuth2Request  extends OAuth2Message {
+abstract class OAuth2Request extends OAuth2Message {
 
     protected $message;
 
