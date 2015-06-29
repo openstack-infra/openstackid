@@ -9,34 +9,51 @@ use openid\helpers\OpenIdErrorMessages;
 use openid\model\OpenIdNonce;
 use openid\services\INonceService;
 use utils\exceptions\UnacquiredLockException;
+use utils\services\IdentifierGenerator;
 use utils\services\ILockManagerService;
 use utils\services\ICacheService;
 use utils\services\IServerConfigurationService;
 use Zend\Math\Rand;
 
-class NonceService implements INonceService
+/**
+ * Class NonceService
+ * @package services\openid
+ */
+final class NonceService implements INonceService
 {
 
-
-    private $cache_service;
-    private $lock_manager_service;
-    private $configuration_service;
-    /*
-     * MAY contain additional ASCII characters in the range 33-126 inclusive (printable non-whitespace characters), as necessary to make each response unique
-     */
-    const NoncePopulation = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     /**
-     * Nonce Salt Length
+     * @var ICacheService
      */
-    const NonceSaltLength = 32;
+    private $cache_service;
+    /**
+     * @var ILockManagerService
+     */
+    private $lock_manager_service;
+    /**
+     * @var IServerConfigurationService
+     */
+    private $configuration_service;
+    /**
+     * @var IdentifierGenerator
+     */
+    private $nonce_generator;
 
+    /**
+     * @param ILockManagerService $lock_manager_service
+     * @param ICacheService $cache_service
+     * @param IServerConfigurationService $configuration_service
+     * @param IdentifierGenerator $nonce_generator
+     */
     public function __construct(ILockManagerService $lock_manager_service,
                                 ICacheService $cache_service,
-                                IServerConfigurationService $configuration_service)
+                                IServerConfigurationService $configuration_service,
+                                IdentifierGenerator $nonce_generator)
     {
         $this->lock_manager_service  = $lock_manager_service;
         $this->cache_service         = $cache_service;
         $this->configuration_service = $configuration_service;
+        $this->nonce_generator       = $nonce_generator;
     }
 
     /**
@@ -75,13 +92,7 @@ class NonceService implements INonceService
      */
     public function generateNonce()
     {
-        $raw_nonce = null;
-
-        do {
-            $raw_nonce = gmdate('Y-m-d\TH:i:s\Z') . $this->makeNonceSalt();
-        } while(!$this->cache_service->addSingleValue($raw_nonce.'.mk_nonce', $raw_nonce.'.mk_nonce'));
-
-        return new OpenIdNonce($raw_nonce);
+        return $this->nonce_generator->generate(new OpenIdNonce(255));
     }
 
     /**

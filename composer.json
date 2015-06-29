@@ -11,7 +11,8 @@
         "greggilbert/recaptcha": "1.0.*",
         "mockery/mockery": "0.9.4",
         "doctrine/dbal": "~2.3",
-        "way/laravel-test-helpers": "dev-master"
+        "way/laravel-test-helpers": "dev-master",
+        "smarcet/jose4php" : "dev-master"
 	},
 	"autoload": {
 		"classmap": [
@@ -21,7 +22,7 @@
 			"app/database/migrations",
 			"app/database/seeds",
             "app/tests",
-			"app/tests/TestCase.php",
+            "app/tests/TestCase.php",
             "app/libs",
             "app/services",
             "app/repositories",

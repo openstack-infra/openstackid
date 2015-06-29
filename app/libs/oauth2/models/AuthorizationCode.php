@@ -21,7 +21,6 @@ class AuthorizationCode extends Token {
         parent::__construct(64);
     }
 
-
     /**
      * @param $user_id
      * @param $client_id
@@ -36,7 +35,6 @@ class AuthorizationCode extends Token {
      */
     public static function create($user_id, $client_id, $scope, $audience='' ,$redirect_uri = null,$access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,$approval_prompt =OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,$has_previous_user_consent=false, $lifetime = 600){
         $instance = new self();
-        $instance->value        = Rand::getString($instance->len, OAuth2Protocol::VsChar, true);
         $instance->scope        = $scope;
         $instance->user_id      = $user_id;
         $instance->redirect_uri = $redirect_uri;

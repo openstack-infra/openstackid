@@ -92,10 +92,10 @@ final class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
             if (is_null($stored_assoc) || $stored_assoc->getType() != IAssociation::TypePrivate)
                 throw new InvalidAssociationTypeException(OpenIdErrorMessages::InvalidAssociationTypeMessage);
 
-            $claimed_nonce = new OpenIdNonce($this->current_request->getNonce());
+            $claimed_nonce = OpenIdNonce::fromValue($this->current_request->getNonce());
 
-	        if(!$claimed_nonce->isValid(intval($this->configuration_service->getConfigValue('Nonce.Lifetime'))))
-				throw new InvalidNonce();
+            if(!$claimed_nonce->isValid(intval($this->configuration_service->getConfigValue('Nonce.Lifetime'))))
+                throw new InvalidNonce();
 
             $this->nonce_service->lockNonce($claimed_nonce);
 

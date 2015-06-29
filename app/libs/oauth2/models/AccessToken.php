@@ -21,7 +21,6 @@ class AccessToken extends Token {
 
     public static function create(AuthorizationCode $auth_code,  $lifetime = 3600){
         $instance = new self();
-        $instance->value        = Rand::getString($instance->len, OAuth2Protocol::VsChar, true);
         $instance->user_id      = $auth_code->getUserId();
         $instance->scope        = $auth_code->getScope();
         $instance->client_id    = $auth_code->getClientId();
@@ -34,7 +33,6 @@ class AccessToken extends Token {
 
     public static function createFromParams($scope, $client_id, $audience,$user_id,$lifetime){
         $instance = new self();
-        $instance->value         = Rand::getString($instance->len,OAuth2Protocol::VsChar,true);
         $instance->scope         = $scope;
         $instance->client_id     = $client_id;
         $instance->user_id       = $user_id;
@@ -48,7 +46,6 @@ class AccessToken extends Token {
 
     public static function createFromRefreshToken(RefreshToken $refresh_token,$scope = null,  $lifetime = 3600){
         $instance = new self();
-        $instance->value         = Rand::getString($instance->len,OAuth2Protocol::VsChar,true);
         $instance->scope         = $scope;
         $instance->from_ip       = $refresh_token->getFromIp();
         $instance->user_id       = $refresh_token->getUserId();
