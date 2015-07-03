@@ -3,6 +3,7 @@
 namespace oauth2\responses;
 
 use oauth2\OAuth2Protocol;
+use utils\http\HttpContentType;
 
 
 /**
@@ -12,11 +13,17 @@ use oauth2\OAuth2Protocol;
  */
 class OAuth2AccessTokenResponse extends OAuth2DirectResponse {
 
-    public function __construct($access_token, $expires_in, $refresh_token=null, $scope=null)
+    /**
+     * @param string $access_token
+     * @param string $expires_in
+     * @param null|string $refresh_token
+     * @param null|string $scope
+     */
+    public function __construct($access_token, $expires_in, $refresh_token = null, $scope = null)
     {
         // Successful Responses: A server receiving a valid request MUST send a
         // response with an HTTP status code of 200.
-        parent::__construct(self::HttpOkResponse, self::DirectResponseContentType);
+        parent::__construct(self::HttpOkResponse, HttpContentType::Json);
 
         $this[OAuth2Protocol::OAuth2Protocol_AccessToken]           = $access_token;
         $this[OAuth2Protocol::OAuth2Protocol_AccessToken_ExpiresIn] = $expires_in;

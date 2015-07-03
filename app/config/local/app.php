@@ -78,7 +78,8 @@ return array(
 	|
 	*/
 
-	'providers' => array(
+	'providers' => array
+	(
         'Illuminate\Foundation\Providers\ArtisanServiceProvider',
         'Illuminate\Auth\AuthServiceProvider',
         'Illuminate\Cache\CacheServiceProvider',
