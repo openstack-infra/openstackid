@@ -6,22 +6,21 @@
 
 @section('content')
 @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
-<div class="row-fluid">
-
-    <div class="row-fluid">
-        <h4 style="float:left"><i class="icon-info-sign accordion-toggle" title=""></i>&nbsp;Resource Servers</h4>
+<div class="row">
+    <div class="row">
+        <h4 style="float:left"><span aria-hidden="true" class="glyphicon glyphicon-info-sign pointable" title=""></span>&nbsp;Resource Servers</h4>
         <div style="position: relative;float:left;">
-            <div style="position:absolute;top:13px;margin-left:5px"><i class="icon-refresh accordion-toggle refresh-servers" title="Update Resource Server List"></i></div>
+            <div style="position:absolute;top:13px;margin-left:5px"><span aria-hidden="true" class="glyphicon glyphicon-refresh pointable refresh-servers"title="Update Resource Server List"></span></div>
         </div>
     </div>
-    <div class="row-fluid">
+    <div class="row">
         <div class="alert alert-info" id="info-resource-servers" style="display: none">
             <strong>There are not any available Scopes</strong>
         </div>
     </div>
-    <div class="row-fluid">
-        <div class="span12">
-            {{ HTML::link(URL::action("ApiResourceServerController@create"),'Add Resource Server',array('class'=>'btn add-resource-server','title'=>'Adds a New Resource Server')) }}
+    <div class="row">
+        <div class="col-md-12">
+            {{ HTML::link(URL::action("ApiResourceServerController@create"),'Add Resource Server',array('class'=>'btn active btn-primary add-resource-server','title'=>'Adds a New Resource Server')) }}
         </div>
     </div>
     <table id='table-resource-servers' class="table table-hover table-condensed">
@@ -50,8 +49,8 @@
             </td>
             <td>
                 &nbsp;
-                {{ HTML::link(URL::action("AdminController@editResourceServer",array("id"=>$resource_server->id)),'Edit',array('class'=>'btn edit-resource-server','title'=>'Edits a Registered Resource Server')) }}
-                {{ HTML::link(URL::action("ApiResourceServerController@delete",array("id"=>$resource_server->id)),'Delete',array('class'=>'btn delete-resource-server','title'=>'Deletes a Registered Resource Server')) }}
+                {{ HTML::link(URL::action("AdminController@editResourceServer",array("id"=>$resource_server->id)),'Edit',array('class'=>'btn btn-default active edit-resource-server','title'=>'Edits a Registered Resource Server')) }}
+                {{ HTML::link(URL::action("ApiResourceServerController@delete",array("id"=>$resource_server->id)),'Delete',array('class'=>'btn btn-default btn-delete active delete-resource-server','title'=>'Deletes a Registered Resource Server')) }}
             </td>
         </tr>
         @endforeach
@@ -98,5 +97,5 @@
 		add : '{{URL::action("ApiResourceServerController@create",null)}}'
 	};
 </script>
-{{ HTML::script('js/oauth2/profile/admin/resource-servers.js') }}
-@stop
+{{ HTML::script('assets/js/oauth2/profile/admin/resource-servers.js') }}
+@append

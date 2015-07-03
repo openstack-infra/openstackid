@@ -15,6 +15,10 @@ use oauth2\services\ITokenService;
 
 use utils\services\ILogService;
 
+/**
+ * Class AbstractGrantType
+ * @package oauth2\grant_types
+ */
 abstract class AbstractGrantType implements IGrantType
 {
 

@@ -2,6 +2,7 @@
 
 namespace oauth2;
 
+
 //endpoints
 use oauth2\endpoints\AuthorizationEndpoint;
 use oauth2\endpoints\TokenEndpoint;
@@ -39,6 +40,7 @@ use oauth2\grant_types\ImplicitGrantType;
 use oauth2\grant_types\RefreshBearerTokenGrantType;
 use oauth2\grant_types\ClientCredentialsGrantType;
 
+use oauth2\models\IClient;
 use oauth2\requests\OAuth2Request;
 
 use oauth2\responses\OAuth2DirectErrorResponse;
@@ -47,21 +49,32 @@ use oauth2\responses\OAuth2TokenRevocationResponse;
 
 use oauth2\services\IApiScopeService;
 use oauth2\services\IClientService;
-use oauth2\services\IMementoOAuth2AuthenticationRequestService;
+use oauth2\services\IMementoOAuth2SerializerService;
 use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use oauth2\strategies\OAuth2IndirectErrorResponseFactoryMethod;
 use oauth2\services\IUserConsentService;
+use utils\ArrayUtils;
 use utils\services\IAuthService;
 use utils\services\ICheckPointService;
 use utils\services\ILogService;
+use oauth2\repositories\IServerPrivateKeyRepository;
+
+// OIDC
+use jwk\impl\RSAJWKFactory;
+use jwk\impl\RSAJWKPEMPrivateKeySpecification;
+use jwk\impl\JWKSet;
+use jwa\JSONWebSignatureAndEncryptionAlgorithms;
+use jwk\JSONWebKeyVisibility;
+use oauth2\discovery\DiscoveryDocumentBuilder;
+use oauth2\discovery\IOpenIDProviderConfigurationService;
 
 /**
  * Class OAuth2Protocol
  * Implementation of http://tools.ietf.org/html/rfc6749
  * @package oauth2
  */
-class OAuth2Protocol implements IOAuth2Protocol
+final class OAuth2Protocol implements IOAuth2Protocol
 {
 
     const OAuth2Protocol_GrantType_AuthCode = 'authorization_code';
@@ -69,8 +82,12 @@ class OAuth2Protocol implements IOAuth2Protocol
     const OAuth2Protocol_GrantType_ResourceOwner_Password = 'password';
     const OAuth2Protocol_GrantType_ClientCredentials = 'client_credentials';
     const OAuth2Protocol_GrantType_RefreshToken = 'refresh_token';
+
     const OAuth2Protocol_ResponseType_Code = 'code';
     const OAuth2Protocol_ResponseType_Token = 'token';
+
+    static public $valid_response_types = array(self::OAuth2Protocol_ResponseType_Code, self::OAuth2Protocol_ResponseType_Token);
+
     const OAuth2Protocol_ResponseType = 'response_type';
     const OAuth2Protocol_ClientId = 'client_id';
     const OAuth2Protocol_UserId = 'user_id';
@@ -138,6 +155,67 @@ class OAuth2Protocol implements IOAuth2Protocol
         self::OAuth2Protocol_State => self::OAuth2Protocol_State
     );
 
+    // http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+
+    const TokenEndpoint_AuthMethod_ClientSecretBasic = 'client_secret_basic';
+    const TokenEndpoint_AuthMethod_ClientSecretPost  = 'client_secret_post';
+    const TokenEndpoint_AuthMethod_ClientSecretJwt   = 'client_secret_jwt';
+    const TokenEndpoint_AuthMethod_PrivateKeyJwt     = 'private_key_jwt';
+    const TokenEndpoint_AuthMethod_None              = 'none';
+
+    public static $token_endpoint_auth_methods = array(
+        self::TokenEndpoint_AuthMethod_ClientSecretBasic,
+        self::TokenEndpoint_AuthMethod_ClientSecretPost,
+        self::TokenEndpoint_AuthMethod_ClientSecretJwt,
+        self::TokenEndpoint_AuthMethod_PrivateKeyJwt,
+    );
+
+    const OpenIdConnect_Scope = 'openid';
+
+    public static $supported_signing_algorithms = array(
+        // MAC SHA2
+        JSONWebSignatureAndEncryptionAlgorithms::HS256,
+        JSONWebSignatureAndEncryptionAlgorithms::HS384,
+        JSONWebSignatureAndEncryptionAlgorithms::HS512,
+        // RSA
+        JSONWebSignatureAndEncryptionAlgorithms::RS256,
+        JSONWebSignatureAndEncryptionAlgorithms::RS384,
+        JSONWebSignatureAndEncryptionAlgorithms::RS512,
+        JSONWebSignatureAndEncryptionAlgorithms::PS256,
+        JSONWebSignatureAndEncryptionAlgorithms::PS384,
+        JSONWebSignatureAndEncryptionAlgorithms::PS512,
+        JSONWebSignatureAndEncryptionAlgorithms::None
+    );
+
+    public static $supported_signing_algorithms_hmac_sha2 = array(
+        JSONWebSignatureAndEncryptionAlgorithms::HS256,
+        JSONWebSignatureAndEncryptionAlgorithms::HS384,
+        JSONWebSignatureAndEncryptionAlgorithms::HS512,
+    );
+
+    public static $supported_signing_algorithms_rsa = array(
+        JSONWebSignatureAndEncryptionAlgorithms::RS256,
+        JSONWebSignatureAndEncryptionAlgorithms::RS384,
+        JSONWebSignatureAndEncryptionAlgorithms::RS512,
+        JSONWebSignatureAndEncryptionAlgorithms::PS256,
+        JSONWebSignatureAndEncryptionAlgorithms::PS384,
+        JSONWebSignatureAndEncryptionAlgorithms::PS512,
+    );
+
+
+    public static $supported_key_management_algorithms = array(
+        JSONWebSignatureAndEncryptionAlgorithms::RSA1_5,
+        JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP,
+        JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP_256,
+        JSONWebSignatureAndEncryptionAlgorithms::None,
+    );
+
+    public static $supported_content_encryption_algorithms = array(
+        JSONWebSignatureAndEncryptionAlgorithms::A128CBC_HS256,
+        JSONWebSignatureAndEncryptionAlgorithms::A192CBC_HS384,
+        JSONWebSignatureAndEncryptionAlgorithms::A256CBC_HS512,
+        JSONWebSignatureAndEncryptionAlgorithms::None,
+    );
 
     /**
      * http://tools.ietf.org/html/rfc6749#appendix-A
@@ -159,22 +237,68 @@ class OAuth2Protocol implements IOAuth2Protocol
     //grant types
     private $grant_types = array();
 
+    /**
+     * @var IServerPrivateKeyRepository
+     */
+    private $server_private_keys_repository;
+
+    /**
+     * @var IOpenIDProviderConfigurationService
+     */
+    private $oidc_provider_configuration_service;
+
     public function __construct(
         ILogService    $log_service,
         IClientService $client_service,
         ITokenService  $token_service,
         IAuthService   $auth_service,
-        IMementoOAuth2AuthenticationRequestService $memento_service,
         IOAuth2AuthenticationStrategy $auth_strategy,
         ICheckPointService $checkpoint_service,
         IApiScopeService   $scope_service,
-        IUserConsentService $user_consent_service)
+        IUserConsentService $user_consent_service,
+        IServerPrivateKeyRepository $server_private_keys_repository,
+        IOpenIDProviderConfigurationService $oidc_provider_configuration_service,
+        IMementoOAuth2SerializerService $memento_service
+        )
     {
 
-        $authorization_code_grant_type    = new AuthorizationCodeGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service,$user_consent_service);
-        $implicit_grant_type              = new ImplicitGrantType($scope_service, $client_service, $token_service, $auth_service, $memento_service, $auth_strategy, $log_service,$user_consent_service);
-        $refresh_bearer_token_grant_type  = new RefreshBearerTokenGrantType($client_service, $token_service, $log_service);
-        $client_credential_grant_type     = new ClientCredentialsGrantType($scope_service,$client_service, $token_service, $log_service);
+        $this->server_private_keys_repository      = $server_private_keys_repository;
+        $this->oidc_provider_configuration_service = $oidc_provider_configuration_service;
+
+        $authorization_code_grant_type    = new AuthorizationCodeGrantType(
+                                                                           $scope_service,
+                                                                           $client_service,
+                                                                           $token_service,
+                                                                           $auth_service,
+                                                                           $auth_strategy,
+                                                                           $log_service,
+                                                                           $user_consent_service,
+                                                                           $memento_service
+                                            );
+
+        $implicit_grant_type              = new ImplicitGrantType(
+                                                                  $scope_service,
+                                                                  $client_service,
+                                                                  $token_service,
+                                                                  $auth_service,
+                                                                  $auth_strategy,
+                                                                  $log_service,
+                                                                  $user_consent_service,
+                                                                  $memento_service
+                                            );
+
+        $refresh_bearer_token_grant_type  = new RefreshBearerTokenGrantType(
+                                                                            $client_service,
+                                                                            $token_service,
+                                                                            $log_service
+                                            );
+
+        $client_credential_grant_type     = new ClientCredentialsGrantType(
+                                                                            $scope_service,
+                                                                            $client_service,
+                                                                            $token_service,
+                                                                            $log_service
+                                            );
 
         $this->grant_types[$authorization_code_grant_type->getType()]   = $authorization_code_grant_type;
         $this->grant_types[$implicit_grant_type->getType()]             = $implicit_grant_type;
@@ -504,5 +628,100 @@ class OAuth2Protocol implements IOAuth2Protocol
     public function getAvailableGrants()
     {
         return $this->grant_types;
+    }
+
+    /**
+     * @param IClient $client
+     */
+    static public function getSigningAlgorithmsPerClientType(IClient $client){
+        if($client->getClientType() == IClient::ClientType_Public){
+            return ArrayUtils::convert2Assoc(array_merge(self::$supported_signing_algorithms_rsa, array(JSONWebSignatureAndEncryptionAlgorithms::None)));
+        }
+        return ArrayUtils::convert2Assoc(array_merge(self::$supported_signing_algorithms_hmac_sha2, self::$supported_signing_algorithms_rsa, array(JSONWebSignatureAndEncryptionAlgorithms::None)));
+    }
+
+    /**
+     * @return string
+     */
+    public function getJWKSDocument()
+    {
+        $keys = $this->server_private_keys_repository->getActives();
+        $set  = array();
+
+        foreach($keys as $private_key){
+            $jwk = RSAJWKFactory::build(new RSAJWKPEMPrivateKeySpecification($private_key->getPEM(), $private_key->getPassword()));
+            $jwk->setVisibility(JSONWebKeyVisibility::PublicOnly);
+            $jwk->setId($private_key->getKeyId());
+            $jwk->setKeyUse($private_key->getUse());
+            $jwk->setType($private_key->getType());
+            array_push($set, $jwk);
+        }
+
+        $jkws = new JWKSet($set);
+        return $jkws->toJson();
+    }
+
+    /**
+     * http://openid.net/specs/openid-connect-discovery-1_0.html
+     * @return string
+     */
+    public function getDiscoveryDocument()
+    {
+        $builder = new DiscoveryDocumentBuilder();
+
+        return $builder
+            ->setIssuer($this->oidc_provider_configuration_service->getIssuerUrl())
+            ->setAuthEndpoint($this->oidc_provider_configuration_service->getAuthEndpoint())
+            ->setTokenEndpoint($this->oidc_provider_configuration_service->getTokenEndpoint())
+            ->setUserInfoEndpoint($this->oidc_provider_configuration_service->getUserInfoEndpoint())
+            ->setJWKSUrl($this->oidc_provider_configuration_service->getJWKSUrl())
+            ->setRevocationEndpoint($this->oidc_provider_configuration_service->getRevocationEndpoint())
+            ->setIntrospectionEndpoint($this->oidc_provider_configuration_service->getIntrospectionEndpoint())
+            // response types
+            ->addResponseTypeSupported('code')
+            ->addResponseTypeSupported('token')
+            ->addResponseTypeSupported('code token')
+            ->addResponseTypeSupported('token id_token')
+            ->addResponseTypeSupported('code token id_token')
+            // claims
+            ->addClaimSupported('aud')
+            ->addClaimSupported('email')
+            ->addClaimSupported('exp')
+            ->addClaimSupported('family_name')
+            ->addClaimSupported('given_name')
+            ->addClaimSupported('iat')
+            ->addClaimSupported('iss')
+            ->addClaimSupported('locale')
+            ->addClaimSupported('name')
+            ->addClaimSupported('picture')
+            ->addClaimSupported('sub')
+            // scopes
+            ->addScopeSupported('openid')
+            ->addScopeSupported('profile')
+            ->addScopeSupported('email')
+            ->addScopeSupported('address')
+            // id token signing alg
+            ->addIdTokenSigningAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::HS256)
+            ->addIdTokenSigningAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::HS384)
+            ->addIdTokenSigningAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::HS512)
+            ->addIdTokenSigningAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::RS256)
+            ->addIdTokenSigningAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::RS384)
+            ->addIdTokenSigningAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::RS512)
+            ->addIdTokenSigningAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::PS256)
+            ->addIdTokenSigningAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::PS384)
+            ->addIdTokenSigningAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::PS512)
+            // id token enc alg
+            ->addIdTokenEncryptionAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::RSA1_5)
+            ->addIdTokenEncryptionAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP)
+            ->addIdTokenEncryptionAlgSupported(JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP_256)
+            // id token enc enc
+            ->addIdTokenEncryptionEncSupported(JSONWebSignatureAndEncryptionAlgorithms::A128CBC_HS256)
+            ->addIdTokenEncryptionEncSupported(JSONWebSignatureAndEncryptionAlgorithms::A192CBC_HS384)
+            ->addIdTokenEncryptionEncSupported(JSONWebSignatureAndEncryptionAlgorithms::A256CBC_HS512)
+            ->addSubjectTypeSupported(IClient::SubjectType_Public)
+            ->addSubjectTypeSupported(IClient::SubjectType_Pairwise)
+            ->addTokenEndpointAuthMethodSupported(self::TokenEndpoint_AuthMethod_ClientSecretBasic)
+            ->addTokenEndpointAuthMethodSupported(self::TokenEndpoint_AuthMethod_ClientSecretPost)
+            ->render();
     }
 }
