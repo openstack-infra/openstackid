@@ -5,6 +5,7 @@ namespace openid;
 use openid\exceptions\InvalidOpenIdMessageMode;
 use openid\helpers\OpenIdErrorMessages;
 use utils\http\HttpMessage;
+use openid\requests\OpenIdMessageMemento;
 
 /**
  * Class OpenIdMessage
@@ -14,11 +15,13 @@ use utils\http\HttpMessage;
 class OpenIdMessage extends HttpMessage
 {
 
-    public function __construct(array $values)
+    /**
+     * @param array $values
+     */
+    public function __construct(array $values = array())
     {
         parent::__construct($values);
     }
-
 
     public function getMode()
     {
@@ -32,8 +35,12 @@ class OpenIdMessage extends HttpMessage
     public function getParam($param)
     {
         if (isset($this->container[OpenIdProtocol::param($param, "_")]))
+        {
             return $this->container[OpenIdProtocol::param($param, "_")];
-        if (isset($this->container[OpenIdProtocol::param($param, ".")])) {
+        }
+
+        if (isset($this->container[OpenIdProtocol::param($param, ".")]))
+        {
             return $this->container[OpenIdProtocol::param($param, ".")];
         }
         return null;
@@ -63,5 +70,34 @@ class OpenIdMessage extends HttpMessage
         if (!OpenIdProtocol::isValidMode($mode))
             throw new InvalidOpenIdMessageMode(sprintf(OpenIdErrorMessages::InvalidOpenIdMessageModeMessage, $mode));
         $this->container[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)] = $mode;;
+    }
+
+    /**
+     * @return OpenIdMessageMemento
+     */
+    public function createMemento()
+    {
+        return OpenIdMessageMemento::buildFromRequest($this);
+    }
+
+    /**
+     * @param OpenIdMessageMemento $memento
+     * @return $this
+     */
+    public function setMemento(OpenIdMessageMemento $memento)
+    {
+        $this->container = $memento->getState();
+        return $this;
+    }
+
+    /**
+     * @param OpenIdMessageMemento $memento
+     * @return OpenIdMessage
+     */
+    static public function buildFromMemento(OpenIdMessageMemento $memento)
+    {
+        $msg = new self;
+        $msg->setMemento($memento);
+        return $msg;
     }
 }

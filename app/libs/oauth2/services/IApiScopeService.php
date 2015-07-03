@@ -8,10 +8,11 @@ use oauth2\models\IApiScope;
  * Interface IApiScopeService
  * @package oauth2\services
  */
-interface IApiScopeService {
+interface IApiScopeService
+{
     /**
      * gets an api scope by id
-     * @param $id id of api scope
+     * @param int $id id of api scope
      * @return IApiScope
      */
     public function get($id);
@@ -63,9 +64,10 @@ interface IApiScopeService {
      * @param $default
      * @param $system
      * @param $api_id
+     * @param $assigned_by_groups
      * @return IApiScope
      */
-    public function add($name, $short_description, $description, $active, $default, $system, $api_id);
+    public function add($name, $short_description, $description, $active, $default, $system, $api_id, $assigned_by_groups);
 
     /**
      * @param array $scopes_names
@@ -83,9 +85,10 @@ interface IApiScopeService {
     /**
      * Get all active scopes (system/non system ones)
      * @param bool $system
+     * @param bool $assigned_by_groups
      * @return array|mixed
      */
-    public function getAvailableScopes($system=false);
+    public function getAvailableScopes($system = false, $assigned_by_groups = false);
 
     /**
      * Given a set of scopes names, retrieves a list of resource server owners
@@ -106,4 +109,9 @@ interface IApiScopeService {
      * @return mixed
      */
     public function getDefaultScopes();
+
+    /**
+     * @return mixed
+     */
+    public function getAssignedByGroups();
 } 

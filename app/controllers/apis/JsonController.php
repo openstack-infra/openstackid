@@ -16,11 +16,20 @@ abstract class JsonController extends BaseController  {
 
     protected function error500(Exception $ex){
         $this->log_service->error($ex);
-        return Response::json(array('message' => 'server error'), 500);
+        return Response::json(array( 'error' => 'server error'), 500);
     }
 
     protected function created($data='ok'){
         $res = Response::json($data, 201);
+        //jsonp
+        if(Input::has('callback'))
+            $res->setCallback(Input::get('callback'));
+        return $res;
+    }
+
+    protected function updated()
+    {
+        $res =  Response::json($data, 204);
         //jsonp
         if(Input::has('callback'))
             $res->setCallback(Input::get('callback'));
@@ -35,7 +44,7 @@ abstract class JsonController extends BaseController  {
         return $res;
     }
 
-    protected function ok($data='ok'){
+    protected function ok($data = 'ok'){
         $res = Response::json($data, 200);
         //jsonp
         if(Input::has('callback'))
@@ -67,6 +76,6 @@ abstract class JsonController extends BaseController  {
      */
     protected function error412($messages){
 
-        return Response::json(array('message' => 'Validation Failed', 'errors' => $messages), 412);
+        return Response::json(array('error'=>'validation' , 'messages' => $messages), 412);
     }
 } 

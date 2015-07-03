@@ -39,5 +39,5 @@
 </div>
 @stop
 @section('scripts')
-{{ HTML::script('js/oauth2/profile/admin/clients.js') }}
+{{ HTML::script('assets/js/oauth2/profile/admin/clients.js') }}
 @stop

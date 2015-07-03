@@ -9,22 +9,63 @@ use oauth2\services\IApiEndpointService;
 use utils\services\IAuthService;
 use openid\services\IUserService;
 use utils\services\IServerConfigurationService;
-use \utils\services\IBannedIPService;
+use utils\services\IBannedIPService;
+use oauth2\repositories\IServerPrivateKeyRepository;
+use oauth2\repositories\IApiScopeGroupRepository;
+use auth\User;
+
 /**
  * Class AdminController
  */
 class AdminController extends BaseController {
 
+    /**
+     * @var IClientService
+     */
     private $client_service;
+    /**
+     * @var IApiScopeService
+     */
     private $scope_service;
+    /**
+     * @var ITokenService
+     */
     private $token_service;
+    /**
+     * @var IResourceServerService
+     */
     private $resource_server_service;
+    /**
+     * @var IApiService
+     */
     private $api_service;
+    /**
+     * @var IApiEndpointService
+     */
     private $endpoint_service;
+    /**
+     * @var IAuthService
+     */
     private $auth_service;
+    /**
+     * @var IUserService
+     */
     private $user_service;
+    /**
+     * @var IServerConfigurationService
+     */
     private $configuration_service;
+    /**
+     * @var IBannedIPService
+     */
     private $banned_ips_service;
+
+    private $private_keys_repository;
+
+    /**
+     * @var IApiScopeGroupRepository
+     */
+    private $group_repository;
 
     public function __construct( IClientService $client_service,
                                  IApiScopeService $scope_service,
@@ -35,7 +76,10 @@ class AdminController extends BaseController {
                                  IAuthService $auth_service,
                                  IUserService $user_service,
                                  IServerConfigurationService $configuration_service,
-                                 IBannedIPService $banned_ips_service){
+                                 IBannedIPService $banned_ips_service,
+                                 IServerPrivateKeyRepository $private_keys_repository,
+                                 IApiScopeGroupRepository $group_repository)
+    {
 
         $this->client_service          = $client_service;
         $this->scope_service           = $scope_service;
@@ -47,6 +91,8 @@ class AdminController extends BaseController {
         $this->user_service            = $user_service;
         $this->configuration_service   = $configuration_service;
         $this->banned_ips_service      = $banned_ips_service;
+        $this->private_keys_repository = $private_keys_repository;
+        $this->group_repository        = $group_repository;
     }
 
     public function editRegisteredClient($id)
@@ -59,8 +105,6 @@ class AdminController extends BaseController {
             return View::make("404");
         }
 
-        $allowed_uris    = $client->getClientRegisteredUris();
-        $allowed_origins = $client->getClientAllowedOrigins();
         $selected_scopes = $client->getClientScopes();
         $aux_scopes      = array();
 
@@ -68,7 +112,8 @@ class AdminController extends BaseController {
             array_push($aux_scopes, $scope->id);
         }
 
-        $scopes        = $this->scope_service->getAvailableScopes($user->canUseSystemScopes());
+        $scopes        = $this->scope_service->getAvailableScopes();
+        $group_scopes  = $user->getGroupScopes();
 
         $access_tokens = $this->token_service->getAccessTokenByClient($client->client_id);
 
@@ -86,32 +131,69 @@ class AdminController extends BaseController {
 
         return View::make("oauth2.profile.edit-client",
             array(
-                'client'          => $client,
-                'allowed_uris'    => $allowed_uris,
-                'allowed_origins' => $allowed_origins,
-                'selected_scopes' => $aux_scopes,
-                'scopes'          => $scopes,
-                'access_tokens'   => $access_tokens,
-                "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
+                'client'               => $client,
+                'selected_scopes'      => $aux_scopes,
+                'scopes'               => array_merge($scopes, $group_scopes),
+                'access_tokens'        => $access_tokens,
+                "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
                 "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
-                "use_system_scopes" => $user->canUseSystemScopes(),
-                'refresh_tokens'  => $refresh_tokens,
+                "use_system_scopes"    => $user->canUseSystemScopes(),
+                'refresh_tokens'       => $refresh_tokens,
             ));
     }
 
-    public function listResourceServers() {
+    // Api Scope Groups
+
+    public function listApiScopeGroups()
+    {
+        $user                = $this->auth_service->getCurrentUser();
+        $groups              = $this->group_repository->getAll(1,1000);
+        $non_selected_scopes = $this->scope_service->getAssignedByGroups();
+        $non_selected_users  = User::where('active', '=', true)->get();
+        return View::make("oauth2.profile.admin.api-scope-groups",array
+        (
+            "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
+            "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
+            'groups'               => $groups,
+            'non_selected_scopes'  => $non_selected_scopes,
+            'non_selected_users'   => $non_selected_users,
+        ));
+    }
+
+    public function editApiScopeGroup($id){
+        $group = $this->group_repository->get($id);
+
+        if(is_null($group))
+            return Response::view('404', array(), 404);
         $user   = $this->auth_service->getCurrentUser();
+        $non_selected_scopes = $this->scope_service->getAssignedByGroups();
+        $non_selected_users  = User::where('active', '=', true)->get();
+        return View::make("oauth2.profile.admin.edit-api-scope-group",
+            array
+            (
+                'is_oauth2_admin'      => $user->isOAuth2ServerAdmin(),
+                'is_openstackid_admin' => $user->isOpenstackIdAdmin(),
+                'group'                => $group,
+                'non_selected_scopes'  => $non_selected_scopes,
+                'non_selected_users'   => $non_selected_users,
+            )
+        );
+    }
+
+    // Resource servers
+    public function listResourceServers() {
+        $user             = $this->auth_service->getCurrentUser();
         $resource_servers = $this->resource_server_service->getAll(1,1000);
         return View::make("oauth2.profile.admin.resource-servers",array(
             "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
             "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
-            'resource_servers'=>$resource_servers));
+            'resource_servers'     => $resource_servers));
     }
 
     public function editResourceServer($id){
         $resource_server = $this->resource_server_service->get($id);
         if(is_null($resource_server))
-            return View::make('404');
+            return Response::view('404', array(), 404);
         $user   = $this->auth_service->getCurrentUser();
         return View::make("oauth2.profile.admin.edit-resource-server",array(
             "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
@@ -123,7 +205,7 @@ class AdminController extends BaseController {
     public function editApi($id){
         $api = $this->api_service->get($id);
         if(is_null($api))
-            return View::make('404');
+            return Response::view('404', array(), 404);
         $user   = $this->auth_service->getCurrentUser();
         return View::make("oauth2.profile.admin.edit-api",array(
             "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
@@ -134,7 +216,7 @@ class AdminController extends BaseController {
     public function editScope($id){
         $scope = $this->scope_service->get($id);
         if(is_null($scope))
-            return View::make('404');
+            return Response::view('404', array(), 404);
         $user   = $this->auth_service->getCurrentUser();
         return View::make("oauth2.profile.admin.edit-scope",array(
             "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
@@ -145,7 +227,7 @@ class AdminController extends BaseController {
     public function editEndpoint($id){
         $endpoint = $this->endpoint_service->get($id);
         if(is_null($endpoint))
-            return View::make('404');
+            return Response::view('404', array(), 404);
         $user   = $this->auth_service->getCurrentUser();
         $selected_scopes = array();
         $list = $endpoint->scopes()->get(array('id'));
@@ -235,31 +317,32 @@ class AdminController extends BaseController {
         ));
     }
 
-
-
     public function listServerConfig(){
 
         $user    = $this->auth_service->getCurrentUser();
         $config_values = array();
 
-        $config_values['MaxFailed.Login.Attempts'] = $this->configuration_service->getConfigValue('MaxFailed.Login.Attempts');
+        $config_values['MaxFailed.Login.Attempts']             = $this->configuration_service->getConfigValue('MaxFailed.Login.Attempts');
         $config_values['MaxFailed.LoginAttempts.2ShowCaptcha'] = $this->configuration_service->getConfigValue('MaxFailed.LoginAttempts.2ShowCaptcha');
 
-        $config_values['OpenId.Private.Association.Lifetime'] = $this->configuration_service->getConfigValue('OpenId.Private.Association.Lifetime');
-        $config_values['OpenId.Session.Association.Lifetime'] = $this->configuration_service->getConfigValue('OpenId.Session.Association.Lifetime');
-        $config_values['OpenId.Nonce.Lifetime'] = $this->configuration_service->getConfigValue('OpenId.Nonce.Lifetime');
+        $config_values['OpenId.Private.Association.Lifetime']  = $this->configuration_service->getConfigValue('OpenId.Private.Association.Lifetime');
+        $config_values['OpenId.Session.Association.Lifetime']  = $this->configuration_service->getConfigValue('OpenId.Session.Association.Lifetime');
+        $config_values['OpenId.Nonce.Lifetime']                = $this->configuration_service->getConfigValue('OpenId.Nonce.Lifetime');
 
-        $config_values['OAuth2.AuthorizationCode.Lifetime'] = $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime');
-        $config_values['OAuth2.AccessToken.Lifetime'] = $this->configuration_service->getConfigValue('OAuth2.AccessToken.Lifetime');
-        $config_values['OAuth2.RefreshToken.Lifetime'] = $this->configuration_service->getConfigValue('OAuth2.RefreshToken.Lifetime');
+        $config_values['OAuth2.AuthorizationCode.Lifetime']    = $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime');
+        $config_values['OAuth2.AccessToken.Lifetime']          = $this->configuration_service->getConfigValue('OAuth2.AccessToken.Lifetime');
+        $config_values['OAuth2.IdToken.Lifetime']              = $this->configuration_service->getConfigValue('OAuth2.IdToken.Lifetime');
+        $config_values['OAuth2.RefreshToken.Lifetime']         = $this->configuration_service->getConfigValue('OAuth2.RefreshToken.Lifetime');
 
-        return View::make("admin.server-config", array(
-            "username" => $user->getFullName(),
-            "user_id" => $user->getId(),
-            "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
-            "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
-            'config_values' => $config_values,
-        ));
+        return View::make("admin.server-config", array
+            (
+                "username"             => $user->getFullName(),
+                "user_id"              => $user->getId(),
+                "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
+                "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
+                'config_values'        => $config_values,
+            )
+        );
     }
 
     public function saveServerConfig(){
@@ -275,6 +358,7 @@ class AdminController extends BaseController {
             'oauth2-auth-code-lifetime'                 => 'required|integer',
             'oauth2-refresh-token-lifetime'             => 'required|integer',
             'oauth2-access-token-lifetime'              => 'required|integer',
+            'oauth2-id-token-lifetime'                  => 'required|integer',
         );
 
         $dictionary = array(
@@ -285,6 +369,7 @@ class AdminController extends BaseController {
             'openid-nonce-lifetime'                     => 'OpenId.Nonce.Lifetime',
             'oauth2-auth-code-lifetime'                 => 'OAuth2.AuthorizationCode.Lifetime',
             'oauth2-access-token-lifetime'              => 'OAuth2.AccessToken.Lifetime',
+            'oauth2-id-token-lifetime'                  => 'OAuth2.IdToken.Lifetime',
             'oauth2-refresh-token-lifetime'             => 'OAuth2.RefreshToken.Lifetime',
         );
 
@@ -312,6 +397,17 @@ class AdminController extends BaseController {
             "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
             "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
             "ips" =>$ips
+        ));
+    }
+
+    public function listServerPrivateKeys(){
+
+        $user = $this->auth_service->getCurrentUser();
+
+        return View::make("oauth2.profile.admin.server-private-keys", array(
+            'private_keys'         => $this->private_keys_repository->getAll(1,4294967296),
+            "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
+            "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
         ));
     }
 }
