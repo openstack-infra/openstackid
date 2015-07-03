@@ -2,32 +2,61 @@
 
 namespace oauth2\grant_types;
 
-use oauth2\exceptions\InvalidClientException;
-use oauth2\exceptions\MissingClientIdParam;
-use oauth2\exceptions\LockedClientException;
 use oauth2\exceptions\InvalidClientCredentials;
-
+use oauth2\exceptions\InvalidClientException;
+use oauth2\exceptions\LockedClientException;
+use oauth2\exceptions\MissingClientIdParam;
+use oauth2\models\ClientAuthenticationContext;
 use oauth2\models\IClient;
 use oauth2\requests\OAuth2Request;
 use oauth2\services\IClientService;
-
 use oauth2\services\ITokenService;
-
+use oauth2\strategies\ClientAuthContextValidatorFactory;
 use utils\services\ILogService;
 
+/**
+ * Class AbstractGrantType
+ * @package oauth2\grant_types
+ */
 abstract class AbstractGrantType implements IGrantType
 {
 
+    /**
+     * @var ClientAuthenticationContext
+     */
+    protected $client_auth_context;
+    /**
+     * @var IClient
+     */
+    protected $current_client;
+
+    /**
+     * @var IClientService
+     */
     protected $client_service;
+    /**
+     * @var ITokenService
+     */
     protected $token_service;
 
-    //authorization info
-    protected $current_client_id;
-    protected $current_client_secret;
-    protected $current_client;
+    /**
+     * @var ILogService
+     */
     protected $log_service;
 
-    public function __construct(IClientService $client_service, ITokenService $token_service, ILogService $log_service)
+
+    /**
+     * @param IClientService $client_service
+     * @param ITokenService $token_service
+     * @param ILogService $log_service
+     */
+    public function __construct
+    (
+        IClientService                  $client_service,
+        ITokenService                   $token_service,
+        ILogService                     $log_service
+
+    )
     {
         $this->client_service = $client_service;
         $this->token_service = $token_service;
@@ -37,33 +66,52 @@ abstract class AbstractGrantType implements IGrantType
     /**
      * @param OAuth2Request $request
      * @return mixed|void
-     * @throws \oauth2\exceptions\MissingClientIdParam
-     * @throws \oauth2\exceptions\InvalidClientCredentials
-     * @throws \oauth2\exceptions\InvalidClientException
-     * @throws \oauth2\exceptions\LockedClientException
+     * @throws MissingClientIdParam
+     * @throws InvalidClientCredentials
+     * @throws InvalidClientException
+     * @throws LockedClientException
      */
     public function completeFlow(OAuth2Request $request)
     {
         //get client credentials from request..
-        list($this->current_client_id, $this->current_client_secret) = $this->client_service->getCurrentClientAuthInfo();
+        $this->client_auth_context = $this->client_service->getCurrentClientAuthInfo();
 
-        //check if we have at least a client id
-        if (empty($this->current_client_id))
-            throw new MissingClientIdParam();
 
         //retrieve client from storage..
-        $this->current_client = $this->client_service->getClientById($this->current_client_id);
+        $this->current_client = $this->client_service->getClientById($this->client_auth_context->getId());
 
         if (is_null($this->current_client))
-            throw new InvalidClientException($this->current_client_id,sprintf("client id %s does not exists!",$this->current_client_id));
+            throw new InvalidClientException
+            (
+                sprintf
+                (
+                    "client id %s does not exists!",
+                    $this->client_auth_context->getId()
+                )
+            );
 
         if (!$this->current_client->isActive() || $this->current_client->isLocked()) {
-            throw new LockedClientException($this->current_client_id, sprintf('client id %s',$this->current_client_id));
+            throw new LockedClientException
+            (
+                sprintf
+                (
+                    'client id %s is locked.',
+                    $this->client_auth_context->getId()
+                )
+            );
         }
 
-        //verify client credentials (only for confidential clients )
-        if ($this->current_client->getClientType() == IClient::ClientType_Confidential && $this->current_client->getClientSecret() !== $this->current_client_secret)
-            throw new InvalidClientCredentials($this->current_client_id, sprintf('client id %s',$this->current_client_id));
+        $this->client_auth_context->setClient($this->current_client);
 
+        if(!ClientAuthContextValidatorFactory::build($this->client_auth_context)->validate($this->client_auth_context))
+            throw new InvalidClientCredentials
+            (
+                sprintf
+                (
+                    'invalid credentials for client id %s.',
+                    $this->client_auth_context->getId()
+                )
+            );
     }
+
 } 
