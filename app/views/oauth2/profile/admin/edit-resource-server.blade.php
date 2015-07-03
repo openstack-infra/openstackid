@@ -8,8 +8,8 @@
 @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
 <a href="{{ URL::action("AdminController@listResourceServers") }}">Go Back</a>
 <legend>Edit Resource Server - Id {{ $resource_server->id }}</legend>
-<div class="row-fluid">
-    <div class="span6">
+<div class="row">
+    <div class="col-md-6">
         <form class="form-horizontal" id="resource-server-form" name="resource-server-form" action='{{URL::action("ApiResourceServerController@update",null)}}'>
             <fieldset>
                 <div class="control-group">
@@ -63,26 +63,26 @@
     </div>
 </div>
 
-<div class="row-fluid">
-    <div class="span12">
-    <div class="row-fluid">
+<div class="row">
+    <div class="col-md-12">
+    <div class="row">
         <h4 style="float:left"><i class="icon-info-sign accordion-toggle" title=""></i>&nbsp;Available Apis</h4>
         <div style="position: relative;float:left;">
             <div style="position:absolute;top:13px;margin-left:5px"><i class="icon-refresh accordion-toggle refresh-apis" title="Update Apis List"></i></div>
         </div>
     </div>
-    <div class="row-fluid">
+    <div class="row">
         <div class="alert alert-info" id="info-apis" style="display: none">
             <strong>There are not any available APIS</strong>
         </div>
     </div>
-    <div class="row-fluid">
-        <div class="span12">
+    <div class="row">
+        <div class="col-md-12">
             {{ HTML::link(URL::action("ApiController@create"),'Register API',array('class'=>'btn add-api','title'=>'Adds a New API')) }}
         </div>
     </div>
-    <div class="row-fluid">
-        <div class="span12">
+    <div class="row">
+        <div class="col-md-12">
     <table id='table-apis' class="table table-hover table-condensed">
         <thead>
         <tr>
@@ -162,5 +162,5 @@
 		success : '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "Resource Server")) }}'
 	};
 </script>
-{{ HTML::script('js/oauth2/profile/admin/edit-resource-server.js') }}
-@stop
+{{ HTML::script('assets/js/oauth2/profile/admin/edit-resource-server.js') }}
+@append

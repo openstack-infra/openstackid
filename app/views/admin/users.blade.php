@@ -42,5 +42,5 @@
 </div>
 @stop
 @section('scripts')
-{{ HTML::script('js/admin/users.js') }}
+{{ HTML::script('assets/js/admin/users.js') }}
 @stop
