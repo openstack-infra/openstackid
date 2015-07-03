@@ -7,6 +7,7 @@ namespace utils;
  * Defines an interface to handle http responses
  * @package utils
  */
-interface IHttpResponseStrategy {
+interface IHttpResponseStrategy
+{
     public function handle($response);
 } 

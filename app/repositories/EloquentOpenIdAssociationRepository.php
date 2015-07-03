@@ -9,39 +9,42 @@ use OpenIdAssociation;
  * Class EloquentOpenIdAssociationRepository
  * @package repositories
  */
+class EloquentOpenIdAssociationRepository implements IOpenIdAssociationRepository
+{
 
-class EloquentOpenIdAssociationRepository implements IOpenIdAssociationRepository {
+    private $association;
 
-	private $association;
+    public function __construct(OpenIdAssociation $association)
+    {
+        $this->association = $association;
+    }
 
-	public function __construct(OpenIdAssociation $association){
-		$this->association = $association;
-	}
+    public function add(OpenIdAssociation $a)
+    {
+        return $a->Save();
+    }
 
-	public function add(OpenIdAssociation $a)
-	{
-		return $a->Save();
-	}
+    public function deleteById($id)
+    {
+        return $this->delete($this->get($id));
+    }
 
-	public function deleteById($id)
-	{
-		return $this->delete($this->get($id));
-	}
+    public function getByHandle($handle)
+    {
+        return $this->association->where('identifier', '=', $handle)->first();
+    }
 
-	public function getByHandle($handle)
-	{
-		return $this->association->where('identifier', '=', $handle)->first();
-	}
+    public function delete(OpenIdAssociation $a)
+    {
+        if (!is_null($a)) {
+            return $a->delete();
+        }
 
-	public function delete(OpenIdAssociation $a)
-	{
-		if(!is_null($a))
-			return $a->delete();
-		return false;
-	}
+        return false;
+    }
 
-	public function get($id)
-	{
-		return $this->association->find($id);
-	}
+    public function get($id)
+    {
+        return $this->association->find($id);
+    }
 }
