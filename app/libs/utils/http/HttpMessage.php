@@ -9,9 +9,15 @@ namespace utils\http;
 class HttpMessage implements \ArrayAccess
 {
 
+    /**
+     * @var array
+     */
     protected $container = array();
 
-    public function __construct(array $values)
+    /**
+     * @param array $values
+     */
+    public function __construct(array $values = array())
     {
         $this->container = $values;
     }

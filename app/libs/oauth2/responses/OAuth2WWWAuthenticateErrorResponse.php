@@ -2,6 +2,8 @@
 
 namespace oauth2\responses;
 
+use utils\http\HttpContentType;
+
 /**
  * Class OAuth2WWWAuthenticateErrorResponse
  * http://tools.ietf.org/html/rfc6750#section-3
@@ -16,7 +18,7 @@ class OAuth2WWWAuthenticateErrorResponse extends OAuth2DirectResponse {
     private $http_error;
 
     public function __construct($realm, $error, $error_description, $scope, $http_error){
-        parent::__construct($http_error, self::DirectResponseContentType);
+        parent::__construct($http_error, HttpContentType::Json);
         $this->realm             = $realm;
         $this->error             = $error;
         $this->error_description = $error_description;

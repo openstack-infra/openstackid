@@ -2,13 +2,20 @@
 
 namespace oauth2\exceptions;
 
-use Exception;
+use oauth2\OAuth2Protocol;
 
-class ScopeNotAllowedException extends Exception
+/**
+ * Class ScopeNotAllowedException
+ * @package oauth2\exceptions
+ */
+final class ScopeNotAllowedException extends OAuth2BaseException
 {
-    public function __construct($message = "")
+
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $message = "Scope Not Allowed : " . $message;
-        parent::__construct($message, 0, null);
+        return OAuth2Protocol::OAuth2Protocol_Error_InvalidScope;
     }
 }
