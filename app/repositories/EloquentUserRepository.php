@@ -4,91 +4,97 @@ namespace repositories;
 
 use auth\IUserRepository;
 use auth\User;
-use utils\services\ILogService;
 use DB;
+use utils\services\ILogService;
+use \Member;
 
-class EloquentUserRepository implements IUserRepository {
+/**
+ * Class EloquentUserRepository
+ * @package repositories
+ */
+final class EloquentUserRepository extends AbstractEloquentEntityRepository implements IUserRepository
+{
 
-	private $user;
-	private $log_service;
 
-	public function __construct(User $user,ILogService $log_service){
-		$this->user        = $user;
-		$this->log_service = $log_service;
-	}
-	/**
-	 * @param $id
-	 * @return User
-	 */
-	public function get($id)
-	{
-		return $this->user->find($id);
-	}
+    /**
+     * @var ILogService
+     */
+    private $log_service;
 
-	public function getByCriteria($filters){
-		return $this->user->Filter($filters)->get();
-	}
+    /**
+     * EloquentUserRepository constructor.
+     * @param User $user
+     * @param ILogService $log_service
+     */
+    public function __construct(User $user, ILogService $log_service)
+    {
+        $this->entity      = $user;
+        $this->log_service = $log_service;
+    }
 
-	public function getOneByCriteria($filters){
-		return $this->user->Filter($filters)->first();
-	}
+    /**
+     * @param $id
+     * @return User
+     */
+    public function get($id)
+    {
+        return $this->entity->find($id);
+    }
 
-	/**
-	 * @param User $u
-	 * @return bool
-	 */
-	public function update(User $u)
-	{
-		return $u->Save();
-	}
+    public function getByCriteria($filters)
+    {
+        return $this->entity->Filter($filters)->get();
+    }
 
-	/**
-	 * @param User $u
-	 * @return bool
-	 */
-	public function add(User $u)
-	{
-		return $u->Save();
-	}
+    public function getOneByCriteria($filters)
+    {
+        return $this->entity->Filter($filters)->first();
+    }
 
-	/**
-	 * @param int   $page_nbr
-	 * @param int   $page_size
-	 * @param array $filters
-	 * @param array $fields
-	 * @return array
-	 */
-	public function getByPage($page_nbr = 1, $page_size = 10, array $filters = array(), array $fields = array('*'))
-	{
-		DB::getPaginator()->setCurrentPage($page_nbr);
-		return $this->user->Filter($filters)->paginate($page_size, $fields);
-	}
+     /**
+     * @param array $filters
+     * @return int
+     */
+    public function getCount(array $filters = array())
+    {
+        return $this->entity->Filter($filters)->count();
+    }
 
-	/**
-	 * @param array $filters
-	 * @return int
-	 */
-	public function getCount(array $filters = array())
-	{
-		return $this->user->Filter($filters)->count();
-	}
+    /**
+     * @param $external_id
+     * @return User
+     */
+    public function getByExternalId($external_id)
+    {
+        return $this->entity->where('external_identifier', '=', $external_id)->first();
+    }
 
-	/**
-	 * @param $external_id
-	 * @return User
-	 */
-	public function getByExternalId($external_id)
-	{
-		return $this->user->where('external_identifier', '=', $external_id)->first();
-	}
+    /**
+     * @param mixed $identifier
+     * @param string $token
+     * @return User
+     */
+    public function getByToken($identifier, $token)
+    {
+        return $this->entity
+            ->where('external_identifier', '=', $identifier)
+            ->where('remember_token', '=',$token)->first();
+    }
 
-	/**
-	 * @param mixed  $identifier
-	 * @param string $token
-	 * @return User
-	 */
-	public function getByToken($identifier, $token)
-	{
-		return $this->user->where('external_identifier', '=', $identifier)->where('remember_token', '=', $token)->first();
-	}
+    /**
+     * @param string $term
+     * @return array
+     */
+    public function getByEmailOrName($term)
+    {
+        $list    = array();
+        $members = Member::where('Email', 'like', '%'.$term.'%')->paginate(10);
+        foreach($members->getItems() as $m)
+        {
+            $user = $this->getByExternalId(intval($m->ID));
+            if(!is_null($user))
+                array_push($list, $user);
+        }
+        return $list;
+    }
 }

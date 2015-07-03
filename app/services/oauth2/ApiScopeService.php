@@ -2,28 +2,31 @@
 
 namespace services\oauth2;
 
+use Api;
+use ApiScope;
+use DB;
 use oauth2\exceptions\InvalidApi;
 use oauth2\exceptions\InvalidApiScope;
 use oauth2\models\IApiScope;
 use oauth2\services\IApiScopeService;
-use ApiScope;
-use Api;
-use DB;
 use utils\db\ITransactionService;
+
 /**
  * Class ApiScopeService
  * @package services\oauth2
  */
-class ApiScopeService implements IApiScopeService {
+final class ApiScopeService implements IApiScopeService
+{
 
-	private $tx_service;
+    private $tx_service;
 
-	/**
-	 * @param ITransactionService $tx_service
-	 */
-	public function __construct(ITransactionService $tx_service){
-		$this->tx_service = $tx_service;
-	}
+    /**
+     * @param ITransactionService $tx_service
+     */
+    public function __construct(ITransactionService $tx_service)
+    {
+        $this->tx_service = $tx_service;
+    }
 
     /**
      * @param array $scopes_names
@@ -31,35 +34,45 @@ class ApiScopeService implements IApiScopeService {
      */
     public function getScopesByName(array $scopes_names)
     {
-        return ApiScope::where('active','=',true)->whereIn('name',$scopes_names)->get();
+        return ApiScope::where('active', '=', true)->whereIn('name', $scopes_names)->get();
     }
 
     /**
      * @param array $scopes_names
      * @return mixed
      */
-    public function getFriendlyScopesByName(array $scopes_names){
-       return DB::table('oauth2_api_scope')->where('active','=',true)->whereIn('name',$scopes_names)->lists('short_description');
+    public function getFriendlyScopesByName(array $scopes_names)
+    {
+        return DB::table('oauth2_api_scope')->where('active', '=', true)->whereIn('name',
+            $scopes_names)->lists('short_description');
     }
 
     /**
      * @param bool $system
+     * @param bool $assigned_by_groups
      * @return array|mixed
      */
-    public function getAvailableScopes($system=false){
-         $scopes = ApiScope
-             ::with('api')
+    public function getAvailableScopes($system = false, $assigned_by_groups = false)
+    {
+        $scopes = ApiScope
+            ::with('api')
             ->with('api.resource_server')
-            ->where('active','=',true)
+            ->where('active', '=', true)
             ->orderBy('api_id')->get();
 
         $res = array();
 
-        foreach($scopes as $scope){
+        foreach ($scopes as $scope)
+        {
             $api = $scope->api()->first();
-            if(!is_null($api) && $api->resource_server()->first()->active && $api->active){
-                if($scope->system && !$system) continue;
-                array_push($res,$scope);
+            if (!is_null($api) && $api->resource_server()->first()->active && $api->active) {
+                if ($scope->system && !$system) {
+                    continue;
+                }
+                if ($scope->assigned_by_groups && !$assigned_by_groups) {
+                    continue;
+                }
+                array_push($res, $scope);
             }
         }
 
@@ -70,16 +83,18 @@ class ApiScopeService implements IApiScopeService {
      * @param array $scopes_names
      * @return array|mixed
      */
-    public function getAudienceByScopeNames(array $scopes_names){
+    public function getAudienceByScopeNames(array $scopes_names)
+    {
         $scopes = $this->getScopesByName($scopes_names);
         $audience = array();
-        foreach($scopes as $scope){
+        foreach ($scopes as $scope) {
             $api = $scope->api()->first();
-            $resource_server = !is_null($api)? $api->resource_server()->first():null;
-            if(!is_null($resource_server) && !array_key_exists($resource_server->host, $audience)){
+            $resource_server = !is_null($api) ? $api->resource_server()->first() : null;
+            if (!is_null($resource_server) && !array_key_exists($resource_server->host, $audience)) {
                 $audience[$resource_server->host] = $resource_server->ip;
             }
         }
+
         return $audience;
     }
 
@@ -87,13 +102,15 @@ class ApiScopeService implements IApiScopeService {
      * @param array $scopes_names
      * @return string
      */
-    public function getStrAudienceByScopeNames(array $scopes_names){
+    public function getStrAudienceByScopeNames(array $scopes_names)
+    {
         $audiences = $this->getAudienceByScopeNames($scopes_names);
-        $audience  = '';
-        foreach($audiences as $resource_server_host => $ip){
-            $audience = $audience . $resource_server_host .' ';
+        $audience = '';
+        foreach ($audiences as $resource_server_host => $ip) {
+            $audience = $audience . $resource_server_host . ' ';
         }
-        $audience  = trim($audience);
+        $audience = trim($audience);
+
         return $audience;
     }
 
@@ -114,10 +131,11 @@ class ApiScopeService implements IApiScopeService {
      * @param array $fields
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10, array $filters=array(), array $fields=array('*'))
+    public function getAll($page_nbr = 1, $page_size = 10, array $filters = array(), array $fields = array('*'))
     {
         DB::getPaginator()->setCurrentPage($page_nbr);
-        return ApiScope::Filter($filters)->paginate($page_size,$fields);
+
+        return ApiScope::Filter($filters)->paginate($page_size, $fields);
     }
 
     /**
@@ -126,9 +144,10 @@ class ApiScopeService implements IApiScopeService {
      */
     public function save(IApiScope $scope)
     {
-        if(!$scope->exists() || count($scope->getDirty())>0){
+        if (!$scope->exists() || count($scope->getDirty()) > 0) {
             return $scope->Save();
         }
+
         return true;
     }
 
@@ -140,25 +159,27 @@ class ApiScopeService implements IApiScopeService {
      */
     public function update($id, array $params)
     {
-        $res      = false;
-	    $this_var = $this;
+        $res = false;
+        $this_var = $this;
 
-	    $this->tx_service->transaction(function () use ($id,$params,&$res,&$this_var) {
+        $this->tx_service->transaction(function () use ($id, $params, &$res, &$this_var) {
 
             //check that scope exists...
             $scope = ApiScope::find($id);
-            if(is_null($scope))
-                throw new InvalidApiScope(sprintf('scope id %s does not exists!',$id));
+            if (is_null($scope)) {
+                throw new InvalidApiScope(sprintf('scope id %s does not exists!', $id));
+            }
 
-            $allowed_update_params = array('name','description','short_description','active','system','default');
+            $allowed_update_params = array('name', 'description', 'short_description', 'active', 'system', 'default', 'assigned_by_groups');
 
-            foreach($allowed_update_params as $param){
-                if(array_key_exists($param,$params)){
+            foreach ($allowed_update_params as $param) {
+                if (array_key_exists($param, $params)) {
 
-                    if($param=='name'){
+                    if ($param == 'name') {
                         //check if we have a former scope with selected name
-                        if(ApiScope::where('name','=',$params[$param])->where('id','<>',$id)->count()>0)
-                            throw new InvalidApiScope(sprintf('scope name %s already exists!',$params[$param]));
+                        if (ApiScope::where('name', '=', $params[$param])->where('id', '<>', $id)->count() > 0) {
+                            throw new InvalidApiScope(sprintf('scope name %s already exists!', $params[$param]));
+                        }
                     }
 
                     $scope->{$param} = $params[$param];
@@ -166,6 +187,7 @@ class ApiScopeService implements IApiScopeService {
             }
             $res = $this_var->save($scope);
         });
+
         return $res;
     }
 
@@ -178,11 +200,12 @@ class ApiScopeService implements IApiScopeService {
      */
     public function setStatus($id, $active)
     {
-	    $scope = ApiScope::find($id);
-        if(is_null($scope))
-            throw new InvalidApiScope(sprintf('scope id %s does not exists!',$id));
+        $scope = ApiScope::find($id);
+        if (is_null($scope)) {
+            throw new InvalidApiScope(sprintf('scope id %s does not exists!', $id));
+        }
 
-        return $scope->update(array('active'=>$active));
+        return $scope->update(array('active' => $active));
     }
 
     /**
@@ -193,14 +216,16 @@ class ApiScopeService implements IApiScopeService {
     public function delete($id)
     {
         $res = false;
-	    $this->tx_service->transaction(function () use ($id,&$res) {
+        $this->tx_service->transaction(function () use ($id, &$res) {
 
             $scope = ApiScope::find($id);
-            if(is_null($scope))
-                throw new InvalidApiScope(sprintf('scope id %s does not exists!',$id));
+            if (is_null($scope)) {
+                throw new InvalidApiScope(sprintf('scope id %s does not exists!', $id));
+            }
 
             $res = $scope->delete();
         });
+
         return $res;
     }
 
@@ -213,43 +238,85 @@ class ApiScopeService implements IApiScopeService {
      * @param $default
      * @param $system
      * @param $api_id
+     * @param $assigned_by_groups
      * @throws \oauth2\exceptions\InvalidApi
      * @return IApiScope
      */
-    public function add($name, $short_description, $description, $active, $default, $system, $api_id)
+    public function add($name, $short_description, $description, $active, $default, $system, $api_id, $assigned_by_groups)
     {
         $instance = null;
-	    $this->tx_service->transaction(function () use ($name, $short_description, $description, $active, $default, $system, $api_id, &$instance) {
+        $this->tx_service->transaction(function () use (
+            $name,
+            $short_description,
+            $description,
+            $active,
+            $default,
+            $system,
+            $api_id,
+            &$instance
+        ) {
 
             // check if api exists...
-            if(is_null(Api::find($api_id)))
-                throw new InvalidApi(sprintf('api id %s does not exists!.',$api_id));
+            if (is_null(Api::find($api_id))) {
+                throw new InvalidApi(sprintf('api id %s does not exists!.', $api_id));
+            }
 
             //check if we have a former scope with selected name
-            if(ApiScope::where('name','=',$name)->count()>0)
-                throw new InvalidApiScope(sprintf('scope name %s not allowed.',$name));
+            if (ApiScope::where('name', '=', $name)->count() > 0) {
+                throw new InvalidApiScope(sprintf('scope name %s not allowed.', $name));
+            }
 
-            $instance = new ApiScope(
-                array(
-                    'name'              => $name,
-                    'description'       => $description,
-                    'short_description' => $short_description,
-                    'active'            => $active,
-                    'default'           => $default,
-                    'system'            => $system,
-                    'api_id'            => $api_id
+            $instance = new ApiScope
+            (
+                array
+                (
+                    'name'               => $name,
+                    'description'        => $description,
+                    'short_description'  => $short_description,
+                    'active'             => $active,
+                    'default'            => $default,
+                    'system'             => $system,
+                    'api_id'             => $api_id,
+                    'assigned_by_groups' => $assigned_by_groups
                 )
             );
 
             $instance->Save();
         });
+
         return $instance;
     }
 
     /**
      * @return mixed
      */
-    public function getDefaultScopes(){
-        return $scopes = ApiScope::where('default','=',true)->where('active','=',true)->get(array('id'));
+    public function getDefaultScopes()
+    {
+        return $scopes = ApiScope::where('default', '=', true)->where('active', '=', true)->get(array('id'));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAssignedByGroups()
+    {
+        $scopes = ApiScope
+            ::with('api')
+            ->with('api.resource_server')
+            ->where('active', '=', true)
+            ->where('assigned_by_groups', '=', true)
+            ->orderBy('api_id')->get();
+
+        $res = array();
+
+        foreach ($scopes as $scope)
+        {
+            $api = $scope->api()->first();
+            if (!is_null($api) && $api->resource_server()->first()->active && $api->active) {
+                array_push($res, $scope);
+            }
+        }
+
+        return $res;
     }
 }

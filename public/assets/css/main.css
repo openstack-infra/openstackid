@@ -1,0 +1,186 @@
+body {
+
+}
+
+.header
+{
+    padding-top: 3em;
+}
+
+#logo a {
+    background: url("../img/open-stack-cloud-computing-logo.png") no-repeat scroll left center rgba(0, 0, 0, 0);
+    display: block;
+    height: 54px;
+    margin-left: -10px;
+    margin-top: 8px;
+    text-indent: -1000em;
+    width: 177px;
+}
+
+.panel-heading {
+    background-color: #F5F5F5;
+    border-bottom: 1px solid #DDDDDD;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    margin: -15px -15px 15px;
+    padding: 10px 15px;
+}
+
+.panel {
+    background-color: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
+    padding: 15px;
+}
+
+* {
+    -moz-box-sizing: border-box;
+}
+
+.margin-top-20 {
+    margin-top: 20px;
+}
+
+#redirect_uri, #origin{
+    margin-bottom: 0px!important;
+    height: 30px !important;
+    width: 90% !important;
+}
+
+#dialog-form-register-new-app textarea {
+    height: auto;
+}
+
+.label-client-secret{
+    font-size: 12px;
+    color: darkgray;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+#client_id, #client_secret{
+    font-weight: normal;
+}
+
+.alert-error{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+
+.popover-content{
+    font-size: 12px;
+}
+
+.popover {
+    width: auto;
+    max-width: 800px;
+}
+
+.info{
+    cursor: pointer;
+}
+
+.email-row{
+    margin-top: 5px;
+}
+
+.error-modal{
+    background-color: #F2DEDE !important;
+    border-color: #EED3D7 !important;
+    color: #B94A48 !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5)
+}
+
+.error-modal .modal-footer{
+    border-top: 1px solid #EED3D7 !important;
+    background-color: #F2DEDE !important;
+    border-color: #EED3D7 !important;
+    color: #B94A48 !important;
+    box-shadow: 0 1px 0 #EED3D7 inset !important;
+}
+
+.error-modal .modal-header{
+    border-bottom: 1px solid #EED3D7 !important;
+}
+
+.error-modal .alert-heading{
+    color: #B94A48;
+    margin: 0;
+}
+
+
+*::after, *::before {
+    box-sizing: border-box;
+}
+*::after, *::before {
+    box-sizing: border-box;
+}
+.bs-glyphicons li {
+    font-size: 12px;
+    width: 12.5%;
+}
+.bs-glyphicons li {
+    background-color: #f9f9f9;
+    border: 1px solid #fff;
+    float: left;
+    font-size: 10px;
+    height: 115px;
+    line-height: 1.4;
+    padding: 10px;
+    text-align: center;
+    width: 25%;
+}
+* {
+    box-sizing: border-box;
+}
+.bs-glyphicons-list {
+    list-style: outside none none;
+}
+body {
+    color: #333;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857;
+}
+
+.accordion-toggle {
+    cursor: pointer;
+}
+
+.pointable {
+    cursor: pointer;
+    color: #000;
+}
+
+.del-client, .regenerate-client-secret, .del-allowed-uri, .revoke-access, .delete-public-key, .btn-delete {
+    color: #900 !important;
+    font-weight: bold !important;
+}
+
+.del-client:hover, .regenerate-client-secret:hover, .del-allowed-uri:hover, .revoke-access:hover, .delete-public-key:hover, .btn-delete:hover {
+    color: #fff !important;
+    background-color: #900 !important;
+    border-color: #d43f3a !important;
+}
+
+.panel-default > .panel-heading {
+    background-color: white !important;
+    border-color: #ddd !important;
+    color: #0078a3 !important;
+}
+
+.bootstrap-tagsinput{
+    width: 100% !important;
+}
+
+textarea {
+    resize: none;
+}
+
+.col-md-offset-neg-1 {
+    margin-left: -15%;
+}

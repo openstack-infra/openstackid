@@ -18,11 +18,19 @@ use oauth2\IOAuth2Protocol;
  * http://tools.ietf.org/html/rfc6749#section-3.1
  * @package oauth2\endpoints
  */
-class AuthorizationEndpoint implements IOAuth2Endpoint {
+class AuthorizationEndpoint implements IOAuth2Endpoint
+{
 
-
+    /**
+     * @var IOAuth2Protocol
+     */
     private $protocol;
-    public function __construct(IOAuth2Protocol $protocol){
+
+    /**
+     * @param IOAuth2Protocol $protocol
+     */
+    public function __construct(IOAuth2Protocol $protocol)
+    {
         $this->protocol = $protocol;
     }
 

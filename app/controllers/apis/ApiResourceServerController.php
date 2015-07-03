@@ -1,8 +1,9 @@
 <?php
 
+use oauth2\exceptions\InvalidResourceServer;
 use oauth2\services\IResourceServerService;
 use utils\services\ILogService;
-use oauth2\exceptions\InvalidResourceServer;
+
 /**
  * Class ApiResourceServerController
  */
@@ -17,7 +18,7 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
     {
         parent::__construct($log_service);
         $this->resource_server_service = $resource_server_service;
-        $this->allowed_filter_fields     = array('');
+        $this->allowed_filter_fields = array('');
         $this->allowed_projection_fields = array('*');
     }
 
@@ -29,18 +30,20 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
                 return $this->error404(array('error' => 'resource server not found'));
             }
 
-            $data         = $resource_server->toArray();
-            $apis         = $resource_server->apis()->get(array('id','name'));
+            $data = $resource_server->toArray();
+            $apis = $resource_server->apis()->get(array('id', 'name'));
             $data['apis'] = $apis->toArray();
 
-            $client  = $resource_server->getClient();
-            if(!is_null($client)){
-                    $data['client_id']     = $client->getClientId();
-                    $data['client_secret'] = $client->getClientSecret();
+            $client = $resource_server->getClient();
+            if (!is_null($client)) {
+                $data['client_id'] = $client->getClientId();
+                $data['client_secret'] = $client->getClientSecret();
             }
+
             return $this->ok($data);
         } catch (Exception $ex) {
             $this->log_service->error($ex);
+
             return $this->error500($ex);
         }
     }
@@ -48,22 +51,24 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
     public function getByPage()
     {
         try {
-            $fields  =  $this->getProjection(Input::get('fields',null));
-            $filters = $this->getFilters(Input::except('fields','limit','offset'));
-            $page_nbr = intval(Input::get('offset',1));
-            $page_size = intval(Input::get('limit',10));
+            $fields = $this->getProjection(Input::get('fields', null));
+            $filters = $this->getFilters(Input::except('fields', 'limit', 'offset'));
+            $page_nbr = intval(Input::get('offset', 1));
+            $page_size = intval(Input::get('limit', 10));
 
-            $list = $this->resource_server_service->getAll($page_nbr, $page_size,$filters,$fields);
+            $list = $this->resource_server_service->getAll($page_nbr, $page_size, $filters, $fields);
             $items = array();
             foreach ($list->getItems() as $rs) {
                 array_push($items, $rs->toArray());
             }
-            return $this->ok( array(
+
+            return $this->ok(array(
                 'page' => $items,
                 'total_items' => $list->getTotal()
             ));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
+
             return $this->error500($ex);
         }
     }
@@ -74,17 +79,18 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
             $values = Input::all();
 
             $rules = array(
-                'host'          => 'required|host|max:255',
-                'ip'            => 'required|ip|max:16',
+                'host' => 'required|host|max:255',
+                'ip' => 'required|ip|max:16',
                 'friendly_name' => 'required|text|max:512',
-                'active'        => 'required|boolean',
+                'active' => 'required|boolean',
             );
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($values, $rules);
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error'=>'validation','messages' => $messages));
+
+                return $this->error400(array('error' => 'validation', 'messages' => $messages));
             }
 
             $new_resource_server_model = $this->resource_server_service->add(
@@ -94,13 +100,13 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
                 $values['active']);
 
             return $this->created(array('resource_server_id' => $new_resource_server_model->id));
-        }
-        catch(InvalidResourceServer $ex1){
+        } catch (InvalidResourceServer $ex1) {
             $this->log_service->error($ex1);
-            return $this->error400(array('error'=>$ex1->getMessage()));
-        }
-        catch (Exception $ex) {
+
+            return $this->error400(array('error' => $ex1->getMessage()));
+        } catch (Exception $ex) {
             $this->log_service->error($ex);
+
             return $this->error500($ex);
         }
     }
@@ -109,9 +115,11 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
     {
         try {
             $res = $this->resource_server_service->delete($id);
-            return $res?$this->deleted():$this->error404(array('error'=>'operation failed'));
+
+            return $res ? $this->deleted() : $this->error404(array('error' => 'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
+
             return $this->error500($ex);
         }
     }
@@ -120,9 +128,11 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
     {
         try {
             $res = $this->resource_server_service->regenerateClientSecret($id);
-            return !is_null($res)?$this->ok(array('new_secret'=>$res)):$this->error404(array('error'=>'operation failed'));
+
+            return !is_null($res) ? $this->ok(array('new_secret' => $res)) : $this->error404(array('error' => 'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
+
             return $this->error500($ex);
         }
     }
@@ -134,48 +144,55 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
             $values = Input::all();
 
             $rules = array(
-                'id'            => 'required|integer',
-                'host'          => 'sometimes|required|host|max:255',
-                'ip'            => 'sometimes|required|ip|max:16',
+                'id' => 'required|integer',
+                'host' => 'sometimes|required|host|max:255',
+                'ip' => 'sometimes|required|ip|max:16',
                 'friendly_name' => 'sometimes|required|text|max:512',
             );
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($values, $rules);
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
-                return $this->error400(array('error'=>'validation','messages' => $messages));
+
+                return $this->error400(array('error' => 'validation', 'messages' => $messages));
             }
-            $res = $this->resource_server_service->update(intval($values['id']),$values);
-            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
-        }
-        catch(InvalidResourceServer $ex1){
+            $res = $this->resource_server_service->update(intval($values['id']), $values);
+
+            return $res ? $this->ok() : $this->error400(array('error' => 'operation failed'));
+        } catch (InvalidResourceServer $ex1) {
             $this->log_service->error($ex1);
-            return $this->error404(array('error'=>$ex1->getMessage()));
-        }
-        catch (Exception $ex) {
-            $this->log_service->error($ex);
-            return $this->error500($ex);
-        }
-    }
 
-
-    public function activate($id){
-        try {
-            $res = $this->resource_server_service->setStatus($id,true);
-            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
+            return $this->error404(array('error' => $ex1->getMessage()));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
+
             return $this->error500($ex);
         }
     }
 
-	public function deactivate($id){
-		try {
-			$res = $this->resource_server_service->setStatus($id,false);
-			return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
-		} catch (Exception $ex) {
-			$this->log_service->error($ex);
-			return $this->error500($ex);
-		}
-	}
+    public function activate($id)
+    {
+        try {
+            $res = $this->resource_server_service->setStatus($id, true);
+
+            return $res ? $this->ok() : $this->error400(array('error' => 'operation failed'));
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
+
+            return $this->error500($ex);
+        }
+    }
+
+    public function deactivate($id)
+    {
+        try {
+            $res = $this->resource_server_service->setStatus($id, false);
+
+            return $res ? $this->ok() : $this->error400(array('error' => 'operation failed'));
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
+
+            return $this->error500($ex);
+        }
+    }
 }

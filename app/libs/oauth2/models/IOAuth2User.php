@@ -35,4 +35,15 @@ interface IOAuth2User {
      * @return bool
      */
     public function isOAuth2ServerAdmin();
+
+    /**
+     * @return IApiScopeGroup[]
+     */
+    public function getGroups();
+
+    /**
+     * @return IApiScope[]
+     */
+    public function getGroupScopes();
+
 } 

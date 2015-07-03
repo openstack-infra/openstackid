@@ -6,15 +6,18 @@ use Eloquent;
 use Illuminate\Auth\UserInterface;
 use Member;
 use MemberPhoto;
+use oauth2\models\IApiScope;
+use oauth2\models\IApiScopeGroup;
 use oauth2\models\IOAuth2User;
 use openid\model\IOpenIdUser;
 use utils\model\BaseModelEloquent;
+use utils\model\IEntity;
 
 /**
  * Class User
  * @package auth
  */
-class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAuth2User
+class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAuth2User, IEntity
 {
     protected $table = 'openid_users';
 
@@ -60,7 +63,6 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
         $this->member = $member;
     }
 
-
     private function getAssociatedMember()
     {
         if (is_null($this->member)) {
@@ -68,15 +70,6 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
         }
 
         return $this->member;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasAssociatedMember()
-    {
-        $this->getAssociatedMember();
-        return !is_null($this->member);
     }
 
     /**
@@ -110,8 +103,16 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
     public function getEmail()
     {
         $this->getAssociatedMember();
-
+        if(is_null($this->member)) return false;
         return $this->member->Email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmailAttribute()
+    {
+        return  $this->getEmail();
     }
 
     public function getFullName()
@@ -175,7 +176,7 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 
     public function getId()
     {
-        return $this->id;
+        return (int)$this->id;
     }
 
     public function getShowProfileFullName()
@@ -264,7 +265,11 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
     {
         $this->getAssociatedMember();
 
-        return sprintf("%s, %s ", $this->member->Address, $this->member->Suburb);
+        $street_address = $this->member->Address;
+        $suburb = $this->member->Suburb;
+        if(!empty($suburb))
+            $street_address .= ', '.$suburb;
+        return $street_address;
     }
 
     public function getRegion()
@@ -306,5 +311,74 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
     public function getRememberTokenName()
     {
         return 'remember_token';
+    }
+
+    /**
+     * @return int
+     */
+    public function getExternalIdentifier()
+    {
+        return $this->getAuthIdentifier();
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormattedAddress()
+    {
+        $street   = $this->getStreetAddress();
+        $region   = $this->getRegion();
+        $city     = $this->getLocality();
+        $zip_code = $this->getPostalCode();
+        $country  = $this->getCountry();
+
+        $complete = $street;
+
+        if(!empty($city))
+            $complete .= ', '.$city;
+
+        if(!empty($region))
+            $complete .= ', '.$region;
+
+        if(!empty($zip_code))
+            $complete .= ', '.$zip_code;
+
+        if(!empty($country))
+            $complete .= ', '.$country;
+
+        return $complete;
+    }
+
+    /**
+     * @return IApiScopeGroup[]
+     */
+    public function getGroups()
+    {
+        return $this->groups()->where('active','=',true)->get();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function groups()
+    {
+        return $this->belongsToMany('ApiScopeGroup','oauth2_api_scope_group_users','user_id', 'group_id');
+    }
+
+    /**
+     * @return IApiScope[]
+     */
+    public function getGroupScopes()
+    {
+        $scopes = array();
+        $map    = array();
+        foreach($this->groups()->where('active','=',true)->get() as $group){
+            foreach($group->scopes()->get() as $scope)
+            {
+                if(!isset($map[$scope->id]))
+                    array_push($scopes, $scope);
+            }
+        }
+        return $scopes;
     }
 }
