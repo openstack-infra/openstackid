@@ -2,19 +2,27 @@
 
 namespace oauth2\responses;
 
-abstract class OAuth2IndirectResponse extends OAuth2Response {
+use utils\http\HttpContentType;
 
+/**
+ * Class OAuth2IndirectResponse
+ * @package oauth2\responses
+ */
+abstract class OAuth2IndirectResponse extends OAuth2Response
+{
+
+    /**
+     * @var string
+     */
     protected $return_to;
 
-    const IndirectResponseContentType = "application/x-www-form-urlencoded";
-    const OAuth2IndirectResponse      ='OAuth2IndirectResponse';
+    const OAuth2IndirectResponse      = "OAuth2IndirectResponse";
 
     public function __construct()
     {
         // Successful Responses: A server receiving a valid request MUST send a
         // response with an HTTP status code of 200.
-        parent::__construct(self::HttpOkResponse, self::IndirectResponseContentType);
-
+        parent::__construct(self::HttpOkResponse, HttpContentType::Form);
     }
 
     public function getType()
@@ -22,21 +30,26 @@ abstract class OAuth2IndirectResponse extends OAuth2Response {
         return self::OAuth2IndirectResponse;
     }
 
-    public function setReturnTo($return_to){
+    public function setReturnTo($return_to)
+    {
         $this->return_to = $return_to;
     }
 
-    public function getReturnTo(){
+    public function getReturnTo()
+    {
         return $this->return_to;
     }
 
     public function getContent()
     {
         $url_encoded_format = "";
-        if ($this->container !== null) {
+        if ($this->container !== null)
+        {
             ksort($this->container);
-            foreach ($this->container as $key => $value) {
-                if (is_array($value)) {
+            foreach ($this->container as $key => $value)
+            {
+                if (is_array($value))
+                {
                     list($key, $value) = array($value[0], $value[1]);
                 }
                 $value = urlencode($value);
@@ -49,6 +62,6 @@ abstract class OAuth2IndirectResponse extends OAuth2Response {
 
     public function getContentType()
     {
-        return self::IndirectResponseContentType;
+        return HttpContentType::Form;
     }
 } 

@@ -41,11 +41,21 @@ interface IOAuth2Protocol {
      */
     public function introspection(OAuth2Request $request = null);
 
-
-
     /**
      * Get all available grant types set on the protocol
      * @return mixed
      */
     public function getAvailableGrants();
+
+    /**
+     * @return string
+     */
+    public function getJWKSDocument();
+
+    /**
+     * http://openid.net/specs/openid-connect-discovery-1_0.html
+     * @return string
+     */
+    public function getDiscoveryDocument();
+
 } 

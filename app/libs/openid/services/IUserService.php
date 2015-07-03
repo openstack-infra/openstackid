@@ -11,14 +11,18 @@ use openid\model\IOpenIdUser;
 interface IUserService
 {
 
+    /**
+     * @param int $id
+     * @return IOpenIdUser
+     */
     public function get($id);
 
-	/**
-	 * @param IOpenIdUser $user
-	 * @param             $proposed_username
-	 * @return bool|IOpenIdUser
-	 */
-	public function associateUser(IOpenIdUser &$user , $proposed_username);
+    /**
+     * @param IOpenIdUser $user
+     * @param             $proposed_username
+     * @return bool|IOpenIdUser
+     */
+    public function associateUser(IOpenIdUser &$user, $proposed_username);
 
     /**
      * @param $identifier
@@ -72,5 +76,5 @@ interface IUserService
      * @param array $fields
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10,array $filters=array(), array $fields=array('*'));
+    public function getAll($page_nbr = 1, $page_size = 10, array $filters = array(), array $fields = array('*'));
 }
