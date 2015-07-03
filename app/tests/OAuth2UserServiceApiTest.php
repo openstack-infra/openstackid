@@ -12,6 +12,7 @@ class OAuth2UserServiceApiTest extends OAuth2ProtectedApiTest {
      * @covers OAuth2UserApiController::get()
      */
     public function testGetInfo(){
+
         $response = $this->action("GET", "OAuth2UserApiController@me",
             array(),
             array(),

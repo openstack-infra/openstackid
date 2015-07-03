@@ -1,5 +1,7 @@
 <?php
 
+use oauth2\OAuth2Protocol;
+
 /**
  * Class ApiScopeSeeder
  */
@@ -44,6 +46,31 @@ class ApiScopeSeeder extends Seeder {
                 'description'        => 'This scope value requests access to the address Claim.',
                 'api_id'             => $users->id,
                 'system'             => false,
+            )
+        );
+
+
+        ApiScope::create(
+            array(
+                'name'               => OAuth2Protocol::OpenIdConnect_Scope,
+                'short_description'  => 'OpenId Connect Protocol',
+                'description'        => 'OpenId Connect Protocol',
+                'api_id'             => null,
+                'system'             => true,
+                'default'            => true,
+                'active'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => OAuth2Protocol::OfflineAccess_Scope,
+                'short_description'  => 'allow to emit refresh tokens (offline access without user presence)',
+                'description'        => 'allow to emit refresh tokens (offline access without user presence)',
+                'api_id'             => null,
+                'system'             => true,
+                'default'            => true,
+                'active'             => true,
             )
         );
 

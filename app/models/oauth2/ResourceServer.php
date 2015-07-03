@@ -3,27 +3,31 @@
 use oauth2\models\IResourceServer;
 use utils\model\BaseModelEloquent;
 
-class ResourceServer extends BaseModelEloquent implements IResourceServer {
+class ResourceServer extends BaseModelEloquent implements IResourceServer
+{
 
-    protected $fillable = array('host','ip','active','friendly_name');
+    protected $fillable = array('host', 'ip', 'active', 'friendly_name');
 
     protected $table = 'oauth2_resource_server';
 
 
-	public function getActiveAttribute(){
-		return (bool) $this->attributes['active'];
-	}
+    public function getActiveAttribute()
+    {
+        return (bool)$this->attributes['active'];
+    }
 
-	public function getIdAttribute(){
-		return (int) $this->attributes['id'];
-	}
+    public function getIdAttribute()
+    {
+        return (int)$this->attributes['id'];
+    }
 
     public function apis()
     {
-        return $this->hasMany('Api','resource_server_id');
+        return $this->hasMany('Api', 'resource_server_id');
     }
 
-    public function client(){
+    public function client()
+    {
         return $this->hasOne('Client');
     }
 

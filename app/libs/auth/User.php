@@ -71,15 +71,6 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
     }
 
     /**
-     * @return bool
-     */
-    public function hasAssociatedMember()
-    {
-        $this->getAssociatedMember();
-        return !is_null($this->member);
-    }
-
-    /**
      * Get the unique identifier for the user.
      * the one that is saved as session id on vendor/laravel/framework/src/Illuminate/Auth/Guard.php
      * @return mixed
@@ -175,7 +166,7 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 
     public function getId()
     {
-        return $this->id;
+        return (int)$this->id;
     }
 
     public function getShowProfileFullName()
@@ -264,7 +255,11 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
     {
         $this->getAssociatedMember();
 
-        return sprintf("%s, %s ", $this->member->Address, $this->member->Suburb);
+        $street_address = $this->member->Address;
+        $suburb = $this->member->Suburb;
+        if(!empty($suburb))
+            $street_address .= ', '.$suburb;
+        return $street_address;
     }
 
     public function getRegion()
@@ -306,5 +301,41 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
     public function getRememberTokenName()
     {
         return 'remember_token';
+    }
+
+    /**
+     * @return int
+     */
+    public function getExternalIdentifier()
+    {
+        return $this->getAuthIdentifier();
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormattedAddress()
+    {
+        $street   = $this->getStreetAddress();
+        $region   = $this->getRegion();
+        $city     = $this->getLocality();
+        $zip_code = $this->getPostalCode();
+        $country  = $this->getCountry();
+
+        $complete = $street;
+
+        if(!empty($city))
+            $complete .= ', '.$city;
+
+        if(!empty($region))
+            $complete .= ', '.$region;
+
+        if(!empty($zip_code))
+            $complete .= ', '.$zip_code;
+
+        if(!empty($country))
+            $complete .= ', '.$country;
+
+        return $complete;
     }
 }
