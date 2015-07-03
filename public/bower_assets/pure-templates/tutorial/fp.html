@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<script>
+		function jsonp(src){
+			var s = document.createElement("script");
+			s.charset = "UTF-8";
+			s.src = encodeURI(src);
+			document.body.appendChild(s);
+			return s;
+		};
+		function urlParam(name, w){
+			w = w || window;
+			var rx = new RegExp('[\&|\?]'+name+'=([^\&\#]+)');
+			var val = w.location.href.match(rx);
+			return !val ? '':val[1];
+		};
+	</script>
+</head>
+<body>
+	<script>
+		var fp = urlParam('fp'),
+			gist = urlParam('gist');
+		if(gist){
+			jsonp( 'http://gist.github.com/' + gist + '.js');
+		}else if(fp){
+			jsonp( 'http://friendpaste.com/' +  fp  + '.js' );
+		}else{
+			document.write('Not a valid gist (gist= ... )or friendpaste fp= ...');
+		}
+	</script>
+</body>
+</html>

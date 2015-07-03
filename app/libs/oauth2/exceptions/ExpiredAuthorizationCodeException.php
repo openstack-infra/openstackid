@@ -3,14 +3,20 @@
 namespace oauth2\exceptions;
 
 use Exception;
+use oauth2\OAuth2Protocol;
 
-class ExpiredAuthorizationCodeException extends Exception
+/**
+ * Class ExpiredAuthorizationCodeException
+ * @package oauth2\exceptions
+ */
+final class ExpiredAuthorizationCodeException extends OAuth2BaseException
 {
 
-    public function __construct($message = "")
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $message = "Expired Authorization Code : " . $message;
-        parent::__construct($message, 0, null);
+        return OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest;
     }
-
 }
