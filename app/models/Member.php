@@ -14,6 +14,9 @@ class Member extends BaseModelEloquent
     //external os members db (SS)
     protected $connection = 'os_members';
 
+    //no timestamps
+    public $timestamps     = false;
+
     public function checkPassword($password)
     {
         $digest = AuthHelper::encrypt_password($password, $this->Salt, $this->PasswordEncryption);
@@ -21,8 +24,22 @@ class Member extends BaseModelEloquent
         return $res;
     }
 
-    public function groups(){
+    public function groups()
+    {
 
         return $this->belongsToMany('Group', 'Group_Members', 'MemberID', 'GroupID');
+    }
+
+    /**
+     * @return bool
+     */
+    public function canLogin()
+    {
+        $attr = $this->getAttributes();
+        if(isset($attr['Active']))
+        {
+            return (bool)$attr['Active'];
+        }
+        return true;
     }
 }
