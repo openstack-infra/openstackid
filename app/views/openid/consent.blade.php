@@ -48,5 +48,5 @@ Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()
 </div>
 @stop
 @section('scripts')
-{{ HTML::script('js/openid/consent.js') }}
+{{ HTML::script('assets/js/openid/consent.js') }}
 @stop

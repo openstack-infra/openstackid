@@ -288,5 +288,5 @@
         success: '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "API")) }}'
     };
 </script>
-{{ HTML::script('js/oauth2/profile/admin/edit-api.js') }}
+{{ HTML::script('assets/js/oauth2/profile/admin/edit-api.js') }}
 @stop
