@@ -2,6 +2,7 @@
 
 namespace oauth2\services;
 
+use jwt\IBasicJWT;
 use oauth2\models\AuthorizationCode;
 use oauth2\models\AccessToken;
 use oauth2\models\RefreshToken;
@@ -25,9 +26,25 @@ interface ITokenService {
      * @param string $access_type
      * @param string $approval_prompt
      * @param bool $has_previous_user_consent
+     * @param string|null $state
+     * @param string|null $nonce
+     * @param string|null $response_type
      * @return AuthorizationCode
      */
-    public function createAuthorizationCode($user_id, $client_id, $scope, $audience='' , $redirect_uri = null,$access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,$approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto, $has_previous_user_consent=false);
+    public function createAuthorizationCode
+    (
+        $user_id,
+        $client_id,
+        $scope,
+        $audience        = '' ,
+        $redirect_uri    = null,
+        $access_type     = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
+        $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
+        $has_previous_user_consent = false,
+        $state = null,
+        $nonce = null,
+        $response_type = null
+    );
 
 
     /**
@@ -44,7 +61,7 @@ interface ITokenService {
      * @param null $redirect_uri
      * @return AccessToken
      */
-    public function createAccessToken(AuthorizationCode $auth_code,$redirect_uri=null);
+    public function createAccessToken(AuthorizationCode $auth_code, $redirect_uri=null);
 
 
     /**
@@ -75,6 +92,13 @@ interface ITokenService {
      * @throws \oauth2\exceptions\InvalidGrantTypeException
      */
     public function getAccessToken($value, $is_hashed = false);
+
+
+    /**
+     * @param AuthorizationCode $auth_code
+     * @return AccessToken|null
+     */
+    public function getAccessTokenByAuthCode(AuthorizationCode $auth_code);
 
     /**
      * Checks if current_ip has access rights on the given $access_token
@@ -155,5 +179,23 @@ interface ITokenService {
      * @return mixed
      */
     public function revokeRefreshToken($value, $is_hashed = false);
+
+
+    /**
+     * @param string $nonce
+     * @param string $client_id
+     * @param AccessToken|null $access_token
+     * @param AuthorizationCode $auth_code
+     * @param bool|false $must_auth_code_hash
+     * @return IBasicJWT
+     */
+    public function createIdToken
+    (
+        $nonce,
+        $client_id,
+        AccessToken $access_token    = null,
+        AuthorizationCode $auth_code = null,
+        $must_auth_code_hash         = false
+    );
 
 } 

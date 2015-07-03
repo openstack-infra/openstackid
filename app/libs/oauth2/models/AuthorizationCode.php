@@ -10,14 +10,29 @@ use oauth2\OAuth2Protocol;
  * http://tools.ietf.org/html/rfc6749#section-1.3.1
  * @package oauth2\models
  */
-class AuthorizationCode extends Token {
+class AuthorizationCode extends Token
+{
 
     private $redirect_uri;
     private $access_type;
     private $approval_prompt;
     private $has_previous_user_consent;
+    /**
+     * @var string
+     */
+    private $state;
+    /**
+     * @var string
+     */
+    private $nonce;
 
-    public function __construct(){
+    /**
+     * @var string
+     */
+    private $response_type;
+
+    public function __construct()
+    {
         parent::__construct(64);
     }
 
@@ -31,9 +46,25 @@ class AuthorizationCode extends Token {
      * @param string $approval_prompt
      * @param bool $has_previous_user_consent
      * @param int $lifetime
+     * @param string|null $state
+     * @param string|null $nonce
+     * @param string|null $response_type
      * @return AuthorizationCode
      */
-    public static function create($user_id, $client_id, $scope, $audience='' ,$redirect_uri = null,$access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,$approval_prompt =OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,$has_previous_user_consent=false, $lifetime = 600){
+    public static function create(
+        $user_id,
+        $client_id,
+        $scope,
+        $audience                  = '',
+        $redirect_uri              = null,
+        $access_type               = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
+        $approval_prompt           = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
+        $has_previous_user_consent = false,
+        $lifetime                  = 600,
+        $state                     = null,
+        $nonce                     = null,
+        $response_type             = null
+    ) {
         $instance = new self();
         $instance->scope        = $scope;
         $instance->user_id      = $user_id;
@@ -46,6 +77,9 @@ class AuthorizationCode extends Token {
         $instance->access_type  = $access_type;
         $instance->approval_prompt = $approval_prompt;
         $instance->has_previous_user_consent = $has_previous_user_consent;
+        $instance->state = $state;
+        $instance->nonce = $nonce;
+        $instance->response_type = $response_type;
         return $instance;
     }
 
@@ -62,10 +96,31 @@ class AuthorizationCode extends Token {
      * @param string $access_type
      * @param string $approval_prompt
      * @param bool $has_previous_user_consent
+     * @param string|null $state
+     * @param string|null $nonce
+     * @param string|null $response_type
      * @param bool $is_hashed
      * @return AuthorizationCode
      */
-    public static function load($value, $user_id, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600, $from_ip = '127.0.0.1',$access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,$approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,$has_previous_user_consent=false,$is_hashed = false){
+    public static function load
+    (
+        $value,
+        $user_id,
+        $client_id,
+        $scope,$audience = '',
+        $redirect_uri = null,
+        $issued = null,
+        $lifetime = 600,
+        $from_ip = '127.0.0.1',
+        $access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
+        $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
+        $has_previous_user_consent = false,
+        $state,
+        $nonce,
+        $response_type,
+        $is_hashed = false
+    )
+    {
         $instance = new self();
         $instance->value           = $value;
         $instance->user_id         = $user_id;
@@ -80,25 +135,66 @@ class AuthorizationCode extends Token {
         $instance->access_type     = $access_type;
         $instance->approval_prompt = $approval_prompt;
         $instance->has_previous_user_consent = $has_previous_user_consent;
+        $instance->state = $state;
+        $instance->nonce = $nonce;
+        $instance->response_type = $response_type;
         return $instance;
     }
 
-
-    public function getRedirectUri(){
+    /**
+     * @return string
+     */
+    public function getRedirectUri()
+    {
         return $this->redirect_uri;
     }
 
-
-    public function getAccessType(){
+    /**
+     * @return string
+     */
+    public function getAccessType()
+    {
         return $this->access_type;
     }
 
-    public function getApprovalPrompt(){
+    /**
+     * @return string
+     */
+    public function getApprovalPrompt()
+    {
         return $this->approval_prompt;
     }
 
-    public function getHasPreviousUserConsent(){
+    /**
+     * @return string
+     */
+    public function getHasPreviousUserConsent()
+    {
         return $this->has_previous_user_consent;
+    }
+
+    /**
+     * @return string
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNonce()
+    {
+        return $this->nonce;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResponseType()
+    {
+        return $this->response_type;
     }
 
     public function toJSON()

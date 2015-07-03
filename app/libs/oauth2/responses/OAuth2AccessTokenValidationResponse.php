@@ -3,6 +3,7 @@
 namespace oauth2\responses;
 
 use oauth2\OAuth2Protocol;
+use utils\http\HttpContentType;
 
 class OAuth2AccessTokenValidationResponse extends OAuth2DirectResponse {
 
@@ -21,7 +22,7 @@ class OAuth2AccessTokenValidationResponse extends OAuth2DirectResponse {
     {
         // Successful Responses: A server receiving a valid request MUST send a
         // response with an HTTP status code of 200.
-        parent::__construct(self::HttpOkResponse, self::DirectResponseContentType);
+        parent::__construct(self::HttpOkResponse, HttpContentType::Json);
         $this[OAuth2Protocol::OAuth2Protocol_AccessToken]           = $access_token;
         $this[OAuth2Protocol::OAuth2Protocol_ClientId]              = $client_id;
         $this[OAuth2Protocol::OAuth2Protocol_TokenType]             = 'Bearer';

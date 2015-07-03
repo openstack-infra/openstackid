@@ -10,7 +10,8 @@ use oauth2\OAuth2Protocol;
  * Base Token Request
  * @package oauth2\requests
  */
-class OAuth2TokenRequest extends OAuth2Request {
+class OAuth2TokenRequest extends OAuth2Request
+{
 
     public function __construct(OAuth2Message $msg)
     {
@@ -27,8 +28,8 @@ class OAuth2TokenRequest extends OAuth2Request {
         return true;
     }
 
-    public function getGrantType(){
-
+    public function getGrantType()
+    {
         return $this->getParam(OAuth2Protocol::OAuth2Protocol_GrantType);
     }
 } 

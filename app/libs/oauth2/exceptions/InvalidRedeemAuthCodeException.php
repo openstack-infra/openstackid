@@ -2,11 +2,19 @@
 
 namespace oauth2\exceptions;
 
-class InvalidRedeemAuthCodeException extends OAuth2ClientBaseException{
+use oauth2\OAuth2Protocol;
 
-    public function __construct($client_id, $message = "")
+/**
+ * Class InvalidRedeemAuthCodeException
+ * @package oauth2\exceptions
+ */
+final class InvalidRedeemAuthCodeException extends OAuth2BaseException
+{
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $message = "Invalid Redeem AuthCode Exception: " . $message;
-        parent::__construct($client_id,$message);
+        return OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient;
     }
-} 
+}
