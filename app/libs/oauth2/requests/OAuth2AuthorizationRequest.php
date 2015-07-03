@@ -2,15 +2,16 @@
 
 namespace oauth2\requests;
 
-use oauth2\OAuth2Protocol;
 use oauth2\OAuth2Message;
+use oauth2\OAuth2Protocol;
 
 /**
  * Class OAuth2AuthorizationRequest
  * http://tools.ietf.org/html/rfc6749#section-4.1.1
  * @package oauth2\requests
  */
-class OAuth2AuthorizationRequest extends OAuth2Request {
+class OAuth2AuthorizationRequest extends OAuth2Request
+{
 
     public function __construct(OAuth2Message $msg)
     {
@@ -18,19 +19,20 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
     }
 
     public static $params = array(
-        OAuth2Protocol::OAuth2Protocol_ResponseType     => OAuth2Protocol::OAuth2Protocol_ResponseType,
-        OAuth2Protocol::OAuth2Protocol_ClientId         => OAuth2Protocol::OAuth2Protocol_ClientId,
-        OAuth2Protocol::OAuth2Protocol_RedirectUri      => OAuth2Protocol::OAuth2Protocol_RedirectUri,
-        OAuth2Protocol::OAuth2Protocol_Scope            => OAuth2Protocol::OAuth2Protocol_Scope,
-        OAuth2Protocol::OAuth2Protocol_State            => OAuth2Protocol::OAuth2Protocol_State,
-	    OAuth2Protocol::OAuth2Protocol_Approval_Prompt  => OAuth2Protocol::OAuth2Protocol_Approval_Prompt,
-	    OAuth2Protocol::OAuth2Protocol_AccessType       => OAuth2Protocol::OAuth2Protocol_AccessType,
+        OAuth2Protocol::OAuth2Protocol_ResponseType => OAuth2Protocol::OAuth2Protocol_ResponseType,
+        OAuth2Protocol::OAuth2Protocol_ClientId => OAuth2Protocol::OAuth2Protocol_ClientId,
+        OAuth2Protocol::OAuth2Protocol_RedirectUri => OAuth2Protocol::OAuth2Protocol_RedirectUri,
+        OAuth2Protocol::OAuth2Protocol_Scope => OAuth2Protocol::OAuth2Protocol_Scope,
+        OAuth2Protocol::OAuth2Protocol_State => OAuth2Protocol::OAuth2Protocol_State,
+        OAuth2Protocol::OAuth2Protocol_Approval_Prompt => OAuth2Protocol::OAuth2Protocol_Approval_Prompt,
+        OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType,
     );
 
     /**
      * @return null|string
      */
-    public function getResponseType(){
+    public function getResponseType()
+    {
         return $this->getParam(OAuth2Protocol::OAuth2Protocol_ResponseType);
     }
 
@@ -39,7 +41,8 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
      * The value passed in this parameter must exactly match the value shown in the Admin Console.
      * @return null|string
      */
-    public function getClientId(){
+    public function getClientId()
+    {
         return $this->getParam(OAuth2Protocol::OAuth2Protocol_ClientId);
     }
 
@@ -47,7 +50,8 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
      * One of the redirect_uri values registered
      * @return null|string
      */
-    public function getRedirectUri(){
+    public function getRedirectUri()
+    {
         return $this->getParam(OAuth2Protocol::OAuth2Protocol_RedirectUri);
     }
 
@@ -55,7 +59,8 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
      * Space-delimited set of permissions that the application requests.
      * @return null|string
      */
-    public function getScope(){
+    public function getScope()
+    {
         return $this->getParam(OAuth2Protocol::OAuth2Protocol_Scope);
     }
 
@@ -66,7 +71,8 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
      * cross-site-request-forgery mitigations.
      * @return null|string
      */
-    public function getState(){
+    public function getState()
+    {
         return $this->getParam(OAuth2Protocol::OAuth2Protocol_State);
     }
 
@@ -77,10 +83,13 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
      * previously gave consent to your application for a given set of scopes.
      * @return null|string
      */
-    public function getApprovalPrompt(){
+    public function getApprovalPrompt()
+    {
         $approval = $this->getParam(OAuth2Protocol::OAuth2Protocol_Approval_Prompt);
-        if(is_null($approval))
+        if (is_null($approval)) {
             $approval = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto;
+        }
+
         return $approval;
     }
 
@@ -91,10 +100,13 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
      * token the first time your application exchanges an authorization code for a user.
      * @return null|string
      */
-    public function getAccessType(){
+    public function getAccessType()
+    {
         $access_type = $this->getParam(OAuth2Protocol::OAuth2Protocol_AccessType);
-        if(is_null($access_type))
+        if (is_null($access_type)) {
             $access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online;
+        }
+
         return $access_type;
     }
 
@@ -104,19 +116,31 @@ class OAuth2AuthorizationRequest extends OAuth2Request {
      */
     public function isValid()
     {
-        if(is_null($this->getResponseType()))
-            return false;
-
-        if(is_null($this->getClientId()))
-            return false;
-
-        if(is_null($this->getRedirectUri()))
-            return false;
-        //approval_prompt
-        $valid_approvals = array(OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Force);
-        if(!in_array($this->getApprovalPrompt(),$valid_approvals)){
+        if (is_null($this->getResponseType())) {
             return false;
         }
+
+        if(!in_array($this->getResponseType(), OAuth2Protocol::$valid_response_types))
+            return false;
+
+        if (is_null($this->getClientId())) {
+            return false;
+        }
+
+        if (is_null($this->getRedirectUri())) {
+            return false;
+        }
+
+        //approval_prompt
+        $valid_approvals = array(
+            OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
+            OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Force
+        );
+
+        if (!in_array($this->getApprovalPrompt(), $valid_approvals)) {
+            return false;
+        }
+
         return true;
     }
 }

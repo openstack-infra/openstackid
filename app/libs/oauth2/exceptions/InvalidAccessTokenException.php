@@ -2,15 +2,19 @@
 
 namespace oauth2\exceptions;
 
-use Exception;
+use oauth2\OAuth2Protocol;
 
-class InvalidAccessTokenException extends Exception
+/**
+ * Class InvalidAccessTokenException
+ * @package oauth2\exceptions
+ */
+final class InvalidAccessTokenException extends OAuth2BaseException
 {
-
-    public function __construct($message = "")
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $message = "Invalid Access Token : " . $message;
-        parent::__construct($message, 0, null);
+        return OAuth2Protocol::OAuth2Protocol_Error_InvalidGrant;
     }
-
 }
