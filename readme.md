@@ -4,7 +4,7 @@
 
     * LAMP/LEMP environment
     * Redis
-    * PHP >= 5.4.0
+    * PHP >= 5.3.7
     * composer (https://getcomposer.org/)
 
 ## Install
@@ -17,7 +17,10 @@ run following commands on root folder
    * php artisan db:seed --env=YOUR_ENVIRONMENT
    * phpunit --bootstrap vendor/autoload.php
    * give proper rights to app/storage folder (775 and proper users)
+   * vendor/bin/behat --config /home/smarcet/git/openstackid/behat.yml
+
 
 ## Permissions
    
-Laravel may require some permissions to be configured: folders within storage and vendor require write access by the web server.   
+Laravel may require some permissions to be configured: folders within storage and vendor require write access by the
+web server. 

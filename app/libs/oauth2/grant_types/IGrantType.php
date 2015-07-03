@@ -9,7 +9,8 @@ use oauth2\requests\OAuth2Request;
  * Defines a common interface for new OAuth2 Grant Types
  * @package oauth2\grant_types
  */
-interface IGrantType {
+interface IGrantType
+{
 
     /** Given an OAuth2Request, returns true if it can handle it, false otherwise
      * @param OAuth2Request $request
@@ -35,8 +36,9 @@ interface IGrantType {
      */
     public function getType();
 
-    /** get grant type response type
-     * @return mixed
+    /**
+     * get grant type response type
+     * @return array
      */
     public function getResponseType();
 

@@ -10,11 +10,14 @@ use openid\OpenIdMessage;
  */
 abstract class OpenIdRequest
 {
-
+    /**
+     * @var OpenIdMessage
+     */
     protected $message;
+
     public function __construct(OpenIdMessage $message)
     {
-        $this->message     = $message;
+        $this->message = $message;
     }
 
     public function getMessage()
