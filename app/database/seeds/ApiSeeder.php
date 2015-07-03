@@ -22,7 +22,7 @@ class ApiSeeder extends Seeder {
                 'active'          =>  true,
                 'Description'     => 'User Info',
                 'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
+                'logo'               => asset('/assets/img/apis/server.png')
             )
         );
     }

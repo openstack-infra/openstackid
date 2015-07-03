@@ -1,0 +1,5 @@
+.DS_Store
+commit.sh
+js/*.html
+bugs/*
+compiler.jar

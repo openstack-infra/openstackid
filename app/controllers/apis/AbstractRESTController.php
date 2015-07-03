@@ -2,23 +2,30 @@
 
 use utils\services\ILogService;
 
-abstract class AbstractRESTController extends JsonController {
+/**
+ * Class AbstractRESTController
+ */
+abstract class AbstractRESTController extends JsonController
+{
+
 
     protected $allowed_filter_fields;
     protected $allowed_projection_fields;
 
-    private $filter_delimiter;
-    private $field_delimiter;
+    protected $filter_delimiter;
+    protected $field_delimiter;
 
 
 
-    public function __construct(ILogService $log_service){
+    public function __construct(ILogService $log_service)
+    {
         parent::__construct($log_service);
         $this->filter_delimiter = '+';
         $this->field_delimiter  = ',';
     }
 
-    protected function getProjection($fields){
+    protected function getProjection($fields)
+    {
         if(!is_string($fields)) return array('*');
         if(empty($fields)) return array('*');
         $fields_args = explode($this->field_delimiter,$fields);
@@ -33,7 +40,8 @@ abstract class AbstractRESTController extends JsonController {
         return $res;
     }
 
-    protected function getFilters($filters){
+    protected function getFilters($filters)
+    {
         if(!is_array($filters)) return array();
         $res = array();
         foreach($filters as $fieldname=>$value){
