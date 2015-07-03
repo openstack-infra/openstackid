@@ -98,5 +98,5 @@
 		add : '{{URL::action("ApiResourceServerController@create",null)}}'
 	};
 </script>
-{{ HTML::script('js/oauth2/profile/admin/resource-servers.js') }}
+{{ HTML::script('assets/js/oauth2/profile/admin/resource-servers.js') }}
 @stop

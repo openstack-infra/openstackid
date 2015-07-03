@@ -106,10 +106,15 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
     //client api
     Route::group(array('prefix' => 'clients'), function(){
 
+        // public keys
+        Route::post('/{id}/public_keys',array('before' => 'user.owns.client.policy', 'uses' => 'ClientPublicKeyApiController@create'));
+        Route::get('/{id}/public_keys',array('before' => 'user.owns.client.policy', 'uses' => 'ClientPublicKeyApiController@getByPage'));
+
         Route::post('/', array('before' => 'is.current.user', 'uses' => 'ClientApiController@create'));
+        Route::put('/', array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@update'));
+        Route::get('/{id}',"ClientApiController@get");
         Route::get('/',array('before' => 'is.current.user', 'uses' => 'ClientApiController@getByPage'));
         Route::delete('/{id}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@delete'));
-
         //allowed redirect uris endpoints
         Route::get('/{id}/uris',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@getRegisteredUris'));
         Route::post('/{id}/uris',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@addAllowedRedirectUri'));

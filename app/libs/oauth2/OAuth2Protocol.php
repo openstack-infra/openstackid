@@ -3,6 +3,7 @@
 namespace oauth2;
 
 //endpoints
+use jwa\JSONWebSignatureAndEncryptionAlgorithms;
 use oauth2\endpoints\AuthorizationEndpoint;
 use oauth2\endpoints\TokenEndpoint;
 use oauth2\endpoints\TokenIntrospectionEndpoint;
@@ -39,6 +40,7 @@ use oauth2\grant_types\ImplicitGrantType;
 use oauth2\grant_types\RefreshBearerTokenGrantType;
 use oauth2\grant_types\ClientCredentialsGrantType;
 
+use oauth2\models\IClient;
 use oauth2\requests\OAuth2Request;
 
 use oauth2\responses\OAuth2DirectErrorResponse;
@@ -52,6 +54,7 @@ use oauth2\services\ITokenService;
 use oauth2\strategies\IOAuth2AuthenticationStrategy;
 use oauth2\strategies\OAuth2IndirectErrorResponseFactoryMethod;
 use oauth2\services\IUserConsentService;
+use utils\ArrayUtils;
 use utils\services\IAuthService;
 use utils\services\ICheckPointService;
 use utils\services\ILogService;
@@ -136,6 +139,67 @@ class OAuth2Protocol implements IOAuth2Protocol
         self::OAuth2Protocol_RedirectUri => self::OAuth2Protocol_RedirectUri,
         self::OAuth2Protocol_Scope => self::OAuth2Protocol_Scope,
         self::OAuth2Protocol_State => self::OAuth2Protocol_State
+    );
+
+    // http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+
+    const TokenEndpoint_AuthMethod_ClientSecretBasic = 'client_secret_basic';
+    const TokenEndpoint_AuthMethod_ClientSecretPost  = 'client_secret_post';
+    const TokenEndpoint_AuthMethod_ClientSecretJwt   = 'client_secret_jwt';
+    const TokenEndpoint_AuthMethod_PrivateKeyJwt     = 'private_key_jwt';
+    const TokenEndpoint_AuthMethod_None              = 'none';
+
+    public static $token_endpoint_auth_methods = array(
+        self::TokenEndpoint_AuthMethod_ClientSecretBasic,
+        self::TokenEndpoint_AuthMethod_ClientSecretPost,
+        self::TokenEndpoint_AuthMethod_ClientSecretJwt,
+        self::TokenEndpoint_AuthMethod_PrivateKeyJwt,
+    );
+
+
+    public static $supported_signing_algorithms = array(
+        // MAC SHA2
+        JSONWebSignatureAndEncryptionAlgorithms::HS256,
+        JSONWebSignatureAndEncryptionAlgorithms::HS384,
+        JSONWebSignatureAndEncryptionAlgorithms::HS512,
+        // RSA
+        JSONWebSignatureAndEncryptionAlgorithms::RS256,
+        JSONWebSignatureAndEncryptionAlgorithms::RS384,
+        JSONWebSignatureAndEncryptionAlgorithms::RS512,
+        JSONWebSignatureAndEncryptionAlgorithms::PS256,
+        JSONWebSignatureAndEncryptionAlgorithms::PS384,
+        JSONWebSignatureAndEncryptionAlgorithms::PS512,
+        JSONWebSignatureAndEncryptionAlgorithms::None
+    );
+
+    public static $supported_signing_algorithms_hmac_sha2 = array(
+        JSONWebSignatureAndEncryptionAlgorithms::HS256,
+        JSONWebSignatureAndEncryptionAlgorithms::HS384,
+        JSONWebSignatureAndEncryptionAlgorithms::HS512,
+    );
+
+    public static $supported_signing_algorithms_rsa = array(
+        JSONWebSignatureAndEncryptionAlgorithms::RS256,
+        JSONWebSignatureAndEncryptionAlgorithms::RS384,
+        JSONWebSignatureAndEncryptionAlgorithms::RS512,
+        JSONWebSignatureAndEncryptionAlgorithms::PS256,
+        JSONWebSignatureAndEncryptionAlgorithms::PS384,
+        JSONWebSignatureAndEncryptionAlgorithms::PS512,
+    );
+
+
+    public static $supported_key_management_algorithms = array(
+        JSONWebSignatureAndEncryptionAlgorithms::RSA1_5,
+        JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP,
+        JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP_256,
+        JSONWebSignatureAndEncryptionAlgorithms::None,
+    );
+
+    public static $supported_content_encryption_algorithms = array(
+        JSONWebSignatureAndEncryptionAlgorithms::A128CBC_HS256,
+        JSONWebSignatureAndEncryptionAlgorithms::A192CBC_HS384,
+        JSONWebSignatureAndEncryptionAlgorithms::A256CBC_HS512,
+        JSONWebSignatureAndEncryptionAlgorithms::None,
     );
 
 
@@ -504,5 +568,15 @@ class OAuth2Protocol implements IOAuth2Protocol
     public function getAvailableGrants()
     {
         return $this->grant_types;
+    }
+
+    /**
+     * @param IClient $client
+     */
+    static public function getSigningAlgorithmsPerClientType(IClient $client){
+        if($client->getClientType() == IClient::ClientType_Public){
+            return ArrayUtils::convert2Assoc(array_merge(self::$supported_signing_algorithms_rsa, array(JSONWebSignatureAndEncryptionAlgorithms::None)));
+        }
+        return ArrayUtils::convert2Assoc(array_merge(self::$supported_signing_algorithms_hmac_sha2, self::$supported_signing_algorithms_rsa, array(JSONWebSignatureAndEncryptionAlgorithms::None)));
     }
 }

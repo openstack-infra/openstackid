@@ -27,6 +27,7 @@ class OAuth2ServiceProvider extends ServiceProvider
         App::singleton('oauth2\\IResourceServerContext', 'services\\oauth2\\ResourceServerContext');
         App::singleton(OAuth2ServiceCatalog::MementoService, 'services\\oauth2\\MementoOAuth2AuthenticationRequestService');
         App::singleton(OAuth2ServiceCatalog::ClientService, 'services\\oauth2\\ClientService');
+        App::singleton(OAuth2ServiceCatalog::ClienPublicKeyService, 'services\\oauth2\\ClienPublicKeyService');
         App::singleton(OAuth2ServiceCatalog::ScopeService, 'services\\oauth2\\ApiScopeService');
         App::singleton(OAuth2ServiceCatalog::ResourceServerService, 'services\\oauth2\\ResourceServerService');
         App::singleton(OAuth2ServiceCatalog::ApiService, 'services\\oauth2\\ApiService');

@@ -38,12 +38,11 @@
 </div>
 
 @section('scripts')
-@parent
-<script type="application/javascript">
-	var clientOriginsUrls = {
-		get :  '{{URL::action("ClientApiController@geAllowedOrigins",array("id"=>$client->id))}}',
-		delete: '{{ URL::action("ClientApiController@deleteClientAllowedOrigin", array("id"=>$client->id,"uri_id"=>"@id")) }}'
-	};
-</script>
-{{ HTML::script('js/oauth2/profile/edit-client-allowed-origins.js') }}
-@stop
+    <script type="application/javascript">
+        var clientOriginsUrls = {
+            get :  '{{URL::action("ClientApiController@geAllowedOrigins",array("id"=>$client->id))}}',
+            delete: '{{ URL::action("ClientApiController@deleteClientAllowedOrigin", array("id"=>$client->id,"uri_id"=>"@id")) }}'
+        };
+    </script>
+    {{ HTML::script('assets/js/oauth2/profile/edit-client-allowed-origins.js') }}
+@append
