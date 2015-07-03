@@ -4,9 +4,17 @@ namespace oauth2\responses;
 
 use oauth2\OAuth2Protocol;
 
-class OAuth2AccessTokenFragmentResponse extends OAuth2IndirectFragmentResponse {
+class OAuth2AccessTokenFragmentResponse extends OAuth2IndirectFragmentResponse
+{
 
-    public function __construct($return_to, $access_token, $expires_in, $scope=null, $state=null)
+    /**
+     * @param $return_to
+     * @param $access_token
+     * @param $expires_in
+     * @param null $scope
+     * @param null $state
+     */
+    public function __construct($return_to, $access_token, $expires_in, $scope = null, $state = null)
     {
 
         parent::__construct();

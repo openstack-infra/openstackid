@@ -51,7 +51,7 @@
 <div class="row-fluid">
     <div class="span12">
         <div class="row-fluid">
-            <h4 style="float:left"><i class="icon-info-sign accordion-toggle" title=""></i>&nbsp;Available Scopes</h4>
+            <h4 style="float:left"><span aria-hidden="true" class="glyphicon glyphicon-info-sign pointable" title=""></span>&nbsp;Available Scopes</h4>
             <div style="position: relative;float:left;">
                 <div style="position:absolute;top:13px;margin-left:5px"><i class="icon-refresh accordion-toggle refresh-scopes" title="Update Scopes List"></i></div>
             </div>
@@ -159,7 +159,7 @@
 <div class="row-fluid">
     <div class="span12">
         <div class="row-fluid">
-            <h4 style="float:left"><i class="icon-info-sign accordion-toggle" title=""></i>&nbsp;Available Endpoints</h4>
+            <h4 style="float:left"><span aria-hidden="true" class="glyphicon glyphicon-info-sign pointable" title=""></span>&nbsp;Available Endpoints</h4>
             <div style="position: relative;float:left;">
                 <div style="position:absolute;top:13px;margin-left:5px"><i class="icon-refresh accordion-toggle refresh-endpoints" title="Update Endpoints List"></i></div>
             </div>
@@ -288,5 +288,5 @@
         success: '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "API")) }}'
     };
 </script>
-{{ HTML::script('js/oauth2/profile/admin/edit-api.js') }}
+{{ HTML::script('assets/js/oauth2/profile/admin/edit-api.js') }}
 @stop

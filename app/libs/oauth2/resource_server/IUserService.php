@@ -6,7 +6,8 @@ namespace oauth2\resource_server;
  * Interface IUserService
  * @package oauth2\resource_server
  */
-interface IUserService {
+interface IUserService
+{
     /**
      * This scope value requests access to the End-User's default profile Claims, which are:
      * name, family_name, given_name, middle_name, nickname, preferred_username, profile, picture,

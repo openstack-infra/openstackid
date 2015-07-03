@@ -10,14 +10,24 @@ use oauth2\OAuth2Protocol;
  * http://tools.ietf.org/html/rfc6749#section-1.3.1
  * @package oauth2\models
  */
-class AuthorizationCode extends Token {
+class AuthorizationCode extends Token
+{
 
     private $redirect_uri;
     private $access_type;
     private $approval_prompt;
     private $has_previous_user_consent;
+    /**
+     * @var string
+     */
+    private $state;
+    /**
+     * @var string
+     */
+    private $nonce;
 
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct(64);
     }
 
@@ -31,9 +41,23 @@ class AuthorizationCode extends Token {
      * @param string $approval_prompt
      * @param bool $has_previous_user_consent
      * @param int $lifetime
+     * @param string|null $state
+     * @param string|null $nonce
      * @return AuthorizationCode
      */
-    public static function create($user_id, $client_id, $scope, $audience='' ,$redirect_uri = null,$access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,$approval_prompt =OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,$has_previous_user_consent=false, $lifetime = 600){
+    public static function create(
+        $user_id,
+        $client_id,
+        $scope,
+        $audience                  = '',
+        $redirect_uri              = null,
+        $access_type               = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
+        $approval_prompt           = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
+        $has_previous_user_consent = false,
+        $lifetime                  = 600,
+        $state                     = null,
+        $nonce                     = null
+    ) {
         $instance = new self();
         $instance->scope        = $scope;
         $instance->user_id      = $user_id;
@@ -46,6 +70,8 @@ class AuthorizationCode extends Token {
         $instance->access_type  = $access_type;
         $instance->approval_prompt = $approval_prompt;
         $instance->has_previous_user_consent = $has_previous_user_consent;
+        $instance->state = $state;
+        $instance->nonce = $nonce;
         return $instance;
     }
 
@@ -62,10 +88,29 @@ class AuthorizationCode extends Token {
      * @param string $access_type
      * @param string $approval_prompt
      * @param bool $has_previous_user_consent
+     * @param string|null $state
+     * @param string|null $nonce
      * @param bool $is_hashed
      * @return AuthorizationCode
      */
-    public static function load($value, $user_id, $client_id, $scope,$audience='', $redirect_uri = null, $issued = null, $lifetime = 600, $from_ip = '127.0.0.1',$access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,$approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,$has_previous_user_consent=false,$is_hashed = false){
+    public static function load
+    (
+        $value,
+        $user_id,
+        $client_id,
+        $scope,$audience = '',
+        $redirect_uri = null,
+        $issued = null,
+        $lifetime = 600,
+        $from_ip = '127.0.0.1',
+        $access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
+        $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
+        $has_previous_user_consent = false,
+        $state,
+        $nonce,
+        $is_hashed = false
+    )
+    {
         $instance = new self();
         $instance->value           = $value;
         $instance->user_id         = $user_id;
@@ -80,25 +125,39 @@ class AuthorizationCode extends Token {
         $instance->access_type     = $access_type;
         $instance->approval_prompt = $approval_prompt;
         $instance->has_previous_user_consent = $has_previous_user_consent;
+        $instance->state = $state;
+        $instance->nonce = $nonce;
         return $instance;
     }
 
-
-    public function getRedirectUri(){
+    public function getRedirectUri()
+    {
         return $this->redirect_uri;
     }
 
-
-    public function getAccessType(){
+    public function getAccessType()
+    {
         return $this->access_type;
     }
 
-    public function getApprovalPrompt(){
+    public function getApprovalPrompt()
+    {
         return $this->approval_prompt;
     }
 
-    public function getHasPreviousUserConsent(){
+    public function getHasPreviousUserConsent()
+    {
         return $this->has_previous_user_consent;
+    }
+
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    public function getNonce()
+    {
+        return $this->nonce;
     }
 
     public function toJSON()

@@ -51,7 +51,7 @@ class Api extends BaseModelEloquent implements IApi {
 
     public function getLogo()
     {
-        $url     = asset('img/apis/server.png');
+        $url     = asset('/assets/img/apis/server.png');
         return !empty($this->logo)?$this->logo:$url;
     }
 
