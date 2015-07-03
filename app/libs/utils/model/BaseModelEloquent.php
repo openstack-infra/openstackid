@@ -40,7 +40,7 @@ abstract class BaseModelEloquent extends Eloquent {
         $builder = parent::newQuery($excludeDeleted);
         // If I am using STI, and I am not the base class,
         // then filter on the class name.
-        if ($this->useSti() && get_class(new $this->stiBaseClass) !== get_class($this)) {
+        if ($this->useSti() && $this->stiBaseClass !== get_class($this)) {
             $builder->where($this->stiClassField, "=", $this->class->getShortName());
         }
         return $builder;
@@ -48,7 +48,7 @@ abstract class BaseModelEloquent extends Eloquent {
 
     public function newFromBuilder($attributes = array())
     {
-        if ($this->useSti() && $attributes->{$this->stiClassField}) {
+        if ($this->useSti() && property_exists($attributes, $this->stiClassField) ) {
             $class = $this->class->getName();
             $instance = new $class;
             $instance->exists = true;
