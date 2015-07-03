@@ -17,8 +17,7 @@ class OpenIdProvider extends ServiceProvider {
     public function register()
     {
         //register on boot bc we rely on Illuminate\Redis\ServiceProvider\RedisServiceProvider
-        App::singleton(OpenIdServiceCatalog::MementoService, 'services\\openid\\MementoRequestService');
-        App::singleton(OpenIdServiceCatalog::AuthenticationStrategy, 'services\\openid\\AuthenticationStrategy');
+        App::singleton(OpenIdServiceCatalog::MementoSerializerService, 'services\\openid\\OpenIdMementoSessionSerializerService');
         App::singleton(OpenIdServiceCatalog::ServerExtensionsService, 'services\\openid\\ServerExtensionsService');
         App::singleton(OpenIdServiceCatalog::AssociationService, 'services\\openid\\AssociationService');
         App::singleton(OpenIdServiceCatalog::TrustedSitesService, 'services\\openid\\TrustedSitesService');
