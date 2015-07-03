@@ -8,16 +8,19 @@ use App;
  * Class ServiceLocator
  * @package utils\services
  */
-final class ServiceLocator {
+final class ServiceLocator
+{
 
     private static $instance = null;
 
-    private function __construct(){
+    private function __construct()
+    {
     }
 
     public static function getInstance()
     {
-        if (self::$instance == null) {
+        if (self::$instance == null)
+        {
             self::$instance = new ServiceLocator();
         }
 

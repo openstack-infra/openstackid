@@ -40,13 +40,13 @@ Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()
         Deny Forever
         </label>
     </div>
-    {{ Form::submit('Ok',array("id"=>"send_authorization",'class'=>'btn')) }}
-    {{ Form::button('Cancel',array('id'=>'cancel_authorization','class'=>'btn cancel_authorization')) }}
+    {{ Form::submit('Ok',array("id" => "send_authorization", 'class' => 'btn btn-default btn-lg active')) }}
+    {{ Form::button('Cancel',array('id' => 'cancel_authorization', 'class' => 'btn active btn-lg btn-danger cancel_authorization')) }}
     </fieldset>
     {{ Form::close() }}
 
 </div>
 @stop
 @section('scripts')
-{{ HTML::script('js/openid/consent.js') }}
+{{ HTML::script('assets/js/openid/consent.js') }}
 @stop
