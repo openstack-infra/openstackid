@@ -3,16 +3,191 @@
 use oauth2\models\IClient;
 use auth\User;
 use utils\services\IAuthService;
+use \jwk\JSONWebKeyPublicKeyUseValues;
+use \jwk\JSONWebKeyTypes;
+use \oauth2\OAuth2Protocol;
+use \jwa\JSONWebSignatureAndEncryptionAlgorithms;
 /**
  * Class OAuth2ApplicationSeeder
  * This seeder is only for testing purposes
  */
 class TestSeeder extends Seeder {
 
+static $client_private_key_1 = <<<PPK
+-----BEGIN RSA PRIVATE KEY-----
+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
+-----END RSA PRIVATE KEY-----
+PPK;
+
+    static $client_public_key_1 = <<<PPK
+-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAkjiUI6n3Fq140AipaLxN
+IPCzEItQFcY8G5Xd17u7InM3H542+34PdBpwR66miQUgJK+rtfaot/v4QPj4/0Bn
+Yc78BhI0Mp3tVEH95jjIrhDMZoRFfSQsAhiom5NTP1B5XiiyRjzkO1+7a29JST5t
+IQUIS2U345DMWyf3GNlC1cBAfgI+PrRo3gLby/iW5EF/Mqq0ZUIOuggZ7r8kU2aU
+hXILFx2w9V/y90DwruJdzZ0TesbsFit2nM3Axie7HX2wIpbl2hyvvhX/AxZ0NPud
+Vh58wNogsKOMUN6guU+RzL5L6vF+QjfzBCtOE+CRmUD60E0LdQHzElBcF0tbc2cj
+2YelZ0Dp+4NEBDjCNsSv//5hHacUxxXQdwwotLUV85iErEZgcGyMNnTMsw7JIh39
+UBgOEmQgfpfOUlH+/5WmRO+kskvPCACz1SR8gzAKz9Nu9r3UyE+gWaZzM2+CpQ1s
+zEd94MIapHxJw9vHogL7sNkjmZ34Y9eQmoCVevqDVpYEdTtLsg9H49+pEndQHI6l
+GAB7QlsPLN8A17L2l3p68BFcYkSZR4GuXAyQguq3KzWYDZ9PjWAV5lhVg6K3GaV7
+fvn2pKCk4P5Y5hZt08fholt3k/5Gc82CP6rfgQFi7HnpBJKRauoIdsvUPvXZYTLl
+TaE5jLBAwxm+wF6Ue/nRPJMCAwEAAQ==
+-----END PUBLIC KEY-----
+PPK;
+
+
+    static $client_private_key_2 = <<<PPK
+-----BEGIN RSA PRIVATE KEY-----
+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
+-----END RSA PRIVATE KEY-----
+PPK;
+
+    static $client_public_key_2 = <<<PPK
+-----BEGIN PUBLIC KEY-----
+MIICITANBgkqhkiG9w0BAQEFAAOCAg4AMIICCQKCAgBHhlSRoBMo9uYJyHPr0g54
+EzzKrpjNBUDqnTztggsIfXR3A73TolGmeXTECu+QIAyEtGGDylp4cJhyworIwzdA
+fMCY9Xux5B+Vo0Kyte2JMvwzanNLhiT21rVw56ZfyxkCJKUxz3wba0kIWQyW+kvw
+LhvbQzmexHnQs15qsfP4o2MEFVTCH2ohQ57OJ8BOSU8XfddCWommmFAQcQwGXYh9
+woky4NOpGBqbnGBXgWF2rnbD0GYL1Sd3OSrgTHG3WrG95UizOcV9uijI8vWxczVl
+P7sriaY7Xetcbh+Z5AbAf9TMOuccRFaM/KlovR7sOcQDO1NzqlL/PRzCfzcNId22
+Q6uV3QE2hzRKfd+lKI1YmFrVJ0SnWlSdeX7kkWn/+eQ4WfkK9hmv4/0bzQYo1XCo
+pEpjefZoWiErCAt4nEt2wr6f6BmSjTGVajGlhn7q8wwBBHfjAUfCgIAk8uGNGWke
+gvytTYywLnyNEF8tHcdg+We+W6itqJ5bQNFHa9uxX+haURoTOcGqxN8n2LPcLoLU
+7xqZY23wpeXO7anzqheGSQUHb56rWqcCRQ9jF/1RLCyyVd9eOEZF6Ke53qpLQxib
+hqnZfba0zOKqhbxod6RSOswSF3wwHoIj+6SRNKgui4DDcMMc+bsndr/KUDxaYpiu
+In2KVE6kd5a0t8BHgdu/yQIDAQAB
+-----END PUBLIC KEY-----
+PPK;
+
+
     public function run()
     {
 
         Eloquent::unguard();
+
+        $member_table = <<<SQL
+      CREATE TABLE Member
+      (
+          ID integer primary key,
+          FirstName varchar(50),
+          Surname varchar(50),
+          Email varchar(254),
+          Password varchar(254),
+          PasswordEncryption varchar(50),
+          Salt varchar(50)
+      );
+SQL;
+
+        DB::connection('os_members')->statement($member_table);
+
+        Member::create(
+            array(
+                'ID'   => 1,
+                'FirstName' => 'Sebastian',
+                'Surname' => 'Marcet',
+                'Email' => 'sebastian@tipit.net',
+                'Password' => '1qaz2wsx',
+                'PasswordEncryption' => 'none',
+                'Salt' => 'none',
+            )
+        );
 
         DB::table('banned_ips')->delete();
         DB::table('user_exceptions_trail')->delete();
@@ -23,10 +198,12 @@ class TestSeeder extends Seeder {
         DB::table('oauth2_client_authorized_uri')->delete();
         DB::table('oauth2_access_token')->delete();
         DB::table('oauth2_refresh_token')->delete();
+        DB::table('oauth2_assymetric_keys')->delete();
         DB::table('oauth2_client')->delete();
 
         DB::table('openid_trusted_sites')->delete();
         DB::table('openid_associations')->delete();
+        DB::table('user_actions')->delete();
         DB::table('openid_users')->delete();
 
         DB::table('oauth2_api_endpoint_api_scope')->delete();
@@ -53,6 +230,31 @@ class TestSeeder extends Seeder {
 
         $this->seedApis();
         //scopes
+
+        ApiScope::create(
+            array(
+                'name'               => OAuth2Protocol::OpenIdConnect_Scope,
+                'short_description'  => 'OIDC',
+                'description'        => 'OIDC',
+                'api_id'             => null,
+                'system'             => true,
+                'default'            => true,
+                'active'             => true,
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name'               => OAuth2Protocol::OfflineAccess_Scope,
+                'short_description'  => 'allow to emit refresh tokens (offline access without user presence)',
+                'description'        => 'allow to emit refresh tokens (offline access without user presence)',
+                'api_id'             => null,
+                'system'             => true,
+                'default'            => true,
+                'active'             => true,
+            )
+        );
+
         $this->seedResourceServerScopes();
         $this->seedApiScopes();
         $this->seedApiEndpointScopes();
@@ -308,7 +510,7 @@ class TestSeeder extends Seeder {
         User::create(
             array(
                 'identifier'          => 'sebastian.marcet',
-                'external_identifier' => 13867,
+                'external_identifier' => 1,
                 'last_login_date'     => gmdate("Y-m-d H:i:s", time())
             )
         );
@@ -323,18 +525,49 @@ class TestSeeder extends Seeder {
             )
         );
 
+        $now     = new \DateTime();
+
         Client::create(
             array(
                 'app_name'             => 'oauth2_test_app',
                 'app_description'      => 'oauth2_test_app',
                 'app_logo'             => null,
                 'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client',
-                'client_secret'        => 'ITc/6Y5N7kOtGKhg',
+                'client_secret'        => 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg',
                 'client_type'          => IClient::ClientType_Confidential,
                 'application_type'     => IClient::ApplicationType_Web_App,
+                'token_endpoint_auth_method' => OAuth2Protocol::TokenEndpoint_AuthMethod_ClientSecretBasic,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => true,
-                'use_refresh_token'    => true
+                'use_refresh_token'    => true,
+                'redirect_uris' => 'https://www.test.com/oauth2',
+                'id_token_signed_response_alg'    => JSONWebSignatureAndEncryptionAlgorithms::HS512,
+                'id_token_encrypted_response_alg' => JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP_256,
+                'id_token_encrypted_response_enc' => JSONWebSignatureAndEncryptionAlgorithms::A256CBC_HS512,
+                'client_secret_expires_at' => $now->add(new \DateInterval('P6M')),
+            )
+        );
+
+        Client::create(
+            array(
+                'app_name'             => 'oauth2_test_app2',
+                'app_description'      => 'oauth2_test_app2',
+                'app_logo'             => null,
+                'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x2.openstack.client',
+                'client_secret'        => 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg',
+                'client_type'          => IClient::ClientType_Confidential,
+                'application_type'     => IClient::ApplicationType_Web_App,
+                'token_endpoint_auth_method' => OAuth2Protocol::TokenEndpoint_AuthMethod_ClientSecretJwt,
+                'token_endpoint_auth_signing_alg' => JSONWebSignatureAndEncryptionAlgorithms::HS512,
+                'subject_type' => IClient::SubjectType_Pairwise,
+                'user_id'              => $user->id,
+                'rotate_refresh_token' => true,
+                'use_refresh_token'    => true,
+                'redirect_uris' => 'https://www.test.com/oauth2',
+                'id_token_signed_response_alg'    => JSONWebSignatureAndEncryptionAlgorithms::HS512,
+                'id_token_encrypted_response_alg' => JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP_256,
+                'id_token_encrypted_response_enc' => JSONWebSignatureAndEncryptionAlgorithms::A256CBC_HS512,
+                'client_secret_expires_at' => $now->add(new \DateInterval('P6M')),
             )
         );
 
@@ -344,12 +577,15 @@ class TestSeeder extends Seeder {
                 'app_description'      => 'oauth2.service',
                 'app_logo'             => null,
                 'client_id'            => '11z87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client',
-                'client_secret'        => '11c/6Y5N7kOtGKhg',
+                'client_secret'        => '11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg',
                 'client_type'          => IClient::ClientType_Confidential,
                 'application_type'     => IClient::ApplicationType_Service,
+                'token_endpoint_auth_method' => OAuth2Protocol::TokenEndpoint_AuthMethod_ClientSecretBasic,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => true,
-                'use_refresh_token'    => true
+                'use_refresh_token'    => true,
+                'redirect_uris' => 'https://www.test.com/oauth2',
+                'client_secret_expires_at' => $now->add(new \DateInterval('P6M')),
             )
         );
 
@@ -361,10 +597,14 @@ class TestSeeder extends Seeder {
                 'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client',
                 'client_secret'        => null,
                 'client_type'          => IClient::ClientType_Public,
-                'application_type'     => IClient::ApplicationType_JS_Client,
+                'application_type'     => IClient::ApplicationType_Native,
+                'token_endpoint_auth_method' => OAuth2Protocol::TokenEndpoint_AuthMethod_PrivateKeyJwt,
+                'token_endpoint_auth_signing_alg' => JSONWebSignatureAndEncryptionAlgorithms::RS512,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => false,
-                'use_refresh_token'    => false
+                'use_refresh_token'    => false,
+                'redirect_uris' => 'https://www.test.com/oauth2',
+
             )
         );
 
@@ -379,7 +619,8 @@ class TestSeeder extends Seeder {
                 'application_type'     => IClient::ApplicationType_JS_Client,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => false,
-                'use_refresh_token'    => false
+                'use_refresh_token'    => false,
+                'redirect_uris' => 'https://www.test.com/oauth2'
             )
         );
 
@@ -389,47 +630,152 @@ class TestSeeder extends Seeder {
                 'app_description'      => 'resource_server_client',
                 'app_logo'             => null,
                 'client_id'            => 'resource.server.1.openstack.client',
-                'client_secret'        => '123456789',
+                'client_secret'        => '123456789123456789123456789123456789123456789',
                 'client_type'          =>  IClient::ClientType_Confidential,
                 'application_type'     => IClient::ApplicationType_Service,
+                'token_endpoint_auth_method' => OAuth2Protocol::TokenEndpoint_AuthMethod_ClientSecretBasic,
                 'resource_server_id'   => $resource_server->id,
                 'rotate_refresh_token' => false,
-                'use_refresh_token'    => false
+                'use_refresh_token'    => false,
+                'client_secret_expires_at' => $now->add(new \DateInterval('P6M')),
             )
         );
 
-        $client_confidential = Client::where('app_name','=','oauth2_test_app')->first();
-        $client_public       = Client::where('app_name','=','oauth2_test_app_public')->first();
-        $client_service      = Client::where('app_name','=','oauth2.service')->first();
-        //attach scopes
+        $client_confidential  = Client::where('app_name','=','oauth2_test_app')->first();
+        $client_confidential2 = Client::where('app_name','=','oauth2_test_app2')->first();
+        $client_public        = Client::where('app_name','=','oauth2_test_app_public')->first();
+        $client_service       = Client::where('app_name','=','oauth2.service')->first();
+
+        //attach all scopes
         $scopes = ApiScope::get();
-        foreach($scopes as $scope){
+        foreach($scopes as $scope)
+        {
             $client_confidential->scopes()->attach($scope->id);
+            $client_confidential2->scopes()->attach($scope->id);
             $client_public->scopes()->attach($scope->id);
             $client_service->scopes()->attach($scope->id);
         }
-        //add uris
-        ClientAuthorizedUri::create(
-            array(
-                'uri' => 'https://www.test.com/oauth2',
-                'client_id' => $client_confidential->id
-            )
+
+        $now =  new \DateTime('now');
+        $to = new \DateTime('now');
+        $to->add(new \DateInterval('P31D'));
+
+        $public_key_1 = ClientPublicKey::buildFromPEM(
+            'public_key_1',
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Encryption,
+            self::$client_public_key_1,
+            JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP_256,
+            true,
+            $now,
+            $to
         );
 
-        //add uris
-        ClientAllowedOrigin::create(
-            array(
-                'allowed_origin' => 'https://www.test.com/oauth2',
-                'client_id' => $client_confidential->id
-            )
+        $public_key_1->oauth2_client_id = $client_confidential->id;
+        $public_key_1->save();
+
+        $public_key_2 = ClientPublicKey::buildFromPEM(
+            'public_key_2',
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Signature,
+            self::$client_public_key_2,
+            JSONWebSignatureAndEncryptionAlgorithms::RS512,
+            true,
+            $now,
+            $to
         );
 
-        ClientAuthorizedUri::create(
-            array(
-                'uri'=>'https://www.test.com/oauth2',
-                'client_id'=>$client_public->id
-            )
+        $public_key_2->oauth2_client_id = $client_confidential->id;
+        $public_key_2->save();
+
+        // confidential client 2
+        $public_key_11 = ClientPublicKey::buildFromPEM(
+            'public_key_1',
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Encryption,
+            self::$client_public_key_1,
+            JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP_256,
+            true,
+            $now,
+            $to
         );
+
+        $public_key_11->oauth2_client_id = $client_confidential2->id;
+        $public_key_11->save();
+
+        $public_key_22 = ClientPublicKey::buildFromPEM(
+            'public_key_2',
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Signature,
+            self::$client_public_key_2,
+            JSONWebSignatureAndEncryptionAlgorithms::RS512,
+            true,
+            $now,
+            $to
+        );
+
+        $public_key_22->oauth2_client_id = $client_confidential2->id;
+        $public_key_22->save();
+
+        // public native client
+        $public_key_33 = ClientPublicKey::buildFromPEM(
+            'public_key_33',
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Encryption,
+            self::$client_public_key_1,
+            JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP_256,
+            true,
+            $now,
+            $to
+        );
+
+        $public_key_33->oauth2_client_id = $client_public->id;
+        $public_key_33->save();
+
+        $public_key_44 = ClientPublicKey::buildFromPEM(
+            'public_key_44',
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Signature,
+            self::$client_public_key_2,
+            JSONWebSignatureAndEncryptionAlgorithms::RS512,
+            true,
+            $now,
+            $to
+        );
+
+        $public_key_44->oauth2_client_id = $client_public->id;
+        $public_key_44->save();
+
+        // server private keys
+
+        $pkey_1 = ServerPrivateKey::build
+        (
+            'server_key_enc',
+            $now,
+            $to,
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Encryption,
+            JSONWebSignatureAndEncryptionAlgorithms::RSA1_5,
+            true,
+            TestKeys::$private_key_pem
+        );
+
+        $pkey_1->save();
+
+
+        $pkey_2 = ServerPrivateKey::build
+        (
+            'server_key_sig',
+            $now,
+            $to,
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Signature,
+            JSONWebSignatureAndEncryptionAlgorithms::RS512,
+            true,
+            TestKeys::$private_key_pem
+        );
+
+        $pkey_2->save();
     }
 
     private function seedApis(){
@@ -442,7 +788,7 @@ class TestSeeder extends Seeder {
                 'active'             =>  true,
                 'Description'        => 'Resource Server CRUD operations',
                 'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
+                'logo'               => asset('/assets/img/apis/server.png')
             )
         );
 
@@ -453,7 +799,7 @@ class TestSeeder extends Seeder {
                 'active'          =>  true,
                 'Description'     => 'Api CRUD operations',
                 'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
+                'logo'               => asset('/assets/img/apis/server.png')
             )
         );
 
@@ -465,7 +811,7 @@ class TestSeeder extends Seeder {
                 'active'          =>  true,
                 'Description'     => 'Api Endpoints CRUD operations',
                 'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
+                'logo'               => asset('/assets/img/apis/server.png')
             )
         );
 
@@ -476,7 +822,7 @@ class TestSeeder extends Seeder {
                 'active'          =>  true,
                 'Description'     => 'Api Scopes CRUD operations',
                 'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
+                'logo'               => asset('/assets/img/apis/server.png')
             )
         );
 
@@ -487,7 +833,7 @@ class TestSeeder extends Seeder {
                 'active'          =>  true,
                 'Description'     => 'User Info',
                 'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
+                'logo'               => asset('/assets/img/apis/server.png')
             )
         );
 
@@ -498,7 +844,7 @@ class TestSeeder extends Seeder {
                 'active'          =>  true,
                 'Description'     => 'Marketplace Public Clouds',
                 'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
+                'logo'               => asset('/assets/img/apis/server.png')
             )
         );
 
@@ -509,7 +855,7 @@ class TestSeeder extends Seeder {
                 'active'          =>  true,
                 'Description'     => 'Marketplace Private Clouds',
                 'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
+                'logo'               => asset('/assets/img/apis/server.png')
             )
         );
 
@@ -520,7 +866,7 @@ class TestSeeder extends Seeder {
                 'active'          =>  true,
                 'Description'     => 'Marketplace Consultants',
                 'resource_server_id' => $resource_server->id,
-                'logo'               => asset('img/apis/server.png')
+                'logo'               => asset('/assets/img/apis/server.png')
             )
         );
 
@@ -666,6 +1012,7 @@ class TestSeeder extends Seeder {
                 'system'             => true,
             )
         );
+
 
     }
 

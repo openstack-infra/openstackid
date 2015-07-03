@@ -17,26 +17,51 @@ namespace services\oauth2;
 use AccessToken as DBAccessToken;
 use DB;
 use Event;
+use jwe\impl\JWEFactory;
+use jwe\impl\specs\JWE_ParamsSpecification;
+use jwk\IJWK;
+use jws\impl\specs\JWS_ParamsSpecification;
+use jws\JWSFactory;
+use jwt\IBasicJWT;
+use jwt\impl\JWTClaimSet;
+use jwt\impl\UnsecuredJWT;
+use jwt\JWTClaim;
 use oauth2\exceptions\AbsentClientException;
 use oauth2\exceptions\ExpiredAccessTokenException;
 use oauth2\exceptions\InvalidAccessTokenException;
 use oauth2\exceptions\InvalidAuthorizationCodeException;
+use oauth2\exceptions\InvalidClientCredentials;
 use oauth2\exceptions\InvalidGrantTypeException;
+use oauth2\exceptions\RecipientKeyNotFoundException;
 use oauth2\exceptions\ReplayAttackException;
+use oauth2\heuristics\ClientEncryptionKeyFinder;
+use oauth2\heuristics\EncryptionClientPublicKeyFinder;
+use oauth2\heuristics\EncryptionKeyFinder;
+use oauth2\heuristics\SigningClientPublicKeyFinder;
+use oauth2\heuristics\SigningKeyFinder;
 use oauth2\models\AccessToken;
 use oauth2\models\AuthorizationCode;
 use oauth2\models\IClient;
 use oauth2\models\RefreshToken;
 use oauth2\OAuth2Protocol;
+use oauth2\repositories\IServerPrivateKeyRepository;
 use oauth2\services\Authorization;
+use oauth2\services\IClientJWKSetReader;
 use oauth2\services\IClientService;
+use oauth2\services\IPrincipalService;
+use oauth2\services\ISecurityContextService;
 use oauth2\services\ITokenService;
 use oauth2\services\IUserConsentService;
 use RefreshToken as DBRefreshToken;
 use RefreshToken as RefreshTokenDB;
+use utils\Base64UrlRepresentation;
+use utils\ByteUtil;
 use utils\db\ITransactionService;
 use utils\exceptions\UnacquiredLockException;
 use utils\IPHelper;
+use utils\json_types\JsonValue;
+use utils\json_types\NumericDate;
+use utils\json_types\StringOrURI;
 use utils\services\IAuthService;
 use utils\services\ICacheService;
 use utils\services\IdentifierGenerator;
@@ -103,10 +128,30 @@ class TokenService implements ITokenService
      * @var IdentifierGenerator
      */
     private $refresh_token_generator;
+
+    /**
+     * @var IServerPrivateKeyRepository
+     */
+    private $server_private_key_repository;
+
+    /**
+     * @var IClientJWKSetReader
+     */
+    private $jwk_set_reader_service;
     /**
      * @var ITransactionService
      */
     private $tx_service;
+
+    /**
+     * @var ISecurityContextService
+     */
+    private $security_context_service;
+
+    /**
+     * @var IPrincipalService
+     */
+    private $principal_service;
 
     /**
      * @param IClientService $client_service
@@ -118,6 +163,10 @@ class TokenService implements ITokenService
      * @param IdentifierGenerator $auth_code_generator
      * @param IdentifierGenerator $access_token_generator
      * @param IdentifierGenerator $refresh_token_generator
+     * @param IServerPrivateKeyRepository $server_private_key_repository
+     * @param IClientJWKSetReader $jwk_set_reader_service
+     * @param ISecurityContextService $security_context_service
+     * @param IPrincipalService $principal_service
      * @param ITransactionService $tx_service
      */
     public function __construct(
@@ -130,18 +179,27 @@ class TokenService implements ITokenService
         IdentifierGenerator $auth_code_generator,
         IdentifierGenerator $access_token_generator,
         IdentifierGenerator $refresh_token_generator,
+        IServerPrivateKeyRepository $server_private_key_repository,
+        IClientJWKSetReader  $jwk_set_reader_service,
+        ISecurityContextService $security_context_service,
+        IPrincipalService $principal_service,
         ITransactionService $tx_service
     ) {
-        $this->client_service          = $client_service;
-        $this->lock_manager_service    = $lock_manager_service;
-        $this->configuration_service   = $configuration_service;
-        $this->cache_service           = $cache_service;
-        $this->auth_service            = $auth_service;
-        $this->user_consent_service    = $user_consent_service;
-        $this->auth_code_generator     = $auth_code_generator;
-        $this->access_token_generator  = $access_token_generator;
-        $this->refresh_token_generator = $refresh_token_generator;
-        $this->tx_service = $tx_service;
+        $this->client_service                = $client_service;
+        $this->lock_manager_service          = $lock_manager_service;
+        $this->configuration_service         = $configuration_service;
+        $this->cache_service                 = $cache_service;
+        $this->auth_service                  = $auth_service;
+        $this->user_consent_service          = $user_consent_service;
+        $this->auth_code_generator           = $auth_code_generator;
+        $this->access_token_generator        = $access_token_generator;
+        $this->refresh_token_generator       = $refresh_token_generator;
+        $this->server_private_key_repository = $server_private_key_repository;
+        $this->jwk_set_reader_service        = $jwk_set_reader_service;
+        $this->security_context_service      = $security_context_service;
+        $this->principal_service             = $principal_service;
+        $this->tx_service                    = $tx_service;
+
         $this_var = $this;
 
         Event::listen('oauth2.client.delete', function ($client_id) use (&$this_var) {
@@ -163,45 +221,59 @@ class TokenService implements ITokenService
      * @param string $access_type
      * @param string $approval_prompt
      * @param bool $has_previous_user_consent
+     * @param string|null $state
+     * @param string|null $nonce
      * @return AuthorizationCode
      */
-    public function createAuthorizationCode(
+    public function createAuthorizationCode
+    (
         $user_id,
         $client_id,
         $scope,
-        $audience = '',
-        $redirect_uri = null,
-        $access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
+        $audience        = '' ,
+        $redirect_uri    = null,
+        $access_type     = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
         $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
-        $has_previous_user_consent = false
-    ) {
+        $has_previous_user_consent = false,
+        $state = null,
+        $nonce = null
+    )
+    {
         //create model
 
-        $code = $this->auth_code_generator->generate(AuthorizationCode::create(
-            $user_id,
-            $client_id,
-            $scope,
-            $audience,
-            $redirect_uri,
-            $access_type,
-            $approval_prompt, $has_previous_user_consent,
-            $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime')));
+        $code = $this->auth_code_generator->generate(
+            AuthorizationCode::create
+            (
+                $user_id,
+                $client_id,
+                $scope,
+                $audience,
+                $redirect_uri,
+                $access_type,
+                $approval_prompt, $has_previous_user_consent,
+                $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime'),
+                $state,
+                $nonce
+            )
+        );
 
         $hashed_value = Hash::compute('sha256', $code->getValue());
         //stores on cache
         $this->cache_service->storeHash($hashed_value,
             array(
-                'client_id' => $code->getClientId(),
-                'scope' => $code->getScope(),
-                'audience' => $code->getAudience(),
-                'redirect_uri' => $code->getRedirectUri(),
-                'issued' => $code->getIssued(),
-                'lifetime' => $code->getLifetime(),
-                'from_ip' => $code->getFromIp(),
-                'user_id' => $code->getUserId(),
-                'access_type' => $code->getAccessType(),
-                'approval_prompt' => $code->getApprovalPrompt(),
-                'has_previous_user_consent' => $code->getHasPreviousUserConsent()
+                'client_id'                 => $code->getClientId(),
+                'scope'                     => $code->getScope(),
+                'audience'                  => $code->getAudience(),
+                'redirect_uri'              => $code->getRedirectUri(),
+                'issued'                    => $code->getIssued(),
+                'lifetime'                  => $code->getLifetime(),
+                'from_ip'                   => $code->getFromIp(),
+                'user_id'                   => $code->getUserId(),
+                'access_type'               => $code->getAccessType(),
+                'approval_prompt'           => $code->getApprovalPrompt(),
+                'has_previous_user_consent' => $code->getHasPreviousUserConsent(),
+                'state'                     => $code->getState(),
+                'nonce'                     => $code->getNonce(),
             ), intval($code->getLifetime()));
 
         //stores brand new auth code hash value on a set by client id...
@@ -223,10 +295,12 @@ class TokenService implements ITokenService
 
         $hashed_value = Hash::compute('sha256', $value);
 
-        if (!$this->cache_service->exists($hashed_value)) {
+        if (!$this->cache_service->exists($hashed_value))
+        {
             throw new InvalidAuthorizationCodeException(sprintf("auth_code %s ", $value));
         }
-        try {
+        try
+        {
 
             $this->lock_manager_service->acquireLock('lock.get.authcode.' . $hashed_value);
 
@@ -241,10 +315,14 @@ class TokenService implements ITokenService
                 'from_ip',
                 'access_type',
                 'approval_prompt',
-                'has_previous_user_consent'
+                'has_previous_user_consent',
+                'state',
+                'nonce'
             ));
 
-            $code = AuthorizationCode::load($value,
+            $code = AuthorizationCode::load
+            (
+                $value,
                 $cache_values['user_id'],
                 $cache_values['client_id'],
                 $cache_values['scope'],
@@ -255,12 +333,24 @@ class TokenService implements ITokenService
                 $cache_values['from_ip'],
                 $cache_values['access_type'],
                 $cache_values['approval_prompt'],
-                $cache_values['has_previous_user_consent']
+                $cache_values['has_previous_user_consent'],
+                $cache_values['state'],
+                $cache_values['nonce']
             );
 
             return $code;
-        } catch (UnacquiredLockException $ex1) {
-            throw new ReplayAttackException($value, sprintf("auth_code %s ", $value));
+        }
+        catch (UnacquiredLockException $ex1)
+        {
+            throw new ReplayAttackException
+            (
+                $value,
+                sprintf
+                (
+                    "invalid auth_code %s.",
+                    $value
+                )
+            );
         }
     }
 
@@ -273,8 +363,10 @@ class TokenService implements ITokenService
     public function createAccessToken(AuthorizationCode $auth_code, $redirect_uri = null)
     {
 
-        $access_token = $this->access_token_generator->generate(
-            AccessToken::create(
+        $access_token = $this->access_token_generator->generate
+        (
+            AccessToken::create
+            (
                     $auth_code,
                     $this->configuration_service->getConfigValue('OAuth2.AccessToken.Lifetime')
             )
@@ -285,25 +377,27 @@ class TokenService implements ITokenService
         $auth_service   = $this->auth_service;
         $this_var       = $this;
 
-        $this->tx_service->transaction(function () use (
+        return $this->tx_service->transaction(function () use (
             $auth_code,
             $redirect_uri,
-            &$access_token,
-            &$cache_service,
-            &$client_service,
-            &$auth_service,
-            &$this_var
+            $access_token,
+            $cache_service,
+            $client_service,
+            $auth_service,
+            $this_var
         ) {
 
-            $value = $access_token->getValue();
+            $value        = $access_token->getValue();
             $hashed_value = Hash::compute('sha256', $value);
-            $client_id = $access_token->getClientId();
-            $user_id = $access_token->getUserId();
-            $client = $client_service->getClientById($client_id);
-            $user = $auth_service->getUserById($user_id);
+            $client_id    = $access_token->getClientId();
+            $user_id      = $access_token->getUserId();
+            $client       = $client_service->getClientById($client_id);
+            $user         = $auth_service->getUserById($user_id);
 
-            $access_token_db = new DBAccessToken (
-                array(
+            $access_token_db = new DBAccessToken
+            (
+                array
+                (
                     'value' => $hashed_value,
                     'from_ip' => IPHelper::getUserIp(),
                     'associated_authorization_code' => Hash::compute('sha256', $auth_code->getValue()),
@@ -319,9 +413,26 @@ class TokenService implements ITokenService
 
             $access_token_db->save();
             //check if use refresh tokens...
-            if ($client->use_refresh_token && $client->getApplicationType() == IClient::ApplicationType_Web_App && $auth_code->getAccessType() == OAuth2Protocol::OAuth2Protocol_AccessType_Offline) {
+            if
+            (
+                $client->use_refresh_token &&
+                (
+                    $client->getApplicationType() == IClient::ApplicationType_Web_App ||
+                    $client->getApplicationType() == IClient::ApplicationType_Native
+                ) &&
+                (
+                    $auth_code->getAccessType() == OAuth2Protocol::OAuth2Protocol_AccessType_Offline ||
+                    str_contains($auth_code->getScope(), OAuth2Protocol::OfflineAccess_Scope)
+                )
+            )
+            {
                 //but only the first time (approval_prompt == force || not exists previous consent)
-                if (!$auth_code->getHasPreviousUserConsent() || $auth_code->getApprovalPrompt() == OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Force) {
+                if
+                (
+                    !$auth_code->getHasPreviousUserConsent() ||
+                     $auth_code->getApprovalPrompt() == OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Force
+                )
+                {
                     $this_var->createRefreshToken($access_token);
                 }
             }
@@ -329,11 +440,17 @@ class TokenService implements ITokenService
             $this_var->storesAccessTokenOnCache($access_token);
             //stores brand new access token hash value on a set by client id...
             $cache_service->addMemberSet($client_id . TokenService::ClientAccessTokenPrefixList, $hashed_value);
-            $cache_service->incCounter($client_id . TokenService::ClientAccessTokensQty,
-                TokenService::ClientAccessTokensQtyLifetime);
+
+            $cache_service->incCounter
+            (
+                $client_id . TokenService::ClientAccessTokensQty,
+                TokenService::ClientAccessTokensQtyLifetime
+            );
+
+            return $access_token;
         });
 
-        return $access_token;
+
     }
 
     /**
@@ -655,7 +772,8 @@ class TokenService implements ITokenService
                 ));
 
                 // reload auth code ...
-                $auth_code = AuthorizationCode::load(
+                $auth_code = AuthorizationCode::load
+                (
                     $cache_values['auth_code'],
                     intval($cache_values['user_id']) == 0 ? null : intval($cache_values['user_id']),
                     $cache_values['client_id'],
@@ -668,11 +786,18 @@ class TokenService implements ITokenService
                     $access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
                     $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
                     $has_previous_user_consent = false,
+                    null,
+                    null,
                     $is_hashed = true
                 );
                 // reload access token ...
-                $access_token = AccessToken::load($value, $auth_code, $cache_values['issued'],
-                    $cache_values['lifetime']);
+                $access_token = AccessToken::load
+                (
+                    $value,
+                    $auth_code,
+                    $cache_values['issued'],
+                    $cache_values['lifetime']
+                );
                 $refresh_token_value = $cache_values['refresh_token'];
 
                 if (!empty($refresh_token_value)) {
@@ -801,7 +926,15 @@ class TokenService implements ITokenService
         }
 
         if ($refresh_token_db->void) {
-            throw new ReplayAttackException($value, sprintf("Refresh token %s is void", $value));
+            throw new ReplayAttackException
+            (
+                $value,
+                sprintf
+                (
+                    "Refresh token %s is void",
+                    $value
+                )
+            );
         }
 
         //check is refresh token is stills alive... (ZERO is infinite lifetime)
@@ -943,7 +1076,6 @@ class TokenService implements ITokenService
         return $res > 0;
     }
 
-
     /**
      * Revokes a give refresh token and all related access tokens
      * @param $value
@@ -1020,7 +1152,8 @@ class TokenService implements ITokenService
     public function getRefreshTokenByClient($client_id)
     {
         $client = $this->client_service->getClientById($client_id);
-        if (is_null($client)) {
+        if (is_null($client))
+        {
             throw new AbsentClientException(sprintf("client id %d does not exists!", $client_id));
         }
         $res = array();
@@ -1066,5 +1199,238 @@ class TokenService implements ITokenService
         }
 
         return $res;
+    }
+
+    /**
+     * @param string $nonce
+     * @param string $client_id
+     * @param AccessToken|null $access_token
+     * @param int $id_token_lifetime
+     * @return IBasicJWT
+     * @throws AbsentClientException
+     * @throws InvalidClientCredentials
+     * @throws RecipientKeyNotFoundException
+     * @throws \jwt\exceptions\ClaimAlreadyExistsException
+     * @throws \oauth2\exceptions\InvalidClientType
+     * @throws \oauth2\exceptions\ServerKeyNotFoundException
+     */
+    public function createIdToken
+    (
+        $nonce,
+        $client_id,
+        AccessToken $access_token = null,
+        $id_token_lifetime        = 3600
+    )
+    {
+        $client = $this->client_service->getClientById($client_id);
+
+        if (is_null($client))
+        {
+            throw new AbsentClientException
+            (
+                sprintf
+                (
+                    "client id %d does not exists!",
+                    $client_id
+                )
+            );
+        }
+
+        $user = $this->auth_service->getCurrentUser();
+        // build claim set
+        $epoch_now = time();
+
+        $claim_set = new JWTClaimSet
+        (
+            $iss = new StringOrURI($this->configuration_service->getSiteUrl()),
+            $sub = new StringOrURI
+            (
+                $this->auth_service->wrapUserId
+                (
+                    $user->getExternalIdentifier(),
+                    $client
+                )
+            ),
+            $aud = new StringOrURI($client_id),
+            $iat = new NumericDate($epoch_now),
+            $exp = new NumericDate($epoch_now + $id_token_lifetime)
+        );
+
+        if(!empty($nonce))
+            $claim_set->addClaim(new JWTClaim(OAuth2Protocol::OAuth2Protocol_Nonce, new StringOrURI($nonce)));
+
+        $id_token_response_info = $client->getIdTokenResponseInfo();
+        $sig_alg                = $id_token_response_info->getSigningAlgorithm();
+        $enc_alg                = $id_token_response_info->getEncryptionKeyAlgorithm();
+        $enc                    = $id_token_response_info->getEncryptionContentAlgorithm();
+
+        if(!is_null($sig_alg) && !is_null($access_token))
+            $this->buildAccessTokenHashClaim($access_token, $sig_alg->getHashingAlgorithm(), $claim_set);
+
+        $this->buildAuthTimeClaim($claim_set);
+
+        $jwt = UnsecuredJWT::fromClaimSet($claim_set);
+
+        if(!is_null($sig_alg))
+        {
+            // must sign
+            // get server private key to sign
+
+            $heuristic = new SigningKeyFinder($this->server_private_key_repository);
+
+            $jwt = self::buildJWS
+            (
+                $heuristic->find
+                (
+                    $client,
+                    $sig_alg->getName()
+                ),
+                $sig_alg->getName(),
+                $claim_set
+            );
+
+        }
+
+        if(!is_null($enc_alg) && !is_null($enc))
+        {
+            //encrypt , get client public key
+
+            $alg     = new  StringOrURI($enc_alg->getName());
+            $enc     = new  StringOrURI($enc->getName());
+
+            //encrypt jwt as payload
+
+            $heuristic = new EncryptionKeyFinder($this->jwk_set_reader_service);
+
+            $jwt = self::buildJWE
+            (
+                $heuristic->find
+                (
+                    $client,
+                    $alg->getString()
+                ),
+                $alg,
+                $enc,
+                $jwt
+            );
+        }
+
+        return $jwt;
+    }
+
+    /**
+     * @param IJWK $recipient_key
+     * @param StringOrURI $alg
+     * @param StringOrURI $enc
+     * @param IBasicJWT $jwt
+     * @return \jwe\IJWE
+     * @throws RecipientKeyNotFoundException
+     * @throws \jwk\exceptions\InvalidJWKAlgorithm
+     * @throws \jwk\exceptions\InvalidJWKType
+     */
+    static private function buildJWE(IJWK $recipient_key, StringOrURI $alg, StringOrURI $enc, IBasicJWT $jwt)
+    {
+
+        if(is_null($recipient_key))
+            throw new RecipientKeyNotFoundException;
+
+        $jwe = JWEFactory::build
+        (
+            new JWE_ParamsSpecification
+            (
+                $recipient_key,
+                $alg,
+                $enc,
+                $payload = $jwt->toCompactSerialization()
+            )
+        );
+        return $jwe;
+    }
+
+    /**
+     * @param IJWK $jwk
+     * @param $alg
+     * @param JWTClaimSet $claim_set
+     * @return \jws\IJWS
+     * @throws \jwk\exceptions\InvalidJWKAlgorithm
+     * @throws \jwk\exceptions\InvalidJWKType
+     */
+    static private function buildJWS(IJWK $jwk, $alg, JWTClaimSet $claim_set)
+    {
+        return JWSFactory::build
+        (
+            new JWS_ParamsSpecification
+            (
+                $jwk,
+                new StringOrURI
+                (
+                    $alg
+                ),
+                $claim_set
+            )
+        );
+    }
+
+    /**
+     * @param AccessToken $access_token
+     * @param $hashing_alg
+     * @param JWTClaimSet $claim_set
+     * @return JWTClaimSet
+     * @throws InvalidClientCredentials
+     * @throws \jwt\exceptions\ClaimAlreadyExistsException
+     */
+    private function buildAccessTokenHashClaim(AccessToken $access_token, $hashing_alg, JWTClaimSet $claim_set)
+    {
+        $at                     = $access_token->getValue();
+        $at_len                 = intval(substr($hashing_alg,3)) / 2 ;
+        $encoder                = new Base64UrlRepresentation();
+
+        if($at_len > ByteUtil::bitLength(strlen($at)))
+            throw new InvalidClientCredentials('invalid access token length!.');
+
+        $claim_set->addClaim
+        (
+            new JWTClaim
+            (
+                OAuth2Protocol::OAuth2Protocol_AccessToken_Hash,
+                new JsonValue
+                (
+                    $encoder->encode
+                    (
+                        substr
+                        (
+                            hash_hmac
+                            (
+                                $hashing_alg,
+                                $at,
+                                true
+                            ),
+                            0,
+                            $at_len / 8
+                        )
+                    )
+                )
+            )
+        );
+
+        return $claim_set;
+    }
+
+    private function buildAuthTimeClaim(JWTClaimSet $claim_set)
+    {
+        if($this->security_context_service->get()->isAuthTimeRequired())
+        {
+            $claim_set->addClaim
+            (
+                new JWTClaim
+                (
+                    OAuth2Protocol::OAuth2Protocol_AuthTime,
+                    new JsonValue
+                    (
+                        $this->principal_service->get()->getAuthTime()
+                    )
+                )
+            );
+        }
     }
 }

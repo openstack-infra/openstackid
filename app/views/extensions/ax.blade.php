@@ -4,7 +4,7 @@
     </label>
     <ul class="unstyled list-inline">
     @foreach ($attributes as $attr)
-        <li>{{$attr}}&nbsp;<i class="icon-info-sign info"></i></li>
+        <li>{{$attr}}&nbsp;<span class="glyphicon glyphicon-info-sign pointable" aria-hidden="true" title=""></span></li>
     @endforeach
     </ul>
 @endif
