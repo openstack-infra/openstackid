@@ -14,19 +14,19 @@
 
 namespace oauth2\exceptions;
 
-use Exception;
+use oauth2\OAuth2Protocol;
 
 /**
  * Class ExpiredAccessTokenException
  * @package oauth2\exceptions
  */
-class ExpiredAccessTokenException extends Exception
+final class ExpiredAccessTokenException extends OAuth2BaseException
 {
-
-    public function __construct($message = "")
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $message = "Expired Access Token: " . $message;
-        parent::__construct($message, 0, null);
+        return OAuth2Protocol::OAuth2Protocol_Error_InvalidToken;
     }
-
 }
