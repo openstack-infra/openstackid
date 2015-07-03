@@ -1,0 +1,38 @@
+{
+	"name": "jquery-migrate",
+	"title": "jQuery Migrate",
+	"description": "Migrate older jQuery code to jQuery 1.9+",
+	"version": "1.2.1",
+	"homepage": "https://github.com/jquery/jquery-migrate",
+	"author": {
+		"name": "jQuery Foundation, Inc. and other contributors",
+		"url": "https://github.com/jquery/jquery-migrate/blob/1.2.1/AUTHORS.txt"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/jquery/jquery-migrate.git"
+	},
+	"bugs": {
+		"url": "http://bugs.jquery.com/"
+	},
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "https://github.com/jquery/jquery-migrate/blob/1.2.1/LICENSE-MIT"
+		}
+	],
+	"dependencies": {
+		"jquery": ">=1.6.4"
+	},
+	"devDependencies": {
+		"grunt-git-authors": "~1.2.0",
+		"grunt-contrib-concat": "~0.1.2",
+		"grunt-contrib-watch": "~0.3.1",
+		"grunt-contrib-qunit": "~0.2.0",
+		"grunt-contrib-jshint": "~0.2.0",
+		"grunt-contrib-uglify": "~0.1.2",
+		"grunt": "0.4.1",
+		"testswarm": "0.2.2"
+	},
+	"keywords": []
+}

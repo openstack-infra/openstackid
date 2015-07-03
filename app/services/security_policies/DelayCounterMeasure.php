@@ -8,6 +8,10 @@ use utils\services\ICacheService;
 use utils\services\ISecurityPolicyCounterMeasure;
 use utils\IPHelper;
 
+/**
+ * Class DelayCounterMeasure
+ * @package services
+ */
 class DelayCounterMeasure implements ISecurityPolicyCounterMeasure
 {
     private $cache_service;

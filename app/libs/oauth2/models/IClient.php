@@ -6,7 +6,8 @@ namespace oauth2\models;
  * Interface IClient
  * @package oauth2\models
  */
-interface IClient {
+interface IClient
+{
 
     const ClientType_Public         = 'PUBLIC';
     const ClientType_Confidential   = 'CONFIDENTIAL';
@@ -14,6 +15,13 @@ interface IClient {
     const ApplicationType_Web_App   = 'WEB_APPLICATION';
     const ApplicationType_JS_Client = 'JS_CLIENT';
     const ApplicationType_Service   = 'SERVICE';
+    const ApplicationType_Native    = 'NATIVE';
+
+    /**
+     *  http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes
+     */
+    const SubjectType_Public   = 'public';
+    const SubjectType_Pairwise = 'pairwise';
 
     /**
      * @return int
@@ -52,9 +60,9 @@ interface IClient {
     public function isScopeAllowed($scope);
 
     /**
-     * @return mixed
+     * @return string[]
      */
-    public function getClientRegisteredUris();
+    public function getRedirectUris();
 
     /**
      * @param $uri
@@ -64,12 +72,12 @@ interface IClient {
 
     /**
      * returns all registered allowed js origins for this client
-     * @return mixed
+     * @return string[]
      */
     public function getClientAllowedOrigins();
 
     /**
-     * @param $origin
+     * @param string $origin
      * @return bool
      */
     public function isOriginAllowed($origin);
@@ -104,7 +112,6 @@ interface IClient {
     public function getUserId();
 
     /**
-     *
      * @return bool
      */
     public function isLocked();
@@ -137,4 +144,116 @@ interface IClient {
      * @return string
      */
     public function getWebsite();
+
+    /**
+     * @return \DateTime
+     */
+    public function getClientSecretExpiration();
+
+    /**
+     * @return bool
+     */
+    public function isClientSecretExpired();
+
+    /**
+     * @return string[]
+     */
+    public function getContacts();
+
+    /**
+     * @return int
+     */
+    public function getDefaultMaxAge();
+
+    /**
+     * @return bool
+     */
+    public function requireAuthTimeClaim();
+
+    /**
+     * @return string
+     */
+    public function getLogoUri();
+
+    /**
+     * @return string
+     */
+    public function getPolicyUri();
+
+    /**
+     * @return string
+     */
+    public function getTermOfServiceUri();
+
+    /**
+     * @return string[]
+     */
+    public function getPostLogoutUris();
+
+    /**
+     * @return string
+     */
+    public function getLogoutUri();
+
+    /**
+     * @return JWTResponseInfo
+     */
+    public function getIdTokenResponseInfo();
+
+    /**
+     * @return JWTResponseInfo
+     */
+    public function getUserInfoResponseInfo();
+
+    /**
+     * @return TokenEndpointAuthInfo
+     */
+    public function getTokenEndpointAuthInfo();
+
+    /**
+     * @return string
+     */
+    public function getSubjectType();
+
+    /**
+     * @return IClientPublicKey[]
+     */
+    public function getPublicKeys();
+
+    /**
+     * @return IClientPublicKey[]
+     */
+    public function getPublicKeysByUse($use);
+
+    /**
+     * @param string $use
+     * @param string $alg
+     * @return IClientPublicKey
+     */
+    public function getCurrentPublicKeyByUse($use, $alg);
+
+    /**
+     * @param string $kid
+     * @return IClientPublicKey
+     */
+    public function getPublicKeyByIdentifier($kid);
+
+    /**
+     * @param IClientPublicKey $public_key
+     * @return $this
+     */
+    public function addPublicKey(IClientPublicKey $public_key);
+
+    /**
+     * @return string
+     */
+    public function getJWKSUri();
+
+
+    /**
+     * @param string $post_logout_uri
+     * @return bool
+     */
+    public function isPostLogoutUriAllowed($post_logout_uri);
+
 }
