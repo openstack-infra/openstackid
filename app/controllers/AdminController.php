@@ -10,21 +10,55 @@ use utils\services\IAuthService;
 use openid\services\IUserService;
 use utils\services\IServerConfigurationService;
 use \utils\services\IBannedIPService;
+use oauth2\repositories\IServerPrivateKeyRepository;
+
 /**
  * Class AdminController
  */
 class AdminController extends BaseController {
 
+    /**
+     * @var IClientService
+     */
     private $client_service;
+    /**
+     * @var IApiScopeService
+     */
     private $scope_service;
+    /**
+     * @var ITokenService
+     */
     private $token_service;
+    /**
+     * @var IResourceServerService
+     */
     private $resource_server_service;
+    /**
+     * @var IApiService
+     */
     private $api_service;
+    /**
+     * @var IApiEndpointService
+     */
     private $endpoint_service;
+    /**
+     * @var IAuthService
+     */
     private $auth_service;
+    /**
+     * @var IUserService
+     */
     private $user_service;
+    /**
+     * @var IServerConfigurationService
+     */
     private $configuration_service;
+    /**
+     * @var IBannedIPService
+     */
     private $banned_ips_service;
+
+    private $private_keys_repository;
 
     public function __construct( IClientService $client_service,
                                  IApiScopeService $scope_service,
@@ -35,7 +69,8 @@ class AdminController extends BaseController {
                                  IAuthService $auth_service,
                                  IUserService $user_service,
                                  IServerConfigurationService $configuration_service,
-                                 IBannedIPService $banned_ips_service){
+                                 IBannedIPService $banned_ips_service,
+                                 IServerPrivateKeyRepository $private_keys_repository){
 
         $this->client_service          = $client_service;
         $this->scope_service           = $scope_service;
@@ -47,6 +82,7 @@ class AdminController extends BaseController {
         $this->user_service            = $user_service;
         $this->configuration_service   = $configuration_service;
         $this->banned_ips_service      = $banned_ips_service;
+        $this->private_keys_repository = $private_keys_repository;
     }
 
     public function editRegisteredClient($id)
@@ -59,8 +95,6 @@ class AdminController extends BaseController {
             return View::make("404");
         }
 
-        $allowed_uris    = $client->getClientRegisteredUris();
-        $allowed_origins = $client->getClientAllowedOrigins();
         $selected_scopes = $client->getClientScopes();
         $aux_scopes      = array();
 
@@ -86,16 +120,14 @@ class AdminController extends BaseController {
 
         return View::make("oauth2.profile.edit-client",
             array(
-                'client'          => $client,
-                'allowed_uris'    => $allowed_uris,
-                'allowed_origins' => $allowed_origins,
-                'selected_scopes' => $aux_scopes,
-                'scopes'          => $scopes,
-                'access_tokens'   => $access_tokens,
-                "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
+                'client'               => $client,
+                'selected_scopes'      => $aux_scopes,
+                'scopes'               => $scopes,
+                'access_tokens'        => $access_tokens,
+                "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
                 "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
-                "use_system_scopes" => $user->canUseSystemScopes(),
-                'refresh_tokens'  => $refresh_tokens,
+                "use_system_scopes"    => $user->canUseSystemScopes(),
+                'refresh_tokens'       => $refresh_tokens,
             ));
     }
 
@@ -235,8 +267,6 @@ class AdminController extends BaseController {
         ));
     }
 
-
-
     public function listServerConfig(){
 
         $user    = $this->auth_service->getCurrentUser();
@@ -312,6 +342,17 @@ class AdminController extends BaseController {
             "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
             "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
             "ips" =>$ips
+        ));
+    }
+
+    public function listServerPrivateKeys(){
+
+        $user = $this->auth_service->getCurrentUser();
+
+        return View::make("oauth2.profile.admin.server-private-keys", array(
+            'private_keys'         => $this->private_keys_repository->getAll(1,4294967296),
+            "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
+            "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
         ));
     }
 }

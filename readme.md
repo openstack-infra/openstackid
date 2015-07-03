@@ -17,6 +17,8 @@ run following commands on root folder
    * php artisan db:seed --env=YOUR_ENVIRONMENT
    * phpunit --bootstrap vendor/autoload.php
    * give proper rights to app/storage folder (775 and proper users)
+   * vendor/bin/behat --config /home/smarcet/git/openstackid/behat.yml
+
 
 ## Permissions
    

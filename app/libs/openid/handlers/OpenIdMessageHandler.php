@@ -7,6 +7,7 @@ use openid\OpenIdMessage;
 use utils\services\ILogService;
 use utils\services\ICheckPointService;
 use openid\exceptions\InvalidOpenIdMessageException;
+use openid\requests\OpenIdAuthenticationRequest;
 
 /**
  * Class OpenIdMessageHandler
@@ -22,7 +23,7 @@ abstract class OpenIdMessageHandler
 	 */
 	protected $successor;
 	/**
-	 * @var OpenIdMessage
+	 * @var OpenIdAuthenticationRequest
 	 */
 	protected $current_request;
 	/**

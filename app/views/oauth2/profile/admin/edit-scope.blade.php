@@ -80,5 +80,5 @@
 		success : '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "Scope")) }}'
 	};
 </script>
-{{ HTML::script('js/oauth2/profile/admin/edit-scope.js') }}
+{{ HTML::script('assets/js/oauth2/profile/admin/edit-scope.js') }}
 @stop
