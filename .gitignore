@@ -21,3 +21,5 @@ ChangeLog
 doc/build
 *.egg
 *.egg-info
+public/bower_assets
+public/bower_assets/*
