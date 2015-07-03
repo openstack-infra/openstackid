@@ -2,15 +2,19 @@
 
 namespace oauth2\exceptions;
 
-use Exception;
+use oauth2\OAuth2Protocol;
 
-class OAuth2GenericException extends Exception
+/**
+ * Class OAuth2GenericException
+ * @package oauth2\exceptions
+ */
+final class OAuth2GenericException extends OAuth2BaseException
 {
-
-    public function __construct($message = "")
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $message = "OAuth2 Generic Exception : " . $message;
-        parent::__construct($message, 0, null);
+        return OAuth2Protocol::OAuth2Protocol_Error_ServerError;
     }
-
 }

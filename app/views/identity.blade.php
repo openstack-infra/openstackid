@@ -15,16 +15,16 @@
                 <legend>{{ $username }}</legend>
                 @endif
                 @if( $show_pic && !empty($pic))
-                <div class="row-fluid">
-                    <div class="span4">
-                        <img src="{{ $pic }}" class="img-polaroid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="{{ $pic }}" class="img-thumbnail">
                     </div>
                 </div>
                 @endif
                 @if( $show_email )
-                    <div class="row-fluid email-row">
-                        <div class="span4">
-                             <i class="icon-envelope"></i>
+                    <div class="row email-row">
+                        <div class="col-md-4">
+                            <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
                             <a href="mailto:{{ $email }}">{{ $email }}</a>
                         </div>
                     </div>
@@ -32,8 +32,8 @@
         @endif
     @else
         Welcome, {{{ $username }}}.
-        <a class="btn btn-small" href="{{ URL::action("UserController@getProfile") }}"">edit your profile</a>
-        <a class="btn btn-small" href="{{ URL::action("UserController@logout") }}"">logout</a>
+        <a class="btn btn-default btn-sm active" href="{{ URL::action("UserController@getProfile") }}"">edit your profile</a>
+        <a class="btn btn-default btn-sm active" href="{{ URL::action("UserController@logout") }}"">logout</a>
         @if( $show_fullname === 0 && $show_email===0 && $show_pic === 0)
         <p>
             This is your identity page. You are currently displaying no information on this page. You can display information such as your name, contact info and a photo.
@@ -43,16 +43,16 @@
             <legend>{{ $username }}</legend>
             @endif
             @if( $show_pic && !empty($pic))
-            <div class="row-fluid">
-                <div class="span4">
-                    <img src="{{ $pic }}" class="img-polaroid">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="{{ $pic }}" class="img-thumbnail">
                 </div>
             </div>
             @endif
             @if( $show_email )
-            <div class="row-fluid email-row">
-                <div class="span4">
-                    <i class="icon-envelope"></i>
+            <div class="row email-row">
+                <div class="col-md-4">
+                    <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
                     <a href="mailto:{{ $email }}">{{ $email }}</a>
                 </div>
             </div>
