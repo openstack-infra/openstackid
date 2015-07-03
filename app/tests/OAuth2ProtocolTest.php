@@ -33,7 +33,6 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
     {
         parent::prepareForTests();
         App::singleton(UtilsServiceCatalog::ServerConfigurationService, 'StubServerConfigurationService');
-        //Route::enableFilters();
         $this->current_realm = Config::get('app.url');
         $user = User::where('identifier', '=', 'sebastian.marcet')->first();
         $this->be($user);
@@ -46,6 +45,8 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
     public function testAuthCode()
     {
 
+        Route::enableFilters();
+
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
 
         $params = array(
@@ -55,19 +56,41 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             'scope' => sprintf('%s/resource-server/read', $this->current_realm),
         );
 
-
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
-
         $response = $this->action("POST", "OAuth2ProviderController@authorize",
             $params,
             array(),
             array(),
             array());
 
+        $this->assertResponseStatus(302);
+
         $url = $response->getTargetUrl();
-        $content = $response->getContent();
+
+        $consent_response = $this->call('POST', $url, array(
+            'trust'  => 'AllowOnce',
+            '_token' => Session::token()
+        ));
 
         $this->assertResponseStatus(302);
+
+        $auth_response =$this->action("GET", "OAuth2ProviderController@authorize",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $auth_response->getTargetUrl();
+
+        $comps = @parse_url($url);
+        $query = $comps['query'];
+        $output = array();
+        parse_str($query, $output);
+
+        $this->assertTrue(array_key_exists('code', $output) );
+        $this->assertTrue(!empty($output['code']) );
+
     }
 
     /** Get Token Test
@@ -77,16 +100,16 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
     {
 
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
-        $client_secret = 'ITc/6Y5N7kOtGKhg';
+        $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
-        $params = array(
+        $params = array
+        (
             'client_id' => $client_id,
             'redirect_uri' => 'https://www.test.com/oauth2',
             'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
             'scope' => sprintf('%s/resource-server/read', $this->current_realm),
             OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
         );
-
 
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -122,7 +145,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         $status = $response->getStatusCode();
 
         $this->assertResponseStatus(200);
-
+        $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
         $content = $response->getContent();
 
         $response = json_decode($content);
@@ -132,6 +155,78 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue(!empty($access_token));
         $this->assertTrue(!empty($refresh_token));
 
+    }
+
+    /** Get Token Test
+     * @throws Exception
+     */
+    public function testAuthCodeReplayAttack()
+    {
+
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+        $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
+
+        $params = array
+        (
+            'client_id' => $client_id,
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
+            'scope' => sprintf('%s/resource-server/read', $this->current_realm),
+            OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
+        );
+
+        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $status = $response->getStatusCode();
+        $url = $response->getTargetUrl();
+        $content = $response->getContent();
+
+        $comps = @parse_url($url);
+        $query = $comps['query'];
+        $output = array();
+        parse_str($query, $output);
+
+        $params = array(
+            'code' => $output['code'],
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
+        );
+
+
+        $response = $this->action("POST", "OAuth2ProviderController@token",
+            $params,
+            array(),
+            array(),
+            // Symfony interally prefixes headers with "HTTP", so
+            array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+        $status = $response->getStatusCode();
+
+        $this->assertResponseStatus(200);
+        $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
+        $content = $response->getContent();
+
+        $response = json_decode($content);
+        $access_token = $response->access_token;
+        $refresh_token = $response->refresh_token;
+
+        $this->assertTrue(!empty($access_token));
+        $this->assertTrue(!empty($refresh_token));
+
+        $response = $this->action("POST", "OAuth2ProviderController@token",
+            $params,
+            array(),
+            array(),
+            // Symfony interally prefixes headers with "HTTP", so
+            array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+        $this->assertResponseStatus(400);
 
     }
 
@@ -144,7 +239,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         try {
 
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
-            $client_secret = 'ITc/6Y5N7kOtGKhg';
+            $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
             Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -191,7 +286,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
 
             $this->assertResponseStatus(200);
-
+            $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
             $content = $response->getContent();
 
             $response = json_decode($content);
@@ -215,7 +310,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
 
             $this->assertResponseStatus(200);
-
+            $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
             $content = $response->getContent();
 
             $response = json_decode($content);
@@ -228,7 +323,6 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         }
     }
 
-
     /** test validate token grant
      * @throws Exception
      */
@@ -240,7 +334,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $_ENV['access.token.lifetime'] = 1;
 
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
-            $client_secret = 'ITc/6Y5N7kOtGKhg';
+            $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
             Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -342,7 +436,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         try {
 
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
-            $client_secret = 'ITc/6Y5N7kOtGKhg';
+            $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
 
             Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
@@ -390,7 +484,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
 
             $this->assertResponseStatus(200);
-
+            $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
             $content = $response->getContent();
 
             $response = json_decode($content);
@@ -415,7 +509,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
 
             $this->assertResponseStatus(200);
-
+            $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
             $content = $response->getContent();
 
             $response = json_decode($content);
@@ -441,7 +535,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         try {
 
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
-            $client_secret = 'ITc/6Y5N7kOtGKhg';
+            $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
             Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
@@ -513,7 +607,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
 
             $this->assertResponseStatus(200);
-
+            $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
             $content = $response->getContent();
 
             $response = json_decode($content);
@@ -800,7 +894,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         try {
 
             $client_id = '11z87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
-            $client_secret = '11c/6Y5N7kOtGKhg';
+            $client_secret = '11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg';
 
             //do get auth token...
             $params = array(
