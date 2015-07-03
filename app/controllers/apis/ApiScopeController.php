@@ -10,6 +10,9 @@ use oauth2\exceptions\InvalidApiScope;
  */
 class ApiScopeController extends AbstractRESTController implements ICRUDController {
 
+    /**
+     * @var IApiScopeService
+     */
     private $api_scope_service;
 
     public function __construct(IApiScopeService $api_scope_service,  ILogService $log_service)
@@ -74,6 +77,7 @@ class ApiScopeController extends AbstractRESTController implements ICRUDControll
                 'default'            => 'required|boolean',
                 'system'             => 'required|boolean',
                 'api_id'             => 'required|integer',
+                'assigned_by_groups' => 'required|boolean',
             );
 
             // Creates a Validator instance and validates the data.
@@ -91,7 +95,8 @@ class ApiScopeController extends AbstractRESTController implements ICRUDControll
                 $values['active'],
                 $values['default'],
                 $values['system'],
-                $values['api_id']
+                $values['api_id'],
+                $values['assigned_by_groups']
             );
 
             return $this->created(array('scope_id' => $new_scope->id));
@@ -140,6 +145,7 @@ class ApiScopeController extends AbstractRESTController implements ICRUDControll
                 'active'             => 'sometimes|required|boolean',
                 'system'             => 'sometimes|required|boolean',
                 'default'            => 'sometimes|required|boolean',
+                'assigned_by_groups' => 'sometimes|boolean',
             );
 
             // Creates a Validator instance and validates the data.

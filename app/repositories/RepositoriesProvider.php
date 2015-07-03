@@ -2,8 +2,8 @@
 
 namespace repositories;
 
-use Illuminate\Support\ServiceProvider;
 use App;
+use Illuminate\Support\ServiceProvider;
 
 /**
  * Class RepositoriesProvider
@@ -11,15 +11,21 @@ use App;
  */
 class RepositoriesProvider extends ServiceProvider
 {
-	protected $defer = false;
+    protected $defer = false;
 
-	public function boot(){
-	}
+    public function boot()
+    {
+    }
 
-	public function register(){
-		App::singleton('openid\repositories\IOpenIdAssociationRepository', 'repositories\EloquentOpenIdAssociationRepository');
-		App::singleton('openid\repositories\IOpenIdTrustedSiteRepository', 'repositories\EloquentOpenIdTrustedSiteRepository');
-		App::singleton('auth\IUserRepository', 'repositories\EloquentUserRepository');
-		App::singleton('auth\IMemberRepository', 'repositories\EloquentMemberRepository');
-	}
+    public function register()
+    {
+        App::singleton('openid\repositories\IOpenIdAssociationRepository', 'repositories\EloquentOpenIdAssociationRepository');
+        App::singleton('openid\repositories\IOpenIdTrustedSiteRepository', 'repositories\EloquentOpenIdTrustedSiteRepository');
+        App::singleton('auth\IUserRepository', 'repositories\EloquentUserRepository');
+        App::singleton('auth\IMemberRepository', 'repositories\EloquentMemberRepository');
+        App::singleton('oauth2\repositories\IClientPublicKeyRepository', 'repositories\EloquentClientPublicKeyRepository');
+        App::singleton('oauth2\repositories\IServerPrivateKeyRepository', 'repositories\EloquentServerPrivateKeyRepository');
+        App::singleton('oauth2\repositories\IClientRepository', 'repositories\EloquentClientRepository');
+        App::singleton('oauth2\repositories\IApiScopeGroupRepository', 'repositories\EloquentApiScopeGroupRepository');
+    }
 }

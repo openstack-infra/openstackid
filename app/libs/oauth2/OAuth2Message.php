@@ -3,6 +3,7 @@
 namespace oauth2;
 
 use utils\http\HttpMessage;
+use oauth2\requests\OAuth2RequestMemento;
 
 /**
  * Class OAuth2Message
@@ -10,7 +11,7 @@ use utils\http\HttpMessage;
  */
 class OAuth2Message extends HttpMessage
 {
-    public function __construct(array $values)
+    public function __construct(array $values = array())
     {
         parent::__construct($values);
     }
@@ -23,7 +24,44 @@ class OAuth2Message extends HttpMessage
 
     public function getParam($param)
     {
-        return isset($this->container[$param])?$this->container[$param]:null;
+        return isset($this->container[$param])? $this->container[$param] : null;
+    }
+
+    /**
+     * @param string $param
+     * @param mixed $value
+     * @return $this
+     */
+    public function setParam($param, $value)
+    {
+        $this->container[$param] = $value;
+        return $this;
+    }
+
+    /**
+     * @return OAuth2RequestMemento
+     */
+    public function createMemento(){
+        return OAuth2RequestMemento::buildFromRequest($this);
+    }
+
+    /**
+     * @param OAuth2RequestMemento $memento
+     * @return $this
+     */
+    public function setMemento(OAuth2RequestMemento $memento){
+        $this->container = $memento->getState();
+        return $this;
+    }
+
+    /**
+     * @param OAuth2RequestMemento $memento
+     * @return OAuth2Message
+     */
+    static public function buildFromMemento(OAuth2RequestMemento $memento){
+        $msg = new self;
+        $msg->setMemento($memento);
+        return $msg;
     }
 
 }
