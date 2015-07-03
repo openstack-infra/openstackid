@@ -2,15 +2,18 @@
 
 namespace oauth2\exceptions;
 
-use Exception;
 
-class UseRefreshTokenException extends Exception
+use oauth2\OAuth2Protocol;
+
+/**
+ * Class UseRefreshTokenException
+ * @package oauth2\exceptions
+ */
+class UseRefreshTokenException extends OAuth2BaseException
 {
 
-    public function __construct($message = "")
+    public function getError()
     {
-        $message = "Use Refresh Token Exception: " . $message;
-        parent::__construct($message, 0, null);
+        return OAuth2Protocol::OAuth2Protocol_Error_InvalidGrant;
     }
-
 }

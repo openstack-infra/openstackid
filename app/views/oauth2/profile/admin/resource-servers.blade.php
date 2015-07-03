@@ -6,22 +6,21 @@
 
 @section('content')
 @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
-<div class="row-fluid">
-
-    <div class="row-fluid">
-        <h4 style="float:left"><i class="icon-info-sign accordion-toggle" title=""></i>&nbsp;Resource Servers</h4>
+<div class="row">
+    <div class="row">
+        <h4 style="float:left"><span aria-hidden="true" class="glyphicon glyphicon-info-sign pointable" title="Registered Resource Servers"></span>&nbsp;Resource Servers</h4>
         <div style="position: relative;float:left;">
-            <div style="position:absolute;top:13px;margin-left:5px"><i class="icon-refresh accordion-toggle refresh-servers" title="Update Resource Server List"></i></div>
+            <div style="position:absolute;top:13px;margin-left:5px"><span aria-hidden="true" class="glyphicon glyphicon-refresh pointable refresh-servers"title="Update Resource Server List"></span></div>
         </div>
     </div>
-    <div class="row-fluid">
+    <div class="row">
         <div class="alert alert-info" id="info-resource-servers" style="display: none">
             <strong>There are not any available Scopes</strong>
         </div>
     </div>
-    <div class="row-fluid">
-        <div class="span12">
-            {{ HTML::link(URL::action("ApiResourceServerController@create"),'Add Resource Server',array('class'=>'btn add-resource-server','title'=>'Adds a New Resource Server')) }}
+    <div class="row">
+        <div class="col-md-12">
+            {{ HTML::link(URL::action("ApiResourceServerController@create"),'Add Resource Server',array('class'=>'btn active btn-primary add-resource-server','title'=>'Adds a New Resource Server')) }}
         </div>
     </div>
     <table id='table-resource-servers' class="table table-hover table-condensed">
@@ -50,8 +49,8 @@
             </td>
             <td>
                 &nbsp;
-                {{ HTML::link(URL::action("AdminController@editResourceServer",array("id"=>$resource_server->id)),'Edit',array('class'=>'btn edit-resource-server','title'=>'Edits a Registered Resource Server')) }}
-                {{ HTML::link(URL::action("ApiResourceServerController@delete",array("id"=>$resource_server->id)),'Delete',array('class'=>'btn delete-resource-server','title'=>'Deletes a Registered Resource Server')) }}
+                {{ HTML::link(URL::action("AdminController@editResourceServer",array("id"=>$resource_server->id)),'Edit',array('class'=>'btn btn-default active edit-resource-server','title'=>'Edits a Registered Resource Server')) }}
+                {{ HTML::link(URL::action("ApiResourceServerController@delete",array("id"=>$resource_server->id)),'Delete',array('class'=>'btn btn-default btn-delete active delete-resource-server','title'=>'Deletes a Registered Resource Server')) }}
             </td>
         </tr>
         @endforeach
@@ -59,31 +58,7 @@
     </table>
 </div>
 
-<div id="dialog-form-resource-server" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">Register New Resource Server</h3>
-    </div>
-    <div class="modal-body">
-        <form id="form-resource-server" name="form-resource-server">
-            <fieldset>
-                <label for="name">Host</label>
-                <input type="text" name="host" id="host">
-                <label for="friendly_name">Friendly Name</label>
-                <input type="text" name="friendly_name" id="friendly_name">
-                <label for="ip">IP Address</label>
-                <input type="text" name="ip" id="ip">
-                <label class="checkbox">
-                    <input type="checkbox" id="active" name="active">&nbsp;Active
-                </label>
-            </fieldset>
-        </form>
-    </div>
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-        <button id='save-resource-server' class="btn btn-primary">Save changes</button>
-    </div>
-</div>
+@include('modal', array ('modal_id' => 'dialog-form-resource-server', 'modal_title' => 'Register New Resource Server', 'modal_save_css_class' => 'save-resource-server', 'modal_save_text' => 'Save', 'modal_form' => 'oauth2.profile.admin.resource-server-add-form', 'modal_form_data' => array()))
 
 @stop
 
@@ -98,5 +73,5 @@
 		add : '{{URL::action("ApiResourceServerController@create",null)}}'
 	};
 </script>
-{{ HTML::script('js/oauth2/profile/admin/resource-servers.js') }}
-@stop
+{{ HTML::script('assets/js/oauth2/profile/admin/resource-servers.js') }}
+@append

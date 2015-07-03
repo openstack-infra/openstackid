@@ -20,13 +20,15 @@ use utils\services\IdentifierGenerator;
  * Class Identifier
  * @package utils\model
  */
-abstract class Identifier {
+abstract class Identifier
+{
 
     /**
      * @param int $len
      * @param int $lifetime
      */
-    public function __construct($len, $lifetime = 0 ){
+    public function __construct($len, $lifetime = 0 )
+    {
         $this->lifetime = $lifetime;
         $this->len      = $len;
     }
@@ -49,28 +51,32 @@ abstract class Identifier {
      * @param IdentifierGenerator $generator
      * @return $this
      */
-    public function generate(IdentifierGenerator $generator){
+    public function generate(IdentifierGenerator $generator)
+    {
         return $generator->generate($this);
     }
 
     /**
      * @return int
      */
-    public function getLenght(){
+    public function getLenght()
+    {
         return $this->len;
     }
 
     /**
      * @return int
      */
-    public function getLifetime(){
+    public function getLifetime()
+    {
         return intval($this->lifetime);
     }
 
     /**
      * @return string
      */
-    public function getValue(){
+    public function getValue()
+    {
         return $this->value;
     }
 
@@ -78,7 +84,8 @@ abstract class Identifier {
      * @param string $value
      * @return $this
      */
-    public function setValue($value){
+    public function setValue($value)
+    {
         $this->value = $value;
         return $this;
     }
