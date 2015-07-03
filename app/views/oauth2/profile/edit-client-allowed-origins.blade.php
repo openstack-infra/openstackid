@@ -45,5 +45,5 @@
 		delete: '{{ URL::action("ClientApiController@deleteClientAllowedOrigin", array("id"=>$client->id,"uri_id"=>"@id")) }}'
 	};
 </script>
-{{ HTML::script('js/oauth2/profile/edit-client-allowed-origins.js') }}
+{{ HTML::script('assets/js/oauth2/profile/edit-client-allowed-origins.js') }}
 @stop

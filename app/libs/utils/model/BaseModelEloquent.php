@@ -48,7 +48,7 @@ abstract class BaseModelEloquent extends Eloquent {
 
     public function newFromBuilder($attributes = array())
     {
-        if ($this->useSti() && $attributes->{$this->stiClassField}) {
+        if ($this->useSti() && property_exists($attributes, $this->stiClassField) ) {
             $class = $this->class->getName();
             $instance = new $class;
             $instance->exists = true;

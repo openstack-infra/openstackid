@@ -48,5 +48,5 @@
 @stop
 
 @section('scripts')
-{{ HTML::script('js/admin/banned-ips.js') }}
+{{ HTML::script('assets/js/admin/banned-ips.js') }}
 @stop

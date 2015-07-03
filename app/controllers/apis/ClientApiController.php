@@ -38,6 +38,21 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
         $this->allowed_projection_fields = array('*');
     }
 
+    public function get($id)
+    {
+        try {
+            $client = $this->client_service->get($id);
+            if (is_null($client)) {
+                return $this->error404(array('error' => 'client not found'));
+            }
+            $data = $client->toArray();
+            return $this->ok($data);
+        } catch (Exception $ex) {
+            $this->log_service->error($ex);
+            return $this->error500($ex);
+        }
+    }
+
     /**
      * Deletes an existing client
      * @param $id client id
@@ -68,7 +83,7 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
                 'user_id'                 => 'required|integer',
                 'app_name'                => 'required|alpha_dash|max:255',
                 'app_description'         => 'required|freetext',
-                'website'                 => 'required|url',
+                'website'                 => 'url',
                 'application_type'        => 'required|applicationtype',
             );
 
@@ -94,24 +109,6 @@ class ClientApiController extends AbstractRESTController implements ICRUDControl
         }
     }
 
-    /**
-     * @param $id
-     * @return mixed
-     */
-    public function get($id)
-    {
-        try {
-            $client = $this->client_service->get($id);
-            if (is_null($client)) {
-                return $this->error404(array('error' => 'client not found'));
-            }
-            $data = $client->toArray();
-            return $this->ok($data);
-        } catch (Exception $ex) {
-            $this->log_service->error($ex);
-            return $this->error500($ex);
-        }
-    }
 
     /**
      * @return mixed

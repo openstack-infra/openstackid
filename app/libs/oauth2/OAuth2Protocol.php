@@ -3,6 +3,7 @@
 namespace oauth2;
 
 //endpoints
+use jwa\JSONWebSignatureAndEncryptionAlgorithms;
 use oauth2\endpoints\AuthorizationEndpoint;
 use oauth2\endpoints\TokenEndpoint;
 use oauth2\endpoints\TokenIntrospectionEndpoint;
@@ -136,6 +137,49 @@ class OAuth2Protocol implements IOAuth2Protocol
         self::OAuth2Protocol_RedirectUri => self::OAuth2Protocol_RedirectUri,
         self::OAuth2Protocol_Scope => self::OAuth2Protocol_Scope,
         self::OAuth2Protocol_State => self::OAuth2Protocol_State
+    );
+
+    // http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+
+    const TokenEndpoint_AuthMethod_ClientSecretBasic = 'client_secret_basic';
+    const TokenEndpoint_AuthMethod_ClientSecretPost  = 'client_secret_post';
+    const TokenEndpoint_AuthMethod_ClientSecretJwt   = 'client_secret_jwt';
+    const TokenEndpoint_AuthMethod_PrivateKeyJwt     = 'private_key_jwt';
+    const TokenEndpoint_AuthMethod_None              = 'none';
+
+    public static $token_endpoint_auth_methods = array(
+        self::TokenEndpoint_AuthMethod_ClientSecretBasic,
+        self::TokenEndpoint_AuthMethod_ClientSecretPost,
+        self::TokenEndpoint_AuthMethod_ClientSecretJwt,
+        self::TokenEndpoint_AuthMethod_PrivateKeyJwt,
+    );
+
+
+    public static $supported_signing_algorithms = array(
+        JSONWebSignatureAndEncryptionAlgorithms::HS256,
+        JSONWebSignatureAndEncryptionAlgorithms::HS384,
+        JSONWebSignatureAndEncryptionAlgorithms::HS512,
+        JSONWebSignatureAndEncryptionAlgorithms::RS256,
+        JSONWebSignatureAndEncryptionAlgorithms::RS384,
+        JSONWebSignatureAndEncryptionAlgorithms::RS512,
+        JSONWebSignatureAndEncryptionAlgorithms::PS256,
+        JSONWebSignatureAndEncryptionAlgorithms::PS384,
+        JSONWebSignatureAndEncryptionAlgorithms::PS512,
+        JSONWebSignatureAndEncryptionAlgorithms::None
+    );
+
+    public static $supported_key_management_algorithms = array(
+        JSONWebSignatureAndEncryptionAlgorithms::RSA1_5,
+        JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP,
+        JSONWebSignatureAndEncryptionAlgorithms::RSA_OAEP_256,
+        JSONWebSignatureAndEncryptionAlgorithms::None,
+    );
+
+    public static $supported_content_encryption_algorithms = array(
+        JSONWebSignatureAndEncryptionAlgorithms::A128CBC_HS256,
+        JSONWebSignatureAndEncryptionAlgorithms::A192CBC_HS384,
+        JSONWebSignatureAndEncryptionAlgorithms::A256CBC_HS512,
+        JSONWebSignatureAndEncryptionAlgorithms::None,
     );
 
 

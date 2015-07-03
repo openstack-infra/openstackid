@@ -1,5 +1,5 @@
-<div class="row-fluid">
-    <div class="span12">
+<div class="row">
+    <div class="col-md-12">
         <ul class="unstyled list-inline">
             <?php $last_api = ''; ?>
             @foreach ($scopes as $scope)
@@ -18,18 +18,20 @@
 
                 <img width="24" height="24" src="{{$current_api_logo}}" alt="api logo"/>
 
-                <span>{{trim($current_api)}}</span>&nbsp;<i class="icon-info-sign accordion-toggle" title="{{$scope->getApiDescription()}}"></i>
+                <span class="label label-default">{{trim($current_api)}}</span>&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" title="{{$scope->getApiDescription()}}"></span>
                 <ul class="unstyled list-inline" style="margin-left: 2em">
             @endif
             {{-- scope header --}}
             <li>
-                <label class="checkbox">
+                <div class="checkbox">
+                    <label>
                     <input type="checkbox" class="scope-checkbox" id="scope[]"
                     @if ( in_array($scope->id,$selected_scopes))
                     checked
                     @endif
-                    value="{{$scope->id}}"/><span>{{trim($scope->name)}}</span>&nbsp;<i class="icon-info-sign accordion-toggle" title="{{$scope->description}}"></i>
+                    value="{{$scope->id}}"/><span>{{trim($scope->name)}}</span>&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="{{$scope->description}}"></span>
                 </label>
+                 </div>
             </li>
             {{-- end scope header --}}
             @endforeach
@@ -48,5 +50,5 @@
 		delete:'{{URL::action("ClientApiController@removeAllowedScope",array("id"=>$client->id,"scope_id"=>"@scope_id"))}}'
 	};
 </script>
-{{ HTML::script('js/oauth2/profile/edit-client-scopes.js') }}
+{{ HTML::script('assets/js/oauth2/profile/edit-client-scopes.js') }}
 @stop

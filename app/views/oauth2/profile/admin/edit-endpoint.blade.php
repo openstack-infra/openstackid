@@ -108,5 +108,5 @@
 	   success: '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "Endpoint")) }}'
    };
 </script>
-{{ HTML::script('js/oauth2/profile/admin/edit-endpoint.js') }}
+{{ HTML::script('assets/js/oauth2/profile/admin/edit-endpoint.js') }}
 @stop

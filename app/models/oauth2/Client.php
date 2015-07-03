@@ -2,8 +2,73 @@
 
 use oauth2\models\IClient;
 use utils\model\BaseModelEloquent;
+use oauth2\models\TokenEndpointAuthInfo;
+use oauth2\models\IdTokenResponseInfo;
+use oauth2\models\UserInfoResponseInfo;
 
-class Client extends BaseModelEloquent implements IClient {
+/**
+ * Class Client
+ */
+class Client extends BaseModelEloquent implements IClient
+{
+
+    protected $fillable = array(
+        'app_name',
+        'app_description',
+        'app_logo',
+        'client_id',
+        'client_secret',
+        'client_type',
+        'active',
+        'locked',
+        'user_id',
+        'created_at',
+        'updated_at',
+        'max_auth_codes_issuance_qty',
+        'max_auth_codes_issuance_basis',
+        'max_access_token_issuance_qty',
+        'max_access_token_issuance_basis',
+        'max_refresh_token_issuance_qty',
+        'max_refresh_token_issuance_basis',
+        'use_refresh_token',
+        'rotate_refresh_token',
+        'resource_server_id',
+        'website',
+        'application_type',
+        'client_secret_expires_at',
+        'contacts',
+        'logo_uri',
+        'tos_uri',
+        'post_logout_redirect_uris',
+        'logout_uri',
+        'logout_session_required',
+        'logout_use_iframe',
+        'policy_uri',
+        'jwks_uri',
+        'default_max_age',
+        'require_auth_time',
+        'token_endpoint_auth_method',
+        'token_endpoint_auth_signing_alg',
+        'subject_type',
+        'userinfo_signed_response_alg',
+        'userinfo_encrypted_response_alg',
+        'userinfo_encrypted_response_enc',
+        'id_token_signed_response_alg',
+        'id_token_encrypted_response_alg',
+        'id_token_encrypted_response_enc',
+    );
+
+    public static  $valid_app_types = array(
+        IClient::ApplicationType_Service,
+        IClient::ApplicationType_JS_Client,
+        IClient::ApplicationType_Web_App,
+        IClient::ApplicationType_Native
+    );
+
+    public static $valid_subject_types = array(
+        IClient::SubjectType_Public,
+        IClient::SubjectType_Pairwise
+    );
 
     protected $table = 'oauth2_client';
 
@@ -18,6 +83,33 @@ class Client extends BaseModelEloquent implements IClient {
     public function getLockedAttribute(){
         return (int) $this->attributes['locked'];
     }
+
+
+    /**
+     * @param string $value
+     */
+    public function setApplicationTypeAttribute($value)
+    {
+        $this->attributes['application_type'] = strtolower($value);
+        $this->attributes['client_type']      = $this->infereClientTypeFromAppType($value);
+    }
+
+    /**
+     * @param string $app_type
+     * @return string
+     */
+    private function infereClientTypeFromAppType($app_type){
+        switch($app_type){
+            case IClient::ApplicationType_JS_Client:
+            case IClient::ApplicationType_Native:
+                return IClient::ClientType_Public;
+            break;
+            default:
+                return IClient::ClientType_Confidential;
+            break;
+        }
+    }
+
 
     public function access_tokens()
     {
@@ -110,7 +202,6 @@ class Client extends BaseModelEloquent implements IClient {
         }
         return $res;
     }
-
 
     public function isUriAllowed($uri)
     {
@@ -208,6 +299,9 @@ class Client extends BaseModelEloquent implements IClient {
             case IClient::ApplicationType_Web_App:
                 return 'Web Server Application';
                 break;
+            case IClient::ApplicationType_Native:
+                return 'Native Application';
+                break;
         }
         throw new Exception('Invalid Application Type');
     }
@@ -245,5 +339,117 @@ class Client extends BaseModelEloquent implements IClient {
     public function getWebsite()
     {
         return $this->website;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getClientSecretExpiration()
+    {
+        // TODO: Implement getClientSecretExpiration() method.
+    }
+
+    /**
+     * @return bool
+     */
+    public function isClientSecretExpired()
+    {
+        // TODO: Implement isClientSecretExpired() method.
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getContacts()
+    {
+        // TODO: Implement getContacts() method.
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultMaxAge()
+    {
+        // TODO: Implement getDefaultMaxAge() method.
+    }
+
+    /**
+     * @return bool
+     */
+    public function requireAuthTimeClaim()
+    {
+        // TODO: Implement requireAuthTimeClaim() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogoUri()
+    {
+        // TODO: Implement getLogoUri() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getPolicyUri()
+    {
+        // TODO: Implement getPolicyUri() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getTermOfServiceUri()
+    {
+        // TODO: Implement getTermOfServiceUri() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getPostLogoutUri()
+    {
+        // TODO: Implement getPostLogoutUri() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogoutUri()
+    {
+        // TODO: Implement getLogoutUri() method.
+    }
+
+    /**
+     * @return IdTokenResponseInfo
+     */
+    public function getIdTokenResponseInfo()
+    {
+        // TODO: Implement getIdTokenResponseInfo() method.
+    }
+
+    /**
+     * @return UserInfoResponseInfo
+     */
+    public function getUserInfoResponseInfo()
+    {
+        // TODO: Implement getUserInfoResponseInfo() method.
+    }
+
+    /**
+     * @return TokenEndpointAuthInfo
+     */
+    public function getTokenEndpointAuthInfo()
+    {
+        // TODO: Implement getTokenEndpointAuthInfo() method.
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubjectType()
+    {
+        // TODO: Implement getSubjectType() method.
     }
 }

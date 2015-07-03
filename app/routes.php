@@ -107,6 +107,7 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
     Route::group(array('prefix' => 'clients'), function(){
 
         Route::post('/', array('before' => 'is.current.user', 'uses' => 'ClientApiController@create'));
+        Route::get('/{id}',"ClientApiController@get");
         Route::get('/',array('before' => 'is.current.user', 'uses' => 'ClientApiController@getByPage'));
         Route::delete('/{id}',array('before' => 'user.owns.client.policy', 'uses' => 'ClientApiController@delete'));
 

@@ -45,5 +45,5 @@
 @stop
 
 @section('scripts')
-{{ HTML::script('js/admin/server-config.js') }}
+{{ HTML::script('assets/js/admin/server-config.js') }}
 @stop

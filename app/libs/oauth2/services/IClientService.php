@@ -39,9 +39,21 @@ interface IClientService {
      * @param  string $app_logo
      * @return IClient
      */
-    public function addClient($application_type, $user_id, $app_name, $app_description,$app_url=null, $app_logo='');
-    public function addClientScope($id,$scope_id);
-    public function deleteClientScope($id,$scope_id);
+    public function addClient($application_type, $user_id, $app_name, $app_description, $app_url = null, $app_logo = '');
+
+    /**
+     * @param $id
+     * @param $scope_id
+     * @return mixed
+     */
+    public function addClientScope($id, $scope_id);
+
+    /**
+     * @param $id
+     * @param $scope_id
+     * @return mixed
+     */
+    public function deleteClientScope($id, $scope_id);
 
     /**
      * Add a new allowed redirection uri
