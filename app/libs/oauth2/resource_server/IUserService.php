@@ -2,11 +2,14 @@
 
 namespace oauth2\resource_server;
 
+use jwt\impl\JWTClaimSet;
+
 /**
  * Interface IUserService
  * @package oauth2\resource_server
  */
-interface IUserService {
+interface IUserService
+{
     /**
      * This scope value requests access to the End-User's default profile Claims, which are:
      * name, family_name, given_name, middle_name, nickname, preferred_username, profile, picture,
@@ -23,4 +26,9 @@ interface IUserService {
     const UserProfileScope_Address   = 'address';
 
     public function getCurrentUserInfo();
+
+    /**
+     * @return JWTClaimSet
+     */
+    public function getCurrentUserInfoClaims();
 }
