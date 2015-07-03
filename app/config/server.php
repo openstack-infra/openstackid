@@ -17,6 +17,7 @@ return array(
      */
     'BlacklistSecurityPolicy_BannedIpLifeTimeSeconds' => 21600,
     'BlacklistSecurityPolicy_MinutesWithoutExceptions' => 5,
+    'BlacklistSecurityPolicy_MaxReplayAttackExceptionAttempts' => 3,
     'BlacklistSecurityPolicy_ReplayAttackExceptionInitialDelay' => 10,
     'BlacklistSecurityPolicy_MaxInvalidNonceAttempts' => 10,
     'BlacklistSecurityPolicy_InvalidNonceInitialDelay' => 10,
@@ -41,6 +42,7 @@ return array(
     //oauth2 default config values
     'OAuth2_AuthorizationCode_Lifetime' => 240,
     'OAuth2_AccessToken_Lifetime' => 3600,
+    'OAuth2_IdToken_Lifetime' => 3600,
     'OAuth2_RefreshToken_Lifetime' => 0,
     'OAuth2_Enable' => true,
     //oauth2 security policy configuration

@@ -98,7 +98,7 @@ App::error(function (Exception $exception, $code) {
         if ($checkpoint_service) {
             $checkpoint_service->trackException($exception);
         }
-        return View::make('404');
+        return Response::view('404', array(), 404);
     }
 });
 
@@ -110,7 +110,7 @@ App::error(function (InvalidOpenIdMessageException $exception, $code) {
         if ($checkpoint_service) {
             $checkpoint_service->trackException($exception);
         }
-        return View::make('404');
+        return Response::view('404', array(), 404);
     }
 });
 
@@ -121,7 +121,7 @@ App::error(function (InvalidOAuth2Request $exception, $code) {
         if ($checkpoint_service) {
             $checkpoint_service->trackException($exception);
         }
-        return View::make('404');
+        return Response::view('404', array(), 404);
     }
 });
 
