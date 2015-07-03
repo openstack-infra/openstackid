@@ -14,6 +14,9 @@ class Member extends BaseModelEloquent
     //external os members db (SS)
     protected $connection = 'os_members';
 
+    //no timestamps
+    public $timestamps = false;
+
     public function checkPassword($password)
     {
         $digest = AuthHelper::encrypt_password($password, $this->Salt, $this->PasswordEncryption);

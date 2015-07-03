@@ -8,14 +8,15 @@ use oauth2\models\IUserConsent;
  * Interface IUserConsentService
  * @package oauth2\services
  */
-interface IUserConsentService {
+interface IUserConsentService
+{
     /**
      * @param $user_id
      * @param $client_id
      * @param $scopes
      * @return IUserConsent
      */
-    public function get($user_id,$client_id,$scopes);
+    public function get($user_id, $client_id, $scopes);
 
     /**
      * @param $user_id
@@ -23,5 +24,5 @@ interface IUserConsentService {
      * @param $scopes
      * @return IUserConsent
      */
-    public function add($user_id,$client_id,$scopes);
+    public function add($user_id, $client_id, $scopes);
 } 

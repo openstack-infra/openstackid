@@ -2,22 +2,19 @@
 
 namespace oauth2\grant_types;
 
+use oauth2\exceptions\InvalidApplicationType;
 use oauth2\exceptions\InvalidGrantTypeException;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\ScopeNotAllowedException;
-use oauth2\exceptions\InvalidApplicationType;
-
 use oauth2\models\IClient;
 use oauth2\OAuth2Protocol;
 use oauth2\requests\OAuth2AccessTokenRequestClientCredentials;
-
 use oauth2\requests\OAuth2Request;
+use oauth2\requests\OAuth2TokenRequest;
 use oauth2\responses\OAuth2AccessTokenResponse;
 use oauth2\services\IApiScopeService;
 use oauth2\services\IClientService;
-
 use oauth2\services\ITokenService;
-use ReflectionClass;
 use utils\services\ILogService;
 
 /**
@@ -34,12 +31,27 @@ use utils\services\ILogService;
 class ClientCredentialsGrantType extends AbstractGrantType
 {
 
-
+    /**
+     * @var IApiScopeService
+     */
     private $scope_service;
 
-    public function __construct(IApiScopeService $scope_service, IClientService $client_service, ITokenService $token_service, ILogService $log_service)
+    /**
+     * @param IApiScopeService $scope_service
+     * @param IClientService $client_service
+     * @param ITokenService $token_service
+     * @param ILogService $log_service
+     */
+    public function __construct
+    (
+        IApiScopeService $scope_service,
+        IClientService   $client_service,
+        ITokenService    $token_service,
+        ILogService      $log_service
+    )
     {
         parent::__construct($client_service, $token_service, $log_service);
+
         $this->scope_service = $scope_service;
     }
 
@@ -49,10 +61,7 @@ class ClientCredentialsGrantType extends AbstractGrantType
      */
     public function canHandle(OAuth2Request $request)
     {
-        $reflector = new ReflectionClass($request);
-        $class_name = $reflector->getName();
-        return
-            ($class_name == 'oauth2\requests\OAuth2TokenRequest' && $request->isValid() &&  $request->getGrantType() == $this->getType());
+        return $request instanceof OAuth2TokenRequest && $request->isValid() && $request->getGrantType() == $this->getType();
     }
 
 
@@ -86,34 +95,45 @@ class ClientCredentialsGrantType extends AbstractGrantType
      */
     public function completeFlow(OAuth2Request $request)
     {
-        $reflector = new ReflectionClass($request);
-        $class_name = $reflector->getName();
-        if ($class_name == 'oauth2\requests\OAuth2AccessTokenRequestClientCredentials') {
-
-            if($request->getGrantType()!=$this->getType())
-                throw new InvalidGrantTypeException;
-
-            parent::completeFlow($request);
-
-            //only confidential clients could use this grant type
-            if ($this->current_client->getApplicationType() != IClient::ApplicationType_Service)
-                throw new InvalidApplicationType($this->current_client_id,sprintf('client id %s client type must be SERVICE',$this->current_client_id));
-
-            //check requested scope
-            $scope = $request->getScope();
-            if (is_null($scope) || empty($scope) || !$this->current_client->isScopeAllowed($scope))
-                throw new ScopeNotAllowedException(sprintf("scope %s", $scope));
-
-            // build current audience ...
-            $audience = $this->scope_service->getStrAudienceByScopeNames(explode(' ', $scope));
-
-            //build access token
-            $access_token = $this->token_service->createAccessTokenFromParams($this->current_client_id,$scope, $audience);
-
-            $response = new OAuth2AccessTokenResponse($access_token->getValue(), $access_token->getLifetime(), null);
-            return $response;
+        if (!($request instanceof OAuth2AccessTokenRequestClientCredentials)) {
+            throw new InvalidOAuth2Request;
         }
-        throw new InvalidOAuth2Request;
+
+        if ($request->getGrantType() != $this->getType()) {
+            throw new InvalidGrantTypeException;
+        }
+
+        parent::completeFlow($request);
+
+        //only confidential clients could use this grant type
+        if ($this->current_client->getApplicationType() != IClient::ApplicationType_Service) {
+            throw new InvalidApplicationType
+            (
+                sprintf
+                (
+                    'client id %s client type must be %s',
+                    $this->client_auth_context->getId(),
+                    IClient::ApplicationType_Service
+                )
+            );
+        }
+
+        //check requested scope
+        $scope = $request->getScope();
+        if (is_null($scope) || empty($scope) || !$this->current_client->isScopeAllowed($scope)) {
+            throw new ScopeNotAllowedException(sprintf("scope %s", $scope));
+        }
+
+        // build current audience ...
+        $audience = $this->scope_service->getStrAudienceByScopeNames(explode(' ', $scope));
+
+        //build access token
+        $access_token = $this->token_service->createAccessTokenFromParams($this->client_auth_context->getId(), $scope, $audience);
+
+        $response = new OAuth2AccessTokenResponse($access_token->getValue(), $access_token->getLifetime(), null);
+
+        return $response;
+
     }
 
     /** builds specific Token request
@@ -122,13 +142,16 @@ class ClientCredentialsGrantType extends AbstractGrantType
      */
     public function buildTokenRequest(OAuth2Request $request)
     {
-        $reflector = new ReflectionClass($request);
-        $class_name = $reflector->getName();
-        if ($class_name == 'oauth2\requests\OAuth2TokenRequest') {
+
+        if ($request instanceof OAuth2TokenRequest)
+        {
             if ($request->getGrantType() !== $this->getType())
+            {
                 return null;
+            }
             return new OAuth2AccessTokenRequestClientCredentials($request->getMessage());
         }
+
         return null;
     }
 
