@@ -2,15 +2,21 @@
 
 namespace oauth2\exceptions;
 
-use Exception;
+use oauth2\OAuth2Protocol;
 
-class InvalidOAuth2Request extends Exception
+/**
+ * Class InvalidOAuth2Request
+ * @package oauth2\exceptions
+ */
+final class InvalidOAuth2Request extends OAuth2BaseException
 {
 
-    public function __construct($message = "")
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $message = "Invalid OAuth2 Request : " . $message;
-        parent::__construct($message, 0, null);
+        return OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest;
     }
 
 }

@@ -2,15 +2,20 @@
 
 namespace oauth2\exceptions;
 
-use Exception;
+use oauth2\OAuth2Protocol;
 
-class InvalidAuthorizationCodeException extends Exception
+/**
+ * Class InvalidAuthorizationCodeException
+ * @package oauth2\exceptions
+ */
+final class InvalidAuthorizationCodeException extends OAuth2BaseException
 {
 
-    public function __construct($message = "")
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $message = "Invalid Authorization Code : " . $message;
-        parent::__construct($message, 0, null);
+        return OAuth2Protocol::OAuth2Protocol_Error_InvalidGrant;
     }
-
 }

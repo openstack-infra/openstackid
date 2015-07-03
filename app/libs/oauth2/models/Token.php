@@ -51,19 +51,28 @@ abstract class Token extends Identifier
         return $this->client_id;
     }
 
+    /**
+     * @return mixed
+     */
     public function getAudience()
     {
         return $this->audience;
     }
 
+    /**
+     * @return string
+     */
     public function getFromIp()
     {
         return $this->from_ip;
     }
 
+    /**
+     * @return int
+     */
     public function getUserId()
     {
-        return $this->user_id;
+        return intval($this->user_id);
     }
 
     public function getRemainingLifetime()

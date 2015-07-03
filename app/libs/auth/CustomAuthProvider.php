@@ -86,11 +86,10 @@ class CustomAuthProvider implements UserProviderInterface
     {
         try {
             //here we do the manuel join between 2 DB, (openid and SS db)
-            $user = $this->user_repository->getByExternalId($identifier);
+            $user   = $this->user_repository->getByExternalId($identifier);
             $member = $this->member_repository->get($identifier);
             if (!is_null($member) && !is_null($user)) {
                 $user->setMember($member);
-
                 return $user;
             }
 
@@ -110,27 +109,35 @@ class CustomAuthProvider implements UserProviderInterface
      */
     public function retrieveByCredentials(array $credentials)
     {
-        $user_service           = $this->user_service;
+        $user_service = $this->user_service;
         $auth_extension_service = $this->auth_extension_service;
-        $user_repository        = $this->user_repository;
-        $member_repository      = $this->member_repository;
+        $user_repository = $this->user_repository;
+        $member_repository = $this->member_repository;
+        $log_service = $this->log_service;
+        $checkpoint_service = $this->checkpoint_service;
 
-        try {
 
+        return $this->tx_service->transaction(function () use (
+            $credentials,
+            $user_repository,
+            $member_repository,
+            $user_service,
+            $auth_extension_service,
+            $log_service,
+            $checkpoint_service
+        ) {
 
-            $user = $this->tx_service->transaction(function () use (
-                $credentials,
-                $user_repository,
-                $member_repository,
-                $user_service,
-                $auth_extension_service
-            ) {
+            $user = null;
 
-                if (!isset($credentials['username']) || !isset($credentials['password'])) {
+            try
+            {
+
+                if (!isset($credentials['username']) || !isset($credentials['password']))
+                {
                     throw new AuthenticationException("invalid crendentials");
                 }
 
-                $email = $credentials['username'];
+                $email    = $credentials['username'];
                 $password = $credentials['password'];
 
                 //get SS member
@@ -153,54 +160,44 @@ class CustomAuthProvider implements UserProviderInterface
 
                 $user = $user_repository->getByExternalId($member->ID);
 
-                //if user does not exists, then create it
-                if (is_null($user)) {
-                    //create user
-                    $user                       = new User();
-                    $user->external_identifier  = $member->ID;
-                    $user->identifier           = $member->ID;
-                    $user->last_login_date      = gmdate("Y-m-d H:i:s", time());
-                    $user->active               = true;
-                    $user->lock                 = false;
-                    $user->login_failed_attempt = 0;
-                    $user_repository->add($user);
+                if (!$user) {
+                    $user = $user_service->buildUser($member);
                 }
 
                 //check user status...
                 if ($user->lock || !$user->active) {
                     Log::warning(sprintf("user %s is on lock state", $email));
-                    throw new AuthenticationLockedUserLoginAttempt($email, sprintf("user %s is on lock state", $email));
+                    throw new AuthenticationLockedUserLoginAttempt($email,
+                        sprintf("user %s is on lock state", $email));
                 }
 
-
-                $user_name = strtolower($member->FirstName . "." . $member->Surname);
-                //do association between user and member
-                $user_service->associateUser($user, $user_name);
-
                 //update user fields
-                $user->last_login_date      = gmdate("Y-m-d H:i:s", time());
+                $user->last_login_date = gmdate("Y-m-d H:i:s", time());
                 $user->login_failed_attempt = 0;
-                $user->active               = true;
-                $user->lock                 = false;
+                $user->active = true;
+                $user->lock = false;
                 $user_repository->update($user);
                 $user->setMember($member);
 
                 $auth_extensions = $auth_extension_service->getExtensions();
 
-                foreach ($auth_extensions as $auth_extension) {
+                foreach ($auth_extensions as $auth_extension)
+                {
                     $auth_extension->process($user);
                 }
 
-                return $user;
 
-            });
-        } catch (Exception $ex) {
-            $this->checkpoint_service->trackException($ex);
-            $this->log_service->error($ex);
-            $user = null;
-        }
+            }
+            catch (Exception $ex)
+            {
+                $checkpoint_service->trackException($ex);
+                $log_service->error($ex);
+                $user = null;
+            }
 
-        return $user;
+            return $user;
+        });
+
     }
 
 
@@ -217,10 +214,10 @@ class CustomAuthProvider implements UserProviderInterface
             throw new AuthenticationException("invalid crendentials");
         }
         try {
-            $email    = $credentials['username'];
+            $email = $credentials['username'];
             $password = $credentials['password'];
 
-            $member   = $this->member_repository->getByEmail($email);
+            $member = $this->member_repository->getByEmail($email);
 
             if (!$member || !$member->checkPassword($password)) {
                 return false;
@@ -263,5 +260,5 @@ class CustomAuthProvider implements UserProviderInterface
         $user->setAttribute($user->getRememberTokenName(), $token);
 
         $user->save();
-	}
+    }
 }
