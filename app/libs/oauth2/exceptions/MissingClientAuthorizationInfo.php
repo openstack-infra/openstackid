@@ -3,14 +3,19 @@
 namespace oauth2\exceptions;
 
 use Exception;
+use oauth2\OAuth2Protocol;
 
-class MissingClientAuthorizationInfo extends Exception
+/**
+ * Class MissingClientAuthorizationInfo
+ * @package oauth2\exceptions
+ */
+final class MissingClientAuthorizationInfo extends OAuth2BaseException
 {
-
-    public function __construct($message = "")
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $message = "Missing Client Authorization Info: " . $message;
-        parent::__construct($message, 0, null);
+        return OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient;
     }
-
 }

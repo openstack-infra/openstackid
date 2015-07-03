@@ -20,8 +20,8 @@ use utils\model\Identifier;
  * Class UniqueIdentifierGenerator
  * @package utils\services
  */
-abstract class UniqueIdentifierGenerator implements IdentifierGenerator {
-
+abstract class UniqueIdentifierGenerator implements IdentifierGenerator
+{
 
     /**
      * @var ICacheService
@@ -45,9 +45,11 @@ abstract class UniqueIdentifierGenerator implements IdentifierGenerator {
         $reflect    = new \ReflectionClass($identifier);
         $class_name = strtolower($reflect->getShortName());
 
-        do {
+        do
+        {
             $value = $this->_generate($identifier)->getValue();
-        } while(!$this->cache_service->addSingleValue($class_name.'.value.'.$value, $class_name.'.value.'.$value));
+        }
+        while(!$this->cache_service->addSingleValue($class_name.'.value.'.$value, $class_name.'.value.'.$value));
         return $identifier;
     }
 
