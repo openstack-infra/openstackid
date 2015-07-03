@@ -30,9 +30,15 @@ class OpenIdServiceProvider extends ServiceProvider {
         $auth_extension_service = App::make('auth\\IAuthenticationExtensionService');
 
         if(!is_null($auth_extension_service)){
-            $memento_service              = App::make(OpenIdServiceCatalog::MementoService);
+            $memento_service              = App::make(OpenIdServiceCatalog::MementoSerializerService);
             $server_configuration_service = App::make(UtilsServiceCatalog::ServerConfigurationService);
-            $auth_extension_service->addExtension(new OpenIdAuthenticationExtension($memento_service,$server_configuration_service));
+
+            $auth_extension_service->addExtension(
+                    new OpenIdAuthenticationExtension(
+                        $memento_service,
+                        $server_configuration_service
+                    )
+            );
         }
     }
 

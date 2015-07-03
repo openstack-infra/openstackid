@@ -41,6 +41,8 @@ abstract class OpenStackIDBaseTest extends TestCase {
             DB::table('openid_trusted_sites')->delete();
         if (Schema::hasTable('openid_associations'))
             DB::table('openid_associations')->delete();
+        if (Schema::hasTable('user_actions'))
+            DB::table('user_actions')->delete();
         if (Schema::hasTable('openid_users'))
             DB::table('openid_users')->delete();
         if (Schema::hasTable('oauth2_api_endpoint_api_scope'))

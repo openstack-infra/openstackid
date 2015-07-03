@@ -7,8 +7,8 @@
 @section('content')
 @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
 <legend>Locked Users</legend>
-<div class="row-fluid">
-    <div class="span12">
+<div class="row">
+    <div class="col-md-12">
         <table id="users-table" class="table table-hover table-condensed">
             <thead>
             <tr>
@@ -31,7 +31,7 @@
                     </div>
                 </td>
                 <td>
-                    {{ HTML::link(URL::action("UserApiController@unlock",array("id"=>$user->id)),'Unlock',array('data-user-id'=>$user->id,'class'=>'btn unlock-user','title'=>'Unlocks given user')) }}
+                    {{ HTML::link(URL::action("UserApiController@unlock", array("id"=>$user->id)),'Unlock',array('data-user-id'=>$user->id,'class'=>'btn unlock-user','title'=>'Unlocks given user')) }}
                 </td>
             </tr>
             @endforeach
@@ -42,5 +42,5 @@
 </div>
 @stop
 @section('scripts')
-{{ HTML::script('js/admin/users.js') }}
-@stop
+{{ HTML::script('assets/js/admin/users.js') }}
+@append

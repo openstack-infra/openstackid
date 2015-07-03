@@ -79,7 +79,7 @@
 
 <div class="row-fluid">
     <div class="span6">
-        <legend>{{Lang::get("messages.edit_endpoint_scope_title")}}&nbsp;<i class="icon-info-sign accordion-toggle" title='{{Lang::get("messages.edit_endpoint_scope_info_title")}}'></i></legend>
+        <legend>{{Lang::get("messages.edit_endpoint_scope_title")}}&nbsp;<span aria-hidden="true" class="glyphicon glyphicon-info-sign pointable" title='{{Lang::get("messages.edit_endpoint_scope_info_title")}}'></span></legend>
         <ul class="unstyled list-inline">
             @foreach($endpoint->api()->first()->scopes()->get() as $scope)
             {{-- scope header --}}
@@ -92,7 +92,7 @@
                     @if ( in_array($scope->id,$selected_scopes))
                     checked
                     @endif
-                    value="{{$scope->id}}"/><span>{{trim($scope->name)}}</span>&nbsp;<i class="icon-info-sign accordion-toggle" title="{{$scope->description}}"></i>
+                    value="{{$scope->id}}"/><span>{{trim($scope->name)}}</span>&nbsp;<span aria-hidden="true" class="glyphicon glyphicon-info-sign pointable" title="{{$scope->description}}"></span>
                 </label>
             </li>
             @endforeach
@@ -108,5 +108,5 @@
 	   success: '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "Endpoint")) }}'
    };
 </script>
-{{ HTML::script('js/oauth2/profile/admin/edit-endpoint.js') }}
+{{ HTML::script('assets/js/oauth2/profile/admin/edit-endpoint.js') }}
 @stop

@@ -2,15 +2,21 @@
 
 namespace strategies;
 
+use App;
 use Illuminate\Support\ServiceProvider;
 use oauth2\responses\OAuth2DirectResponse;
 use oauth2\responses\OAuth2IndirectResponse;
 use openid\responses\OpenIdDirectResponse;
 use openid\responses\OpenIdIndirectResponse;
 use oauth2\responses\OAuth2IndirectFragmentResponse;
-use App;
+use openid\services\OpenIdServiceCatalog;
+use oauth2\services\OAuth2ServiceCatalog;
 
-class StrategyProvider extends ServiceProvider
+/**
+ * Class StrategyProvider
+ * @package strategies
+ */
+final class StrategyProvider extends ServiceProvider
 {
 
     public function boot()
@@ -26,7 +32,9 @@ class StrategyProvider extends ServiceProvider
         App::singleton(OpenIdIndirectResponse::OpenIdIndirectResponse, 'strategies\\IndirectResponseQueryStringStrategy');
         App::singleton(OAuth2IndirectResponse::OAuth2IndirectResponse, 'strategies\\IndirectResponseQueryStringStrategy');
         App::singleton(OAuth2IndirectFragmentResponse::OAuth2IndirectFragmentResponse,'strategies\\IndirectResponseUrlFragmentStrategy');
-        App::singleton('oauth2\\strategies\\IOAuth2AuthenticationStrategy', 'strategies\\OAuth2AuthenticationStrategy');
+        // authentication strategies
+        App::singleton(OAuth2ServiceCatalog::AuthenticationStrategy, 'strategies\\OAuth2AuthenticationStrategy');
+        App::singleton(OpenIdServiceCatalog::AuthenticationStrategy, 'strategies\\OpenIdAuthenticationStrategy');
     }
 
     public function provides()

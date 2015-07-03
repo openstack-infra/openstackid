@@ -20,13 +20,24 @@ use oauth2\requests\OAuth2Request;
 class TokenEndpoint implements IOAuth2Endpoint
 {
 
+    /**
+     * @var IOAuth2Protocol
+     */
     private $protocol;
 
+    /**
+     * @param IOAuth2Protocol $protocol
+     */
     public function __construct(IOAuth2Protocol $protocol)
     {
         $this->protocol = $protocol;
     }
 
+    /**
+     * @param OAuth2Request $request
+     * @return mixed
+     * @throws InvalidGrantTypeException
+     */
     public function handle(OAuth2Request $request)
     {
         foreach ($this->protocol->getAvailableGrants() as $key => $grant) {
