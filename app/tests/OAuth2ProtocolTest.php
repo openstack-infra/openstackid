@@ -33,7 +33,6 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
     {
         parent::prepareForTests();
         App::singleton(UtilsServiceCatalog::ServerConfigurationService, 'StubServerConfigurationService');
-        //Route::enableFilters();
         $this->current_realm = Config::get('app.url');
         $user = User::where('identifier', '=', 'sebastian.marcet')->first();
         $this->be($user);
@@ -46,6 +45,8 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
     public function testAuthCode()
     {
 
+        Route::enableFilters();
+
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
 
         $params = array(
@@ -55,19 +56,41 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             'scope' => sprintf('%s/resource-server/read', $this->current_realm),
         );
 
-
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
-
         $response = $this->action("POST", "OAuth2ProviderController@authorize",
             $params,
             array(),
             array(),
             array());
 
+        $this->assertResponseStatus(302);
+
         $url = $response->getTargetUrl();
-        $content = $response->getContent();
+
+        $consent_response = $this->call('POST', $url, array(
+            'trust'  => 'AllowOnce',
+            '_token' => Session::token()
+        ));
 
         $this->assertResponseStatus(302);
+
+        $auth_response =$this->action("GET", "OAuth2ProviderController@authorize",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $auth_response->getTargetUrl();
+
+        $comps = @parse_url($url);
+        $query = $comps['query'];
+        $output = array();
+        parse_str($query, $output);
+
+        $this->assertTrue(array_key_exists('code', $output) );
+        $this->assertTrue(!empty($output['code']) );
+
     }
 
     /** Get Token Test
@@ -131,7 +154,6 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
         $this->assertTrue(!empty($access_token));
         $this->assertTrue(!empty($refresh_token));
-
 
     }
 

@@ -6,8 +6,8 @@
 
 @section('content')
 @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
-<div class="row-fluid">
-    <div class="span6">
+<div class="row">
+    <div class="col-md-6">
         <form method="POST" id="form-server-configuration">
         <fieldset>
             <legend>General Configuration</legend>
@@ -45,5 +45,5 @@
 @stop
 
 @section('scripts')
-{{ HTML::script('js/admin/server-config.js') }}
-@stop
+{{ HTML::script('assets/js/admin/server-config.js') }}
+@append

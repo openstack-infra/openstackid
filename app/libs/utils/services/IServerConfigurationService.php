@@ -17,4 +17,9 @@ interface IServerConfigurationService {
     public function getAllConfigValues();
 
     public function saveConfigValue($key,$value);
+
+    /**
+     * @return string
+     */
+    public function getSiteUrl();
 } 

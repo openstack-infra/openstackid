@@ -7,9 +7,11 @@ use oauth2\services\AccessTokenGenerator;
 use oauth2\services\AuthorizationCodeGenerator;
 use oauth2\services\OAuth2ServiceCatalog;
 use oauth2\services\RefreshTokenGenerator;
+use oauth2\strategies\ClientAuthContextValidatorFactory;
 use services\oauth2\ResourceServer;
 use App;
 use utils\services\UtilsServiceCatalog;
+use URL;
 
 /**
  * Class OAuth2ServiceProvider
@@ -19,20 +21,26 @@ class OAuth2ServiceProvider extends ServiceProvider
 {
     protected $defer = false;
 
-    public function boot(){
+    public function boot()
+    {
     }
 
-    public function register(){
+    public function register()
+    {
 
         App::singleton('oauth2\\IResourceServerContext', 'services\\oauth2\\ResourceServerContext');
-        App::singleton(OAuth2ServiceCatalog::MementoService, 'services\\oauth2\\MementoOAuth2AuthenticationRequestService');
         App::singleton(OAuth2ServiceCatalog::ClientService, 'services\\oauth2\\ClientService');
+        App::singleton(OAuth2ServiceCatalog::ClienPublicKeyService, 'services\\oauth2\\ClienPublicKeyService');
+        App::singleton(OAuth2ServiceCatalog::ServerPrivateKeyService, 'services\\oauth2\\ServerPrivateKeyService');
         App::singleton(OAuth2ServiceCatalog::ScopeService, 'services\\oauth2\\ApiScopeService');
         App::singleton(OAuth2ServiceCatalog::ResourceServerService, 'services\\oauth2\\ResourceServerService');
         App::singleton(OAuth2ServiceCatalog::ApiService, 'services\\oauth2\\ApiService');
         App::singleton(OAuth2ServiceCatalog::ApiEndpointService, 'services\\oauth2\\ApiEndpointService');
         App::singleton(OAuth2ServiceCatalog::UserConsentService, 'services\\oauth2\\UserConsentService');
         App::singleton(OAuth2ServiceCatalog::AllowedOriginService, 'services\\oauth2\\AllowedOriginService');
+        App::singleton(OAuth2ServiceCatalog::OpenIDProviderConfigurationService,'services\\oauth2\\OpenIDProviderConfigurationService');
+        App::singleton(OAuth2ServiceCatalog::MementoSerializerService,'services\\oauth2\\OAuth2MementoSessionSerializerService');
+
         App::singleton(OAuth2ServiceCatalog::TokenService, function(){
 
             return new TokenService(

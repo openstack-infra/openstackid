@@ -2,22 +2,19 @@
 
 namespace oauth2\grant_types;
 
+use Exception;
+use oauth2\exceptions\BearerTokenDisclosureAttemptException;
+use oauth2\exceptions\ExpiredAccessTokenException;
+use oauth2\exceptions\InvalidGrantTypeException;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\UnAuthorizedClientException;
-use oauth2\exceptions\BearerTokenDisclosureAttemptException;
-use oauth2\exceptions\InvalidGrantTypeException;
-use oauth2\exceptions\ExpiredAccessTokenException;
-
 use oauth2\OAuth2Protocol;
 use oauth2\requests\OAuth2Request;
+use oauth2\requests\OAuth2TokenRevocationRequest;
 use oauth2\responses\OAuth2TokenRevocationResponse;
 use oauth2\services\IClientService;
 use oauth2\services\ITokenService;
-
-use ReflectionClass;
 use utils\services\ILogService;
-
-use Exception;
 
 /**
  * Class RevokeTokenGrantType
@@ -62,10 +59,7 @@ class RevokeBearerTokenGrantType extends AbstractGrantType
      */
     public function canHandle(OAuth2Request $request)
     {
-        $reflector = new ReflectionClass($request);
-        $class_name = $reflector->getName();
-
-        return $class_name == 'oauth2\requests\OAuth2TokenRevocationRequest' && $request->isValid();
+        return $request instanceof Auth2TokenRevocationRequest && $request->isValid();
     }
 
     /** defines entry point for first request processing
@@ -78,89 +72,111 @@ class RevokeBearerTokenGrantType extends AbstractGrantType
         throw new InvalidOAuth2Request('not implemented!');
     }
 
+    /**
+     * @param OAuth2Request $request
+     * @return OAuth2TokenRevocationResponse
+     * @throws BearerTokenDisclosureAttemptException
+     * @throws Exception
+     * @throws ExpiredAccessTokenException
+     * @throws InvalidOAuth2Request
+     * @throws UnAuthorizedClientException
+     * @throws \oauth2\exceptions\InvalidClientCredentials
+     * @throws \oauth2\exceptions\InvalidClientException
+     * @throws \oauth2\exceptions\LockedClientException
+     * @throws \oauth2\exceptions\MissingClientIdParam
+     */
     public function completeFlow(OAuth2Request $request)
     {
 
-        $reflector = new ReflectionClass($request);
-        $class_name = $reflector->getName();
-        if ($class_name == 'oauth2\requests\OAuth2TokenRevocationRequest') {
+        if (!($request instanceof OAuth2TokenRevocationRequest)) {
+            throw new InvalidOAuth2Request;
+        }
 
-            parent::completeFlow($request);
-            $token_value = $request->getToken();
-            $token_hint  = $request->getTokenHint();
+        parent::completeFlow($request);
+        $token_value = $request->getToken();
+        $token_hint = $request->getTokenHint();
 
-            try{
-                if (!is_null($token_hint) && !empty($token_hint)) {
-                    //we have been provided with a token hint...
-                    switch ($token_hint) {
-                        case OAuth2Protocol::OAuth2Protocol_AccessToken:
-                        {
-                            //check ownership
-                            $access_token = $this->token_service->getAccessToken($token_value);
-
-                            if(is_null($access_token))
-                                throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $token_value));
-
-                            if ($access_token->getClientId() !== $this->current_client_id)
-                                throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('access token %s does not belongs to client id %s',$token_value, $this->current_client_id));
-
-                            $this->token_service->revokeAccessToken($token_value, false);
-                        }
-                            break;
-                        case OAuth2Protocol::OAuth2Protocol_RefreshToken:
-                        {
-                            //check ownership
-                            $refresh_token = $this->token_service->getRefreshToken($token_value);
-
-                            if ($refresh_token->getClientId() !== $this->current_client_id)
-                                throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('refresh token %s does not belongs to client id %s',$token_value, $this->current_client_id));
-
-                            $this->token_service->revokeRefreshToken($token_value, false);
-                        }
-                            break;
-                    }
-                } else {
-                    /*
-                     * no token hint given :(
-                     * if the server is unable to locate the token using
-                     * the given hint, it MUST extend its search across all of its
-                     * supported token types.
-                     */
-
-                    //check and handle access token first ..
-                    try{
+        try {
+            if (!is_null($token_hint) && !empty($token_hint)) {
+                //we have been provided with a token hint...
+                switch ($token_hint) {
+                    case OAuth2Protocol::OAuth2Protocol_AccessToken: {
                         //check ownership
                         $access_token = $this->token_service->getAccessToken($token_value);
 
-                        if(is_null($access_token))
+                        if (is_null($access_token)) {
                             throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $token_value));
+                        }
 
-                        if ($access_token->getClientId() !== $this->current_client_id)
-                            throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('access token %s does not belongs to client id %s',$token_value, $this->current_client_id));
+                        if ($access_token->getClientId() !== $this->client_auth_context->getId()) {
+                            throw new BearerTokenDisclosureAttemptException($this->client_auth_context->getId(),
+                                sprintf('access token %s does not belongs to client id %s', $token_value,
+                                    $this->client_auth_context->getId()));
+                        }
 
                         $this->token_service->revokeAccessToken($token_value, false);
                     }
-                    catch(UnAuthorizedClientException $ex1){
-                        $this->log_service->error($ex1);
-                        throw $ex1;
-                    }
-                    catch(Exception $ex){
-                        $this->log_service->warning($ex);
-                        //access token was not found, check refresh token
+                        break;
+                    case OAuth2Protocol::OAuth2Protocol_RefreshToken: {
                         //check ownership
                         $refresh_token = $this->token_service->getRefreshToken($token_value);
-                        if ($refresh_token->getClientId() !== $this->current_client_id)
-                            throw new BearerTokenDisclosureAttemptException($this->current_client_id,sprintf('refresh token %s does not belongs to client id %s',$token_value, $this->current_client_id));
+
+                        if ($refresh_token->getClientId() !== $this->client_auth_context->getId()) {
+                            throw new BearerTokenDisclosureAttemptException($this->client_auth_context->getId(),
+                                sprintf('refresh token %s does not belongs to client id %s', $token_value,
+                                    $this->client_auth_context->getId()));
+                        }
+
                         $this->token_service->revokeRefreshToken($token_value, false);
                     }
+                        break;
                 }
-                return new OAuth2TokenRevocationResponse;
+            } else {
+                /*
+                 * no token hint given :(
+                 * if the server is unable to locate the token using
+                 * the given hint, it MUST extend its search across all of its
+                 * supported token types.
+                 */
+
+                //check and handle access token first ..
+                try {
+                    //check ownership
+                    $access_token = $this->token_service->getAccessToken($token_value);
+
+                    if (is_null($access_token)) {
+                        throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $token_value));
+                    }
+
+                    if ($access_token->getClientId() !== $this->client_auth_context->getId()) {
+                        throw new BearerTokenDisclosureAttemptException($this->client_auth_context->getId(),
+                            sprintf('access token %s does not belongs to client id %s', $token_value,
+                                $this->client_auth_context->getId()));
+                    }
+
+                    $this->token_service->revokeAccessToken($token_value, false);
+                } catch (UnAuthorizedClientException $ex1) {
+                    $this->log_service->error($ex1);
+                    throw $ex1;
+                } catch (Exception $ex) {
+                    $this->log_service->warning($ex);
+                    //access token was not found, check refresh token
+                    //check ownership
+                    $refresh_token = $this->token_service->getRefreshToken($token_value);
+                    if ($refresh_token->getClientId() !== $this->client_auth_context->getId()) {
+                        throw new BearerTokenDisclosureAttemptException($this->client_auth_context->getId(),
+                            sprintf('refresh token %s does not belongs to client id %s', $token_value,
+                                $this->client_auth_context->getId()));
+                    }
+                    $this->token_service->revokeRefreshToken($token_value, false);
+                }
             }
-            catch(InvalidGrantTypeException $ex){
-                throw new BearerTokenDisclosureAttemptException($this->current_client_id,$ex->getMessage());
-            }
+
+            return new OAuth2TokenRevocationResponse;
+        } catch (InvalidGrantTypeException $ex) {
+            throw new BearerTokenDisclosureAttemptException($this->client_auth_context->getId(), $ex->getMessage());
         }
-        throw new InvalidOAuth2Request;
+
     }
 
     /**
