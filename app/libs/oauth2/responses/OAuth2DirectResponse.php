@@ -2,12 +2,13 @@
 
 namespace oauth2\responses;
 
-class OAuth2DirectResponse extends OAuth2Response {
+class OAuth2DirectResponse extends OAuth2Response
+{
 
     const DirectResponseContentType = "application/json;charset=UTF-8";
     const OAuth2DirectResponse      = 'OAuth2DirectResponse';
 
-    public function __construct($http_code=self::HttpOkResponse, $content_type=self::DirectResponseContentType)
+    public function __construct($http_code = self::HttpOkResponse, $content_type = self::DirectResponseContentType)
     {
         // Successful Responses: A server receiving a valid request MUST send a
         // response with an HTTP status code of 200.
