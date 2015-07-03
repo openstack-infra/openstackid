@@ -2,23 +2,21 @@
 
 namespace openid;
 
+use openid\handlers\IOpenIdAuthenticationStrategy;
 use openid\handlers\OpenIdAuthenticationRequestHandler;
 use openid\handlers\OpenIdCheckAuthenticationRequestHandler;
 use openid\handlers\OpenIdSessionAssociationRequestHandler;
+use openid\services\IAssociationService;
+use openid\services\IMementoOpenIdSerializerService;
+use openid\services\INonceService;
+use openid\services\IServerConfigurationService;
+use openid\services\IServerExtensionsService;
+use openid\services\ITrustedSitesService;
 use openid\XRDS\XRDSDocumentBuilder;
 use openid\XRDS\XRDSService;
-
-//services
-use utils\services\ILogService;
-use openid\services\IMementoOpenIdRequestService;
-use openid\handlers\IOpenIdAuthenticationStrategy;
-use openid\services\IServerExtensionsService;
-use openid\services\IAssociationService;
-use openid\services\ITrustedSitesService;
-use openid\services\IServerConfigurationService;
-use openid\services\INonceService;
 use utils\services\IAuthService;
 use utils\services\ICheckPointService;
+use utils\services\ILogService;
 use utils\services\IServerConfigurationService as IUtilsServerConfigurationService;
 
 /**
@@ -124,13 +122,35 @@ class OpenIdProtocol implements IOpenIdProtocol
         self::OpenIdProtocol_MacKey => self::OpenIdProtocol_MacKey,
     );
 
+    /**
+     * @var OpenIdAuthenticationRequestHandler
+     */
     private $request_handlers;
+    /**
+     * @var IServerExtensionsService
+     */
     private $server_extension_service;
+    /**
+     * @var IServerConfigurationService
+     */
     private $server_config_service;
 
+    /**
+     * @param IAuthService $auth_service
+     * @param IMementoOpenIdSerializerService $memento_request_service
+     * @param IOpenIdAuthenticationStrategy $auth_strategy
+     * @param IServerExtensionsService $server_extension_service
+     * @param IAssociationService $association_service
+     * @param ITrustedSitesService $trusted_sites_service
+     * @param IServerConfigurationService $server_config_service
+     * @param INonceService $nonce_service
+     * @param ILogService $log_service
+     * @param ICheckPointService $checkpoint_service
+     * @param IUtilsServerConfigurationService $utils_configuration_service
+     */
     public function __construct(
                                 IAuthService $auth_service,
-                                IMementoOpenIdRequestService $memento_request_service,
+                                IMementoOpenIdSerializerService $memento_request_service,
                                 IOpenIdAuthenticationStrategy $auth_strategy,
                                 IServerExtensionsService $server_extension_service,
                                 IAssociationService $association_service,
