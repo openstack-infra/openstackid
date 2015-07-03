@@ -6,6 +6,9 @@ use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
 use oauth2\services\OAuth2ServiceCatalog;
 use oauth2\exceptions\InvalidAuthorizationRequestException;
+use oauth2\strategies\ClientAuthContextValidatorFactory;
+use services\oauth2\HttpIClientJWKSetReader;
+
 /*
 |--------------------------------------------------------------------------
 | Application & Route Filters
@@ -19,13 +22,28 @@ use oauth2\exceptions\InvalidAuthorizationRequestException;
 
 //SAP (single access point)
 App::before(function($request){
-    try {
+
+    ClientAuthContextValidatorFactory::setTokenEndpointUrl
+    (
+        URL::action("OAuth2ProviderController@token")
+    );
+
+    ClientAuthContextValidatorFactory::setJWKSetReader
+    (
+        new HttpIClientJWKSetReader
+    );
+
+    try
+    {
         //checkpoint security pattern entry point
         $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
-        if (!$checkpoint_service->check()) {
+        if (!$checkpoint_service->check())
+        {
             return View::make('404');
         }
-    } catch (Exception $ex) {
+    }
+    catch (Exception $ex)
+    {
         Log::error($ex);
         return View::make('404');
     }
@@ -39,15 +57,6 @@ App::after(function($request, $response){
     // https://www.owasp.org/index.php/List_of_useful_HTTP_headers
     $response->headers->set('X-content-type-options','nosniff');
     $response->headers->set('X-xss-protection','1; mode=block');
-    // http://tools.ietf.org/html/rfc6797
-    /**
-     * The HSTS header field below stipulates that the HSTS Policy is to
-     * remain in effect for one year (there are approximately 31536000
-     * seconds in a year)
-     * applies to the domain of the issuing HSTS Host and all of its
-     * subdomains:
-     */
-    $response->headers->set('Strict-Transport-Security','max-age=31536000; includeSubDomains');
     //cache
     $response->headers->set('pragma','no-cache');
     $response->headers->set('Expires','-1');
@@ -120,50 +129,8 @@ Route::filter('ajax', function()
     if (!Request::ajax()) App::abort(404);
 });
 
-
-Route::filter("openid.needs.auth.request", function () {
-
-    $memento_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::MementoService);
-    $openid_message = $memento_service->getCurrentRequest();
-
-    if ($openid_message == null || !$openid_message->isValid())
-        throw new InvalidOpenIdMessageException();
-    $configuration_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::ServerConfigurationService);
-    $auth_request          = new OpenIdAuthenticationRequest($openid_message, $configuration_service->getUserIdentityEndpointURL('@identifier'));
-    if (!$auth_request->isValid())
-        throw new InvalidOpenIdMessageException();
-});
-
-Route::filter("openid.save.request", function () {
-
-    $memento_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::MementoService);
-    $memento_service->saveCurrentRequest();
-
-});
-
-Route::filter("oauth2.save.request", function () {
-
-    $memento_service = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::MementoService);
-    $memento_service->saveCurrentAuthorizationRequest();
-});
-
-Route::filter("oauth2.needs.auth.request", function () {
-
-    $memento_service = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::MementoService);
-    $oauth2_message  = $memento_service->getCurrentAuthorizationRequest();
-
-    if ($oauth2_message == null || !$oauth2_message->isValid())
-        throw new InvalidAuthorizationRequestException();
-});
-
 Route::filter("ssl", function () {
     if ((!Request::secure()) && (ServerConfigurationService::getConfigValue("SSL.Enable"))) {
-        $openid_memento_service = ServiceLocator::getInstance()->getService(OpenIdServiceCatalog::MementoService);
-        $openid_memento_service->saveCurrentRequest();
-
-        $oauth2_memento_service = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::MementoService);
-        $oauth2_memento_service->saveCurrentAuthorizationRequest();
-
         return Redirect::secure(Request::getRequestUri());
     }
 });
@@ -179,6 +146,13 @@ Route::filter('user.owns.client.policy',function($route, $request){
         $authentication_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::AuthenticationService);
         $client_service         = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ClientService);
         $client_id              = $route->getParameter('id');
+
+        if(is_null($client_id))
+            $client_id          = $route->getParameter('client_id');
+
+        if(is_null($client_id))
+            $client_id          =Input::get('client_id',null);;
+
         $client                 = $client_service->getClientByIdentifier($client_id);
         $user                   = $authentication_service->getCurrentUser();
         if (is_null($client) || intval($client->getUserId()) !== intval($user->getId()))
@@ -213,8 +187,6 @@ Route::filter('is.current.user',function($route, $request){
         return Response::json(array('error' => 'operation not allowed.'), 400);
     }
 });
-
-
 
 
 // filter to protect an api endpoint with oauth2
