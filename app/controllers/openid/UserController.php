@@ -2,61 +2,117 @@
 
 use oauth2\services\IApiScopeService;
 use oauth2\services\IClientService;
-use oauth2\services\IMementoOAuth2AuthenticationRequestService;
-use oauth2\services\ITokenService;
 use oauth2\services\IResourceServerService;
-use openid\services\IMementoOpenIdRequestService;
+use oauth2\services\ITokenService;
+use openid\requests\OpenIdAuthenticationRequest;
+use openid\services\IMementoOpenIdSerializerService;
+use openid\services\IServerConfigurationService;
 use openid\services\ITrustedSitesService;
 use openid\services\IUserService;
-use openid\services\IServerConfigurationService;
-use openid\requests\OpenIdAuthenticationRequest;
-use openid\XRDS\XRDSDocumentBuilder;
-use strategies\OpenIdLoginStrategy;
-use strategies\OpenIdConsentStrategy;
-use utils\IPHelper;
 use services\IUserActionService;
 use strategies\DefaultLoginStrategy;
 use strategies\OAuth2ConsentStrategy;
 use strategies\OAuth2LoginStrategy;
+use strategies\OpenIdConsentStrategy;
+use strategies\OpenIdLoginStrategy;
+use utils\IPHelper;
 use utils\services\IAuthService;
 use utils\services\IServerConfigurationService as IUtilsServerConfigurationService;
-
+use oauth2\services\IMementoOAuth2SerializerService;
 /**
  * Class UserController
  */
 class UserController extends OpenIdController
 {
 
+    /**
+     * @var IMementoOpenIdSerializerService
+     */
     private $openid_memento_service;
+    /**
+     * @var IMementoOAuth2SerializerService
+     */
     private $oauth2_memento_service;
+    /**
+     * @var IAuthService
+     */
     private $auth_service;
+    /**
+     * @var IServerConfigurationService
+     */
     private $server_configuration_service;
+    /**
+     * @var DiscoveryController
+     */
     private $discovery;
+    /**
+     * @var IUserService
+     */
     private $user_service;
+    /**
+     * @var IUserActionService
+     */
     private $user_action_service;
+    /**
+     * @var DefaultLoginStrategy
+     */
     private $login_strategy;
+    /**
+     * @var null
+     */
     private $consent_strategy;
+    /**
+     * @var IClientService
+     */
     private $client_service;
+    /**
+     * @var IApiScopeService
+     */
     private $scope_service;
+    /**
+     * @var ITokenService
+     */
     private $token_service;
+    /**
+     * @var IResourceServerService
+     */
     private $resource_server_service;
-	private $utils_configuration_service;
+    /**
+     * @var IUtilsServerConfigurationService
+     */
+    private $utils_configuration_service;
 
-    public function __construct(IMementoOpenIdRequestService $openid_memento_service,
-                                IMementoOAuth2AuthenticationRequestService $oauth2_memento_service,
-                                IAuthService $auth_service,
-                                IServerConfigurationService $server_configuration_service,
-                                ITrustedSitesService $trusted_sites_service,
-                                DiscoveryController $discovery,
-                                IUserService $user_service,
-                                IUserActionService $user_action_service,
-                                IClientService $client_service,
-                                IApiScopeService $scope_service,
-                                ITokenService $token_service,
-                                IResourceServerService $resource_server_service,
-                                IUtilsServerConfigurationService $utils_configuration_service
-								)
-    {
+    /**
+     * @param IMementoOpenIdSerializerService $openid_memento_service
+     * @param IMementoOAuth2SerializerService $oauth2_memento_service
+     * @param IAuthService $auth_service
+     * @param IServerConfigurationService $server_configuration_service
+     * @param ITrustedSitesService $trusted_sites_service
+     * @param DiscoveryController $discovery
+     * @param IUserService $user_service
+     * @param IUserActionService $user_action_service
+     * @param IClientService $client_service
+     * @param IApiScopeService $scope_service
+     * @param ITokenService $token_service
+     * @param IResourceServerService $resource_server_service
+     * @param IUtilsServerConfigurationService $utils_configuration_service
+     */
+    public function __construct(
+        IMementoOpenIdSerializerService $openid_memento_service,
+        IMementoOAuth2SerializerService $oauth2_memento_service,
+        IAuthService $auth_service,
+        IServerConfigurationService $server_configuration_service,
+        ITrustedSitesService $trusted_sites_service,
+        DiscoveryController $discovery,
+        IUserService $user_service,
+        IUserActionService $user_action_service,
+        IClientService $client_service,
+        IApiScopeService $scope_service,
+        ITokenService $token_service,
+        IResourceServerService $resource_server_service,
+        IUtilsServerConfigurationService $utils_configuration_service
+    ) {
+
         $this->openid_memento_service = $openid_memento_service;
         $this->oauth2_memento_service = $oauth2_memento_service;
         $this->auth_service = $auth_service;
@@ -69,25 +125,45 @@ class UserController extends OpenIdController
         $this->scope_service = $scope_service;
         $this->token_service = $token_service;
         $this->resource_server_service = $resource_server_service;
-	    $this->utils_configuration_service = $utils_configuration_service;
+        $this->utils_configuration_service = $utils_configuration_service;
         //filters
         $this->beforeFilter('csrf', array('only' => array('postLogin', 'postConsent')));
 
-        $openid_msg = $this->openid_memento_service->getCurrentRequest();
-        $oauth2_msg = $this->oauth2_memento_service->getCurrentAuthorizationRequest();
-
-        if (!is_null($openid_msg) && $openid_msg->isValid() && OpenIdAuthenticationRequest::IsOpenIdAuthenticationRequest($openid_msg)) {
+        if ($this->openid_memento_service->exists())
+        {
             //openid stuff
-            $this->beforeFilter('openid.save.request');
-            $this->beforeFilter('openid.needs.auth.request', array('only' => array('getConsent')));
-            $this->login_strategy   = new OpenIdLoginStrategy($openid_memento_service, $user_action_service, $auth_service);
-            $this->consent_strategy = new OpenIdConsentStrategy($openid_memento_service, $auth_service, $server_configuration_service, $user_action_service);
-        } else if (!is_null($oauth2_msg) && $oauth2_msg->isValid()) {
-            $this->beforeFilter('oauth2.save.request');
-            $this->beforeFilter('oauth2.needs.auth.request', array('only' => array('getConsent')));
-            $this->login_strategy   = new OAuth2LoginStrategy($auth_service, $oauth2_memento_service ,$user_action_service);
-            $this->consent_strategy = new OAuth2ConsentStrategy($auth_service, $oauth2_memento_service, $scope_service, $client_service);
-        } else {
+            $this->login_strategy   = new OpenIdLoginStrategy(
+                $openid_memento_service,
+                $user_action_service,
+                $auth_service
+            );
+
+            $this->consent_strategy = new OpenIdConsentStrategy(
+                $openid_memento_service,
+                $auth_service,
+                $server_configuration_service,
+                $user_action_service
+            );
+
+        }
+        else if ($this->oauth2_memento_service->exists())
+        {
+
+                $this->login_strategy = new OAuth2LoginStrategy(
+                    $auth_service,
+                    $oauth2_memento_service,
+                    $user_action_service
+                );
+
+                $this->consent_strategy = new OAuth2ConsentStrategy(
+                    $auth_service,
+                    $oauth2_memento_service,
+                    $scope_service,
+                    $client_service
+                );
+        }
+        else
+        {
             //default stuff
             $this->login_strategy   = new DefaultLoginStrategy($user_action_service, $auth_service);
             $this->consent_strategy = null;
@@ -122,11 +198,10 @@ class UserController extends OpenIdController
             $validator = Validator::make($data, $rules);
 
 
-
             if ($validator->passes()) {
-	            $username = Input::get("username");
-	            $password = Input::get("password");
-	            $remember = Input::get("remember");
+                $username = Input::get("username");
+                $password = Input::get("password");
+                $remember = Input::get("remember");
 
                 $remember = !is_null($remember);
                 if ($this->auth_service->login($username, $password, $remember)) {
@@ -137,36 +212,45 @@ class UserController extends OpenIdController
                 if ($user) {
                     $login_attempts = $user->login_failed_attempt;
                 }
+
                 return Redirect::action('UserController@getLogin')
-	                ->with('max_login_attempts_2_show_captcha', $max_login_attempts_2_show_captcha)
-	                ->with('login_attempts', $login_attempts)
-	                ->with('username',$username)
-	                ->with('flash_notice', "We're sorry, your username or password does not match an existing record.");
+                    ->with('max_login_attempts_2_show_captcha', $max_login_attempts_2_show_captcha)
+                    ->with('login_attempts', $login_attempts)
+                    ->with('username', $username)
+                    ->with('flash_notice', "We're sorry, your username or password does not match an existing record.");
             }
+
             return Redirect::action('UserController@getLogin')
-	            ->withErrors($validator);
+                ->withErrors($validator);
         } catch (Exception $ex) {
             Log::error($ex);
+
             return Redirect::action('UserController@getLogin');
         }
     }
 
     public function getConsent()
     {
-        if (is_null($this->consent_strategy))
+        if (is_null($this->consent_strategy)) {
             return View::make("404");
+        }
+
         return $this->consent_strategy->getConsent();
     }
 
     public function postConsent()
     {
-        try {
+        try
+        {
             $trust_action = input::get("trust");
-            if (!is_null($trust_action) && !is_null($this->consent_strategy)) {
+            if (!is_null($trust_action) && !is_null($this->consent_strategy))
+            {
                 return $this->consent_strategy->postConsent($trust_action);
             }
             return Redirect::action('UserController@getConsent');
-        } catch (Exception $ex) {
+        }
+        catch (Exception $ex)
+        {
             Log::error($ex);
             return Redirect::action('UserController@getConsent');
         }
@@ -176,8 +260,9 @@ class UserController extends OpenIdController
     {
         try {
             $user = $this->auth_service->getUserByOpenId($identifier);
-            if (is_null($user))
+            if (is_null($user)) {
                 return View::make("404");
+            }
 
             if ($this->isDiscoveryRequest()) {
                 /*
@@ -195,9 +280,9 @@ class UserController extends OpenIdController
                 $another_user = true;
             }
 
-	        $assets_url                   = $this->utils_configuration_service->getConfigValue("Assets.Url");
-	        $pic_url                      = $user->getPic();
-	        $pic_url = str_contains($pic_url,'http')?$pic_url:$assets_url.$pic_url;
+            $assets_url = $this->utils_configuration_service->getConfigValue("Assets.Url");
+            $pic_url = $user->getPic();
+            $pic_url = str_contains($pic_url, 'http') ? $pic_url : $assets_url . $pic_url;
 
             $params = array(
                 'show_fullname' => $user->getShowProfileFullName(),
@@ -209,24 +294,28 @@ class UserController extends OpenIdController
                 'pic' => $pic_url,
                 'another_user' => $another_user,
             );
+
             return View::make("identity", $params);
         } catch (Exception $ex) {
             Log::error($ex);
+
             return View::make("404");
         }
     }
 
     public function logout()
     {
-        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(), IUserActionService::LogoutAction);
+        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(),
+            IUserActionService::LogoutAction);
         Auth::logout();
+
         return Redirect::action("UserController@getLogin");
     }
 
     public function getProfile()
     {
-        $user    = $this->auth_service->getCurrentUser();
-        $sites   = $user->getTrustedSites();
+        $user = $this->auth_service->getCurrentUser();
+        $sites = $user->getTrustedSites();
         $actions = $user->getActions();
 
         return View::make("profile", array(
@@ -252,12 +341,14 @@ class UserController extends OpenIdController
         $show_pic = Input::get("show_pic");
         $user = $this->auth_service->getCurrentUser();
         $this->user_service->saveProfileInfo($user->getId(), $show_pic, $show_full_name, $show_email);
+
         return Redirect::action("UserController@getProfile");
     }
 
     public function deleteTrustedSite($id)
     {
         $this->trusted_sites_service->delTrustedSite($id);
+
         return Redirect::action("UserController@getProfile");
     }
 

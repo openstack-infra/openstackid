@@ -27,6 +27,7 @@ class TestSeeder extends Seeder {
 
         DB::table('openid_trusted_sites')->delete();
         DB::table('openid_associations')->delete();
+        DB::table('user_actions')->delete();
         DB::table('openid_users')->delete();
 
         DB::table('oauth2_api_endpoint_api_scope')->delete();
