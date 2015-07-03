@@ -24,7 +24,7 @@ class InsertMarketplaceApiEndpointsScopes extends Migration {
 				'active'          =>  true,
 				'Description'     => 'Marketplace Public Clouds',
 				'resource_server_id' => $resource_server->id,
-				'logo'               => asset('img/apis/server.png')
+				'logo'               => asset('/assets/img/apis/server.png')
 			)
 		);
 		// private clouds
@@ -35,7 +35,7 @@ class InsertMarketplaceApiEndpointsScopes extends Migration {
 				'active'          =>  true,
 				'Description'     => 'Marketplace Private Clouds',
 				'resource_server_id' => $resource_server->id,
-				'logo'               => asset('img/apis/server.png')
+				'logo'               => asset('/assets/img/apis/server.png')
 			)
 		);
 		// consultants
@@ -46,7 +46,7 @@ class InsertMarketplaceApiEndpointsScopes extends Migration {
 				'active'          =>  true,
 				'Description'     => 'Marketplace Consultants',
 				'resource_server_id' => $resource_server->id,
-				'logo'               => asset('img/apis/server.png')
+				'logo'               => asset('/assets/img/apis/server.png')
 			)
 		);
 
