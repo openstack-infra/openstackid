@@ -213,14 +213,13 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     public function testAuthenticationSetupModePrivateAssociation()
     {
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
-        $params = array(
-            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS) => OpenIdProtocol::OpenID2MessageType,
-            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode) => OpenIdProtocol::SetupMode,
-            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm) => "https://www.test.com/",
-            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo) => "https://www.test.com/oauth2",
-            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity) => "http://specs.openid.net/auth/2.0/identifier_select",
+         $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)      => OpenIdProtocol::SetupMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)     => "https://www.newsite.com/",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)  => "https://www.newsite.com/return_to/",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)  => "http://specs.openid.net/auth/2.0/identifier_select",
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
         );
 
@@ -228,15 +227,35 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
 
         $this->assertResponseStatus(302);
 
-        $openid_response = $this->parseOpenIdResponse($response->getTargetUrl());
+        $url = $response->getTargetUrl();
+
+        // post consent response ...
+
+        $consent_response = $this->call('POST', $url, array
+            (
+                'trust'  => array('AllowOnce'),
+                '_token' => Session::token()
+            )
+        );
+
+        $this->assertResponseStatus(302);
+
+        $auth_response = $this->action("GET", "OpenIdProviderController@endpoint",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $openid_response = $this->parseOpenIdResponse($auth_response->getTargetUrl());
 
         $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)]));
         $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)]));
         $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]));
 
         //http://openid.net/specs/openid-authentication-2_0.html#check_auth
-        $response = $this->action("POST", "OpenIdProviderController@endpoint",
-            $this->prepareCheckAuthenticationParams($openid_response));
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $this->prepareCheckAuthenticationParams($openid_response));
         $openid_response = $this->getOpenIdResponseLineBreak($response->getContent());
         $this->assertResponseStatus(200);
         $this->assertTrue($openid_response['is_valid'] === 'true');
@@ -471,7 +490,6 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]));
         $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]));
 
-
         //sreg
 
         $this->assertTrue(isset($openid_response[OpenIdSREGExtension::paramNamespace()]));
@@ -501,8 +519,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     public function testCheckSetupOAuth2Extension()
     {
 
-        //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
+        $sreg_required_params = array('email', 'fullname');
 
         $scope = array(
             sprintf('%s/resource-server/read', $this->current_realm),
@@ -526,11 +543,34 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
             OpenIdOAuth2Extension::param(OpenIdOAuth2Extension::ClientId) => $this->oauth2_client_id,
             OpenIdOAuth2Extension::param(OpenIdOAuth2Extension::Scope) => implode(' ', $scope),
             OpenIdOAuth2Extension::param(OpenIdOAuth2Extension::State) => uniqid(),
+            //sreg
+            OpenIdSREGExtension::paramNamespace() => OpenIdSREGExtension::NamespaceUrl,
+            OpenIdSREGExtension::param(OpenIdSREGExtension::Required) => implode(",", $sreg_required_params),
         );
 
         $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
         $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $response = $this->call('GET', $url);
+
+        $this->assertResponseStatus(200);
+
+        $consent_html_content = $response->getContent();
+
+        $this->assertTrue(str_contains($consent_html_content, 'Welcome to openstackId - consent'));
+        $this->assertTrue(str_contains($consent_html_content, 'The site has also requested some personal information'));
+        $this->assertTrue(str_contains($consent_html_content, 'The site has also requested some permissions for following OAuth2 application'));
+
+
+        $response = $this->call('POST', $url, array(
+            'trust'  => array('AllowOnce'),
+            '_token' => Session::token()
+        ));
+
+        $response = $this->call('GET', $response->getTargetUrl());
 
         $openid_response = $this->parseOpenIdResponse($response->getTargetUrl());
 
@@ -561,7 +601,6 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]));
         $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]));
 
-
         //oauth2
 
         $this->assertTrue(isset($openid_response[OpenIdOAuth2Extension::paramNamespace()]));
@@ -573,6 +612,18 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue(isset($openid_response[OpenIdOAuth2Extension::param(OpenIdOAuth2Extension::Scope)]));
         $this->assertTrue(!empty($openid_response[OpenIdOAuth2Extension::param(OpenIdOAuth2Extension::Scope)]));
 
+        //sreg
+
+        $this->assertTrue(isset($openid_response[OpenIdSREGExtension::paramNamespace()]));
+        $this->assertTrue($openid_response[OpenIdSREGExtension::paramNamespace()] === OpenIdSREGExtension::NamespaceUrl);
+
+        $this->assertTrue(isset($openid_response[OpenIdSREGExtension::param(OpenIdSREGExtension::FullName)]));
+        $full_name = $openid_response[OpenIdSREGExtension::param(OpenIdSREGExtension::FullName)];
+        $this->assertTrue(!empty($full_name) && $full_name === 'Sebastian Marcet');
+
+        $this->assertTrue(isset($openid_response[OpenIdSREGExtension::param(OpenIdSREGExtension::Email)]));
+        $email = $openid_response[OpenIdSREGExtension::param(OpenIdSREGExtension::Email)];
+        $this->assertTrue(!empty($email) && $email === 'smarcet@gmail.com');
 
         //http://openid.net/specs/openid-authentication-2_0.html#check_auth
         $response = $this->action("POST", "OpenIdProviderController@endpoint",

@@ -2,20 +2,20 @@
 
 namespace oauth2\exceptions;
 
-use Exception;
+use oauth2\OAuth2Protocol;
 
-class ReplayAttackException extends Exception
+/**
+ * Class ReplayAttackException
+ * @package oauth2\exceptions
+ */
+final class ReplayAttackException extends OAuth2BaseException
 {
-    private $auth_code;
 
-    public function getAuthCode(){
-        return $this->auth_code;
-    }
-
-    public function __construct($auth_code,$message = "")
+    /**
+     * @return string
+     */
+    public function getError()
     {
-        $this->auth_code = $auth_code;
-        $message = "Possible Replay Attack : " . $message;
-        parent::__construct($message, 0, null);
+       return OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest;
     }
 }

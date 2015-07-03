@@ -3,11 +3,15 @@
 namespace auth;
 
 use Auth;
+use Member;
 use Session;
 use utils\services\IAuthService;
-use \Member;
 
-class AuthService implements IAuthService
+/**
+ * Class AuthService
+ * @package auth
+ */
+final class AuthService implements IAuthService
 {
 
     /**
@@ -34,7 +38,13 @@ class AuthService implements IAuthService
      */
     public function login($username, $password, $remember_me)
     {
-        return Auth::attempt(array('username' => $username, 'password' => $password), $remember_me);
+        $res = Auth::attempt(array('username' => $username, 'password' => $password), $remember_me);
+        if ($res) {
+            // save on session auth time
+            Session::set('openstackid.auth_time', time());
+        }
+
+        return $res;
     }
 
     public function logout()
@@ -49,12 +59,15 @@ class AuthService implements IAuthService
     {
         if (Session::has("openid.authorization.response")) {
             $value = Session::get("openid.authorization.response");
+
             return $value;
         }
+
         return IAuthService::AuthorizationResponse_None;
     }
 
-    public function clearUserAuthorizationResponse(){
+    public function clearUserAuthorizationResponse()
+    {
         if (Session::has("openid.authorization.response")) {
             Session::remove("openid.authorization.response");
         }
@@ -68,14 +81,17 @@ class AuthService implements IAuthService
     public function getUserByOpenId($openid)
     {
         $user = User::where('identifier', '=', $openid)->first();
+
         return $user;
     }
 
     public function getUserByUsername($username)
     {
         $member = Member::where('Email', '=', $username)->first();
-        if(!is_null($member))
-            return  User::where('external_identifier', '=', $member->ID)->first();
+        if (!is_null($member)) {
+            return User::where('external_identifier', '=', $member->ID)->first();
+        }
+
         return false;
     }
 
@@ -84,26 +100,38 @@ class AuthService implements IAuthService
         return User::find($id);
     }
 
-	// Authentication
+    // Authentication
 
-	public function getUserAuthenticationResponse()
-	{
-		if (Session::has("openstackid.authentication.response")) {
-			$value = Session::get("openstackid.authentication.response");
-			return $value;
-		}
-		return IAuthService::AuthenticationResponse_None;
-	}
+    public function getUserAuthenticationResponse()
+    {
+        if (Session::has("openstackid.authentication.response")) {
+            $value = Session::get("openstackid.authentication.response");
+            return $value;
+        }
+        return IAuthService::AuthenticationResponse_None;
+    }
 
-	public function setUserAuthenticationResponse($auth_response)
-	{
-		Session::set("openstackid.authentication.response", $auth_response);
-	}
+    public function setUserAuthenticationResponse($auth_response)
+    {
+        Session::set("openstackid.authentication.response", $auth_response);
+    }
 
-	public function clearUserAuthenticationResponse()
-	{
-		if (Session::has("openstackid.authentication.response")) {
-			Session::remove("openstackid.authentication.response");
-		}
-	}
+    public function clearUserAuthenticationResponse()
+    {
+        if (Session::has("openstackid.authentication.response")) {
+            Session::remove("openstackid.authentication.response");
+        }
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getAuthTime()
+    {
+        if (Session::has("openstackid.auth_time")) {
+            return intval(Session::get("openstackid.auth_time"));
+        }
+
+        return null;
+    }
 }

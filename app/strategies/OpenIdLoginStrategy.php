@@ -3,29 +3,46 @@
 namespace strategies;
 
 use Auth;
-use Redirect;
-use View;
+use openid\OpenIdMessage;
 use openid\OpenIdProtocol;
 use openid\requests\OpenIdAuthenticationRequest;
-use openid\responses\OpenIdNonImmediateNegativeAssertion;
-use openid\services\IMementoOpenIdRequestService;
-use openid\strategies\OpenIdResponseStrategyFactoryMethod;
-use utils\IPHelper;
+use openid\services\IMementoOpenIdSerializerService;
+use Redirect;
 use services\IUserActionService;
+use utils\IPHelper;
 use utils\services\IAuthService;
+use View;
 
-
-class OpenIdLoginStrategy implements ILoginStrategy
+/**
+ * Class OpenIdLoginStrategy
+ * @package strategies
+ */
+final class OpenIdLoginStrategy implements ILoginStrategy
 {
 
+    /**
+     * @var IMementoOpenIdSerializerService
+     */
     private $memento_service;
+    /**
+     * @var IUserActionService
+     */
     private $user_action_service;
+    /**
+     * @var IAuthService
+     */
     private $auth_service;
 
-    public function __construct(IMementoOpenIdRequestService $memento_service,
-                                IUserActionService $user_action_service,
-                                IAuthService $auth_service)
-    {
+    /**
+     * @param IMementoOpenIdSerializerService $memento_service
+     * @param IUserActionService $user_action_service
+     * @param IAuthService $auth_service
+     */
+    public function __construct(
+        IMementoOpenIdSerializerService $memento_service,
+        IUserActionService $user_action_service,
+        IAuthService $auth_service
+    ) {
         $this->memento_service = $memento_service;
         $this->user_action_service = $user_action_service;
         $this->auth_service = $auth_service;
@@ -34,16 +51,18 @@ class OpenIdLoginStrategy implements ILoginStrategy
     public function getLogin()
     {
         if (Auth::guest()) {
-            $msg          = $this->memento_service->getCurrentRequest();
+            $msg = OpenIdMessage::buildFromMemento($this->memento_service->load());
             $auth_request = new OpenIdAuthenticationRequest($msg);
-            $params       = array('realm' => $auth_request->getRealm());
+            $params = array('realm' => $auth_request->getRealm());
+
             if (!$auth_request->isIdentitySelectByOP()) {
-                $params['claimed_id']      = $auth_request->getClaimedId();
-                $params['identity']        = $auth_request->getIdentity();
+                $params['claimed_id'] = $auth_request->getClaimedId();
+                $params['identity'] = $auth_request->getIdentity();
                 $params['identity_select'] = false;
             } else {
                 $params['identity_select'] = true;
             }
+
             return View::make("login", $params);
         } else {
             return Redirect::action("UserController@getProfile");
@@ -53,14 +72,17 @@ class OpenIdLoginStrategy implements ILoginStrategy
     public function  postLogin()
     {
         //go to authentication flow again
-        $msg = $this->memento_service->getCurrentRequest();
-        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(), IUserActionService::LoginAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
+        $msg = OpenIdMessage::buildFromMemento($this->memento_service->load());
+        $this->user_action_service->addUserAction($this->auth_service->getCurrentUser(), IPHelper::getUserIp(),
+            IUserActionService::LoginAction, $msg->getParam(OpenIdProtocol::OpenIDProtocol_Realm));
+
         return Redirect::action("OpenIdProviderController@endpoint");
     }
 
     public function  cancelLogin()
     {
-	    $this->auth_service->setUserAuthenticationResponse(IAuthService::AuthenticationResponse_Cancel);
-	    return Redirect::action("OpenIdProviderController@endpoint");
+        $this->auth_service->setUserAuthenticationResponse(IAuthService::AuthenticationResponse_Cancel);
+
+        return Redirect::action("OpenIdProviderController@endpoint");
     }
 }

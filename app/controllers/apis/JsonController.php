@@ -16,7 +16,7 @@ abstract class JsonController extends BaseController  {
 
     protected function error500(Exception $ex){
         $this->log_service->error($ex);
-        return Response::json(array('message' => 'server error'), 500);
+        return Response::json(array( 'error' => 'server error'), 500);
     }
 
     protected function created($data='ok'){

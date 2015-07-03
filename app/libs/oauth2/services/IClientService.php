@@ -2,6 +2,9 @@
 
 namespace oauth2\services;
 
+use oauth2\exceptions\InvalidClientAuthMethodException;
+use oauth2\exceptions\MissingClientAuthorizationInfo;
+use oauth2\models\ClientAuthenticationContext;
 use oauth2\models\IClient;
 /**
  * Interface IClientService
@@ -22,8 +25,10 @@ interface IClientService {
      * client credentials in the request-body using the following
      * parameters:
      * implementation of http://tools.ietf.org/html/rfc6749#section-2.3.1
-     * @throws InvalidClientException;
-     * @return list
+     * implementation of http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+     * @throws InvalidClientAuthMethodException
+     * @throws MissingClientAuthorizationInfo
+     * @return ClientAuthenticationContext
      */
     public function getCurrentClientAuthInfo();
 
@@ -39,38 +44,22 @@ interface IClientService {
      * @param  string $app_logo
      * @return IClient
      */
-    public function addClient($application_type, $user_id, $app_name, $app_description,$app_url=null, $app_logo='');
-    public function addClientScope($id,$scope_id);
-    public function deleteClientScope($id,$scope_id);
-
-    /**
-     * Add a new allowed redirection uri
-     * @param $id client id
-     * @param $uri allowed redirection uri
-     * @return mixed
-     */
-    public function addClientAllowedUri($id,$uri);
+    public function addClient($application_type, $user_id, $app_name, $app_description, $app_url = null, $app_logo = '');
 
     /**
      * @param $id
-     * @param $origin
+     * @param $scope_id
      * @return mixed
      */
-    public function addClientAllowedOrigin($id,$origin);
-
-    /**
-     * Deletes a former client allowed redirection Uri
-     * @param $id client identifier
-     * @param $uri_id uri identifier
-     */
-    public function deleteClientAllowedUri($id,$uri_id);
+    public function addClientScope($id, $scope_id);
 
     /**
      * @param $id
-     * @param $origin_id
+     * @param $scope_id
      * @return mixed
      */
-    public function deleteClientAllowedOrigin($id,$origin_id);
+    public function deleteClientScope($id, $scope_id);
+
 
     public function deleteClientByIdentifier($id);
 
@@ -126,12 +115,10 @@ interface IClientService {
      */
     public function existClientAppName($app_name);
 
-
-
     /**
-     * gets an api scope by id
-     * @param $id id of api scope
-     * @return IApiScope
+     * gets a client by id
+     * @param $id id of client
+     * @return IClient
      */
     public function get($id);
 

@@ -2,26 +2,33 @@
 
 namespace utils\services;
 
+use openid\model\IOpenIdUser;
+
 /**
  * Interface IAuthService
  * @package utils\services
  */
-interface IAuthService {
+interface IAuthService
+{
     const AuthorizationResponse_None         = "None";
     const AuthorizationResponse_AllowOnce    = "AllowOnce";
     const AuthorizationResponse_AllowForever = "AllowForever";
     const AuthorizationResponse_DenyForever  = "DenyForever";
     const AuthorizationResponse_DenyOnce     = "DenyOnce";
 
-	const AuthenticationResponse_None         = "None";
-	const AuthenticationResponse_Cancel       = "Cancel";
+    const AuthenticationResponse_None   = "None";
+    const AuthenticationResponse_Cancel = "Cancel";
 
     /**
      * @return bool
      */
     public function isUserLogged();
 
+    /**
+     * @return IOpenIdUser
+     */
     public function getCurrentUser();
+
     /**
      * @param $username
      * @param $password
@@ -38,15 +45,20 @@ interface IAuthService {
 
     public function setUserAuthorizationResponse($auth_response);
 
-	public function clearUserAuthorizationResponse();
+    public function clearUserAuthorizationResponse();
 
-	public function getUserAuthenticationResponse();
+    public function getUserAuthenticationResponse();
 
-	public function setUserAuthenticationResponse($auth_response);
+    public function setUserAuthenticationResponse($auth_response);
 
-	public function clearUserAuthenticationResponse();
+    public function clearUserAuthenticationResponse();
 
     public function logout();
 
     public function getUserByOpenId($openid);
+
+    /**
+     * @return int|null
+     */
+    public function getAuthTime();
 }

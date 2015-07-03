@@ -3,6 +3,10 @@
 use oauth2\models\IClient;
 use auth\User;
 use utils\services\IAuthService;
+use \jwk\JSONWebKeyPublicKeyUseValues;
+use \jwk\JSONWebKeyTypes;
+use \oauth2\OAuth2Protocol;
+use \jwa\JSONWebSignatureAndEncryptionAlgorithms;
 /**
  * Class OAuth2ApplicationSeeder
  * This seeder is only for testing purposes
@@ -13,6 +17,33 @@ class TestSeeder extends Seeder {
     {
 
         Eloquent::unguard();
+
+        $member_table = <<<SQL
+      CREATE TABLE Member
+      (
+          ID integer primary key,
+          FirstName varchar(50),
+          Surname varchar(50),
+          Email varchar(254),
+          Password varchar(254),
+          PasswordEncryption varchar(50),
+          Salt varchar(50)
+      );
+SQL;
+
+        DB::connection('os_members')->statement($member_table);
+
+        Member::create(
+            array(
+                'ID'   => 1,
+                'FirstName' => 'Sebastian',
+                'Surname' => 'Marcet',
+                'Email' => 'sebastian@tipit.net',
+                'Password' => '1qaz2wsx',
+                'PasswordEncryption' => 'none',
+                'Salt' => 'none',
+            )
+        );
 
         DB::table('banned_ips')->delete();
         DB::table('user_exceptions_trail')->delete();
@@ -27,6 +58,7 @@ class TestSeeder extends Seeder {
 
         DB::table('openid_trusted_sites')->delete();
         DB::table('openid_associations')->delete();
+        DB::table('user_actions')->delete();
         DB::table('openid_users')->delete();
 
         DB::table('oauth2_api_endpoint_api_scope')->delete();
@@ -53,6 +85,19 @@ class TestSeeder extends Seeder {
 
         $this->seedApis();
         //scopes
+
+        ApiScope::create(
+            array(
+                'name'               => 'openid',
+                'short_description'  => 'OIDC',
+                'description'        => 'OIDC',
+                'api_id'             => null,
+                'system'             => true,
+                'default'            => true,
+                'active'             => true,
+            )
+        );
+
         $this->seedResourceServerScopes();
         $this->seedApiScopes();
         $this->seedApiEndpointScopes();
@@ -308,7 +353,7 @@ class TestSeeder extends Seeder {
         User::create(
             array(
                 'identifier'          => 'sebastian.marcet',
-                'external_identifier' => 13867,
+                'external_identifier' => 1,
                 'last_login_date'     => gmdate("Y-m-d H:i:s", time())
             )
         );
@@ -332,9 +377,11 @@ class TestSeeder extends Seeder {
                 'client_secret'        => 'ITc/6Y5N7kOtGKhg',
                 'client_type'          => IClient::ClientType_Confidential,
                 'application_type'     => IClient::ApplicationType_Web_App,
+                'token_endpoint_auth_method' => OAuth2Protocol::TokenEndpoint_AuthMethod_ClientSecretBasic,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => true,
-                'use_refresh_token'    => true
+                'use_refresh_token'    => true,
+                'redirect_uris' => 'https://www.test.com/oauth2'
             )
         );
 
@@ -349,7 +396,8 @@ class TestSeeder extends Seeder {
                 'application_type'     => IClient::ApplicationType_Service,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => true,
-                'use_refresh_token'    => true
+                'use_refresh_token'    => true,
+                'redirect_uris' => 'https://www.test.com/oauth2'
             )
         );
 
@@ -361,10 +409,11 @@ class TestSeeder extends Seeder {
                 'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client',
                 'client_secret'        => null,
                 'client_type'          => IClient::ClientType_Public,
-                'application_type'     => IClient::ApplicationType_JS_Client,
+                'application_type'     => IClient::ApplicationType_Native,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => false,
-                'use_refresh_token'    => false
+                'use_refresh_token'    => false,
+                'redirect_uris' => 'https://www.test.com/oauth2'
             )
         );
 
@@ -379,7 +428,8 @@ class TestSeeder extends Seeder {
                 'application_type'     => IClient::ApplicationType_JS_Client,
                 'user_id'              => $user->id,
                 'rotate_refresh_token' => false,
-                'use_refresh_token'    => false
+                'use_refresh_token'    => false,
+                'redirect_uris' => 'https://www.test.com/oauth2'
             )
         );
 
@@ -401,35 +451,76 @@ class TestSeeder extends Seeder {
         $client_confidential = Client::where('app_name','=','oauth2_test_app')->first();
         $client_public       = Client::where('app_name','=','oauth2_test_app_public')->first();
         $client_service      = Client::where('app_name','=','oauth2.service')->first();
-        //attach scopes
+
+        //attach all scopes
         $scopes = ApiScope::get();
-        foreach($scopes as $scope){
+        foreach($scopes as $scope)
+        {
             $client_confidential->scopes()->attach($scope->id);
             $client_public->scopes()->attach($scope->id);
             $client_service->scopes()->attach($scope->id);
         }
-        //add uris
-        ClientAuthorizedUri::create(
-            array(
-                'uri' => 'https://www.test.com/oauth2',
-                'client_id' => $client_confidential->id
-            )
+
+        $now =  new \DateTime('now');
+
+        $public_key_1 = ClientPublicKey::buildFromPEM(
+            'public_key_1',
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Encryption,
+            TestKeys::$public_key_pem,
+            JSONWebSignatureAndEncryptionAlgorithms::RSA1_5,
+            true,
+            $now,
+            $now->add(new \DateInterval('P31D'))
         );
 
-        //add uris
-        ClientAllowedOrigin::create(
-            array(
-                'allowed_origin' => 'https://www.test.com/oauth2',
-                'client_id' => $client_confidential->id
-            )
+        $public_key_1->oauth2_client_id = $client_confidential->id;
+        $public_key_1->save();
+
+        $public_key_2 = ClientPublicKey::buildFromPEM(
+            'public_key_2',
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Signature,
+            TestKeys::$public_key2_pem,
+            JSONWebSignatureAndEncryptionAlgorithms::RS512,
+            true,
+            $now,
+            $now->add(new \DateInterval('P31D'))
         );
 
-        ClientAuthorizedUri::create(
-            array(
-                'uri'=>'https://www.test.com/oauth2',
-                'client_id'=>$client_public->id
-            )
+        $public_key_2->oauth2_client_id = $client_confidential->id;
+        $public_key_2->save();
+
+        // server private keys
+
+        $pkey_1 = ServerPrivateKey::build
+        (
+            'server_key_enc',
+            $now,
+            $now->add(new \DateInterval('P31D')),
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Encryption,
+            JSONWebSignatureAndEncryptionAlgorithms::RSA1_5,
+            true,
+            TestKeys::$private_key_pem
         );
+
+        $pkey_1->save();
+
+
+        $pkey_2 = ServerPrivateKey::build
+        (
+            'server_key_sig',
+            $now,
+            $now->add(new \DateInterval('P31D')),
+            JSONWebKeyTypes::RSA,
+            JSONWebKeyPublicKeyUseValues::Signature,
+            JSONWebSignatureAndEncryptionAlgorithms::RS512,
+            true,
+            TestKeys::$private_key_pem
+        );
+
+        $pkey_2->save();
     }
 
     private function seedApis(){
@@ -666,6 +757,7 @@ class TestSeeder extends Seeder {
                 'system'             => true,
             )
         );
+
 
     }
 
