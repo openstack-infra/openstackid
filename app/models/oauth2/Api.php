@@ -3,27 +3,36 @@
 use oauth2\models\IApi;
 use utils\model\BaseModelEloquent;
 
-class Api extends BaseModelEloquent implements IApi {
+class Api extends BaseModelEloquent implements IApi
+{
 
-    protected $fillable = array('name','description','active','resource_server_id','logo');
+    protected $fillable = array('name', 'description', 'active', 'resource_server_id', 'logo');
 
     protected $table = 'oauth2_api';
 
-	public function getActiveAttribute(){
-		return (bool) $this->attributes['active'];
-	}
+    public function getActiveAttribute()
+    {
+        return (bool)$this->attributes['active'];
+    }
 
-	public function getIdAttribute(){
-		return (int) $this->attributes['id'];
-	}
+    public function getIdAttribute()
+    {
+        return (int)$this->attributes['id'];
+    }
 
-	public function getResourceServerIdAttribute(){
-		return (int) $this->attributes['resource_server_id'];
-	}
+    public function getLogoAttribute()
+    {
+       return $this->getLogo();
+    }
+
+    public function getResourceServerIdAttribute()
+    {
+        return (int)$this->attributes['resource_server_id'];
+    }
 
     public function scopes()
     {
-        return $this->hasMany('ApiScope','api_id');
+        return $this->hasMany('ApiScope', 'api_id');
     }
 
     public function resource_server()
@@ -33,7 +42,7 @@ class Api extends BaseModelEloquent implements IApi {
 
     public function endpoints()
     {
-        return $this->hasMany('ApiEndpoint','api_id');
+        return $this->hasMany('ApiEndpoint', 'api_id');
     }
 
     /**
@@ -51,8 +60,8 @@ class Api extends BaseModelEloquent implements IApi {
 
     public function getLogo()
     {
-        $url     = asset('img/apis/server.png');
-        return !empty($this->logo)?$this->logo:$url;
+        $url = asset('/assets/img/apis/server.png');
+        return $url;
     }
 
 
@@ -64,11 +73,14 @@ class Api extends BaseModelEloquent implements IApi {
     public function getScope()
     {
         $scope = '';
-        foreach($this->scopes()->get() as $s){
-            if(!$s->active) continue;
-            $scope = $scope .$s->name.' ';
+        foreach ($this->scopes()->get() as $s) {
+            if (!$s->active) {
+                continue;
+            }
+            $scope = $scope . $s->name . ' ';
         }
         $scope = trim($scope);
+
         return $scope;
     }
 
@@ -93,15 +105,15 @@ class Api extends BaseModelEloquent implements IApi {
         $this->active = $active;
     }
 
-    public function delete ()
+    public function delete()
     {
-        $endpoints = ApiEndpoint::where('api_id','=', $this->id)->get();
-        foreach($endpoints as $endpoint){
+        $endpoints = ApiEndpoint::where('api_id', '=', $this->id)->get();
+        foreach ($endpoints as $endpoint) {
             $endpoint->delete();
         }
 
-        $scopes = ApiScope::where('api_id','=', $this->id)->get();
-        foreach($scopes as $scope){
+        $scopes = ApiScope::where('api_id', '=', $this->id)->get();
+        foreach ($scopes as $scope) {
             $scope->delete();
         }
 

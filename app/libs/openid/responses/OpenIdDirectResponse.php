@@ -5,6 +5,7 @@ namespace openid\responses;
 use openid\exceptions\InvalidKVFormat;
 use openid\helpers\OpenIdErrorMessages;
 use openid\OpenIdProtocol;
+use utils\http\HttpContentType;
 
 /**
  * Class OpenIdDirectResponse
@@ -15,13 +16,12 @@ class OpenIdDirectResponse extends OpenIdResponse
 {
 
     const OpenIdDirectResponse = "OpenIdDirectResponse";
-    const DirectResponseContentType = "text/plain";
 
     public function __construct()
     {
         // Successful Responses: A server receiving a valid request MUST send a
         // response with an HTTP status code of 200.
-        parent::__construct(self::HttpOkResponse, self::DirectResponseContentType);
+        parent::__construct(self::HttpOkResponse, HttpContentType::Text);
         /*
          * This particular value MUST be present for the response to be a valid OpenID 2.0
          * response. Future versions of the specification may define different values in order

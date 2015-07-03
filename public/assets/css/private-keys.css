@@ -1,0 +1,28 @@
+.private-key-fingerprint {
+    color: #767676;
+    display: block;
+    font-weight: normal;
+}
+
+.private-key-validity-range {
+
+}
+
+.private-key-title {
+    display: block;
+    max-width: 360px;
+}
+
+.private-key-active {
+    background-color: #6cc644 !important;
+    box-shadow: 0 0 10px rgba(108, 198, 68, 0.5);
+    padding: 0 !important;
+    cursor: pointer;
+}
+
+.private-key-deactivated {
+    background-image: linear-gradient(#aaa, #ccc);
+    box-shadow: 0 1px 0 #fff;
+    padding: 0 !important;
+    cursor: pointer;
+}

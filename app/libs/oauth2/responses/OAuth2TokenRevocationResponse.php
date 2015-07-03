@@ -2,6 +2,8 @@
 
 namespace oauth2\responses;
 
+use utils\http\HttpContentType;
+
 /**
  * Class OAuth2TokenRevocationResponse
  * http://tools.ietf.org/html/rfc7009#section-2.2
@@ -24,6 +26,6 @@ class OAuth2TokenRevocationResponse extends OAuth2DirectResponse {
     {
         // Successful Responses: A server receiving a valid request MUST send a
         // response with an HTTP status code of 200.
-        parent::__construct(self::HttpOkResponse, self::DirectResponseContentType);
+        parent::__construct(self::HttpOkResponse, HttpContentType::Json);
     }
 } 
