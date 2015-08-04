@@ -3,7 +3,7 @@ OpenID 2.0 endpoint
 ===================
 
 To get the OpenStackID OpenID endpoint, perform discovery by sending a GET
-HTTP request to https://openstackid.openstack.org. We recommend setting the
+HTTP request to https://openstackid.org. We recommend setting the
 Accept header to "application/xrds+xml". OpenStackID returns an XRDS document
 containing an OpenID provider endpoint URL.The endpoint address is
 annotated as::
