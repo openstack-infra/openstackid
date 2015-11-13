@@ -25,13 +25,8 @@ class DiscoveryController extends OpenIdController
      */
     public function idp()
     {
-
-        if ($this->isDiscoveryRequest()) {
-            $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeIdp), 200);
-            $this->setDiscoveryResponseType($response);
-        } else {
-            $response = View::make("home");
-        }
+        $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeIdp), 200);
+        $this->setDiscoveryResponseType($response);
         return $response;
     }
 

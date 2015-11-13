@@ -22,6 +22,8 @@ class OpenIdProviderController extends BaseController
 
     public function endpoint()
     {
+        $input = Input::all();
+        Log::debug(print_r($input, true));
         $msg = $this->memento_service->getCurrentRequest();
         if (is_null($msg) || !$msg->isValid())
             throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidOpenIdMessage);
