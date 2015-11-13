@@ -2,6 +2,9 @@
 @section('title')
 <title>Welcome to openstackId</title>
 @stop
+@section('meta')
+<meta http-equiv="X-XRDS-Location" content="{{ URL::action("DiscoveryController@idp")}}" />
+@stop
 @section('content')
 <div class="container">
     @if(Auth::guest() || $another_user)
