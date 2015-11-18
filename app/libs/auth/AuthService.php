@@ -3,9 +3,9 @@
 namespace auth;
 
 use Auth;
+use Member;
 use Session;
 use utils\services\IAuthService;
-use \Member;
 
 class AuthService implements IAuthService
 {
@@ -15,7 +15,16 @@ class AuthService implements IAuthService
      */
     public function isUserLogged()
     {
-        return Auth::check();
+        $res = Auth::check();
+        if ($res) {
+            $user = $this->getCurrentUser();
+            if (!$user->hasAssociatedMember()) {
+                $this->logout();
+                $res = false;
+            }
+        }
+
+        return $res;
     }
 
     /**
@@ -23,7 +32,13 @@ class AuthService implements IAuthService
      */
     public function getCurrentUser()
     {
-        return Auth::user();
+        $user = Auth::user();
+        if (!is_null($user) && !$user->hasAssociatedMember()) {
+            $this->logout();
+            $user = null;
+        }
+
+        return $user;
     }
 
     /**
@@ -49,12 +64,15 @@ class AuthService implements IAuthService
     {
         if (Session::has("openid.authorization.response")) {
             $value = Session::get("openid.authorization.response");
+
             return $value;
         }
+
         return IAuthService::AuthorizationResponse_None;
     }
 
-    public function clearUserAuthorizationResponse(){
+    public function clearUserAuthorizationResponse()
+    {
         if (Session::has("openid.authorization.response")) {
             Session::remove("openid.authorization.response");
         }
@@ -68,14 +86,17 @@ class AuthService implements IAuthService
     public function getUserByOpenId($openid)
     {
         $user = User::where('identifier', '=', $openid)->first();
+
         return $user;
     }
 
     public function getUserByUsername($username)
     {
         $member = Member::where('Email', '=', $username)->first();
-        if(!is_null($member))
-            return  User::where('external_identifier', '=', $member->ID)->first();
+        if (!is_null($member)) {
+            return User::where('external_identifier', '=', $member->ID)->first();
+        }
+
         return false;
     }
 
@@ -84,26 +105,28 @@ class AuthService implements IAuthService
         return User::find($id);
     }
 
-	// Authentication
+    // Authentication
 
-	public function getUserAuthenticationResponse()
-	{
-		if (Session::has("openstackid.authentication.response")) {
-			$value = Session::get("openstackid.authentication.response");
-			return $value;
-		}
-		return IAuthService::AuthenticationResponse_None;
-	}
+    public function getUserAuthenticationResponse()
+    {
+        if (Session::has("openstackid.authentication.response")) {
+            $value = Session::get("openstackid.authentication.response");
 
-	public function setUserAuthenticationResponse($auth_response)
-	{
-		Session::set("openstackid.authentication.response", $auth_response);
-	}
+            return $value;
+        }
 
-	public function clearUserAuthenticationResponse()
-	{
-		if (Session::has("openstackid.authentication.response")) {
-			Session::remove("openstackid.authentication.response");
-		}
-	}
+        return IAuthService::AuthenticationResponse_None;
+    }
+
+    public function setUserAuthenticationResponse($auth_response)
+    {
+        Session::set("openstackid.authentication.response", $auth_response);
+    }
+
+    public function clearUserAuthenticationResponse()
+    {
+        if (Session::has("openstackid.authentication.response")) {
+            Session::remove("openstackid.authentication.response");
+        }
+    }
 }
