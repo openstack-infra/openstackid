@@ -107,8 +107,8 @@ class UserService extends OAuth2ProtectedService implements IUserService
             }
             if (in_array(self::UserProfileScope_Email, $scopes)) {
                 // Email Claim
-                $data[StandardClaims::Email] = $current_user->getEmail();
-                $data[StandardClaims::EmailVerified] = true;
+                $data[StandardClaims::Email]         = $current_user->getEmail();
+                $data[StandardClaims::EmailVerified] = false;
             }
         } catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -187,7 +187,7 @@ class UserService extends OAuth2ProtectedService implements IUserService
             {
                 // Address Claim
                 $claim_set->addClaim(new JWTClaim(StandardClaims::Email, new StringOrURI($current_user->getEmail())));
-                $claim_set->addClaim(new JWTClaim(StandardClaims::EmailVerified, new JsonValue(true)));
+                $claim_set->addClaim(new JWTClaim(StandardClaims::EmailVerified, new JsonValue(false)));
             }
         } catch (Exception $ex) {
             $this->log_service->error($ex);
