@@ -13,7 +13,7 @@
     "OIDC"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/openstack-infra/openstackid",
+  "homepage": "https://git.openstack.org/cgit/openstack-infra/openstackid",
   "authors": [
     "Sebastian Marcet <smarcet@gmail.com>"
   ],
