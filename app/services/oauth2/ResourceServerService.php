@@ -17,7 +17,7 @@ use utils\db\ITransactionService;
  * Class ResourceServerService
  * @package services\oauth2
  */
-class ResourceServerService implements IResourceServerService
+final class ResourceServerService implements IResourceServerService
 {
 
     private $client_service;
@@ -29,7 +29,7 @@ class ResourceServerService implements IResourceServerService
     public function __construct(IClientService $client_service, ITransactionService $tx_service)
     {
         $this->client_service = $client_service;
-        $this->tx_service = $tx_service;
+        $this->tx_service     = $tx_service;
     }
 
     /**
@@ -186,6 +186,12 @@ class ResourceServerService implements IResourceServerService
                     $host));
             }
 
+            if (ResourceServer::where('ip', '=', $ip)->count() > 0)
+            {
+                throw new InvalidResourceServer(sprintf('there is already another resource server with that ip (%s).',
+                    $ip));
+            }
+
             if (ResourceServer::where('friendly_name', '=', $friendly_name)->count() > 0) {
                 throw new InvalidResourceServer(sprintf('there is already another resource server with that friendly name (%s).',
                     $friendly_name));
@@ -244,5 +250,14 @@ class ResourceServerService implements IResourceServerService
         });
 
         return $res;
+    }
+
+    /**
+     * @param string $ip
+     * @return IResourceServer
+     */
+    public function getByIPAddress($ip)
+    {
+        return ResourceServer::where('ip', '=', $ip)->first();
     }
 }

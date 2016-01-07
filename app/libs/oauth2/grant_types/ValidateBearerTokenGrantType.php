@@ -240,6 +240,12 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
             $this->log_service->error($ex2);
             throw new BearerTokenDisclosureAttemptException($ex2->getMessage());
         }
+        catch(ExpiredAccessTokenException $ex3)
+        {
+            $this->log_service->error($ex3);
+            $this->token_service->expireAccessToken($token_value);
+            throw $ex3;
+        }
     }
 
     /**

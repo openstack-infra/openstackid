@@ -5,7 +5,20 @@
  */
 class AccessToken extends Eloquent {
 
-    protected $fillable = array('value','user_id', 'from_ip', 'associated_authorization_code','lifetime','scope','audience','created_at','updated_at','client_id','refresh_token_id');
+    protected $fillable = array
+    (
+        'value',
+        'user_id',
+        'from_ip',
+        'associated_authorization_code',
+        'lifetime',
+        'scope',
+        'audience',
+        'created_at',
+        'updated_at',
+        'client_id',
+        'refresh_token_id'
+    );
 
     protected $table = 'oauth2_access_token';
 

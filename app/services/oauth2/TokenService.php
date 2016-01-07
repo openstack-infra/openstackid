@@ -772,7 +772,6 @@ final class TokenService implements ITokenService
         ) {
             //hash the given value, bc tokens values are stored hashed on DB
             $hashed_value = !$is_hashed ? Hash::compute('sha256', $value) : $value;
-            $lock_name    = '';
             $access_token = null;
 
             try
@@ -780,39 +779,33 @@ final class TokenService implements ITokenService
                 // check cache ...
                 if (!$cache_service->exists($hashed_value))
                 {
-                    // check on DB...
-                    $access_token_db = DBAccessToken::where('value', '=', $hashed_value)->first();
-                    if (is_null($access_token_db))
-                    {
-                        if($this_var->isAccessTokenRevoked($hashed_value))
+                    $lock_manager_service->lock('lock.get.accesstoken.' . $hashed_value, function() use($value, $hashed_value, $this_var){
+                        // check on DB...
+                        $access_token_db = DBAccessToken::where('value', '=', $hashed_value)->first();
+                        if (is_null($access_token_db))
                         {
-                            throw new RevokedAccessTokenException(sprintf('Access token %s is revoked!', $value));
+                            if($this_var->isAccessTokenRevoked($hashed_value))
+                            {
+                                throw new RevokedAccessTokenException(sprintf('Access token %s is revoked!', $value));
+                            }
+                            else if($this_var->isAccessTokenVoid($hashed_value)) // check if its marked on cache as expired ...
+                            {
+                                throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $value));
+                            }
+                            else
+                            {
+                                throw new InvalidGrantTypeException(sprintf("Access token %s is invalid!", $value));
+                            }
                         }
-                        else if($this_var->isAccessTokenVoid($hashed_value)) // check if its marked on cache as expired ...
+
+                        if ($access_token_db->isVoid())
                         {
+                            // invalid one ...
                             throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $value));
                         }
-                        else
-                        {
-                            throw new InvalidGrantTypeException(sprintf("Access token %s is invalid!", $value));
-                        }
-                    }
-                    // lock ...
-                    $lock_name = 'lock.get.accesstoken.' . $hashed_value;
-                    $lock_manager_service->acquireLock($lock_name);
-                    if ($access_token_db->isVoid())
-                    {
-                        // invalid one ...
-                        // add to cache as expired ...
-                        $this_var->markAccessTokenAsVoid($hashed_value);
-                        // and deleted it from db
-                        $access_token_db->delete();
-                        throw new ExpiredAccessTokenException(sprintf('Access token %s is expired!', $value));
-                    }
-                    //reload on cache
-                    $this_var->storesDBAccessTokenOnCache($access_token_db);
-                    //release lock
-                    $lock_manager_service->releaseLock($lock_name);
+                        //reload on cache
+                        $this_var->storesDBAccessTokenOnCache($access_token_db);
+                    });
                 }
 
                 $cache_values = $cache_service->getHash($hashed_value, array
@@ -861,19 +854,11 @@ final class TokenService implements ITokenService
                     $refresh_token = $this_var->getRefreshToken($refresh_token_value, true);
                     $access_token->setRefreshToken($refresh_token);
                 }
-            } catch (UnacquiredLockException $ex1) {
-                throw new InvalidAccessTokenException("access token %s ", $value);
-            } catch (ExpiredAccessTokenException $ex2) {
-                if (!empty($lock_name)) {
-                    $lock_manager_service->releaseLock($lock_name);
-                }
-            } catch (\Exception $ex) {
-                if (!empty($lock_name)) {
-                    $lock_manager_service->releaseLock($lock_name);
-                }
-                throw $ex;
             }
-
+            catch (UnacquiredLockException $ex1)
+            {
+                throw new InvalidAccessTokenException("access token %s ", $value);
+            }
             return $access_token;
         });
     }
@@ -1080,6 +1065,7 @@ final class TokenService implements ITokenService
             $hashed_value = !$is_hashed ? Hash::compute('sha256', $value) : $value;
 
             $access_token_db = DBAccessToken::where('value', '=', $hashed_value)->first();
+            if(is_null($access_token_db)) return false;
             $client          = $access_token_db->client()->first();
             //delete from cache
             $res = $cache_service->delete($hashed_value);
@@ -1097,6 +1083,41 @@ final class TokenService implements ITokenService
             return $res > 0;
         });
 
+    }
+
+    /**
+     * @param $value
+     * @param bool|false $is_hashed
+     * @return bool
+     */
+    public function expireAccessToken($value, $is_hashed = false)
+    {
+        $cache_service = $this->cache_service;
+        $this_var      = $this;
+
+        return $this->tx_service->transaction(function () use ($value, $is_hashed, $cache_service, $this_var) {
+            $res = 0;
+            //hash the given value, bc tokens values are stored hashed on DB
+            $hashed_value = !$is_hashed ? Hash::compute('sha256', $value) : $value;
+
+            $access_token_db = DBAccessToken::where('value', '=', $hashed_value)->first();
+            if(is_null($access_token_db)) return false;
+            $client          = $access_token_db->client()->first();
+            //delete from cache
+            $res = $cache_service->delete($hashed_value);
+            $res = $cache_service->deleteMemberSet
+            (
+                $client->client_id . TokenService::ClientAccessTokenPrefixList,
+                $access_token_db->value
+            );
+
+            //check on DB... and delete it
+            $res = $access_token_db->delete();
+
+            $this_var->markAccessTokenAsVoid($hashed_value);
+
+            return $res > 0;
+        });
     }
 
     /**
@@ -1587,4 +1608,5 @@ final class TokenService implements ITokenService
         if(is_null($db_access_token)) return null;
         return $this->getAccessToken($db_access_token->value, true);
     }
+
 }

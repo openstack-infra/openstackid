@@ -157,6 +157,13 @@ interface ITokenService {
     public function revokeAccessToken($value, $is_hashed = false);
 
     /**
+     * @param $value
+     * @param bool|false $is_hashed
+     * @return bool
+     */
+    public function expireAccessToken($value, $is_hashed = false);
+
+    /**
      * @param $value refresh_token value
      * @param bool $is_hashed
      * @return bool

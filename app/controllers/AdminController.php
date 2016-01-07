@@ -321,20 +321,32 @@ class AdminController extends BaseController {
 
         $user    = $this->auth_service->getCurrentUser();
         $config_values = array();
+        $dictionary = array
+        (
+            'MaxFailed.Login.Attempts',
+            'MaxFailed.LoginAttempts.2ShowCaptcha',
+            'OpenId.Private.Association.Lifetime',
+            'OpenId.Session.Association.Lifetime',
+            'OpenId.Nonce.Lifetime',
+            'OAuth2.AuthorizationCode.Lifetime',
+            'OAuth2.AccessToken.Lifetime',
+            'OAuth2.IdToken.Lifetime',
+            'OAuth2.RefreshToken.Lifetime',
+            'OAuth2.AccessToken.Revoked.Lifetime',
+            'OAuth2.AccessToken.Void.Lifetime',
+            'OAuth2.RefreshToken.Revoked.Lifetime',
+            'OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts',
+            'OAuth2SecurityPolicy.MinutesWithoutExceptions',
+            'OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts',
+            'OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts',
+            'OAuth2SecurityPolicy.MaxInvalidClientCredentialsAttempts',
+        );
 
-        $config_values['MaxFailed.Login.Attempts']             = $this->configuration_service->getConfigValue('MaxFailed.Login.Attempts');
-        $config_values['MaxFailed.LoginAttempts.2ShowCaptcha'] = $this->configuration_service->getConfigValue('MaxFailed.LoginAttempts.2ShowCaptcha');
+        foreach($dictionary as $key)
+            $config_values[$key] = $this->configuration_service->getConfigValue($key);
 
-        $config_values['OpenId.Private.Association.Lifetime']  = $this->configuration_service->getConfigValue('OpenId.Private.Association.Lifetime');
-        $config_values['OpenId.Session.Association.Lifetime']  = $this->configuration_service->getConfigValue('OpenId.Session.Association.Lifetime');
-        $config_values['OpenId.Nonce.Lifetime']                = $this->configuration_service->getConfigValue('OpenId.Nonce.Lifetime');
-
-        $config_values['OAuth2.AuthorizationCode.Lifetime']    = $this->configuration_service->getConfigValue('OAuth2.AuthorizationCode.Lifetime');
-        $config_values['OAuth2.AccessToken.Lifetime']          = $this->configuration_service->getConfigValue('OAuth2.AccessToken.Lifetime');
-        $config_values['OAuth2.IdToken.Lifetime']              = $this->configuration_service->getConfigValue('OAuth2.IdToken.Lifetime');
-        $config_values['OAuth2.RefreshToken.Lifetime']         = $this->configuration_service->getConfigValue('OAuth2.RefreshToken.Lifetime');
-
-        return View::make("admin.server-config", array
+        return View::make("admin.server-config",
+            array
             (
                 "username"             => $user->getFullName(),
                 "user_id"              => $user->getId(),
@@ -349,40 +361,60 @@ class AdminController extends BaseController {
 
         $values = Input::all();
 
-        $rules = array(
-            'general-max-failed-login-attempts'         => 'required|integer',
-            'general-max-failed-login-attempts-captcha' => 'required|integer',
-            'openid-private-association-lifetime'       => 'required|integer',
-            'openid-session-association-lifetime'       => 'required|integer',
-            'openid-nonce-lifetime'                     => 'required|integer',
-            'oauth2-auth-code-lifetime'                 => 'required|integer',
-            'oauth2-refresh-token-lifetime'             => 'required|integer',
-            'oauth2-access-token-lifetime'              => 'required|integer',
-            'oauth2-id-token-lifetime'                  => 'required|integer',
+        $rules = array
+        (
+            'general-max-failed-login-attempts'                                 => 'required|integer',
+            'general-max-failed-login-attempts-captcha'                         => 'required|integer',
+            'openid-private-association-lifetime'                               => 'required|integer',
+            'openid-session-association-lifetime'                               => 'required|integer',
+            'openid-nonce-lifetime'                                             => 'required|integer',
+            'oauth2-auth-code-lifetime'                                         => 'required|integer',
+            'oauth2-refresh-token-lifetime'                                     => 'required|integer',
+            'oauth2-access-token-lifetime'                                      => 'required|integer',
+            'oauth2-id-token-lifetime'                                          => 'required|integer',
+            'oauth2-id-access-token-revoked-lifetime'                           => 'required|integer',
+            'oauth2-id-access-token-void-lifetime'                              => 'required|integer',
+            'oauth2-id-refresh-token-revoked-lifetime'                          => 'required|integer',
+            'oauth2-id-security-policy-minutes-without-exceptions'              => 'required|integer',
+            'oauth2-id-security-policy-max-bearer-token-disclosure-attempts'    => 'required|integer',
+            'oauth2-id-security-policy-max-invalid-client-exception-attempts'   => 'required|integer',
+            'oauth2-id-security-policy-max-invalid-redeem-auth-code-attempts'   => 'required|integer',
+            'oauth2-id-security-policy-max-invalid-client-credentials-attempts' => 'required|integer',
         );
 
-        $dictionary = array(
-            'general-max-failed-login-attempts'         => 'MaxFailed.Login.Attempts',
-            'general-max-failed-login-attempts-captcha' => 'MaxFailed.LoginAttempts.2ShowCaptcha',
-            'openid-private-association-lifetime'       => 'OpenId.Private.Association.Lifetime',
-            'openid-session-association-lifetime'       => 'OpenId.Session.Association.Lifetime',
-            'openid-nonce-lifetime'                     => 'OpenId.Nonce.Lifetime',
-            'oauth2-auth-code-lifetime'                 => 'OAuth2.AuthorizationCode.Lifetime',
-            'oauth2-access-token-lifetime'              => 'OAuth2.AccessToken.Lifetime',
-            'oauth2-id-token-lifetime'                  => 'OAuth2.IdToken.Lifetime',
-            'oauth2-refresh-token-lifetime'             => 'OAuth2.RefreshToken.Lifetime',
+        $dictionary = array
+        (
+            'general-max-failed-login-attempts'                                 => 'MaxFailed.Login.Attempts',
+            'general-max-failed-login-attempts-captcha'                         => 'MaxFailed.LoginAttempts.2ShowCaptcha',
+            'openid-private-association-lifetime'                               => 'OpenId.Private.Association.Lifetime',
+            'openid-session-association-lifetime'                               => 'OpenId.Session.Association.Lifetime',
+            'openid-nonce-lifetime'                                             => 'OpenId.Nonce.Lifetime',
+            'oauth2-auth-code-lifetime'                                         => 'OAuth2.AuthorizationCode.Lifetime',
+            'oauth2-access-token-lifetime'                                      => 'OAuth2.AccessToken.Lifetime',
+            'oauth2-id-token-lifetime'                                          => 'OAuth2.IdToken.Lifetime',
+            'oauth2-refresh-token-lifetime'                                     => 'OAuth2.RefreshToken.Lifetime',
+            'oauth2-id-access-token-revoked-lifetime'                           => 'OAuth2.AccessToken.Revoked.Lifetime',
+            'oauth2-id-access-token-void-lifetime'                              => 'OAuth2.AccessToken.Void.Lifetime',
+            'oauth2-id-refresh-token-revoked-lifetime'                          => 'OAuth2.RefreshToken.Revoked.Lifetime',
+            'oauth2-id-security-policy-minutes-without-exceptions'              => 'OAuth2SecurityPolicy.MinutesWithoutExceptions',
+            'oauth2-id-security-policy-max-bearer-token-disclosure-attempts'    => 'OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts',
+            'oauth2-id-security-policy-max-invalid-client-exception-attempts'   => 'OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts',
+            'oauth2-id-security-policy-max-invalid-redeem-auth-code-attempts'   => 'OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts',
+            'oauth2-id-security-policy-max-invalid-client-credentials-attempts' => 'OAuth2SecurityPolicy.MaxInvalidClientCredentialsAttempts',
         );
 
         // Creates a Validator instance and validates the data.
         $validation = Validator::make($values, $rules);
 
-        if ($validation->fails()) {
+        if ($validation->fails())
+        {
             return Redirect::action("AdminController@listServerConfig")->withErrors($validation);
         }
 
-        foreach($values as $field=>$value){
-            if(array_key_exists($field,$dictionary))
-                $this->configuration_service->saveConfigValue($dictionary[$field],$value);
+        foreach($values as $field => $value)
+        {
+            if(array_key_exists($field, $dictionary))
+                $this->configuration_service->saveConfigValue($dictionary[$field], $value);
         }
 
         return Redirect::action("AdminController@listServerConfig");

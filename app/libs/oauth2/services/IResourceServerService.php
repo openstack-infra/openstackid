@@ -22,7 +22,7 @@ interface IResourceServerService {
      * @param int $page_nbr
      * @return mixed
      */
-    public function getAll($page_nbr=1,$page_size=10,array $filters = array(), array $fields=array('*'));
+    public function getAll($page_nbr = 1,$page_size = 10, array $filters = array(), array $fields=array('*'));
 
     /**
      * @param IResourceServer $resource_server
@@ -71,4 +71,10 @@ interface IResourceServerService {
      * @return string
      */
     public function regenerateClientSecret($id);
+
+    /**
+     * @param string $ip
+     * @return IResourceServer
+     */
+    public function getByIPAddress($ip);
 } 

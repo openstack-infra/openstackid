@@ -48,6 +48,40 @@
                 <label for="oauth2-refresh-token-lifetime">Refresh Token Lifetime&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in seconds - zero value means infinite"></span></label>
                 <input class="form-control" type="number" min="0" step="1" id="oauth2-refresh-token-lifetime" name="oauth2-refresh-token-lifetime" value="{{$config_values['OAuth2.RefreshToken.Lifetime']}}"/>
             </div>
+            <div class="form-group">
+                <label for="oauth2-id-access-token-revoked-lifetime">Revoked Access Token Lifetime&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in seconds"></span></label>
+                <input class="form-control" type="number" min="600" step="1" id="oauth2-id-access-token-revoked-lifetime" name="oauth2-id-access-token-revoked-lifetime" value="{{$config_values['OAuth2.AccessToken.Revoked.Lifetime']}}"/>
+            </div>
+            <div class="form-group">
+                <label for="oauth2-id-access-token-void-lifetime">Void Access Token Lifetime&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in seconds"></span></label>
+                <input class="form-control" type="number" min="600" step="1" id="oauth2-id-access-token-void-lifetime" name="oauth2-id-access-token-void-lifetime" value="{{$config_values['OAuth2.AccessToken.Void.Lifetime']}}"/>
+            </div>
+            <div class="form-group">
+                <label for="oauth2-id-refresh-token-revoked-lifetime">Revoked Refresh Token Lifetime&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in seconds"></span></label>
+                <input class="form-control" type="number" min="600" step="1" id="oauth2-id-refresh-token-revoked-lifetime" name="oauth2-id-refresh-token-revoked-lifetime" value="{{$config_values['OAuth2.RefreshToken.Revoked.Lifetime']}}"/>
+            </div>
+            <legend>OAUTH2 Security Policies Configuration</legend>
+            <div class="form-group">
+                <label for="oauth2-id-security-policy-minutes-without-exceptions">Minutes without exceptions rate&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in minutes"></span></label>
+                <input class="form-control" type="number" min="1" step="1" id="oauth2-id-security-policy-minutes-without-exceptions" name="oauth2-id-security-policy-minutes-without-exceptions" value="{{$config_values['OAuth2SecurityPolicy.MinutesWithoutExceptions']}}"/>
+            </div>
+            <div class="form-group">
+                <label for="oauth2-id-security-policy-max-bearer-token-disclosure-attempts">Max. Bearer token disclousure exceptions attemps&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in attemps"></span></label>
+                <input class="form-control" type="number" min="3" step="1" id="oauth2-id-security-policy-max-bearer-token-disclosure-attempts" name="oauth2-id-security-policy-max-bearer-token-disclosure-attempts" value="{{$config_values['OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts']}}"/>
+            </div>
+            <div class="form-group">
+                <label for="oauth2-id-security-policy-max-invalid-client-exception-attempts">Max. invalid client exception attemps&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in attemps"></span></label>
+                <input class="form-control" type="number" min="3" step="1" id="oauth2-id-security-policy-max-invalid-client-exception-attempts" name="oauth2-id-security-policy-max-invalid-client-exception-attempts" value="{{$config_values['OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts']}}"/>
+            </div>
+            <div class="form-group">
+                <label for="oauth2-id-security-policy-max-invalid-redeem-auth-code-attempts">Max. invalid redeem Auth Code exception attemps&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in attemps"></span></label>
+                <input class="form-control" type="number" min="3" step="1" id="oauth2-id-security-policy-max-invalid-redeem-auth-code-attempts" name="oauth2-id-security-policy-max-invalid-redeem-auth-code-attempts" value="{{$config_values['OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts']}}"/>
+            </div>
+            <div class="form-group">
+                <label for="oauth2-id-security-policy-max-invalid-client-credentials-attempts">Max. invalid client credentials exception attemps&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in attemps"></span></label>
+                <input class="form-control" type="number" min="3" step="1" id="oauth2-id-security-policy-max-invalid-client-credentials-attempts" name="oauth2-id-security-policy-max-invalid-client-credentials-attempts" value="{{$config_values['OAuth2SecurityPolicy.MaxInvalidClientCredentialsAttempts']}}"/>
+            </div>
+
             <button type="submit" class="btn btn-default btn-md active">Submit</button>
         </form>
     </div>

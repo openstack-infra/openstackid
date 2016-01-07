@@ -7,6 +7,7 @@ use DateTime;
 use DB;
 use Exception;
 use Log;
+use oauth2\services\IResourceServerService;
 use UserExceptionTrail;
 use utils\db\ITransactionService;
 use utils\exceptions\UnacquiredLockException;
@@ -23,21 +24,34 @@ use utils\services\IServerConfigurationService;
 class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
 {
 
+    /**
+     * @var array
+     */
     private $exception_dictionary = array();
 
     /**
+     * @var IResourceServerService
+     */
+    private $resource_server_service;
+
+    /**
+     * BlacklistSecurityPolicy constructor.
      * @param IServerConfigurationService $server_configuration_service
      * @param ILockManagerService $lock_manager_service
      * @param ICacheService $cache_service
+     * @param IResourceServerService $resource_server_service
      * @param ITransactionService $tx_service
      */
-    public function __construct(
+    public function __construct
+    (
         IServerConfigurationService $server_configuration_service,
-        ILockManagerService $lock_manager_service,
-        ICacheService $cache_service,
-        ITransactionService $tx_service
+        ILockManagerService         $lock_manager_service,
+        ICacheService               $cache_service,
+        IResourceServerService      $resource_server_service,
+        ITransactionService         $tx_service
     ) {
         parent::__construct($server_configuration_service, $lock_manager_service, $cache_service, $tx_service);
+        $this->resource_server_service = $resource_server_service;
         // here we configure on which exceptions are we interested and the max occurrence attempts and initial delay on tar pit for
         // offending IP address
         $this->exception_dictionary = array(
@@ -94,13 +108,12 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
      */
     public function check()
     {
-        $res = true;
+        $res            = true;
         $remote_address = IPHelper::getUserIp();
         try {
             //check if banned ip is on cache ...
             if ($this->cache_service->incCounterIfExists($remote_address)) {
                 $this->counter_measure->trigger();
-
                 return false;
             }
             //check on db
@@ -155,14 +168,16 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
     {
         try
         {
-            $remote_ip = IPHelper::getUserIp();
+            $remote_ip       = IPHelper::getUserIp();
             $exception_class = get_class($ex);
+
             //check exception count by type on last "MinutesWithoutExceptions" minutes...
             $exception_count = intval(UserExceptionTrail::where('from_ip', '=', $remote_ip)
                 ->where('exception_type', '=', $exception_class)
                 ->where('created_at', '>',
                     DB::raw('( UTC_TIMESTAMP() - INTERVAL ' . $this->server_configuration_service->getConfigValue("BlacklistSecurityPolicy.MinutesWithoutExceptions") . ' MINUTE )'))
                 ->count());
+
             if (array_key_exists($exception_class, $this->exception_dictionary))
             {
                 $params = $this->exception_dictionary[$exception_class];
@@ -181,7 +196,7 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
                 );
 
                 $initial_delay_on_tar_pit = intval($this->server_configuration_service->getConfigValue($params[1]));
-                if ($exception_count >= $max_attempts)
+                if ($exception_count >= $max_attempts && !$this->isIPAddressWhitelisted($remote_ip))
                 {
                     Log::warning
                     (
@@ -204,6 +219,16 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
             Log::error($ex);
             throw $ex;
         }
+    }
+
+    /**
+     * @param string $ip
+     * @return bool
+     */
+    private function isIPAddressWhitelisted($ip)
+    {
+        $rs = $this->resource_server_service->getByIPAddress($ip);
+        return !is_null($rs);
     }
 
 }

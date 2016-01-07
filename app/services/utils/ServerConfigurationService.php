@@ -109,36 +109,24 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
             10);
 
 
-        $this->default_config_params["OAuth2.AuthorizationCode.Lifetime"] = Config::get('server.OAuth2_AuthorizationCode_Lifetime',
-            240);
-        $this->default_config_params["OAuth2.AccessToken.Lifetime"] = Config::get('server.OAuth2_AccessToken_Lifetime',
-            3600);
-
-        $this->default_config_params["OAuth2.IdToken.Lifetime"] = Config::get('server.OAuth2_IdToken_Lifetime',
-            3600);
+        $this->default_config_params["OAuth2.AuthorizationCode.Lifetime"] = Config::get('server.OAuth2_AuthorizationCode_Lifetime', 240);
+        $this->default_config_params["OAuth2.AccessToken.Lifetime"] = Config::get('server.OAuth2_AccessToken_Lifetime', 3600);
+        $this->default_config_params["OAuth2.IdToken.Lifetime"] = Config::get('server.OAuth2_IdToken_Lifetime', 3600);
         //infinite by default
-        $this->default_config_params["OAuth2.RefreshToken.Lifetime"] = Config::get('server.OAuth2_RefreshToken_Lifetime',
-            0);
-
-        $this->default_config_params["OAuth2.AccessToken.Revoked.Lifetime"] = Config::get('server.OAuth2_AccessToken_Revoked_Lifetime', 600);
-        $this->default_config_params["OAuth2.AccessToken.Void.Lifetime"] = Config::get('server.OAuth2_AccessToken_Void_Lifetime', 600);
-        $this->default_config_params["OAuth2.RefreshToken.Revoked.Lifetime"] = Config::get('server.OAuth2_RefreshToken_Revoked_Lifetime', 600);
+        $this->default_config_params["OAuth2.RefreshToken.Lifetime"] = Config::get('server.OAuth2_RefreshToken_Lifetime', 0);
+        //revoked lifetimes
+        $this->default_config_params["OAuth2.AccessToken.Revoked.Lifetime"] = Config::get('server.OAuth2_AccessToken_Revoked_Lifetime', 3600);
+        $this->default_config_params["OAuth2.AccessToken.Void.Lifetime"] = Config::get('server.OAuth2_AccessToken_Void_Lifetime', 3600);
+        $this->default_config_params["OAuth2.RefreshToken.Revoked.Lifetime"] = Config::get('server.OAuth2_RefreshToken_Revoked_Lifetime', 3600);
 
         //oauth2 policy defaults
-        $this->default_config_params["OAuth2SecurityPolicy.MinutesWithoutExceptions"] = Config::get('server.OAuth2SecurityPolicy_MinutesWithoutExceptions',
-            2);
-        $this->default_config_params["OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts"] = Config::get('server.OAuth2SecurityPolicy_MaxBearerTokenDisclosureAttempts',
-            5);
-        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts"] = Config::get('server.OAuth2SecurityPolicy_MaxInvalidClientExceptionAttempts',
-            10);
-        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts"] = Config::get('server.OAuth2SecurityPolicy_MaxInvalidRedeemAuthCodeAttempts',
-            10);
-        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidInvalidClientCredentialsAttempts"] = Config::get('server.OAuth2SecurityPolicy_MaxInvalidInvalidClientCredentialsAttempts',
-            5);
-
+        $this->default_config_params["OAuth2SecurityPolicy.MinutesWithoutExceptions"]            = Config::get('server.OAuth2SecurityPolicy_MinutesWithoutExceptions', 2);
+        $this->default_config_params["OAuth2SecurityPolicy.MaxBearerTokenDisclosureAttempts"]    = Config::get('server.OAuth2SecurityPolicy_MaxBearerTokenDisclosureAttempts', 5);
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidClientExceptionAttempts"]   = Config::get('server.OAuth2SecurityPolicy_MaxInvalidClientExceptionAttempts', 10);
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidRedeemAuthCodeAttempts"]    = Config::get('server.OAuth2SecurityPolicy_MaxInvalidRedeemAuthCodeAttempts', 10);
+        $this->default_config_params["OAuth2SecurityPolicy.MaxInvalidClientCredentialsAttempts"] = Config::get('server.OAuth2SecurityPolicy_MaxInvalidClientCredentialsAttempts', 5);
         //ssl
         $this->default_config_params["SSL.Enable"] = Config::get('server.SSL_Enable', true);
-
     }
 
     public function getUserIdentityEndpointURL($identifier)

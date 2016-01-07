@@ -51,6 +51,6 @@ return array(
     'OAuth2SecurityPolicy_MaxBearerTokenDisclosureAttempts' => 5,
     'OAuth2SecurityPolicy_MaxInvalidClientExceptionAttempts' => 10,
     'OAuth2SecurityPolicy_MaxInvalidRedeemAuthCodeAttempts' => 10,
-    'OAuth2SecurityPolicy_MaxInvalidInvalidClientCredentialsAttempts' => 5,
+    'OAuth2SecurityPolicy_MaxInvalidClientCredentialsAttempts' => 5,
     'Banning_Enable' => true,
 );
