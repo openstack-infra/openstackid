@@ -99,9 +99,18 @@ abstract class AssymetricKey extends BaseModelEloquent implements IAssymetricKey
         return $this->kid;
     }
 
-    private function calculateThumbprint($alg){
-        $pem = str_replace( array("\n","\r"), '', trim($this->getPublicKeyPEM()));
-        return strtoupper(hash($alg, base64_decode($pem)));
+    private function calculateThumbprint($alg)
+    {
+        $res = '';
+        try {
+            $pem = str_replace(array("\n", "\r"), '', trim($this->getPublicKeyPEM()));
+            $res = strtoupper(hash($alg, base64_decode($pem)));
+        }
+        catch(Exception $ex)
+        {
+            $res = 'INVALID';
+        }
+        return $res;
     }
 
     /**
