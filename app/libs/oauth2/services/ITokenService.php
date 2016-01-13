@@ -29,6 +29,7 @@ interface ITokenService {
      * @param string|null $state
      * @param string|null $nonce
      * @param string|null $response_type
+     * @param string|null $prompt
      * @return AuthorizationCode
      */
     public function createAuthorizationCode
@@ -43,7 +44,8 @@ interface ITokenService {
         $has_previous_user_consent = false,
         $state = null,
         $nonce = null,
-        $response_type = null
+        $response_type = null,
+        $prompt        = null
     );
 
 

@@ -182,7 +182,8 @@ class HybridGrantType extends InteractiveGrantType
             $has_former_consent,
             $request->getState(),
             $request->getNonce(),
-            $request->getResponseType()
+            $request->getResponseType(),
+            $request->getPrompt(true)
         );
 
         if (is_null($auth_code)) {

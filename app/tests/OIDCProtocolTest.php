@@ -658,6 +658,199 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
         return $access_token;
     }
 
+    public function testGetResfreshTokenFromNativeAppNTimes($n=5)
+    {
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.android.openstack.client';
+        $client_secret = '11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhgfdfdfdf';
+
+        $params_auth_code = array
+        (
+            'client_id'                              => $client_id,
+            'redirect_uri'                           => 'androipapp://oidc_endpoint_callback',
+            'response_type'                          => 'code',
+            'scope'                                  => sprintf('%s profile email address %s', OAuth2Protocol::OpenIdConnect_Scope, OAuth2Protocol::OfflineAccess_Scope),
+            OAuth2Protocol::OAuth2Protocol_LoginHint => 'sebastian@tipit.net',
+            OAuth2Protocol::OAuth2Protocol_Nonce     => 'test_nonce',
+            OAuth2Protocol::OAuth2Protocol_Prompt    => OAuth2Protocol::OAuth2Protocol_Prompt_Consent,
+            OAuth2Protocol::OAuth2Protocol_MaxAge    => 3200,
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params_auth_code,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $response = $this->call('GET', $url);
+
+        $this->assertResponseStatus(200);
+
+        // verify that login hint (email) is populated
+        $this->assertTrue(str_contains($response->getContent(), 'sebastian@tipit.net'));
+
+        // do login
+        $response = $this->call('POST', $url,
+            array
+            (
+                'username' => 'sebastian@tipit.net',
+                'password' => '1qaz2wsx',
+                '_token' => Session::token()
+            )
+        );
+
+        $this->assertResponseStatus(302);
+
+        $response = $this->action("GET", "OAuth2ProviderController@authorize",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $response = $this->action('GET', 'UserController@getConsent');
+
+        $this->assertResponseStatus(200);
+
+        $response = $this->action('POST', 'UserController@getConsent', array(
+            'trust' => 'AllowOnce',
+            '_token' => Session::token()
+        ));
+
+        $this->assertResponseStatus(302);
+
+        // get auth code
+
+        $response = $this->action("GET", "OAuth2ProviderController@authorize",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $comps = @parse_url($url);
+        $query = $comps['query'];
+        $output = array();
+        parse_str($query, $output);
+
+        $this->assertTrue(array_key_exists('code', $output));
+        $this->assertTrue(!empty($output['code']));
+
+        $params = array(
+            'code' => $output['code'],
+            'redirect_uri' => 'androipapp://oidc_endpoint_callback',
+            'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@token",
+            $params,
+            array(),
+            array(),
+            // Symfony interally prefixes headers with "HTTP", so
+            array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+
+        $this->assertResponseStatus(200);
+
+        $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
+
+        $content = $response->getContent();
+
+        $response = json_decode($content);
+        $access_token = $response->access_token;
+        $refresh_token = $response->refresh_token;
+        $id_token = $response->id_token;
+
+        $this->assertTrue(!empty($access_token));
+        $this->assertTrue(!empty($refresh_token));
+        $this->assertTrue(!empty($id_token));
+
+
+        $iteration = 0;
+        do {
+            $response = $this->action("POST", "OAuth2ProviderController@authorize",
+                $params_auth_code,
+                array(),
+                array(),
+                array());
+
+
+            $this->assertResponseStatus(302);
+
+
+            $response = $this->action('GET', 'UserController@getConsent');
+
+            $this->assertResponseStatus(200);
+
+            $response = $this->action('POST', 'UserController@getConsent', array(
+                'trust' => 'AllowOnce',
+                '_token' => Session::token()
+            ));
+
+            $this->assertResponseStatus(302);
+
+            // get auth code
+
+            $response = $this->action("GET", "OAuth2ProviderController@authorize",
+                array(),
+                array(),
+                array(),
+                array());
+
+            $this->assertResponseStatus(302);
+
+            $url = $response->getTargetUrl();
+            $this->assertResponseStatus(302);
+
+            $url = $response->getTargetUrl();
+
+            $comps = @parse_url($url);
+            $query = $comps['query'];
+            $output = array();
+            parse_str($query, $output);
+
+            $this->assertTrue(array_key_exists('code', $output));
+            $this->assertTrue(!empty($output['code']));
+
+            $params = array(
+                'code'         => $output['code'],
+                'redirect_uri' => 'androipapp://oidc_endpoint_callback',
+                'grant_type'   => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
+            );
+
+            $response = $this->action("POST", "OAuth2ProviderController@token",
+                $params,
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+
+            $this->assertResponseStatus(200);
+
+            $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
+
+            $content = $response->getContent();
+
+            $response = json_decode($content);
+            $access_token = $response->access_token;
+            $refresh_token = $response->refresh_token;
+            $id_token = $response->id_token;
+
+            $this->assertTrue(!empty($access_token));
+            $this->assertTrue(!empty($refresh_token));
+            $this->assertTrue(!empty($id_token));
+            ++$iteration;
+        }while( $iteration < $n);
+    }
+
     public function testTokenResponseModePost()
     {
 

@@ -37,6 +37,36 @@ class AuthorizationCode extends Token
     private $requested_auth_time;
 
     /**
+     * @var string
+     * prompt
+     * OPTIONAL.
+     * Space delimited, case sensitive list of ASCII string values that specifies whether the Authorization
+     * Server prompts the End-User for reauthentication and consent. The defined values are:
+     * none
+     *      The Authorization Server MUST NOT display any authentication or consent user interface pages. An error is
+     *      returned if an End-User is not already authenticated or the Client does not have pre-configured consent for
+     *      the requested Claims or does not fulfill other conditions for processing the request. The error code will
+     *      typically be login_required, interaction_required, or another code defined in Section 3.1.2.6. This can be
+     *      used as a method to check for existing authentication and/or consent.
+     * login
+     *      The Authorization Server SHOULD prompt the End-User for reauthentication. If it cannot reauthenticate the
+     *      End-User, it MUST return an error, typically login_required.
+     * consent
+     *      The Authorization Server SHOULD prompt the End-User for consent before returning information to the Client.
+     *      If it cannot obtain consent, it MUST return an error, typically consent_required.
+     * select_account
+     *      The Authorization Server SHOULD prompt the End-User to select a user account. This enables an End-User who
+     *      has multiple accounts at the Authorization Server to select amongst the multiple accounts that they might
+     *      have current sessions for. If it cannot obtain an account selection choice made by the End-User, it MUST
+     *      return an error, typically account_selection_required.
+     *
+     * The prompt parameter can be used by the Client to make sure that the End-User is still present for the current
+     * session or to bring attention to the request. If this parameter contains none with any other value, an error is
+     * returned.
+     */
+    private $prompt;
+
+    /**
      * @var int
      */
     private $auth_time;
@@ -61,6 +91,7 @@ class AuthorizationCode extends Token
      * @param string|null $response_type
      * @param $requested_auth_time
      * @param $auth_time
+     * @param null|string $prompt
      * @return AuthorizationCode
      */
     public static function create(
@@ -77,25 +108,27 @@ class AuthorizationCode extends Token
         $nonce                     = null,
         $response_type             = null,
         $requested_auth_time       = false,
-        $auth_time                 = -1
+        $auth_time                 = -1,
+        $prompt                    = null
     ) {
-        $instance = new self();
-        $instance->scope        = $scope;
-        $instance->user_id      = $user_id;
-        $instance->redirect_uri = $redirect_uri;
-        $instance->client_id    = $client_id;
-        $instance->lifetime     = intval($lifetime);
-        $instance->audience     = $audience;
-        $instance->is_hashed    = false;
-        $instance->from_ip      = IPHelper::getUserIp();
-        $instance->access_type  = $access_type;
-        $instance->approval_prompt = $approval_prompt;
+        $instance                            = new self();
+        $instance->scope                     = $scope;
+        $instance->user_id                   = $user_id;
+        $instance->redirect_uri              = $redirect_uri;
+        $instance->client_id                 = $client_id;
+        $instance->lifetime                  = intval($lifetime);
+        $instance->audience                  = $audience;
+        $instance->is_hashed                 = false;
+        $instance->from_ip                   = IPHelper::getUserIp();
+        $instance->access_type               = $access_type;
+        $instance->approval_prompt           = $approval_prompt;
         $instance->has_previous_user_consent = $has_previous_user_consent;
-        $instance->state = $state;
-        $instance->nonce = $nonce;
-        $instance->response_type = $response_type;
-        $instance->requested_auth_time = $requested_auth_time;
-        $instance->auth_time = $auth_time;
+        $instance->state                     = $state;
+        $instance->nonce                     = $nonce;
+        $instance->response_type             = $response_type;
+        $instance->requested_auth_time       = $requested_auth_time;
+        $instance->auth_time                 = $auth_time;
+        $instance->prompt                    = $prompt;
 
         return $instance;
     }
@@ -118,6 +151,7 @@ class AuthorizationCode extends Token
      * @param string|null $response_type
      * @param $requested_auth_time
      * @param $auth_time
+     * @param null|string $prompt
      * @param bool $is_hashed
      * @return AuthorizationCode
      */
@@ -126,20 +160,21 @@ class AuthorizationCode extends Token
         $value,
         $user_id,
         $client_id,
-        $scope,$audience = '',
-        $redirect_uri = null,
-        $issued = null,
-        $lifetime = 600,
-        $from_ip = '127.0.0.1',
-        $access_type = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
-        $approval_prompt = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
+        $scope,$audience           = '',
+        $redirect_uri              = null,
+        $issued                    = null,
+        $lifetime                  = 600,
+        $from_ip                   = '127.0.0.1',
+        $access_type               = OAuth2Protocol::OAuth2Protocol_AccessType_Online,
+        $approval_prompt           = OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto,
         $has_previous_user_consent = false,
         $state,
         $nonce,
         $response_type,
         $requested_auth_time       = false,
         $auth_time                 = -1,
-        $is_hashed = false
+        $prompt                    = null,
+        $is_hashed                 = false
     )
     {
         $instance = new self();
@@ -161,7 +196,7 @@ class AuthorizationCode extends Token
         $instance->response_type = $response_type;
         $instance->requested_auth_time = $requested_auth_time;
         $instance->auth_time = $auth_time;
-
+        $instance->prompt   = $prompt;
         return $instance;
     }
 
@@ -237,6 +272,14 @@ class AuthorizationCode extends Token
                 return true;
         }
         return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrompt()
+    {
+        return $this->prompt;
     }
 
     /**

@@ -339,11 +339,13 @@ class AuthorizationCodeGrantType extends InteractiveGrantType
             )
         );
 
-        $nonce = null;
+        $nonce  = null;
+        $prompt = null;
 
         if($request instanceof OAuth2AuthenticationRequest)
         {
-            $nonce = $request->getNonce();
+            $nonce  = $request->getNonce();
+            $prompt = $request->getPrompt(true);
         }
 
         $auth_code = $this->token_service->createAuthorizationCode
@@ -358,7 +360,8 @@ class AuthorizationCodeGrantType extends InteractiveGrantType
             $has_former_consent,
             $request->getState(),
             $nonce,
-            $request->getResponseType()
+            $request->getResponseType(),
+            $prompt
         );
 
         if (is_null($auth_code))

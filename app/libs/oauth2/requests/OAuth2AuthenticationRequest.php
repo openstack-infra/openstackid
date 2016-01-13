@@ -57,11 +57,13 @@ class OAuth2AuthenticationRequest extends OAuth2AuthorizationRequest
     }
 
     /**
-     * @return string[]
+     * @param bool|false $raw
+     * @return array|string|null
      */
-    public function getPrompt()
+    public function getPrompt($raw = false)
     {
         $prompt = $this->getParam(OAuth2Protocol::OAuth2Protocol_Prompt);
+        if($raw) return $prompt;
         if(!empty($prompt))
             return explode(' ', $prompt);
         return array();
@@ -202,10 +204,17 @@ class OAuth2AuthenticationRequest extends OAuth2AuthorizationRequest
 
             if($this->offlineAccessRequested() && !in_array(OAuth2Protocol::OAuth2Protocol_Prompt_Consent, $prompt))
                 throw new InvalidOAuth2Request('invalid offline access!');
+
+            // if has requested offline access
+            if($this->offlineAccessRequested() && $this->getAccessType() === OAuth2Protocol::OAuth2Protocol_AccessType_Offline){
+                throw new InvalidOAuth2Request('invalid param access_type=offline (OAUTH2.0)');
+            }
+
         }
 
         return $res;
     }
+
 
     /**
      * @param string $param_name

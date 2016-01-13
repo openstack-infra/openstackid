@@ -235,6 +235,7 @@ final class TokenService implements ITokenService
      * @param string|null $state
      * @param string|null $nonce
      * @param string|null $response_type
+     * @param string|null $prompt
      * @return AuthorizationCode
      */
     public function createAuthorizationCode
@@ -249,7 +250,8 @@ final class TokenService implements ITokenService
         $has_previous_user_consent = false,
         $state                     = null,
         $nonce                     = null,
-        $response_type             = null
+        $response_type             = null,
+        $prompt                    = null
     )
     {
         //create model
@@ -270,7 +272,8 @@ final class TokenService implements ITokenService
                 $nonce,
                 $response_type,
                 $this->security_context_service->get()->isAuthTimeRequired(),
-                $this->principal_service->get()->getAuthTime()
+                $this->principal_service->get()->getAuthTime(),
+                $prompt
             )
         );
 
@@ -295,6 +298,7 @@ final class TokenService implements ITokenService
                 'response_type'             => $code->getResponseType(),
                 'requested_auth_time'       => $code->isAuthTimeRequested(),
                 'auth_time'                 => $code->getAuthTime(),
+                'prompt'                    => $code->getPrompt(),
             ), intval($code->getLifetime()));
 
         //stores brand new auth code hash value on a set by client id...
@@ -342,7 +346,8 @@ final class TokenService implements ITokenService
                 'nonce',
                 'response_type',
                 'requested_auth_time',
-                'auth_time'
+                'auth_time',
+                'prompt',
             ));
 
             $code = AuthorizationCode::load
@@ -363,7 +368,8 @@ final class TokenService implements ITokenService
                 $cache_values['nonce'],
                 $cache_values['response_type'],
                 $cache_values['requested_auth_time'],
-                $cache_values['auth_time']
+                $cache_values['auth_time'],
+                $cache_values['prompt']
             );
 
             return $code;
@@ -450,6 +456,7 @@ final class TokenService implements ITokenService
                 ) &&
                 (
                     $auth_code->getAccessType() == OAuth2Protocol::OAuth2Protocol_AccessType_Offline ||
+                    //OIDC: http://openid.net/specs/openid-connect-core-1_0.html#OfflineAccess
                     str_contains($auth_code->getScope(), OAuth2Protocol::OfflineAccess_Scope)
                 )
             )
@@ -458,7 +465,10 @@ final class TokenService implements ITokenService
                 if
                 (
                     !$auth_code->getHasPreviousUserConsent() ||
-                     $auth_code->getApprovalPrompt() == OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Force
+                     // google oauth2 protocol
+                     $auth_code->getApprovalPrompt() == OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Force ||
+                     // http://openid.net/specs/openid-connect-core-1_0.html#OfflineAccess
+                     $auth_code->getPrompt()         == OAuth2Protocol::OAuth2Protocol_Prompt_Consent
                 )
                 {
                     $this_var->createRefreshToken($access_token);

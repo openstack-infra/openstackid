@@ -38,11 +38,11 @@
             </div>
             <div class="form-group">
                 <label for="oauth2-access-token-lifetime">Access Token Lifetime&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in seconds"></span></label>
-                <input class="form-control" type="number" min="3600" step="1" id="oauth2-access-token-lifetime" name="oauth2-access-token-lifetime" value="{{$config_values['OAuth2.AccessToken.Lifetime']}}"/>
+                <input class="form-control" type="number" min="60" step="1" id="oauth2-access-token-lifetime" name="oauth2-access-token-lifetime" value="{{$config_values['OAuth2.AccessToken.Lifetime']}}"/>
             </div>
             <div class="form-group">
                 <label for="oauth2-id-token-lifetime">Id Token Lifetime&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in seconds"></span></label>
-                <input class="form-control" type="number" min="3600" step="1" id="oauth2-id-token-lifetime" name="oauth2-id-token-lifetime" value="{{$config_values['OAuth2.IdToken.Lifetime']}}"/>
+                <input class="form-control" type="number" min="60" step="1" id="oauth2-id-token-lifetime" name="oauth2-id-token-lifetime" value="{{$config_values['OAuth2.IdToken.Lifetime']}}"/>
             </div>
             <div class="form-group">
                 <label for="oauth2-refresh-token-lifetime">Refresh Token Lifetime&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="in seconds - zero value means infinite"></span></label>
