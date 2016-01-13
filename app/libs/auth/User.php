@@ -209,16 +209,7 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
     public function getPic()
     {
         $this->getAssociatedMember();
-        $url = asset('img/generic-profile-photo.png');
-        $photoId = $this->member->PhotoID;
-        if (!is_null($photoId) && is_numeric($photoId) && $photoId > 0) {
-            $photo = MemberPhoto::where('ID', '=', $photoId)->first();
-            if (!is_null($photo)) {
-                $url = $photo->Filename;
-            }
-        }
-
-        return $url;
+        return 'profile_images/members/'.$this->member->ID;
     }
 
     public function getClients()
