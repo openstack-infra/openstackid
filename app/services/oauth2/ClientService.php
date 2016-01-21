@@ -464,48 +464,49 @@ class ClientService implements IClientService
             }
 
             // validate uris
-            switch($current_app_type)
-            {
-                case IClient::ApplicationType_Native:
-                {
-                    $redirect_uris = explode(',', $params['redirect_uris']);
-                    if(!isset($params['redirect_uris'])) throw new \ValidationException('redirect_uris param is required.');
-                    //check that custom schema does not already exists for another registerd app
-                    if(!empty($params['redirect_uris'])) {
-                        foreach ($redirect_uris as $uri) {
-                            $uri = @parse_url($uri);
-                            if (!isset($uri['scheme'])) {
-                                throw new \ValidationException('invalid scheme on redirect uri.');
-                            }
-                            if (HttpUtils::isCustomSchema($uri['scheme'])) {
-                                $already_has_schema_registered = Client::where('redirect_uris', 'like',
-                                    '%' . $uri['scheme'] . '://%')->where('id', '<>', $id)->count();
-                                if ($already_has_schema_registered > 0) {
-                                    throw new \ValidationException(sprintf('schema %s:// already registered for another client.',
-                                        $uri['scheme']));
+            switch($current_app_type) {
+                case IClient::ApplicationType_Native: {
+
+                    if (isset($params['redirect_uris'])) {
+                        $redirect_uris = explode(',', $params['redirect_uris']);
+                        //check that custom schema does not already exists for another registerd app
+                        if (!empty($params['redirect_uris'])) {
+                            foreach ($redirect_uris as $uri) {
+                                $uri = @parse_url($uri);
+                                if (!isset($uri['scheme'])) {
+                                    throw new \ValidationException('invalid scheme on redirect uri.');
                                 }
-                            } else {
-                                if (!HttpUtils::isHttpSchema($uri['scheme'])) {
-                                    throw new \ValidationException(sprintf('scheme %s:// is invalid.', $uri['scheme']));
+                                if (HttpUtils::isCustomSchema($uri['scheme'])) {
+                                    $already_has_schema_registered = Client::where('redirect_uris', 'like',
+                                        '%' . $uri['scheme'] . '://%')->where('id', '<>', $id)->count();
+                                    if ($already_has_schema_registered > 0) {
+                                        throw new \ValidationException(sprintf('schema %s:// already registered for another client.',
+                                            $uri['scheme']));
+                                    }
+                                } else {
+                                    if (!HttpUtils::isHttpSchema($uri['scheme'])) {
+                                        throw new \ValidationException(sprintf('scheme %s:// is invalid.',
+                                            $uri['scheme']));
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                break;
+                    break;
                 case IClient::ApplicationType_Web_App:
-                case IClient::ApplicationType_JS_Client:
-                {
-                    if(!isset($params['redirect_uris'])) throw new \ValidationException('redirect_uris param is required.');
-                    if(!empty($params['redirect_uris'])) {
-                        $redirect_uris = explode(',', $params['redirect_uris']);
-                        foreach ($redirect_uris as $uri) {
-                            $uri = @parse_url($uri);
-                            if (!isset($uri['scheme'])) {
-                                throw new \ValidationException('invalid scheme on redirect uri.');
-                            }
-                            if (!HttpUtils::isHttpsSchema($uri['scheme'])) {
-                                throw new \ValidationException(sprintf('scheme %s:// is invalid.', $uri['scheme']));
+                case IClient::ApplicationType_JS_Client: {
+                    if (isset($params['redirect_uris'])){
+                        if (!empty($params['redirect_uris'])) {
+                            $redirect_uris = explode(',', $params['redirect_uris']);
+                            foreach ($redirect_uris as $uri) {
+                                $uri = @parse_url($uri);
+                                if (!isset($uri['scheme'])) {
+                                    throw new \ValidationException('invalid scheme on redirect uri.');
+                                }
+                                if (!HttpUtils::isHttpsSchema($uri['scheme'])) {
+                                    throw new \ValidationException(sprintf('scheme %s:// is invalid.', $uri['scheme']));
+                                }
                             }
                         }
                     }
