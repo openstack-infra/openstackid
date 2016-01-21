@@ -166,7 +166,8 @@ final class RefreshBearerTokenGrantType extends AbstractGrantType
         (
             $access_token->getValue(),
             $access_token->getLifetime(),
-            !is_null($new_refresh_token) ? $new_refresh_token->getValue() : $scope
+            !is_null($new_refresh_token) ? $new_refresh_token->getValue() : null,
+            $scope
         );
 
         return $response;
