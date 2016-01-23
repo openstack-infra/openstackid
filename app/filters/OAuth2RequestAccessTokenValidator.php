@@ -152,13 +152,6 @@ final class OAuth2BearerAccessTokenRequestValidator {
             {
                 // http://tools.ietf.org/html/rfc6750#section-2- 2
                 // if access token is not on authorization header check on POST/GET params
-                if($request->headers->get('content-type') !== HttpContentType::Form)
-                    throw new OAuth2ResourceServerException
-                    (
-                        400,
-                        OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest,
-                        'invalid content-type'
-                    );
                 $access_token_value = Input::get(OAuth2Protocol::OAuth2Protocol_AccessToken, '');
             }
 
