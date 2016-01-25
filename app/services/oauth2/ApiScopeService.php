@@ -253,6 +253,7 @@ final class ApiScopeService implements IApiScopeService
             $default,
             $system,
             $api_id,
+            $assigned_by_groups,
             &$instance
         ) {
 

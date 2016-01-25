@@ -24,6 +24,11 @@
     </div>
     <div class="checkbox">
         <label>
+            <input type="checkbox" id="assigned_by_groups" name="assigned_by_groups">&nbsp;Assigned By Groups
+        </label>
+    </div>
+    <div class="checkbox">
+        <label>
             <input type="checkbox" id="active" name="active">&nbsp;Active
         </label>
     </div>
