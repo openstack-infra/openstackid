@@ -99,7 +99,10 @@ final class ServerEncryptionKeyFinder implements IKeyFinder
         }
 
         if(is_null($key))
-            throw new ServerKeyNotFoundException;
+            throw new ServerKeyNotFoundException
+            (
+                sprintf('enc key not found  - client id %s - requested alg %s', $client->getClientId(), $alg->getName())
+            );
 
         $jwk = $key->toJWK();
 

@@ -109,7 +109,10 @@ final class ServerSigningKeyFinder implements IKeyFinder
 
         if (is_null($key))
         {
-            throw new ServerKeyNotFoundException;
+            throw new ServerKeyNotFoundException
+            (
+                sprintf('sig key not found  - client id %s - requested alg %s', $client->getClientId(), $alg->getName())
+            );
         }
 
         $jwk = $key->toJWK();

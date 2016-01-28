@@ -601,6 +601,7 @@ final class OAuth2Protocol implements IOAuth2Protocol
 
     const OAuth2Protocol_Error_Invalid_Recipient_Keys = 'invalid_recipient_keys';
     const OAuth2Protocol_Error_Invalid_Server_Keys    = 'invalid_server_keys';
+    const OAuth2Protocol_Error_Not_Found_Server_Keys  = 'not_found_server_keys';
 
 
     public static $valid_responses_types = array

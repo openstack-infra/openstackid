@@ -27,6 +27,12 @@ final class ServerKeyNotFoundException extends OAuth2BaseException
      */
     public function getError()
     {
-        return OAuth2Protocol::OAuth2Protocol_Error_Invalid_Server_Keys;
+        $error       = OAuth2Protocol::OAuth2Protocol_Error_Not_Found_Server_Keys;
+        $description = $this->getMessage();
+        if(!empty($description))
+        {
+            $error = sprintf('%s : %s',$error, $description);
+        }
+        return $error;
     }
 }
