@@ -16,6 +16,10 @@ use utils\services\ILogService;
 final class UserService implements IUserService
 {
 
+    const USER_NAME_INVALID_CHAR_REPLACEMENT = '.';
+
+    const USER_NAME_CHAR_CONNECTOR           = '.';
+
     /**
      * @var IUserRepository
      */
@@ -224,7 +228,12 @@ final class UserService implements IUserService
             $user->login_failed_attempt = 0;
 
             $repository->add($user);
-            $proposed_username     = strtolower($member->FirstName . "." . $member->Surname);
+            $proposed_username     = strtolower
+            (
+                preg_replace('/[^\d\w]+/i', UserService::USER_NAME_INVALID_CHAR_REPLACEMENT, $member->FirstName)
+                . UserService::USER_NAME_CHAR_CONNECTOR .
+                preg_replace('/[^\d\w]+/i', UserService::USER_NAME_INVALID_CHAR_REPLACEMENT, $member->Surname)
+            );
             $done                  = false;
             $fragment_nbr          = 1;
             $aux_proposed_username = $proposed_username;
@@ -248,7 +257,7 @@ final class UserService implements IUserService
                 }
                 else
                 {
-                    $aux_proposed_username = $proposed_username . "." . $fragment_nbr;
+                    $aux_proposed_username = $proposed_username . UserService::USER_NAME_CHAR_CONNECTOR . $fragment_nbr;
                     $fragment_nbr++;
                 }
 
