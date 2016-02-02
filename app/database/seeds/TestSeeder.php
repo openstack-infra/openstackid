@@ -205,6 +205,9 @@ SQL;
             )
         );
 
+
+
+
         Member::create(
             array(
                 'ID'   => 2,
@@ -231,6 +234,87 @@ SQL;
                 'FirstName' => 'Sebastian',
                 'Surname' => 'Marcet',
                 'Email' => 'sebastian+2@tipit.net',
+                'Password' => '1qaz2wsx',
+                'PasswordEncryption' => 'none',
+                'Salt' => 'none',
+                'Gender' => 'male',
+                'Address' => 'Av. Siempre Viva 111',
+                'Suburb' => 'Lanus Este',
+                'State' => 'Buenos Aires',
+                'City' => 'Lanus',
+                'Postcode' => '1824',
+                'Country' => 'AR',
+                'Locale' => 'ESP',
+            )
+        );
+
+
+        Member::create(
+            array(
+                'ID'   => 4,
+                'FirstName' => 'Márton',
+                'Surname' => 'Kiss',
+                'Email' => 'mkiss@tipit.net',
+                'Password' => '1qaz2wsx',
+                'PasswordEncryption' => 'none',
+                'Salt' => 'none',
+                'Gender' => 'male',
+                'Address' => 'Av. Siempre Viva 111',
+                'Suburb' => 'Lanus Este',
+                'State' => 'Buenos Aires',
+                'City' => 'Lanus',
+                'Postcode' => '1824',
+                'Country' => 'AR',
+                'Locale' => 'ESP',
+            )
+        );
+
+        Member::create(
+            array(
+                'ID'   => 5,
+                'FirstName' => '付',
+                'Surname' => '金刚',
+                'Email' => 'fujg573@tipit.net',
+                'Password' => '1qaz2wsx',
+                'PasswordEncryption' => 'none',
+                'Salt' => 'none',
+                'Gender' => 'male',
+                'Address' => 'Av. Siempre Viva 111',
+                'Suburb' => 'Lanus Este',
+                'State' => 'Buenos Aires',
+                'City' => 'Lanus',
+                'Postcode' => '1824',
+                'Country' => 'AR',
+                'Locale' => 'ESP',
+            )
+        );
+
+        Member::create(
+            array(
+                'ID'   => 6,
+                'FirstName' => 'Bharath',
+                'Surname' => 'Kumar M R',
+                'Email' => 'mrbharathee@tipit.com',
+                'Password' => '1qaz2wsx',
+                'PasswordEncryption' => 'none',
+                'Salt' => 'none',
+                'Gender' => 'male',
+                'Address' => 'Av. Siempre Viva 111',
+                'Suburb' => 'Lanus Este',
+                'State' => 'Buenos Aires',
+                'City' => 'Lanus',
+                'Postcode' => '1824',
+                'Country' => 'AR',
+                'Locale' => 'ESP',
+            )
+        );
+
+        Member::create(
+            array(
+                'ID'   => 7,
+                'FirstName' => '大塚',
+                'Surname' => '元央',
+                'Email' => 'yuanying@tipit.com',
                 'Password' => '1qaz2wsx',
                 'PasswordEncryption' => 'none',
                 'Salt' => 'none',

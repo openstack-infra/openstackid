@@ -6,7 +6,11 @@ use App;
 use Illuminate\Support\ServiceProvider;
 use utils\services\UtilsServiceCatalog;
 
-class AuthenticationServiceProvider extends ServiceProvider
+/**
+ * Class AuthenticationServiceProvider
+ * @package auth
+ */
+final class AuthenticationServiceProvider extends ServiceProvider
 {
 
     public function boot()
@@ -17,6 +21,7 @@ class AuthenticationServiceProvider extends ServiceProvider
     {
         App::singleton(UtilsServiceCatalog::AuthenticationService, 'auth\\AuthService');
         App::singleton('auth\\IAuthenticationExtensionService', 'auth\\AuthenticationExtensionService');
+        App::singleton('auth\\IUserNameGeneratorService','auth\\UserNameGeneratorService');
     }
 
     public function provides()
