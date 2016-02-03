@@ -21,6 +21,9 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 {
     protected $table = 'openid_users';
 
+    /**
+     * @var Member
+     */
     private $member;
 
     public function trusted_sites()
@@ -371,5 +374,15 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
             }
         }
         return $scopes;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailVerified()
+    {
+        $this->getAssociatedMember();
+
+        return $this->member->isEmailVerified();
     }
 }

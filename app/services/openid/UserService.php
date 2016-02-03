@@ -245,7 +245,8 @@ final class UserService implements IUserService
 
             $done                  = false;
             $fragment_nbr          = 1;
-            $aux_proposed_username = $user_name_generator->generate($member);
+            $proposed_username     = $user_name_generator->generate($member);
+            $aux_proposed_username = $proposed_username;
             do
             {
 

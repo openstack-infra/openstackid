@@ -42,4 +42,17 @@ class Member extends BaseModelEloquent
         }
         return true;
     }
+
+    /**
+     * @return bool
+     */
+    public function isEmailVerified()
+    {
+        $attr = $this->getAttributes();
+        if(isset($attr['EmailVerified']))
+        {
+            return (bool)$attr['EmailVerified'];
+        }
+        return false;
+    }
 }
