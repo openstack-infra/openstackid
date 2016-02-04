@@ -85,11 +85,11 @@ class UserService extends OAuth2ProtectedService implements IUserService
 
             if (in_array(self::UserProfileScope_Address, $scopes)) {
                 // Address Claims
-                $data[AddressClaim::Country] = $current_user->getCountry();
+                $data[AddressClaim::Country]       = $current_user->getCountry();
                 $data[AddressClaim::StreetAddress] = $current_user->getCountry();
-                $data[AddressClaim::PostalCode] = $current_user->getPostalCode();
-                $data[AddressClaim::Region] = $current_user->getRegion();
-                $data[AddressClaim::Locality] = $current_user->getLocality();
+                $data[AddressClaim::PostalCode]    = $current_user->getPostalCode();
+                $data[AddressClaim::Region]        = $current_user->getRegion();
+                $data[AddressClaim::Locality]      = $current_user->getLocality();
             }
             if (in_array(self::UserProfileScope_Profile, $scopes)) {
                 // Profile Claims
@@ -97,18 +97,18 @@ class UserService extends OAuth2ProtectedService implements IUserService
                 $pic_url = $current_user->getPic();
                 $pic_url = str_contains($pic_url, 'http') ? $pic_url : $assets_url . $pic_url;
 
-                $data[StandardClaims::Name] = $current_user->getFullName();
-                $data[StandardClaims::GivenName] = $current_user->getFirstName();
+                $data[StandardClaims::Name]       = $current_user->getFullName();
+                $data[StandardClaims::GivenName]  = $current_user->getFirstName();
                 $data[StandardClaims::FamilyName] = $current_user->getLastName();
-                $data[StandardClaims::NickName] = $current_user->getNickName();
-                $data[StandardClaims::Picture] = $pic_url;
-                $data[StandardClaims::Birthdate] = $current_user->getDateOfBirth();
-                $data[StandardClaims::Gender] = $current_user->getGender();
+                $data[StandardClaims::NickName]   = $current_user->getNickName();
+                $data[StandardClaims::Picture]    = $pic_url;
+                $data[StandardClaims::Birthdate]  = $current_user->getDateOfBirth();
+                $data[StandardClaims::Gender]     = $current_user->getGender();
             }
             if (in_array(self::UserProfileScope_Email, $scopes)) {
                 // Email Claim
                 $data[StandardClaims::Email]         = $current_user->getEmail();
-                $data[StandardClaims::EmailVerified] = false;
+                $data[StandardClaims::EmailVerified] = $current_user->isEmailVerified();
             }
         } catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -157,12 +157,12 @@ class UserService extends OAuth2ProtectedService implements IUserService
             if (in_array(self::UserProfileScope_Address, $scopes)) {
                 // Address Claims
                 $address = array();
-                $address[AddressClaim::Country] = $current_user->getCountry();
+                $address[AddressClaim::Country]       = $current_user->getCountry();
                 $address[AddressClaim::StreetAddress] = $current_user->getStreetAddress();
-                $address[AddressClaim::PostalCode] = $current_user->getPostalCode();
-                $address[AddressClaim::Region] = $current_user->getRegion();
-                $address[AddressClaim::Locality] = $current_user->getLocality();
-                $address[AddressClaim::Formatted] = $current_user->getFormattedAddress();
+                $address[AddressClaim::PostalCode]    = $current_user->getPostalCode();
+                $address[AddressClaim::Region]        = $current_user->getRegion();
+                $address[AddressClaim::Locality]      = $current_user->getLocality();
+                $address[AddressClaim::Formatted]     = $current_user->getFormattedAddress();
 
                 $claim_set->addClaim(new JWTClaim(StandardClaims::Address, new JsonValue($address)));
 
@@ -187,7 +187,7 @@ class UserService extends OAuth2ProtectedService implements IUserService
             {
                 // Address Claim
                 $claim_set->addClaim(new JWTClaim(StandardClaims::Email, new StringOrURI($current_user->getEmail())));
-                $claim_set->addClaim(new JWTClaim(StandardClaims::EmailVerified, new JsonValue(false)));
+                $claim_set->addClaim(new JWTClaim(StandardClaims::EmailVerified, new JsonValue($current_user->isEmailVerified())));
             }
         } catch (Exception $ex) {
             $this->log_service->error($ex);

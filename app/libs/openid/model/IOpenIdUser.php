@@ -114,4 +114,9 @@ interface IOpenIdUser
      * @return int
      */
     public function getExternalIdentifier();
+
+    /**
+     * @return bool
+     */
+    public function isEmailVerified();
 }
