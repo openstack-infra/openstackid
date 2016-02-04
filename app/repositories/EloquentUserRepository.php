@@ -97,4 +97,13 @@ final class EloquentUserRepository extends AbstractEloquentEntityRepository impl
         }
         return $list;
     }
+
+    /**
+     * @param string $user_identifier
+     * @return User
+     */
+    public function getByIdentifier($user_identifier)
+    {
+        return $this->entity->where('identifier', '=', $user_identifier)->first();
+    }
 }

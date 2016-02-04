@@ -10,7 +10,7 @@ use openid\model\IOpenIdUser;
 use openid\services\IUserService;
 use utils\db\ITransactionService;
 use utils\services\ILogService;
-
+use Log;
 /**
  * Class UserService
  * @package services\openid
@@ -233,6 +233,10 @@ final class UserService implements IUserService
 
         return $this->tx_service->transaction(function () use($member, $user_name_generator, $repository){
             //create user
+            $old_user = $repository->getByExternalId($member->ID);
+            if(!is_null($old_user))
+                throw new ValidationException(sprintf('already exists an user with external_identifier %s', $member->ID));
+
             $user                       = new User();
             $user->external_identifier  = $member->ID;
             $user->identifier           = $member->ID;
@@ -241,38 +245,24 @@ final class UserService implements IUserService
             $user->lock                 = false;
             $user->login_failed_attempt = 0;
 
-            $repository->add($user);
-
             $done                  = false;
             $fragment_nbr          = 1;
-            $proposed_username     = $user_name_generator->generate($member);
-            $aux_proposed_username = $proposed_username;
+            $identifier            = $original_identifier = $user_name_generator->generate($member);
             do
             {
-
-                $old_user = $repository->getOneByCriteria
-                (
-                    array
-                    (
-                        array('name' => 'identifier', 'op' => '=', 'value' => $aux_proposed_username),
-                        array('name' => 'id', 'op' => '<>', 'value' => $user->id)
-                    )
-                );
-
-                if (is_null($old_user))
+                Log::debug(sprintf('proposed user identifer %s for member %s', $identifier, $member->ID));
+                $old_user = $repository->getByIdentifier($identifier);
+                if(!is_null($old_user))
                 {
-
-                    $user->identifier = $aux_proposed_username;
-                    $done = $repository->update($user);
-                }
-                else
-                {
-                    $aux_proposed_username = $proposed_username . IUserNameGeneratorService::USER_NAME_CHAR_CONNECTOR . $fragment_nbr;
+                    Log::debug(sprintf('proposed user identifer %s already exists!, trying new one ...', $identifier));
+                    $identifier = $original_identifier . IUserNameGeneratorService::USER_NAME_CHAR_CONNECTOR . $fragment_nbr;
                     $fragment_nbr++;
+                    continue;
                 }
-
-            } while (!$done);
-
+                $user->identifier = $identifier;
+                break;
+            } while (1);
+            $repository->add($user);
             return $user;
         });
     }

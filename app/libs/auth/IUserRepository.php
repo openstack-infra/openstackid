@@ -49,4 +49,10 @@ interface IUserRepository extends IBaseRepository
      * @return array
      */
     public function getByEmailOrName($term);
+
+    /**
+     * @param string $user_identifier
+     * @return User
+     */
+    public function getByIdentifier($user_identifier);
 } 
