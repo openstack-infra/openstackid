@@ -8,9 +8,30 @@
 
 namespace strategies;
 
-
-interface ILoginStrategy {
+/**
+ * Interface ILoginStrategy
+ * @package strategies
+ */
+interface ILoginStrategy
+{
+    /**
+     * @return mixed
+     */
     public function  getLogin();
+
+    /**
+     * @return mixed
+     */
     public function  postLogin();
+
+    /**
+     * @return mixed
+     */
     public function  cancelLogin();
+
+    /**
+     * @param array $params
+     * @return mixed
+     */
+    public function errorLogin(array $params);
 } 

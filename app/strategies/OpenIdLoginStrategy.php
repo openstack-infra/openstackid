@@ -17,21 +17,13 @@ use View;
  * Class OpenIdLoginStrategy
  * @package strategies
  */
-final class OpenIdLoginStrategy implements ILoginStrategy
+final class OpenIdLoginStrategy extends DefaultLoginStrategy
 {
 
     /**
      * @var IMementoOpenIdSerializerService
      */
     private $memento_service;
-    /**
-     * @var IUserActionService
-     */
-    private $user_action_service;
-    /**
-     * @var IAuthService
-     */
-    private $auth_service;
 
     /**
      * @param IMementoOpenIdSerializerService $memento_service
@@ -44,8 +36,8 @@ final class OpenIdLoginStrategy implements ILoginStrategy
         IAuthService $auth_service
     ) {
         $this->memento_service = $memento_service;
-        $this->user_action_service = $user_action_service;
-        $this->auth_service = $auth_service;
+
+        parent::__construct($user_action_service, $auth_service);
     }
 
     public function getLogin()

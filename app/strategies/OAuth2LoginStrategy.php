@@ -21,21 +21,13 @@ use URL;
  * Class OAuth2LoginStrategy
  * @package strategies
  */
-class OAuth2LoginStrategy implements ILoginStrategy
+class OAuth2LoginStrategy extends DefaultLoginStrategy
 {
 
     /**
      * @var IMementoOAuth2SerializerService
      */
     private $memento_service;
-    /**
-     * @var IUserActionService
-     */
-    private $user_action_service;
-    /**
-     * @var IAuthService
-     */
-    private $auth_service;
 
     /**
      * @var ISecurityContextService
@@ -56,9 +48,8 @@ class OAuth2LoginStrategy implements ILoginStrategy
         ISecurityContextService $security_context_service
     )
     {
+        parent::__construct($user_action_service, $auth_service);
         $this->memento_service          = $memento_service;
-        $this->user_action_service      = $user_action_service;
-        $this->auth_service             = $auth_service;
         $this->security_context_service = $security_context_service;
     }
 
@@ -126,5 +117,27 @@ class OAuth2LoginStrategy implements ILoginStrategy
         $this->auth_service->setUserAuthenticationResponse(IAuthService::AuthenticationResponse_Cancel);
 
         return Redirect::action("OAuth2ProviderController@authorize");
+    }
+
+    /**
+     * @param array $params
+     * @return mixed
+     */
+    public function errorLogin(array $params)
+    {
+        $auth_request = OAuth2AuthorizationRequestFactory::getInstance()->build(
+            OAuth2Message::buildFromMemento(
+                $this->memento_service->load()
+            )
+        );
+        $display = $auth_request->getDisplay();
+
+        if($display === OAuth2Protocol::OAuth2Protocol_Display_Page)
+            return parent::errorLogin($params);
+
+        if($display === OAuth2Protocol::OAuth2Protocol_Display_Touch)
+        {
+            return Response::json($params, 412);
+        }
     }
 }

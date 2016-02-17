@@ -228,11 +228,16 @@ class UserController extends OpenIdController
                     $login_attempts = $user->login_failed_attempt;
                 }
 
-                return Redirect::action('UserController@getLogin')
-                    ->with('max_login_attempts_2_show_captcha', $max_login_attempts_2_show_captcha)
-                    ->with('login_attempts', $login_attempts)
-                    ->with('username', $username)
-                    ->with('flash_notice', "We're sorry, your username or password does not match an existing record.");
+                return $this->login_strategy->errorLogin
+                (
+                    array
+                    (
+                        'max_login_attempts_2_show_captcha' => $max_login_attempts_2_show_captcha,
+                        'login_attempts'                    => $login_attempts,
+                        'username'                          => $username,
+                        'error_message'                     => '"We\'re sorry, your username or password does not match an existing record."'
+                    )
+                );
             }
 
             return Redirect::action('UserController@getLogin')

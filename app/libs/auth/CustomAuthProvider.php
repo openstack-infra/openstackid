@@ -158,7 +158,7 @@ class CustomAuthProvider implements UserProviderInterface
 
                 if (!$valid_password)
                 {
-                    throw new AuthenticationInvalidPasswordAttemptException($email,
+                    throw new AuthenticationInvalidPasswordAttemptException($member->ID,
                         sprintf("invalid login attempt for user %s ", $email));
                 }
 
