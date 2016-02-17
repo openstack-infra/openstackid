@@ -22,6 +22,7 @@ use oauth2\exceptions\InvalidClientException;
 use oauth2\exceptions\InvalidOAuth2Request;
 use oauth2\exceptions\OAuth2BaseException;
 use oauth2\exceptions\UriNotAllowedException;
+use oauth2\factories\OAuth2AuthorizationRequestFactory;
 use oauth2\grant_types\AuthorizationCodeGrantType;
 use oauth2\grant_types\ClientCredentialsGrantType;
 use oauth2\grant_types\HybridGrantType;
@@ -29,6 +30,8 @@ use oauth2\grant_types\ImplicitGrantType;
 use oauth2\grant_types\RefreshBearerTokenGrantType;
 use oauth2\models\IClient;
 use oauth2\repositories\IServerPrivateKeyRepository;
+use oauth2\requests\OAuth2AuthenticationRequest;
+use oauth2\requests\OAuth2AuthorizationRequest;
 use oauth2\requests\OAuth2EndSessionRequest;
 use oauth2\requests\OAuth2LogoutRequest;
 use oauth2\requests\OAuth2Request;
@@ -61,6 +64,10 @@ use utils\services\ILogService;
 final class OAuth2Protocol implements IOAuth2Protocol
 {
 
+    /**
+     * @var OAuth2Request
+     */
+    private $last_request = null;
     const OAuth2Protocol_Scope_Delimiter        = ' ';
     const OAuth2Protocol_ResponseType_Delimiter = ' ';
 
@@ -232,9 +239,6 @@ final class OAuth2Protocol implements IOAuth2Protocol
      */
     const OAuth2Protocol_AccessToken_Hash = 'at_hash';
 
-
-
-
     /**
      * Code hash value. Its value is the base64url encoding of the left-most half of the hash of the octets of the ASCII
      * representation of the code value, where the hash algorithm used is the hash algorithm used in the alg Header
@@ -280,9 +284,9 @@ final class OAuth2Protocol implements IOAuth2Protocol
     static public $valid_display_values = array
     (
         self::OAuth2Protocol_Display_Page,
-        self::OAuth2Protocol_Display_PopUp,
+        //self::OAuth2Protocol_Display_PopUp,
         self::OAuth2Protocol_Display_Touch,
-        self::OAuth2Protocol_Display_Wap
+        //self::OAuth2Protocol_Display_Wap
     );
 
     /**
@@ -754,6 +758,10 @@ final class OAuth2Protocol implements IOAuth2Protocol
     private $oidc_provider_configuration_service;
 
     /**
+     * @var IMementoOAuth2SerializerService
+     */
+    private $memento_service;
+    /**
      * @param ILogService $log_service
      * @param IClientService $client_service
      * @param ITokenService $token_service
@@ -792,6 +800,7 @@ final class OAuth2Protocol implements IOAuth2Protocol
 
         $this->server_private_keys_repository      = $server_private_keys_repository;
         $this->oidc_provider_configuration_service = $oidc_provider_configuration_service;
+        $this->memento_service                     = $memento_service;
 
         $authorization_code_grant_type    = new AuthorizationCodeGrantType
         (
@@ -802,7 +811,7 @@ final class OAuth2Protocol implements IOAuth2Protocol
             $auth_strategy,
             $log_service,
             $user_consent_service,
-            $memento_service,
+            $this->memento_service,
             $security_context_service,
             $principal_service,
             $server_private_key_repository,
@@ -818,7 +827,7 @@ final class OAuth2Protocol implements IOAuth2Protocol
             $auth_strategy,
             $log_service,
             $user_consent_service,
-            $memento_service,
+            $this->memento_service,
             $security_context_service,
             $principal_service,
             $server_private_key_repository,
@@ -834,7 +843,7 @@ final class OAuth2Protocol implements IOAuth2Protocol
             $auth_strategy,
             $log_service,
             $user_consent_service,
-            $memento_service,
+            $this->memento_service,
             $security_context_service,
             $principal_service,
             $server_private_key_repository,
@@ -885,10 +894,26 @@ final class OAuth2Protocol implements IOAuth2Protocol
     {
         try
         {
-            if (is_null($request) || !$request->isValid())
-                throw new InvalidOAuth2Request;
+            $this->last_request = $request;
 
-            return $this->authorize_endpoint->handle($request);
+            if (is_null($this->last_request)) throw new InvalidOAuth2Request;
+
+            if(!$this->last_request->isValid())
+            {
+                // then check if we have a memento ....
+                if (!$this->memento_service->exists())
+                    throw new InvalidOAuth2Request($this->last_request->getLastValidationError());
+
+                $this->last_request = OAuth2AuthorizationRequestFactory::getInstance()->build
+                (
+                    OAuth2Message::buildFromMemento($this->memento_service->load())
+                );
+
+                if(!$this->last_request->isValid())
+                    throw new InvalidOAuth2Request($this->last_request->getLastValidationError());
+
+            }
+            return $this->authorize_endpoint->handle($this->last_request);
         }
         catch (UriNotAllowedException $ex1)
         {
@@ -901,14 +926,14 @@ final class OAuth2Protocol implements IOAuth2Protocol
             $this->log_service->error($ex2);
             $this->checkpoint_service->trackException($ex2);
 
-            $redirect_uri = $this->validateRedirectUri($request);
+            $redirect_uri = $this->validateRedirectUri($this->last_request);
 
             if (is_null($redirect_uri))
                 throw $ex2;
 
             return OAuth2IndirectErrorResponseFactoryMethod::buildResponse
             (
-                $request,
+                $this->last_request,
                 $ex2->getError(),
                 $ex2->getMessage(),
                 $redirect_uri
@@ -919,36 +944,18 @@ final class OAuth2Protocol implements IOAuth2Protocol
             $this->log_service->error($ex);
             $this->checkpoint_service->trackException($ex);
 
-            $redirect_uri = $this->validateRedirectUri($request);
+            $redirect_uri = $this->validateRedirectUri($this->last_request);
             if (is_null($redirect_uri))
                 throw $ex;
 
             return OAuth2IndirectErrorResponseFactoryMethod::buildResponse
             (
-                $request,
+                $this->last_request,
                 OAuth2Protocol::OAuth2Protocol_Error_ServerError,
                 $ex->getMessage(),
                 $redirect_uri
             );
         }
-    }
-
-    private function validateRedirectUri(OAuth2Request $request = null)
-    {
-        if (is_null($request))
-            return null;
-        $redirect_uri = $request->getRedirectUri();
-        if (is_null($redirect_uri))
-            return null;
-        $client_id = $request->getClientId();
-        if (is_null($client_id))
-            return null;
-        $client = $this->client_service->getClientById($client_id);
-        if (is_null($client))
-            return null;
-        if (!$client->isUriAllowed($redirect_uri))
-            return null;
-        return $redirect_uri;
     }
 
     /**
@@ -959,9 +966,15 @@ final class OAuth2Protocol implements IOAuth2Protocol
     {
         try
         {
-            if (is_null($request) || !$request->isValid())
+            $this->last_request = $request;
+
+            if (is_null($this->last_request))
                 throw new InvalidOAuth2Request;
-            return $this->token_endpoint->handle($request);
+
+            if(!$this->last_request->isValid())
+                throw new InvalidOAuth2Request($this->last_request->getLastValidationError());
+
+            return $this->token_endpoint->handle($this->last_request);
         }
         catch(OAuth2BaseException $ex1)
         {
@@ -992,9 +1005,15 @@ final class OAuth2Protocol implements IOAuth2Protocol
     public function revoke(OAuth2Request $request = null){
 
         try {
-            if (is_null($request) || !$request->isValid())
+            $this->last_request = $request;
+
+            if (is_null($this->last_request))
                 throw new InvalidOAuth2Request;
-            return $this->revoke_endpoint->handle($request);
+
+            if(!$this->last_request->isValid())
+                throw new InvalidOAuth2Request($this->last_request->getLastValidationError());
+
+            return $this->revoke_endpoint->handle($this->last_request);
         }
         catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -1014,10 +1033,15 @@ final class OAuth2Protocol implements IOAuth2Protocol
     {
         try
         {
-            if (is_null($request) || !$request->isValid())
+            $this->last_request = $request;
+
+            if (is_null($this->last_request))
                 throw new InvalidOAuth2Request;
 
-            return $this->introspection_endpoint->handle($request);
+            if(!$this->last_request->isValid())
+                throw new InvalidOAuth2Request($this->last_request->getLastValidationError());
+
+            return $this->introspection_endpoint->handle($this->last_request);
         }
         catch(ExpiredAccessTokenException $ex1)
         {
@@ -1285,12 +1309,17 @@ final class OAuth2Protocol implements IOAuth2Protocol
     {
         try
         {
-            if (is_null($request) || !$request->isValid())
+            $this->last_request = $request;
+
+            if (is_null($this->last_request))
                 throw new InvalidOAuth2Request;
 
-            if(! $request instanceof OAuth2LogoutRequest) throw new InvalidOAuth2Request;
+            if(!$this->last_request->isValid())
+                throw new InvalidOAuth2Request($this->last_request->getLastValidationError());
 
-            $id_token_hint = $request->getIdTokenHint();
+            if(! $this->last_request instanceof OAuth2LogoutRequest) throw new InvalidOAuth2Request;
+
+            $id_token_hint = $this->last_request->getIdTokenHint();
 
             $jwt = BasicJWTFactory::build($id_token_hint);
 
@@ -1305,9 +1334,9 @@ final class OAuth2Protocol implements IOAuth2Protocol
 
             if(is_null($client)) throw new InvalidClientException('client not found!');
 
-            $redirect_logout_uri = $request->getPostLogoutRedirectUri();
+            $redirect_logout_uri = $this->last_request->getPostLogoutRedirectUri();
 
-            $state               = $request->getState();
+            $state               = $this->last_request->getState();
 
 
             if(!empty($redirect_logout_uri) && !$client->isPostLogoutUriAllowed($redirect_logout_uri))
@@ -1361,5 +1390,35 @@ final class OAuth2Protocol implements IOAuth2Protocol
                 $ex->getMessage()
             );
         }
+    }
+
+    /**
+     * @return OAuth2Request
+     */
+    public function getLastRequest()
+    {
+        return $this->last_request;
+    }
+
+    /**
+     * @param OAuth2Request|null $request
+     * @return null
+     */
+    private function validateRedirectUri(OAuth2Request $request = null)
+    {
+        if (is_null($request))
+            return null;
+        $redirect_uri = $request->getRedirectUri();
+        if (is_null($redirect_uri))
+            return null;
+        $client_id = $request->getClientId();
+        if (is_null($client_id))
+            return null;
+        $client = $this->client_service->getClientById($client_id);
+        if (is_null($client))
+            return null;
+        if (!$client->isUriAllowed($redirect_uri))
+            return null;
+        return $redirect_uri;
     }
 }

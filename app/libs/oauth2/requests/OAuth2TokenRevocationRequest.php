@@ -14,10 +14,14 @@ class OAuth2TokenRevocationRequest extends OAuth2Request {
 
     public function isValid()
     {
+        $this->last_validation_error = '';
+
         $token = $this->getToken();
 
-        if(is_null($token))
+        if(is_null($token)) {
+            $this->last_validation_error = 'token not set';
             return false;
+        }
 
         return true;
     }

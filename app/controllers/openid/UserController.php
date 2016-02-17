@@ -259,12 +259,18 @@ class UserController extends OpenIdController
     {
         try
         {
-            $trust_action = input::get("trust");
-            if (!is_null($trust_action) && !is_null($this->consent_strategy))
+            $data  = Input::all();
+            $rules = array
+            (
+                'trust' => 'required|oauth2_trust_response',
+            );
+            // Create a new validator instance.
+            $validator = Validator::make($data, $rules);
+            if ($validator->passes())
             {
-                return $this->consent_strategy->postConsent($trust_action);
+                return $this->consent_strategy->postConsent(input::get("trust"));
             }
-            return Redirect::action('UserController@getConsent');
+            return Redirect::action('UserController@getConsent')->withErrors($validator);
         }
         catch (Exception $ex)
         {
@@ -334,9 +340,9 @@ class UserController extends OpenIdController
             IPHelper::getUserIp(),
             IUserActionService::LogoutAction
         );
-
         $this->auth_service->logout();
-
+        Session::flush();
+        Session::regenerate();
         return Redirect::action("UserController@getLogin");
     }
 
@@ -348,18 +354,18 @@ class UserController extends OpenIdController
 
         return View::make("profile", array
         (
-            "username" => $user->getFullName(),
-            "user_id" => $user->getId(),
-            "is_oauth2_admin" => $user->isOAuth2ServerAdmin(),
+            "username"             => $user->getFullName(),
+            "user_id"              => $user->getId(),
+            "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
             "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
-            "use_system_scopes" => $user->canUseSystemScopes(),
-            "openid_url" => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
-            "identifier " => $user->getIdentifier(),
-            "sites" => $sites,
-            "show_pic" => $user->getShowProfilePic(),
-            "show_full_name" => $user->getShowProfileFullName(),
-            "show_email" => $user->getShowProfileEmail(),
-            'actions' => $actions,
+            "use_system_scopes"    => $user->canUseSystemScopes(),
+            "openid_url"           => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
+            "identifier "          => $user->getIdentifier(),
+            "sites"                => $sites,
+            "show_pic"             => $user->getShowProfilePic(),
+            "show_full_name"       => $user->getShowProfileFullName(),
+            "show_email"           => $user->getShowProfileEmail(),
+            'actions'              => $actions,
         ));
     }
 
@@ -377,7 +383,6 @@ class UserController extends OpenIdController
     public function deleteTrustedSite($id)
     {
         $this->trusted_sites_service->delTrustedSite($id);
-
         return Redirect::action("UserController@getProfile");
     }
 

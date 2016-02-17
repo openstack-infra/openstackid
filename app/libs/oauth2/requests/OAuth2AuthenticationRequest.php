@@ -53,7 +53,9 @@ class OAuth2AuthenticationRequest extends OAuth2AuthorizationRequest
      */
     public function getDisplay()
     {
-        return $this->getParam(OAuth2Protocol::OAuth2Protocol_Display);
+        $display = $this->getParam(OAuth2Protocol::OAuth2Protocol_Display);
+        if(empty($display)) return OAuth2Protocol::OAuth2Protocol_Display_Page;
+        return $display;
     }
 
     /**
@@ -145,19 +147,24 @@ class OAuth2AuthenticationRequest extends OAuth2AuthorizationRequest
     public function isValid()
     {
         $res = parent::isValid();
-        if(!$res) throw new InvalidOAuth2Request('invalid parent request!');
 
         if($res)
         {
             // Reject requests without nonce unless using the code flow
             $nonce         = $this->getNonce();
             if(empty($nonce) && !OAuth2Protocol::responseTypeBelongsToFlow($this->getResponseType(false), OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode))
-                throw new InvalidOAuth2Request('missing nonce!');
+            {
+                $this->last_validation_error = 'nonce not set';
+                return false;
+            }
 
             $current_scope = trim($this->getScope());
 
             if(!str_contains($current_scope, OAuth2Protocol::OpenIdConnect_Scope))
-                throw new InvalidOAuth2Request('missing openid scope!');
+            {
+                $this->last_validation_error = 'missing openid scope';
+                return false;
+            }
 
             if($current_scope === OAuth2Protocol::OpenIdConnect_Scope)
             {
@@ -167,8 +174,11 @@ class OAuth2AuthenticationRequest extends OAuth2AuthorizationRequest
 
             $display = $this->getDisplay();
 
-            if(!empty($display) && !in_array($display, OAuth2Protocol::$valid_display_values))
-                throw new InvalidOAuth2Request('not valid display value');
+            if(!in_array($display, OAuth2Protocol::$valid_display_values))
+            {
+                $this->last_validation_error = 'not valid display value';
+                return false;
+            }
 
             $prompt = $this->getPrompt();
 
@@ -176,12 +186,18 @@ class OAuth2AuthenticationRequest extends OAuth2AuthorizationRequest
             {
                 // if this parameter contains none with any other value, an error is returned.
                 if(in_array(OAuth2Protocol::OAuth2Protocol_Prompt_None, $prompt) && count($prompt) > 1)
-                    throw new InvalidOAuth2Request('not valid prompt!');
+                {
+                    $this->last_validation_error = 'not valid prompt';
+                    return false;
+                }
 
                 foreach($prompt as $p)
                 {
                     if(!in_array($p, OAuth2Protocol::$valid_prompt_values))
-                        throw new InvalidOAuth2Request('not valid prompt!');
+                    {
+                        $this->last_validation_error = 'not valid prompt';
+                        return false;
+                    }
                 }
             }
 
@@ -189,27 +205,42 @@ class OAuth2AuthenticationRequest extends OAuth2AuthorizationRequest
 
             if(!empty($response_mode))
             {
-                if(!in_array($response_mode, OAuth2Protocol::$valid_response_modes)) throw new InvalidOAuth2Request('invalid response_mode!');
+                if(!in_array($response_mode, OAuth2Protocol::$valid_response_modes))
+                {
+                    $this->last_validation_error = 'invalid response_mode';
+                    return false;
+                }
 
                 $default_response_mode = OAuth2Protocol::getDefaultResponseMode($this->getResponseType(false));
 
-                if($default_response_mode === $response_mode) throw new InvalidOAuth2Request('invalid response_mode!');
+                if($default_response_mode === $response_mode)
+                {
+                    $this->last_validation_error = 'invalid response_mode';
+                    return false;
+                }
             }
 
             // http://openid.net/specs/openid-connect-core-1_0.html#OfflineAccess
             // MUST ensure that the prompt parameter contains consent unless other conditions for processing the request
             // permitting offline access to the requested resources are in place
             if($this->offlineAccessRequested() && empty($prompt))
-                throw new InvalidOAuth2Request('invalid offline access!');
-
-            if($this->offlineAccessRequested() && !in_array(OAuth2Protocol::OAuth2Protocol_Prompt_Consent, $prompt))
-                throw new InvalidOAuth2Request('invalid offline access!');
-
-            // if has requested offline access
-            if($this->offlineAccessRequested() && $this->getAccessType() === OAuth2Protocol::OAuth2Protocol_AccessType_Offline){
-                throw new InvalidOAuth2Request('invalid param access_type=offline (OAUTH2.0)');
+            {
+                $this->last_validation_error = 'invalid offline access';
+                return false;
             }
 
+            if($this->offlineAccessRequested() && !in_array(OAuth2Protocol::OAuth2Protocol_Prompt_Consent, $prompt))
+            {
+                $this->last_validation_error = 'invalid offline access';
+                return false;
+            }
+
+            // if has requested offline access
+            if($this->offlineAccessRequested() && $this->getAccessType() === OAuth2Protocol::OAuth2Protocol_AccessType_Offline)
+            {
+                $this->last_validation_error = 'invalid param access_type=offline (OAUTH2.0)';
+                return false;
+            }
         }
 
         return $res;

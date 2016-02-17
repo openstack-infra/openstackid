@@ -37,8 +37,14 @@ final class OAuth2LogoutRequest extends OAuth2Request
      */
     public function isValid()
     {
+        $this->last_validation_error = '';
+
         $id_token_hint = $this->getIdTokenHint();
-        if(empty($id_token_hint)) return false;
+        if(empty($id_token_hint))
+        {
+            $this->last_validation_error = 'id_token_hint not set';
+            return false;
+        }
         $log_out_uri = $this->getPostLogoutRedirectUri();
         $state       = $this->getState();
         if(!empty($log_out_uri))

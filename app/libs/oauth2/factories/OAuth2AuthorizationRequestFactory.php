@@ -42,8 +42,8 @@ final class OAuth2AuthorizationRequestFactory
 
         if( str_contains($auth_request->getScope(), OAuth2Protocol::OpenIdConnect_Scope) ) {
             $auth_request = new OAuth2AuthenticationRequest($auth_request);
-
         }
+
         return  $auth_request;
     }
 

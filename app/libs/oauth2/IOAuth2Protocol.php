@@ -64,4 +64,9 @@ interface IOAuth2Protocol {
      */
     public function endSession(OAuth2Request $request = null);
 
+    /**
+     * @return OAuth2Request
+     */
+    public function getLastRequest();
+
 } 

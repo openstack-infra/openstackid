@@ -26,11 +26,6 @@ final class OAuth2ProviderController extends BaseController
     private $oauth2_protocol;
 
     /**
-     * @var IMementoOAuth2SerializerService
-     */
-    private $memento_service;
-
-    /**
      * @var IAuthService
      */
     private $auth_service;
@@ -42,20 +37,17 @@ final class OAuth2ProviderController extends BaseController
 
     /**
      * @param IOAuth2Protocol $oauth2_protocol
-     * @param IMementoOAuth2SerializerService $memento_service
      * @param IClientService $client_service
      * @param IAuthService $auth_service
      */
     public function __construct
     (
         IOAuth2Protocol $oauth2_protocol,
-        IMementoOAuth2SerializerService $memento_service,
         IClientService $client_service,
         IAuthService $auth_service
     )
     {
         $this->oauth2_protocol = $oauth2_protocol;
-        $this->memento_service = $memento_service;
         $this->auth_service    = $auth_service;
         $this->client_service  = $client_service;
     }
@@ -71,19 +63,23 @@ final class OAuth2ProviderController extends BaseController
     {
         try
         {
-            $msg = new OAuth2Message(Input::all());
-
-            if ($this->memento_service->exists()) {
-                $msg = OAuth2Message::buildFromMemento($this->memento_service->load());
-            }
-
-            $request = OAuth2AuthorizationRequestFactory::getInstance()->build($msg);
-
-            $response = $this->oauth2_protocol->authorize($request);
+            $response = $this->oauth2_protocol->authorize
+            (
+                OAuth2AuthorizationRequestFactory::getInstance()->build
+                (
+                    new OAuth2Message
+                    (
+                        Input::all()
+                    )
+                )
+            );
 
             if ($response instanceof OAuth2Response) {
-                $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($request, $response);
-
+                $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy
+                (
+                    $this->oauth2_protocol->getLastRequest(),
+                    $response
+                );
                 return $strategy->handle($response);
             }
 
@@ -111,19 +107,24 @@ final class OAuth2ProviderController extends BaseController
     public function token()
     {
 
-        $request = new OAuth2TokenRequest
+        $response  = $this->oauth2_protocol->token
         (
-            new OAuth2Message
+            new OAuth2TokenRequest
             (
-                Input::all()
+                new OAuth2Message
+                (
+                    Input::all()
+                )
             )
         );
 
-        $response  = $this->oauth2_protocol->token($request);
-
         if ($response instanceof OAuth2Response)
         {
-            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($request, $response);
+            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy
+            (
+                $this->oauth2_protocol->getLastRequest(),
+                $response
+            );
             return $strategy->handle($response);
         }
 
@@ -136,19 +137,24 @@ final class OAuth2ProviderController extends BaseController
      */
     public function revoke()
     {
-        $request  = new OAuth2TokenRevocationRequest
+        $response = $this->oauth2_protocol->revoke
         (
-            new OAuth2Message
+            new OAuth2TokenRevocationRequest
             (
-                Input::all()
+                new OAuth2Message
+                (
+                    Input::all()
+                )
             )
         );
 
-        $response = $this->oauth2_protocol->revoke($request);
-
         if ($response instanceof OAuth2Response)
         {
-            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($request, $response);
+            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy
+            (
+                $this->oauth2_protocol->getLastRequest(),
+                $response
+            );
             return $strategy->handle($response);
         }
 
@@ -162,19 +168,25 @@ final class OAuth2ProviderController extends BaseController
      */
     public function introspection()
     {
-        $request = new OAuth2AccessTokenValidationRequest
+
+        $response = $this->oauth2_protocol->introspection
         (
-            new OAuth2Message
+            new OAuth2AccessTokenValidationRequest
             (
-                Input::all()
+                new OAuth2Message
+                (
+                    Input::all()
+                )
             )
         );
 
-        $response = $this->oauth2_protocol->introspection($request);
-
         if ($response instanceof OAuth2Response)
         {
-            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($request, $response);
+            $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy
+            (
+                $this->oauth2_protocol->getLastRequest(),
+                $response
+            );
             return $strategy->handle($response);
         }
 

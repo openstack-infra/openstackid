@@ -18,8 +18,11 @@ class HomeController extends OpenIdController
 
         if ($this->isDiscoveryRequest())
             return $this->discovery->idp();
-        if (Auth::guest())
+        if (Auth::guest()) {
+            Session::flush();
+            Session::regenerate();
             return View::make("home");
+        }
         else
             return Redirect::action("UserController@getProfile");
     }

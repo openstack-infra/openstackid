@@ -25,8 +25,12 @@ class OAuth2AccessTokenRequestAuthCode extends OAuth2TokenRequest
             return false;
 
         $redirect_uri = $this->getRedirectUri();
+
         if (is_null($redirect_uri))
+        {
+            $this->last_validation_error = 'redirect_uri not set';
             return false;
+        }
 
         return true;
     }

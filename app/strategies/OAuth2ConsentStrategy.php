@@ -1,14 +1,19 @@
 <?php
 
 namespace strategies;
+
+use oauth2\OAuth2Protocol;
 use oauth2\OAuth2Message;
 use oauth2\services\IApiScopeService;
 use oauth2\services\IClientService;
 use oauth2\services\IMementoOAuth2SerializerService;
 use  utils\services\IAuthService;
+use oauth2\factories\OAuth2AuthorizationRequestFactory;
 use Redirect;
 use View;
-use oauth2\factories\OAuth2AuthorizationRequestFactory;
+use Response;
+use URL;
+
 
 /**
  * Class OAuth2ConsentStrategy
@@ -82,13 +87,39 @@ class OAuth2ConsentStrategy implements IConsentStrategy
         $data['app_description']  = $client->getApplicationDescription();
         $data['dev_info_email']   = $client->getDeveloperEmail();
 
-        return View::make("oauth2.consent",$data);
+        $display = $auth_request->getDisplay();
+
+        if($display === OAuth2Protocol::OAuth2Protocol_Display_Page)
+            return Response::view("oauth2.consent", $data, 200);
+
+        if($display === OAuth2Protocol::OAuth2Protocol_Display_Touch)
+        {
+            $data['requested_scopes']             = array();
+            foreach($requested_scopes as $scope)
+            {
+                array_push($data['requested_scopes'], $scope->toArray());
+            }
+            $data['required_params']              = array('_token', 'trust');
+            $data['required_params_valid_values'] = array
+            (
+                'trust' => array
+                (
+                    IAuthService::AuthorizationResponse_AllowOnce,
+                    IAuthService::AuthorizationResponse_DenyOnce,
+                ),
+                '_token' => csrf_token()
+            );
+            $data['optional_params'] = array();
+            $data['url']             = URL::action('UserController@postConsent');
+            $data['method']          = 'POST';
+            return Response::json($data, 412);
+        }
+
     }
 
     public function postConsent($trust_action)
     {
         $this->auth_service->setUserAuthorizationResponse($trust_action);
-
         return Redirect::action('OAuth2ProviderController@authorize');
     }
 }

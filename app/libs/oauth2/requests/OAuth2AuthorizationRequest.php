@@ -129,21 +129,29 @@ class OAuth2AuthorizationRequest extends OAuth2Request
      */
     public function isValid()
     {
+        $this->last_validation_error = '';
+
         if (is_null($this->getResponseType()))
         {
+            $this->last_validation_error = 'response_type not set';
             return false;
         }
 
         if(!OAuth2Protocol::responseTypeBelongsToFlow($this->getResponseType(false), 'all'))
+        {
+            $this->last_validation_error = 'response_type does not belong to current flow';
             return false;
+        }
 
         if (is_null($this->getClientId()))
         {
+            $this->last_validation_error = 'client_id not set';
             return false;
         }
 
         if (is_null($this->getRedirectUri()))
         {
+            $this->last_validation_error = 'redirect_url not set';
             return false;
         }
 
@@ -156,9 +164,10 @@ class OAuth2AuthorizationRequest extends OAuth2Request
 
         if (!in_array($this->getApprovalPrompt(), $valid_approvals))
         {
+            $this->last_validation_error = 'approval_prompt is not valid';
             return false;
         }
-
         return true;
     }
+
 }

@@ -5,6 +5,7 @@ namespace strategies;
 use Auth;
 use oauth2\factories\OAuth2AuthorizationRequestFactory;
 use oauth2\OAuth2Message;
+use oauth2\OAuth2Protocol;
 use oauth2\services\IMementoOAuth2SerializerService;
 use oauth2\services\ISecurityContextService;
 use Redirect;
@@ -13,6 +14,8 @@ use utils\IPHelper;
 use utils\services\IAuthService;
 use View;
 use Session;
+use Response;
+use URL;
 
 /**
  * Class OAuth2LoginStrategy
@@ -69,7 +72,36 @@ class OAuth2LoginStrategy implements ILoginStrategy
                 Session::put('username', $this->auth_service->getUserById($requested_user_id)->getEmail());
                 Session::save();
             }
-            return View::make("login");
+            $auth_request = OAuth2AuthorizationRequestFactory::getInstance()->build(
+                OAuth2Message::buildFromMemento(
+                    $this->memento_service->load()
+                )
+            );
+            $display = $auth_request->getDisplay();
+
+            if($display === OAuth2Protocol::OAuth2Protocol_Display_Page)
+                return Response::view("login", array(), 200);
+
+            if($display === OAuth2Protocol::OAuth2Protocol_Display_Touch)
+            {
+                $data = array
+                (
+                    'required_params'   => array('username','password', '_token'),
+                    'optional_params'   => array('remember'),
+                    'required_params_valid_values' => array
+                    (
+                        '_token' => csrf_token()
+                    ),
+                    'url'               => URL::action('UserController@postLogin'),
+                    'method'            => 'POST',
+                );
+                if(!is_null($requested_user_id))
+                {
+                    $data['required_params_valid_values']['username'] = $this->auth_service->getUserById($requested_user_id)->getEmail();
+                }
+                return Response::json($data, 412);
+            }
+
         } else {
             return Redirect::action("UserController@getProfile");
         }

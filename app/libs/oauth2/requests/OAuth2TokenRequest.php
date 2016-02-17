@@ -20,10 +20,14 @@ class OAuth2TokenRequest extends OAuth2Request
 
     public function isValid()
     {
+        $this->last_validation_error = '';
+
         $grant_type = $this->getGrantType();
 
-        if(is_null($grant_type))
+        if(is_null($grant_type)) {
+            $this->last_validation_error = 'grant_type not set';
             return false;
+        }
 
         return true;
     }

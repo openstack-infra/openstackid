@@ -19,8 +19,10 @@ class OAuth2RefreshAccessTokenRequest extends OAuth2TokenRequest {
 
         $refresh_token = $this->getRefreshToken();
 
-        if(is_null($refresh_token))
+        if(is_null($refresh_token)) {
+            $this->last_validation_error = 'refresh_token not set';
             return false;
+        }
 
         return true;
     }

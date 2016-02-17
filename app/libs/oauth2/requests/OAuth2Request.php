@@ -65,4 +65,14 @@ abstract class OAuth2Request {
      */
     public abstract function isValid();
 
+    protected $last_validation_error = '';
+
+    /**
+     * @return string
+     */
+    public function getLastValidationError()
+    {
+        return $this->last_validation_error;
+    }
+
 } 

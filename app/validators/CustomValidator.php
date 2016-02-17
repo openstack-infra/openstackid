@@ -6,7 +6,7 @@ use jwk\JSONWebKeyPublicKeyUseValues;
 use jwk\JSONWebKeyTypes;
 use oauth2\OAuth2Protocol;
 use oauth2\models\IClient;
-
+use utils\services\IAuthService;
 /**
  * Class CustomValidator
  * Custom validation methods
@@ -325,5 +325,17 @@ class CustomValidator extends Validator
         {
             return in_array($value, OAuth2Protocol::$supported_key_management_algorithms);
         }
+    }
+
+    public function validateOauth2TrustResponse($attribute, $value, $parameters){
+        $valid_values = array
+        (
+            IAuthService::AuthorizationResponse_AllowOnce,
+            IAuthService::AuthorizationResponse_DenyOnce,
+            IAuthService::AuthorizationResponse_AllowForever,
+            IAuthService::AuthorizationResponse_DenyForever,
+        );
+        if(is_array($value)) $value = $value[0];
+        return in_array($value, $valid_values);
     }
 } 
