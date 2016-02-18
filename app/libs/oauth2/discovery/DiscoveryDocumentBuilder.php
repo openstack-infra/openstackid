@@ -138,6 +138,14 @@ final class DiscoveryDocumentBuilder
         return $this;
     }
 
+    /**
+     * @param string $display_value
+     * @return $this
+     */
+    public function addDisplayValueSupported($display_value){
+        $this->addArrayValue(OpenIDProviderMetadata::DisplayValuesSupported, $display_value);
+        return $this;
+    }
 
     /**
      * @param string $response_mode

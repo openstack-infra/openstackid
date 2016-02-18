@@ -55,47 +55,24 @@ class OAuth2LoginStrategy extends DefaultLoginStrategy
 
     public function getLogin()
     {
-        if (Auth::guest())
-        {
-            $requested_user_id = $this->security_context_service->get()->getRequestedUserId();
-            if(!is_null($requested_user_id))
-            {
-                Session::put('username', $this->auth_service->getUserById($requested_user_id)->getEmail());
-                Session::save();
-            }
-            $auth_request = OAuth2AuthorizationRequestFactory::getInstance()->build(
-                OAuth2Message::buildFromMemento(
-                    $this->memento_service->load()
-                )
-            );
-            $display = $auth_request->getDisplay();
-
-            if($display === OAuth2Protocol::OAuth2Protocol_Display_Page)
-                return Response::view("login", array(), 200);
-
-            if($display === OAuth2Protocol::OAuth2Protocol_Display_Touch)
-            {
-                $data = array
-                (
-                    'required_params'   => array('username','password', '_token'),
-                    'optional_params'   => array('remember'),
-                    'required_params_valid_values' => array
-                    (
-                        '_token' => csrf_token()
-                    ),
-                    'url'               => URL::action('UserController@postLogin'),
-                    'method'            => 'POST',
-                );
-                if(!is_null($requested_user_id))
-                {
-                    $data['required_params_valid_values']['username'] = $this->auth_service->getUserById($requested_user_id)->getEmail();
-                }
-                return Response::json($data, 412);
-            }
-
-        } else {
+        if (!Auth::guest())
             return Redirect::action("UserController@getProfile");
+
+        $requested_user_id = $this->security_context_service->get()->getRequestedUserId();
+        if (!is_null($requested_user_id)) {
+            Session::put('username', $this->auth_service->getUserById($requested_user_id)->getEmail());
+            Session::save();
         }
+
+        $auth_request = OAuth2AuthorizationRequestFactory::getInstance()->build(
+            OAuth2Message::buildFromMemento(
+                $this->memento_service->load()
+            )
+        );
+
+        $response_strategy = DisplayResponseStrategyFactory::build($auth_request->getDisplay());
+
+        return $response_strategy->getLoginResponse();
     }
 
     public function postLogin()
@@ -130,14 +107,9 @@ class OAuth2LoginStrategy extends DefaultLoginStrategy
                 $this->memento_service->load()
             )
         );
-        $display = $auth_request->getDisplay();
 
-        if($display === OAuth2Protocol::OAuth2Protocol_Display_Page)
-            return parent::errorLogin($params);
+        $response_strategy = DisplayResponseStrategyFactory::build($auth_request->getDisplay());
 
-        if($display === OAuth2Protocol::OAuth2Protocol_Display_Touch)
-        {
-            return Response::json($params, 412);
-        }
+        return $response_strategy->getLoginErrorResponse($params);
     }
 }

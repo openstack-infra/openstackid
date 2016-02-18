@@ -273,4 +273,5 @@ abstract class OpenIDProviderMetadata
 
 
     const IntrospectionEndpoint = 'introspection_endpoint';
+
 }

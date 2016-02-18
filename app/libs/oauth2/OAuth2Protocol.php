@@ -279,14 +279,20 @@ final class OAuth2Protocol implements IOAuth2Protocol
     const OAuth2Protocol_Display_Wap ='wap';
 
     /**
+     *  Extension: display the login/consent interaction like a json doc
+     */
+    const OAuth2Protocol_Display_Native ='native';
+
+    /**
      * @var array
      */
     static public $valid_display_values = array
     (
         self::OAuth2Protocol_Display_Page,
-        //self::OAuth2Protocol_Display_PopUp,
+        self::OAuth2Protocol_Display_PopUp,
         self::OAuth2Protocol_Display_Touch,
-        //self::OAuth2Protocol_Display_Wap
+        self::OAuth2Protocol_Display_Wap,
+        self::OAuth2Protocol_Display_Native,
     );
 
     /**
@@ -1299,6 +1305,11 @@ final class OAuth2Protocol implements IOAuth2Protocol
             ->addResponseModeSupported(self::OAuth2Protocol_ResponseMode_FormPost)
             ->addResponseModeSupported(self::OAuth2Protocol_ResponseMode_Query)
             ->addResponseModeSupported(self::OAuth2Protocol_ResponseMode_Fragment)
+            ->addDisplayValueSupported(self::OAuth2Protocol_Display_Page)
+            ->addDisplayValueSupported(self::OAuth2Protocol_Display_PopUp)
+            ->addDisplayValueSupported(self::OAuth2Protocol_Display_Touch)
+            ->addDisplayValueSupported(self::OAuth2Protocol_Display_Wap)
+            ->addDisplayValueSupported(self::OAuth2Protocol_Display_Native)
             ->render();
     }
 
