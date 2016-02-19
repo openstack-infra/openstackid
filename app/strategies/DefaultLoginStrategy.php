@@ -61,10 +61,15 @@ class DefaultLoginStrategy implements ILoginStrategy
      */
     public function errorLogin(array $params)
     {
-        return Redirect::action('UserController@getLogin')
+        $response = Redirect::action('UserController@getLogin')
             ->with('max_login_attempts_2_show_captcha', $params['max_login_attempts_2_show_captcha'])
-            ->with('login_attempts', $params['login_attempts'])
-            ->with('username', $params['username'])
-            ->with('flash_notice', $params['error_message']);
+            ->with('login_attempts', $params['login_attempts']);
+        if(isset($params['username']))
+            $response= $response->with('username', $params['username']);
+        if(isset($params['error_message']))
+            $response = $response->with('flash_notice', $params['error_message']);
+        if(isset($params['validator']))
+            $response = $response->withErrors($params['validator']);
+        return $response;
     }
 }

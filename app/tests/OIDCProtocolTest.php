@@ -88,6 +88,49 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
 
     }
 
+    public function testLoginWithTralingSpace()
+    {
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+
+        $params = array
+        (
+            'client_id' => $client_id,
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'response_type' => 'code',
+            'scope' => 'openid profile email',
+            OAuth2Protocol::OAuth2Protocol_LoginHint => ' sebastian@tipit.net ',
+            OAuth2Protocol::OAuth2Protocol_MaxAge    => 3200,
+            OAuth2Protocol::OAuth2Protocol_Prompt    => OAuth2Protocol::OAuth2Protocol_Prompt_Consent,
+            OAuth2Protocol::OAuth2Protocol_Display   => OAuth2Protocol::OAuth2Protocol_Display_Native
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $response = $this->call('GET', $url);
+
+        $this->assertResponseStatus(412);
+
+        // do login
+        $response = $this->action('POST', "UserController@postLogin",
+            array
+            (
+                'username' => ' sebastian@tipit.net ',
+                'password' => ' 1qaz2wsx ',
+                '_token' => Session::token()
+            )
+        );
+
+        $this->assertResponseStatus(302);
+    }
+
     public function testConsentPrompt()
     {
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';

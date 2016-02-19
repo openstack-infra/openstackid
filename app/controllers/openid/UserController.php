@@ -196,6 +196,12 @@ class UserController extends OpenIdController
         {
             $max_login_attempts_2_show_captcha = $this->server_configuration_service->getConfigValue("MaxFailed.LoginAttempts.2ShowCaptcha");
             $data = Input::all();
+
+            if(isset($data['username']))
+                $data['username'] = trim($data['username']);
+            if(isset($data['password']))
+                $data['password'] = trim($data['password']);
+
             $login_attempts = intval(Input::get('login_attempts'));
             // Build the validation constraint set.
             $rules = array
@@ -212,8 +218,8 @@ class UserController extends OpenIdController
 
             if ($validator->passes())
             {
-                $username = Input::get("username");
-                $password = Input::get("password");
+                $username = $data['username'];
+                $password = $data['password'];
                 $remember = Input::get("remember");
 
                 $remember = !is_null($remember);
@@ -235,13 +241,20 @@ class UserController extends OpenIdController
                         'max_login_attempts_2_show_captcha' => $max_login_attempts_2_show_captcha,
                         'login_attempts'                    => $login_attempts,
                         'username'                          => $username,
-                        'error_message'                     => '"We\'re sorry, your username or password does not match an existing record."'
+                        'error_message'                     => "We\'re sorry, your username or password does not match an existing record."
                     )
                 );
             }
-
-            return Redirect::action('UserController@getLogin')
-                ->withErrors($validator);
+            // validator errors
+            return $this->login_strategy->errorLogin
+            (
+                array
+                (
+                    'max_login_attempts_2_show_captcha' => $max_login_attempts_2_show_captcha,
+                    'login_attempts'                    => $login_attempts,
+                    'validator'                         => $validator
+                )
+            );
         }
         catch (Exception $ex)
         {
