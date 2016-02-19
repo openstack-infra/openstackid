@@ -49,10 +49,17 @@ class DisplayResponseUserAgentStrategy implements IDisplayResponseStrategy
      */
     public function getLoginErrorResponse(array $data = array())
     {
-        return Redirect::action('UserController@getLogin')
+        $response =  Redirect::action('UserController@getLogin')
             ->with('max_login_attempts_2_show_captcha', $data['max_login_attempts_2_show_captcha'])
-            ->with('login_attempts', $data['login_attempts'])
-            ->with('username', $data['username'])
-            ->with('flash_notice', $data['error_message']);
+            ->with('login_attempts', $data['login_attempts']);
+
+        if(isset($params['username']))
+            $response= $response->with('username', $params['username']);
+        if(isset($params['error_message']))
+            $response = $response->with('flash_notice', $params['error_message']);
+        if(isset($params['validator']))
+            $response = $response->withErrors($params['validator']);
+
+        return $response;
     }
 }

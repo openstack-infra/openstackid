@@ -36,7 +36,7 @@ abstract class OAuth2Request {
     public function getParam($param)
     {
         $value =  $this->message->getParam($param);
-        if(!empty($value)) $value = urldecode($value);
+        if(!empty($value)) $value = trim(urldecode($value));
         return $value;
     }
 

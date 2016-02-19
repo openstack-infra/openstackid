@@ -14,6 +14,7 @@
 
 namespace strategies;
 
+use Illuminate\Support\Contracts\MessageProviderInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Illuminate\Support\Facades\Response;
 use Redirect;
@@ -83,6 +84,17 @@ class DisplayResponseJsonStrategy implements IDisplayResponseStrategy
      */
     public function getLoginErrorResponse(array $data = array())
     {
+        if(isset($data['validator']) && $data['validator'] instanceof MessageProviderInterface )
+        {
+            $validator = $data['validator'];
+            unset($data['validator']);
+            $data['error'] = array();
+            $errors = $validator->getMessageBag()->getMessages();
+            foreach($errors as $e)
+            {
+                array_push($data['error'],$e[0]);
+            }
+        }
         return Response::json($data, 412);
     }
 }
