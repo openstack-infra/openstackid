@@ -149,14 +149,12 @@ class AdminController extends BaseController {
         $user                = $this->auth_service->getCurrentUser();
         $groups              = $this->group_repository->getAll(1,1000);
         $non_selected_scopes = $this->scope_service->getAssignedByGroups();
-        $non_selected_users  = User::where('active', '=', true)->get();
         return View::make("oauth2.profile.admin.api-scope-groups",array
         (
             "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
             "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
             'groups'               => $groups,
             'non_selected_scopes'  => $non_selected_scopes,
-            'non_selected_users'   => $non_selected_users,
         ));
     }
 
@@ -167,7 +165,6 @@ class AdminController extends BaseController {
             return Response::view('404', array(), 404);
         $user   = $this->auth_service->getCurrentUser();
         $non_selected_scopes = $this->scope_service->getAssignedByGroups();
-        $non_selected_users  = User::where('active', '=', true)->get();
         return View::make("oauth2.profile.admin.edit-api-scope-group",
             array
             (
@@ -175,7 +172,6 @@ class AdminController extends BaseController {
                 'is_openstackid_admin' => $user->isOpenstackIdAdmin(),
                 'group'                => $group,
                 'non_selected_scopes'  => $non_selected_scopes,
-                'non_selected_users'   => $non_selected_users,
             )
         );
     }
