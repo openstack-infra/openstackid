@@ -49,16 +49,6 @@ class OAuth2AuthenticationRequest extends OAuth2AuthorizationRequest
     }
 
     /**
-     * @return null|string
-     */
-    public function getDisplay()
-    {
-        $display = $this->getParam(OAuth2Protocol::OAuth2Protocol_Display);
-        if(empty($display)) return OAuth2Protocol::OAuth2Protocol_Display_Page;
-        return $display;
-    }
-
-    /**
      * @param bool|false $raw
      * @return array|string|null
      */

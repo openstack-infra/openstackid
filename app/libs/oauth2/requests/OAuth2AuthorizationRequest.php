@@ -13,6 +13,10 @@ use oauth2\OAuth2Protocol;
 class OAuth2AuthorizationRequest extends OAuth2Request
 {
 
+    /**
+     * OAuth2AuthorizationRequest constructor.
+     * @param OAuth2Message $msg
+     */
     public function __construct(OAuth2Message $msg)
     {
         parent::__construct($msg);
@@ -170,4 +174,13 @@ class OAuth2AuthorizationRequest extends OAuth2Request
         return true;
     }
 
+    /**
+     * @return null|string
+     */
+    public function getDisplay()
+    {
+        $display = $this->getParam(OAuth2Protocol::OAuth2Protocol_Display);
+        if(empty($display)) return OAuth2Protocol::OAuth2Protocol_Display_Page;
+        return $display;
+    }
 }
