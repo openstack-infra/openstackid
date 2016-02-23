@@ -3,10 +3,13 @@
 use oauth2\models\IResourceServer;
 use utils\model\BaseModelEloquent;
 
+/**
+ * Class ResourceServer
+ */
 class ResourceServer extends BaseModelEloquent implements IResourceServer
 {
 
-    protected $fillable = array('host', 'ip', 'active', 'friendly_name');
+    protected $fillable = array('host', 'ips', 'active', 'friendly_name');
 
     protected $table = 'oauth2_resource_server';
 
@@ -50,15 +53,6 @@ class ResourceServer extends BaseModelEloquent implements IResourceServer
     }
 
     /**
-     * get resource server ip address
-     * @return string
-     */
-    public function getIp()
-    {
-        return $this->ip;
-    }
-
-    /**
      * get resource server friendly name
      * @return mixed
      */
@@ -85,13 +79,26 @@ class ResourceServer extends BaseModelEloquent implements IResourceServer
         $this->active = $active;
     }
 
-    public function setIp($ip)
-    {
-        $this->ip = $ip;
-    }
-
     public function setFriendlyName($friendly_name)
     {
         $this->friendly_name = $friendly_name;
+    }
+
+    /**
+     * @param string $ip
+     * @return bool
+     */
+    public function isOwn($ip)
+    {
+        $ips = explode(',',  $this->ips);
+        return in_array($ip, $ips);
+    }
+
+    /**
+     * @return string
+     */
+    public function getIPAddresses()
+    {
+       return $this->ips;
     }
 }

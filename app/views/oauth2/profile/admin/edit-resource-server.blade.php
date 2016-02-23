@@ -4,6 +4,10 @@
 <title>Welcome to openstackId - Server Admin - Edit Resource Server</title>
 @stop
 
+@section('css')
+    {{ HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.css') }}
+@append
+
 @section('content')
 @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
 <a href="{{ URL::action("AdminController@listResourceServers") }}">Go Back</a>
@@ -21,10 +25,13 @@
                     <input type="text" class="form-control" name="friendly_name" id="friendly_name" value="{{ $resource_server->friendly_name }}">
                 </div>
 
-                <div class="form-group">
-                    <label class="control-label" for="ip">IP Address&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title=""></span></label>
-                    <input type="text" class="form-control" name="ip" id="ip" value="{{ $resource_server->ip }}">
-                </div>
+            <div class="form-group">
+                <label for="ip">IP Addresses&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true"
+                                                           title=""></span></label>
+                <input type="text" name="ips" id="ips" value="{{$resource_server->ips}}"
+                       style="width: 100%"></input>
+            </div>
+
 
                 <div class="checkbox">
                     <label>
@@ -147,5 +154,6 @@
 		success : '{{ Lang::get("messages.global_successfully_save_entity", array("entity" => "Resource Server")) }}'
 	};
 </script>
+{{ HTML::script('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.js')}}
 {{ HTML::script('assets/js/oauth2/profile/admin/edit-resource-server.js') }}
 @append

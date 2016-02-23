@@ -345,9 +345,63 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             //old token and new token should be equal
             $this->assertTrue(!empty($validate_access_token));
             $this->assertTrue($validate_access_token === $access_token);
+            return $access_token;
         } catch (Exception $ex) {
             throw $ex;
         }
+    }
+
+    public function testResourceServerInstrospection()
+    {
+        $access_token = $this->testValidateToken();
+
+        $client_id = 'resource.server.1.openstack.client';
+        $client_secret = '123456789123456789123456789123456789123456789';
+        //do token validation ....
+        $params = array(
+            'token' => $access_token,
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@introspection",
+            $params,
+            array(),
+            array(),
+            // Symfony interally prefixes headers with "HTTP", so
+            array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+        $this->assertResponseStatus(200);
+        $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
+        $content = $response->getContent();
+
+        $response = json_decode($content);
+        $validate_access_token = $response->access_token;
+        //old token and new token should be equal
+        $this->assertTrue(!empty($validate_access_token));
+        $this->assertTrue($validate_access_token === $access_token);
+    }
+
+    public function testResourceServerInstrospectionNotValidIP()
+    {
+        $access_token = $this->testValidateToken();
+
+        $client_id = 'resource.server.2.openstack.client';
+        $client_secret = '123456789123456789123456789123456789123456789';
+        //do token validation ....
+        $params = array(
+            'token' => $access_token,
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@introspection",
+            $params,
+            array(),
+            array(),
+            // Symfony interally prefixes headers with "HTTP", so
+            array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+        $this->assertResponseStatus(400);
+        $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
+        $content = $response->getContent();
+        $response = json_decode($content);
     }
 
     /** test validate token grant

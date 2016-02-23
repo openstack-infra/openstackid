@@ -9,13 +9,13 @@ function loadResourceServers(){
             success: function (data,textStatus,jqXHR) {
                 //load data...
                 var uris = data.page;
-                var template = $('<tbody><tr><td class="fname"></td><td class="hname"></td><td class="ip"></td><td class="resource-server-active"><input type="checkbox" class="resource-server-active-checkbox"></td><td>&nbsp;<a class="btn btn-default active edit-resource-server" title="Edits a Registered Resource Server">Edit</a>&nbsp;<a class="btn btn-default btn-delete active delete-resource-server" title="Deletes a Registered Resource Server">Delete</a></td></tr></tbody>');
+                var template = $('<tbody><tr><td width="25%" class="fname"></td><td width="25%" class="hname"></td><td width="10%"class="ips"></td><td width="5%" class="resource-server-active"><input type="checkbox" class="resource-server-active-checkbox"></td><td width="25%">&nbsp;<a class="btn btn-default active edit-resource-server" title="Edits a Registered Resource Server">Edit</a>&nbsp;<a class="btn btn-default btn-delete active delete-resource-server" title="Deletes a Registered Resource Server">Delete</a></td></tr></tbody>');
                 var directives = {
                     'tr':{
                         'resource_server<-context':{
                             'td.fname':'resource_server.friendly_name',
                             'td.hname':'resource_server.host',
-                            'td.ip':'resource_server.ip',
+                            'td.ips':'resource_server.ips',
                             '.resource-server-active-checkbox@value':'resource_server.id',
                             '.resource-server-active-checkbox@checked':function(arg){
                                 return arg.item.active?'true':'';
@@ -60,13 +60,30 @@ $(document).ready(function() {
         rules: {
             "host"  :        {required: true, nowhitespace:true,rangelength: [1, 512]},
             "friendly_name": {required: true, free_text:true,rangelength: [1, 255]},
-            "ip":            {required: true, ipV4:true}
+            "ips":           { required: true},
         }
     });
 
     dialog_resource_server.modal({
         show:false,
         backdrop:"static"
+    });
+
+    $('#ips').tagsinput({
+        trimValue: true,
+        onTagExists: function(item, $tag) {
+            $tag.hide().fadeIn();
+        },
+        allowDuplicates: false
+    });
+
+    $('#ips').on('beforeItemAdd', function(event) {
+        var ip     = event.item;
+        var valid  = regex_ipv4.test(ip);
+        if(!valid)
+            valid  = regex_ipv6.test(ip);
+        if(!valid)
+            event.cancel = true;
     });
 
     dialog_resource_server.on('hidden', function () {

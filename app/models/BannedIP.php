@@ -1,6 +1,9 @@
 <?php
 use utils\model\BaseModelEloquent;
 
+/**
+ * Class BannedIP
+ */
 class BannedIP extends BaseModelEloquent
 {
     protected $table = 'banned_ips';

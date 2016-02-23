@@ -18,15 +18,13 @@ interface IResourceServer {
      * @return bool
      */
     public function isActive();
-    public function setActive($active);
 
     /**
-     * get resource server ip address
-     * @return string
+     * @param bool $active
+     * @return void
      */
-    public function getIp();
+    public function setActive($active);
 
-    public function setIp($ip);
 
     /**
      * get resource server friendly name
@@ -40,4 +38,14 @@ interface IResourceServer {
      */
     public function getClient();
 
+    /**
+     * @param string $ip
+     * @return bool
+     */
+    public function isOwn($ip);
+
+    /**
+     * @return string
+     */
+    public function getIPAddresses();
 } 

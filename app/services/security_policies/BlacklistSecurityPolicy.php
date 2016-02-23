@@ -111,6 +111,9 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
         $res            = true;
         $remote_address = IPHelper::getUserIp();
         try {
+
+            if($this->isIPAddressWhitelisted($remote_address)) return true;
+
             //check if banned ip is on cache ...
             if ($this->cache_service->incCounterIfExists($remote_address)) {
                 $this->counter_measure->trigger();
@@ -155,7 +158,6 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
             Log::error($ex);
             $res = false;
         }
-
         return $res;
     }
 
@@ -196,7 +198,7 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
                 );
 
                 $initial_delay_on_tar_pit = intval($this->server_configuration_service->getConfigValue($params[1]));
-                if ($exception_count >= $max_attempts && !$this->isIPAddressWhitelisted($remote_ip))
+                if (!$this->isIPAddressWhitelisted($remote_ip) && $exception_count >= $max_attempts)
                 {
                     Log::warning
                     (
@@ -227,8 +229,9 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
      */
     private function isIPAddressWhitelisted($ip)
     {
-        $rs = $this->resource_server_service->getByIPAddress($ip);
-        return !is_null($rs);
+        $resource_server = $this->resource_server_service->getByIPAddress($ip);
+        $white_listed_ip = \WhiteListedIP::where('ip','=', $ip)->first();
+        return !is_null($resource_server) || !is_null($white_listed_ip);
     }
 
 }

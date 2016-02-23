@@ -44,6 +44,7 @@ Log::useDailyFiles(storage_path() . '/logs/' . $logFile,$days = 0, $level = 'deb
 //set email log
 $to          = Config::get('log.to_email');
 $from        = Config::get('log.from_email');
+
 if(!empty($to) && !empty($from)){
     $subject     = 'openstackid error';
     $mono_log    = Log::getMonolog();

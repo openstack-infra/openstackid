@@ -887,10 +887,8 @@ final class TokenService implements ITokenService
         if (!is_array($current_audience)) {
             $current_audience = array($current_audience);
         }
-
-        return \ResourceServer
-            ::where('active', '=', true)
-            ->where('ip', '=', $current_ip)
+        return \ResourceServer::where('ips','like', '%'.$current_ip.'%')
+            ->where('active', '=', true)
             ->whereIn('host', $current_audience)->count() > 0;
     }
 

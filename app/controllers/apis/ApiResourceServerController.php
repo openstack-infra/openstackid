@@ -35,6 +35,7 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
             $data['apis'] = $apis->toArray();
 
             $client = $resource_server->getClient();
+
             if (!is_null($client)) {
                 $data['client_id'] = $client->getClientId();
                 $data['client_secret'] = $client->getClientSecret();
@@ -79,10 +80,10 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
             $values = Input::all();
 
             $rules = array(
-                'host' => 'required|host|max:255',
-                'ip' => 'required|ip|max:16',
+                'host'          => 'required|host|max:255',
+                'ips'           => 'required',
                 'friendly_name' => 'required|text|max:512',
-                'active' => 'required|boolean',
+                'active'        => 'required|boolean',
             );
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($values, $rules);
@@ -95,7 +96,7 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
 
             $new_resource_server_model = $this->resource_server_service->add(
                 $values['host'],
-                $values['ip'],
+                $values['ips'],
                 $values['friendly_name'],
                 $values['active']);
 
@@ -144,9 +145,9 @@ class ApiResourceServerController extends AbstractRESTController implements ICRU
             $values = Input::all();
 
             $rules = array(
-                'id' => 'required|integer',
-                'host' => 'sometimes|required|host|max:255',
-                'ip' => 'sometimes|required|ip|max:16',
+                'id'            => 'required|integer',
+                'host'          => 'sometimes|required|host|max:255',
+                'ips'           => 'required',
                 'friendly_name' => 'sometimes|required|text|max:512',
             );
             // Creates a Validator instance and validates the data.

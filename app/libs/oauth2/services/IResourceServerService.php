@@ -54,16 +54,14 @@ interface IResourceServerService {
     public function delete($id);
 
 
-    /**
-     * Creates a new resource server instance, and a brand new
-     * confidential registered client associated with it
+    /** Creates a new resource server instance
      * @param $host
-     * @param $ip
+     * @param $ips
      * @param $friendly_name
      * @param bool $active
      * @return IResourceServer
      */
-    public function add($host,$ip,$friendly_name, $active);
+    public function add($host, $ips, $friendly_name, $active);
 
 
     /**

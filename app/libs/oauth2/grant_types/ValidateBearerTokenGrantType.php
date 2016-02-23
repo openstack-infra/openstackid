@@ -136,6 +136,7 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
                     )
                 );
             }
+
             if (!$this->current_client->isResourceServerClient())
             {
                 // if current client is not a resource server, then we could only access to our own tokens
@@ -174,14 +175,14 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
                     );
                 }
                 //check resource server ip address
-                if ($current_ip !== $resource_server->ip)
+                if (!$resource_server->isOwn($current_ip))
                 {
                     throw new BearerTokenDisclosureAttemptException
                     (
                         sprintf
                         (
                             'resource server ip (%s) differs from current request ip %s',
-                            $resource_server->ip,
+                            $resource_server->getIPAddresses(),
                             $current_ip
                         )
                     );

@@ -21,6 +21,8 @@ abstract class OpenStackIDBaseTest extends TestCase {
     {
         if (Schema::hasTable('banned_ips'))
             DB::table('banned_ips')->delete();
+        if (Schema::hasTable('white_listed_ips'))
+            DB::table('white_listed_ips')->delete();
         if (Schema::hasTable('user_exceptions_trail'))
             DB::table('user_exceptions_trail')->delete();
         if (Schema::hasTable('server_configuration'))

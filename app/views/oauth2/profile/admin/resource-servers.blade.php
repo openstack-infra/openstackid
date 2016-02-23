@@ -4,6 +4,10 @@
 <title>Welcome to openstackId - Server Admin - Resource Server</title>
 @stop
 
+@section('css')
+    {{ HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.css') }}
+@append
+
 @section('content')
 @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
 <div class="row">
@@ -28,7 +32,7 @@
         <tr>
             <th>Friendly Name</th>
             <th>Host</th>
-            <th>IP Address</th>
+            <th>IP Addresses</th>
             <th>Active</th>
             <th>&nbsp;</th>
         </tr>
@@ -36,10 +40,10 @@
         <tbody id="body-resource-servers">
         @foreach ($resource_servers as $resource_server)
         <tr id="{{ $resource_server->id }}">
-            <td>{{$resource_server->friendly_name}}</td>
-            <td>{{$resource_server->host}}</td>
-            <td>{{$resource_server->ip}}</td>
-            <td>
+            <td width="25%">{{$resource_server->friendly_name}}</td>
+            <td width="25%">{{$resource_server->host}}</td>
+            <td width="10%">{{$resource_server->ips}}</td>
+            <td width="5%">
                 <input type="checkbox" class="resource-server-active-checkbox" id="resource-server-active_{{$resource_server->id}}"
                        data-resource-server-id="{{$resource_server->id}}"
                 @if ( $resource_server->active)
@@ -47,7 +51,7 @@
                 @endif
                 value="{{$resource_server->id}}"/>
             </td>
-            <td>
+            <td width="25%">
                 &nbsp;
                 {{ HTML::link(URL::action("AdminController@editResourceServer",array("id"=>$resource_server->id)),'Edit',array('class'=>'btn btn-default active edit-resource-server','title'=>'Edits a Registered Resource Server')) }}
                 {{ HTML::link(URL::action("ApiResourceServerController@delete",array("id"=>$resource_server->id)),'Delete',array('class'=>'btn btn-default btn-delete active delete-resource-server','title'=>'Deletes a Registered Resource Server')) }}
@@ -73,5 +77,6 @@
 		add : '{{URL::action("ApiResourceServerController@create",null)}}'
 	};
 </script>
+{{ HTML::script('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.js')}}
 {{ HTML::script('assets/js/oauth2/profile/admin/resource-servers.js') }}
 @append

@@ -87,7 +87,7 @@ jQuery(document).ready(function($){
         rules: {
             "host"  :        {required: true, nowhitespace:true,rangelength: [1, 512]},
             "friendly_name": {required: true, free_text:true,rangelength: [1, 255]},
-            "ip":            {required: true, ipV4:true}
+            "ips":           {required: true, ipv4V6Set: true }
         }
     });
 
@@ -98,6 +98,23 @@ jQuery(document).ready(function($){
         }
     });
 
+
+    $('#ips').tagsinput({
+        trimValue: true,
+        onTagExists: function(item, $tag) {
+            $tag.hide().fadeIn();
+        },
+        allowDuplicates: false
+    });
+
+    $('#ips').on('beforeItemAdd', function(event) {
+        var ip     = event.item;
+        var valid  = regex_ipv4.test(ip);
+        if(!valid)
+            valid  = regex_ipv6.test(ip);
+        if(!valid)
+            event.cancel = true;
+    });
 
     api_dialog.on('hidden.bs.modal', function () {
         api_form.cleanForm();

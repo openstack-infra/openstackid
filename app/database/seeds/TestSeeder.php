@@ -360,9 +360,17 @@ SQL;
 
         ResourceServer::create(
             array(
-                'friendly_name'   => 'test resource server',
-                'host'            => $components['host'],
-                'ip'              => '127.0.0.1'
+                'friendly_name'    => 'test resource server',
+                'host'             => $components['host'],
+                'ips'              => '127.0.0.1,10.0.0.0,2001:4800:7821:101:be76:4eff:fe06:858b,174.143.201.173'
+            )
+        );
+
+        ResourceServer::create(
+            array(
+                'friendly_name'    => 'test resource server 2',
+                'host'             => $components['host'],
+                'ips'              => '10.0.0.0,2001:4800:7821:101:be76:4eff:fe06:858b,174.143.201.173'
             )
         );
 
@@ -644,7 +652,8 @@ SQL;
 
     private function seedTestUsersAndClients(){
 
-        $resource_server = ResourceServer::first();
+        $resource_server  = ResourceServer::where('friendly_name', '=', 'test resource server')->first();
+        $resource_server2 = ResourceServer::where('friendly_name', '=', 'test resource server 2')->first();
 
         // create users and clients ...
         User::create(
@@ -832,6 +841,24 @@ SQL;
                 'application_type'     => IClient::ApplicationType_Service,
                 'token_endpoint_auth_method' => OAuth2Protocol::TokenEndpoint_AuthMethod_ClientSecretBasic,
                 'resource_server_id'   => $resource_server->id,
+                'rotate_refresh_token' => false,
+                'use_refresh_token'    => false,
+                'client_secret_expires_at' => $now->add(new \DateInterval('P6M')),
+            )
+        );
+
+
+        Client::create(
+            array(
+                'app_name'             => 'resource_server_client2',
+                'app_description'      => 'resource_server_client2',
+                'app_logo'             => null,
+                'client_id'            => 'resource.server.2.openstack.client',
+                'client_secret'        => '123456789123456789123456789123456789123456789',
+                'client_type'          =>  IClient::ClientType_Confidential,
+                'application_type'     => IClient::ApplicationType_Service,
+                'token_endpoint_auth_method' => OAuth2Protocol::TokenEndpoint_AuthMethod_ClientSecretBasic,
+                'resource_server_id'   => $resource_server2->id,
                 'rotate_refresh_token' => false,
                 'use_refresh_token'    => false,
                 'client_secret_expires_at' => $now->add(new \DateInterval('P6M')),

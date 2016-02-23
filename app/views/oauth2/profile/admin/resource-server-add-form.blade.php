@@ -7,10 +7,10 @@
         <label class="control-label" for="friendly_name">Friendly Name&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title=""></span></label>
         <input type="text" class="form-control" name="friendly_name" id="friendly_name">
     </div>
-
     <div class="form-group">
-        <label class="control-label" for="ip">IP Address&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title=""></span></label>
-        <input type="text" class="form-control" name="ip" id="ip">
+        <label for="ips">IP Addresses&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true"
+                                                                                      title=""></span></label>
+        <input type="text" name="ips" id="ips" style="width: 100%"></input>
     </div>
     <div class="checkbox">
         <label>

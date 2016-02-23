@@ -65,7 +65,7 @@ final class ResourceServerService implements IResourceServerService
             if (is_null($resource_server)) {
                 throw new InvalidResourceServer(sprintf('resource server id %s does not exists!', $id));
             }
-            $allowed_update_params = array('host', 'ip', 'active', 'friendly_name');
+            $allowed_update_params = array('host', 'ips', 'active', 'friendly_name');
 
             foreach ($allowed_update_params as $param) {
                 if (array_key_exists($param, $params)) {
@@ -158,12 +158,12 @@ final class ResourceServerService implements IResourceServerService
 
     /** Creates a new resource server instance
      * @param $host
-     * @param $ip
+     * @param $ips
      * @param $friendly_name
      * @param bool $active
      * @return IResourceServer
      */
-    public function add($host, $ip, $friendly_name, $active)
+    public function add($host, $ips, $friendly_name, $active)
     {
 
         $client_service = $this->client_service;
@@ -175,7 +175,7 @@ final class ResourceServerService implements IResourceServerService
 
         return $this->tx_service->transaction(function () use (
             $host,
-            $ip,
+            $ips,
             $friendly_name,
             $active,
             $client_service
@@ -186,10 +186,10 @@ final class ResourceServerService implements IResourceServerService
                     $host));
             }
 
-            if (ResourceServer::where('ip', '=', $ip)->count() > 0)
+            if (ResourceServer::where('ips','like', '%'.$ips.'%')->count() > 0)
             {
                 throw new InvalidResourceServer(sprintf('there is already another resource server with that ip (%s).',
-                    $ip));
+                    $ips));
             }
 
             if (ResourceServer::where('friendly_name', '=', $friendly_name)->count() > 0) {
@@ -201,9 +201,9 @@ final class ResourceServerService implements IResourceServerService
             (
                 array
                 (
-                    'host' => $host,
-                    'ip' => $ip,
-                    'active' => $active,
+                    'host'          => $host,
+                    'ips'           => $ips,
+                    'active'        => $active,
                     'friendly_name' => $friendly_name
                 )
             );
@@ -258,6 +258,6 @@ final class ResourceServerService implements IResourceServerService
      */
     public function getByIPAddress($ip)
     {
-        return ResourceServer::where('ip', '=', $ip)->first();
+        return ResourceServer::where('ips','like', '%'.$ip.'%')->first();
     }
 }
