@@ -116,8 +116,7 @@ final class ApiScopeGroupService implements IApiScopeGroupService
                         }
                     }
                     else if($param === 'users'){
-                        $ids = $group->users()->getRelatedIds();
-                        $group->users()->detach($ids);
+                        $group->removeAllUsers();
                         $users = explode(',', $params['users']);
                         foreach($users as $user_id)
                         {

@@ -338,4 +338,14 @@ class CustomValidator extends Validator
         if(is_array($value)) $value = $value[0];
         return in_array($value, $valid_values);
     }
+
+    public function validateUserIds($attribute, $value, $parameters)
+    {
+        $user_ids = explode(',',$value);
+        foreach($user_ids as $id)
+        {
+            if(!intval($id)) return false;
+        }
+        return true;
+    }
 } 

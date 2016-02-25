@@ -256,4 +256,39 @@ interface IClient
      */
     public function isPostLogoutUriAllowed($post_logout_uri);
 
+    /**
+     * @param $user
+     */
+    public function candEdit($user);
+
+    /**
+     * @param $user
+     * @return bool
+     */
+    public function canDelete($user);
+
+    /**
+     * @param $user
+     * @return $this
+     */
+    public function setOwner($user);
+
+
+    /**
+     * @return $this
+     */
+    public function removeAllScopes();
+
+    /**
+     * @param IApiScope $scope
+     * @return $this
+     */
+    public function addScope(IApiScope $scope);
+
+    /**
+     * @param $editing_user
+     * @return $this
+     */
+    public function setEditedBy($editing_user);
+
 }

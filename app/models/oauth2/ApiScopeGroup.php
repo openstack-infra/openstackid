@@ -39,6 +39,7 @@ class ApiScopeGroup extends BaseModelEloquent implements IEntity
     public function addScope(IApiScope $scope)
     {
         $this->scopes()->attach($scope->id);
+        return $this;
     }
 
     /**
@@ -47,6 +48,7 @@ class ApiScopeGroup extends BaseModelEloquent implements IEntity
     public function addUser(IOAuth2User $user)
     {
         $this->users()->attach($user->id);
+        return $this;
     }
 
     /**
@@ -55,6 +57,13 @@ class ApiScopeGroup extends BaseModelEloquent implements IEntity
     public function removeScope(IOAuth2User $scope)
     {
         $this->scopes()->detach($scope->id);
+        return $this;
+    }
+
+    public function removeAllScopes()
+    {
+        $this->scopes()->detach();
+        return $this;
     }
 
     /**
@@ -63,6 +72,13 @@ class ApiScopeGroup extends BaseModelEloquent implements IEntity
     public function removeUser(IOAuth2User $user)
     {
         $this->users()->detach($user->id);
+        return $this;
+    }
+
+    public function removeAllUsers()
+    {
+        $this->users()->detach();
+        return $this;
     }
 
     /**

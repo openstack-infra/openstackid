@@ -2,10 +2,12 @@
 
 namespace oauth2\services;
 
+use oauth2\exceptions\AbsentClientException;
 use oauth2\exceptions\InvalidClientAuthMethodException;
 use oauth2\exceptions\MissingClientAuthorizationInfo;
 use oauth2\models\ClientAuthenticationContext;
 use oauth2\models\IClient;
+use openid\model\IOpenIdUser;
 /**
  * Interface IClientService
  * @package oauth2\services
@@ -35,24 +37,32 @@ interface IClientService {
     public function getClientByIdentifier($id);
 
     /**
-     * Creates a new client
-     * @param  string $application_type
-     * @param  int $user_id
-     * @param  string $app_name
-     * @param  string $app_description
-     * @param  null|string $app_url
-     * @param  string $app_logo
+     * @param string $application_type
+     * @param string $app_name
+     * @param string $app_description
+     * @param null|string  $app_url
+     * @param array $admin_users
+     * @param string $app_logo
      * @return IClient
      */
     public function addClient
     (
         $application_type,
-        $user_id,
         $app_name,
         $app_description,
         $app_url = null,
+        array $admin_users = array(),
         $app_logo = ''
     );
+
+    /**
+     * @param $id
+     * @param array $params
+     * @throws AbsentClientException
+     * @throws \ValidationException
+     * @return mixed
+     */
+    public function update($id, array $params);
 
     /**
      * @param $id
@@ -138,20 +148,6 @@ interface IClientService {
      * @return mixed
      */
     public function getAll($page_nbr=1,$page_size=10,array $filters=array(), array $fields=array('*'));
-
-    /**
-     * @param IClient $client
-     * @return bool
-     */
-    public function save(IClient $client);
-
-    /**
-     * @param $id
-     * @param array $params
-     * @return bool
-     * @throws \oauth2\exceptions\InvalidClientException
-     */
-    public function update($id, array $params);
 
     /**
      * @param string $origin

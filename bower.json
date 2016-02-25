@@ -35,10 +35,11 @@
     "bootstrap-tagsinput": "0.7.1",
     "bootstrap-datepicker": "~1.4.0",
     "pure-templates": "*",
-    "pwstrength-bootstrap":"~1.2.7",
-    "uri.js":"~1.15.2",
-    "crypto-js":"~3.1.5",
+    "pwstrength-bootstrap": "~1.2.7",
+    "uri.js": "~1.15.2",
+    "crypto-js": "~3.1.5",
     "jquery-cookie": "~1.4.1",
-    "typeahead.js": "0.11.1"
+    "typeahead.js": "0.11.1",
+    "sweetalert": "~1.1.3"
   }
 }

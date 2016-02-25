@@ -6,8 +6,11 @@
 @section('css')
     {{ HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.css') }}
     {{ HTML::style('bower_assets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}
+    {{ HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput-typeahead.css') }}
+    {{ HTML::style('assets/css/edit-client.css') }}
 @append
 @section('scripts')
+    {{ HTML::script('bower_assets/typeahead.js/dist/typeahead.bundle.js')}}
     {{ HTML::script('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.js')}}
     {{ HTML::script('bower_assets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')}}
     <script type="application/javascript">
@@ -20,7 +23,8 @@
             add_public_key: '{{URL::action("ClientPublicKeyApiController@create",array("id"=>$client->id))}}',
             get_public_keys: '{{URL::action("ClientPublicKeyApiController@getByPage",array("id"=>$client->id))}}',
             delete_public_key: '{{URL::action("ClientPublicKeyApiController@delete",array("id" => $client->id, 'public_key_id'=> '@public_key_id'))}}',
-            update_public_key: '{{URL::action("ClientPublicKeyApiController@update",array("id" => $client->id, 'public_key_id'=> '@public_key_id'))}}'
+            update_public_key: '{{URL::action("ClientPublicKeyApiController@update",array("id" => $client->id, 'public_key_id'=> '@public_key_id'))}}',
+            fetchUsers: '{{URL::action("UserApiController@fetch",null)}}',
         };
 
         var oauth2_supported_algorithms =
@@ -33,6 +37,11 @@
             key_management_algorihtms: {{utils\ArrayUtils::toJson(oauth2\OAuth2Protocol::$supported_key_management_algorithms)}},
             content_encryption_algorihtms:  {{utils\ArrayUtils::toJson(oauth2\OAuth2Protocol::$supported_content_encryption_algorithms)}}
         };
+        var current_admin_users  = [];
+
+        @foreach($client->admin_users()->get() as $user)
+        current_admin_users.push({ "id": {{$user->id}} , "value": "{{ $user->getFullName() }}" });
+        @endforeach
 
         $(document).ready
         (
@@ -44,7 +53,18 @@
 @append
 @section('content')
 @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
-<legend><span aria-hidden="true" class="glyphicon glyphicon-info-sign pointable" title="OAuth 2.0 allows users to share specific data with you (for example, contact lists) while keeping their usernames, passwords, and other information private."></span>&nbsp;{{$client->getFriendlyApplicationType()}} - Client {{ $client->app_name }}</legend>
+<legend>
+    <span aria-hidden="true" class="glyphicon glyphicon-info-sign pointable"
+          title="OAuth 2.0 allows users to share specific data with you (for example, contact lists) while keeping their usernames, passwords, and other information private.">
+
+    </span>&nbsp;{{$client->getFriendlyApplicationType()}} - Client {{ $client->app_name }}
+</legend>
+<div class="row">
+    <div style="padding-left:15px" class="col-md-2 clear-padding"><strong>Created By:&nbsp;</strong></div><div class="col-md-10 clear-padding">{{ $client->getOwnerNice() }}</div>
+</div>
+<div class="row">
+    <div style="padding-left:15px" class="col-md-2 clear-padding"><strong>Edited By</strong>:&nbsp;</div><div class="col-md-10 clear-padding">{{ $client->getEditedByNice() }}</div>
+</div>
 @if($errors->any())
 <div class="errors">
     <ul>

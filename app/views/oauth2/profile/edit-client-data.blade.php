@@ -25,7 +25,9 @@
                 <div class="col-md-12">
                     <label for="client_secret" class="label-client-secret">Client Secret</label>
                     <span id="client_secret">{{ $client->client_secret }}</span>
+                    @if ($client->isOwner(Auth::user()))
                     {{ HTML::link(URL::action("ClientApiController@regenerateClientSecret",array("id"=>$client->id)),'Regenerate',array('class'=>'btn btn-default btn-md active regenerate-client-secret','title'=>'Regenerates Client Secret')) }}
+                    @endif
                 </div>
             </div>
         @endif
@@ -73,6 +75,11 @@
         <div class="row">
             <div class="col-md-12">
                 <form id="form-application-main-data" name="form-application-main-data">
+
+                    <div class="form-group">
+                        <label class="control-label" for="admin_users">Admin Users&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="Choose which users would be administrator of this application"></span></label>
+                        <input type="text" class="form-control" name="admin_users" id="admin_users" @if (!$client->isOwner(Auth::user()))disabled @endif>
+                    </div>
 
                     <div class="form-group">
                         <label for="website">Application Web Site Url (optional)&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true"

@@ -17,6 +17,40 @@ jQuery(document).ready(function($){
             event.cancel = true;
     });
 
+    var users = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: dataClientUrls.fetchUsers+'?t=%QUERY',
+            wildcard: '%QUERY'
+        }
+    });
+
+    $('#admin_users').tagsinput({
+        itemValue: 'id',
+        itemText: 'value',
+        freeInput: false,
+        allowDuplicates: false,
+        trimValue: true,
+        typeaheadjs: [
+            {
+                hint: true,
+                highlight: true,
+                minLength: 1
+            },
+            {
+                name: 'users',
+                displayKey: 'value',
+                source: users
+            }
+        ]
+    });
+
+    for(var user of current_admin_users)
+    {
+        $('#admin_users').tagsinput('add',user);
+    }
+
     $('#redirect_uris').tagsinput({
         trimValue: true,
         onTagExists: function(item, $tag) {
@@ -51,8 +85,17 @@ jQuery(document).ready(function($){
     });
 
     $("body").on('click',".regenerate-client-secret",function(event){
-        if(confirm("Are you sure? Regenerating client secret would invalidate all current tokens")){
-            var link = $(this).attr('href');
+        var link = $(this).attr('href');
+        swal({
+            title: "Are you sure?",
+            text: "Regenerating client secret would invalidate all current tokens!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Regenerate it!",
+            closeOnConfirm: true
+        },
+        function(){
             $.ajax(
                 {
                     type: "PUT",
@@ -72,7 +115,7 @@ jQuery(document).ready(function($){
                     }
                 }
             );
-        }
+        });
         event.preventDefault();
         return false;
     });

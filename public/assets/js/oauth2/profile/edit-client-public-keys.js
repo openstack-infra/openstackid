@@ -77,33 +77,39 @@
         });
 
         $("body").on('click',".delete-public-key",function(event){
-            if(window.confirm('are you sure?')){
-                //delete key
-                var public_key_id = $(this).attr('data-public-key-id');
-
-                $.ajax(
-                    {
-                        type: "DELETE",
-                        url: dataClientUrls.delete_public_key.replace('@public_key_id', public_key_id),
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        timeout: 60000,
-                        success: function (data, textStatus, jqXHR) {
-                            $('#tr_'+public_key_id).fadeOut(300, function() {
-                                $(this).remove();
-                                if($('#body-public-keys').children('tr').length)
-                                    $('.public-keys-empty-message').hide();
-                                else
-                                    $('.public-keys-empty-message').show();
-                            });
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            ajaxError(jqXHR, textStatus, errorThrown);
+            var public_key_id = $(this).attr('data-public-key-id');
+            swal({
+                    title: "Are you sure?",
+                    text: "Deleting this public key is a non reversible operation!",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes, Delete it!",
+                    closeOnConfirm: true
+                },
+                function(){
+                    $.ajax(
+                        {
+                            type: "DELETE",
+                            url: dataClientUrls.delete_public_key.replace('@public_key_id', public_key_id),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            timeout: 60000,
+                            success: function (data, textStatus, jqXHR) {
+                                $('#tr_'+public_key_id).fadeOut(300, function() {
+                                    $(this).remove();
+                                    if($('#body-public-keys').children('tr').length)
+                                        $('.public-keys-empty-message').hide();
+                                    else
+                                        $('.public-keys-empty-message').show();
+                                });
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                ajaxError(jqXHR, textStatus, errorThrown);
+                            }
                         }
-                    }
-                );
-            }
-
+                    );
+                });
             event.preventDefault();
             return false;
         });

@@ -110,6 +110,13 @@ Route::filter('guest', function () {
     if (Auth::check()) return Redirect::to('/');
 });
 
+Route::filter('user.logged', function () {
+    if (!Auth::check())
+    {
+        return Response::json(array('error' => 'operation not allowed.'), 400);
+    }
+});
+
 /*
 |--------------------------------------------------------------------------
 | CSRF Protection Filter
@@ -158,7 +165,30 @@ Route::filter('user.owns.client.policy',function($route, $request){
 
         $client                 = $client_service->getClientByIdentifier($client_id);
         $user                   = $authentication_service->getCurrentUser();
-        if (is_null($client) || intval($client->getUserId()) !== intval($user->getId()))
+        if (is_null($client) || !$client->isOwner($user))
+            throw new Exception('invalid client id for current user');
+
+    } catch (Exception $ex) {
+        Log::error($ex);
+        return Response::json(array('error' => 'operation not allowed.'), 400);
+    }
+});
+
+Route::filter('user.can.edit.client.policy',function($route, $request){
+    try{
+        $authentication_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::AuthenticationService);
+        $client_service         = ServiceLocator::getInstance()->getService(OAuth2ServiceCatalog::ClientService);
+        $client_id              = $route->getParameter('id');
+
+        if(is_null($client_id))
+            $client_id          = $route->getParameter('client_id');
+
+        if(is_null($client_id))
+            $client_id          = Input::get('client_id',null);;
+
+        $client                 = $client_service->getClientByIdentifier($client_id);
+        $user                   = $authentication_service->getCurrentUser();
+        if (is_null($client) || !$client->candEdit($user))
             throw new Exception('invalid client id for current user');
 
     } catch (Exception $ex) {

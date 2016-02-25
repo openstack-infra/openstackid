@@ -184,3 +184,18 @@ textarea {
 .col-md-offset-neg-1 {
     margin-left: -15%;
 }
+
+.clear-padding
+{
+    padding:0;
+}
+
+.formatted-credential
+{
+    text-align: left;
+}
+
+.auto-width
+{
+    width: auto !important;
+}

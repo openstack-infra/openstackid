@@ -8,7 +8,7 @@ use oauth2\services\ITokenService;
 use utils\services\ILogService;
 use utils\exceptions\EntityNotFoundException;
 use oauth2\exceptions\InvalidApiScope;
-
+use utils\services\IAuthService;
 /**
  * Class ClientApiController
  * Client REST API
@@ -29,25 +29,25 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
      */
     private $token_service;
 
-
     /**
-     * @param IApiScopeService $scope_service
-     * @param ITokenService $token_service
-     * @param IClientService $client_service
-     * @param ILogService $log_service
+     * @var IAuthService
      */
+    private $auth_service;
+
     public function __construct
     (
         IApiScopeService $scope_service,
         ITokenService $token_service,
         IClientService $client_service,
+        IAuthService $auth_service,
         ILogService $log_service
     ) {
         parent::__construct($log_service);
 
         $this->client_service = $client_service;
-        $this->scope_service = $scope_service;
-        $this->token_service = $token_service;
+        $this->scope_service  = $scope_service;
+        $this->token_service  = $token_service;
+        $this->auth_service   = $auth_service;
 
         //set filters allowed values
         $this->allowed_filter_fields = array('user_id');
@@ -81,7 +81,6 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
     {
         try {
             $res = $this->client_service->deleteClientByIdentifier($id);
-
             return $res ? $this->deleted() : $this->error404(array('error' => 'operation failed'));
         } catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -101,10 +100,10 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
 
             // Build the validation constraint set.
             $rules = array(
-                'user_id'          => 'required|integer',
                 'app_name'         => 'required|alpha_dash|max:255',
                 'app_description'  => 'required|freetext',
                 'website'          => 'url',
+                'admin_users'      => 'user_ids',
                 'application_type' => 'required|applicationtype',
             );
 
@@ -120,47 +119,30 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
             if ($this->client_service->existClientAppName($values['app_name'])) {
                 return $this->error400(array('error' => 'application Name already exists!.'));
             }
+            $admin_users = trim($values['admin_users']);
+            $admin_users = empty($admin_users) ? array():explode(',',$admin_users);
 
-            $new_client = $this->client_service->addClient($values['application_type'], intval($values['user_id']),
-                trim($values['app_name']), trim($values['app_description']), trim($values['website']));
+            $new_client = $this->client_service->addClient
+            (
+                $values['application_type'],
+                trim($values['app_name']),
+                trim($values['app_description']),
+                trim($values['website']),
+                $admin_users
+            );
 
-            return $this->created(array('client_id' => $new_client->id));
+            return $this->created
+            (
+                array
+                (
+                    'id'            => $new_client->id,
+                    'client_id'     => $new_client->client_id,
+                    'client_secret' => $new_client->client_secret,
+                )
+            );
 
         } catch (Exception $ex) {
             $this->log_service->error($ex);
-
-            return $this->error500($ex);
-        }
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function getByPage()
-    {
-        try {
-            //check for optional filters param on querystring
-            $fields = $this->getProjection(Input::get('fields', null));
-            $filters = $this->getFilters(Input::except('fields', 'limit', 'offset'));
-            $page_nbr = intval(Input::get('offset', 1));
-            $page_size = intval(Input::get('limit', 10));
-
-            $list = $this->client_service->getAll($page_nbr, $page_size, $filters, $fields);
-            $items = array();
-            foreach ($list->getItems() as $client) {
-                $data = $client->toArray();
-                $data['application_type'] = $client->getFriendlyApplicationType();
-                array_push($items, $data);
-            }
-
-            return $this->ok(array(
-                'page' => $items,
-                'total_items' => $list->getTotal()
-            ));
-        } catch (Exception $ex) {
-            $this->log_service->error($ex);
-
             return $this->error500($ex);
         }
     }
@@ -207,6 +189,7 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
                 'id_token_signed_response_alg' => 'sometimes|required|signing_alg',
                 'id_token_encrypted_response_alg' => 'sometimes|required|encrypted_alg',
                 'id_token_encrypted_response_enc' => 'sometimes|required|encrypted_enc',
+                'admin_users'                     => 'user_ids',
             );
 
             // Creates a Validator instance and validates the data.
@@ -240,6 +223,42 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
         }
     }
 
+    /**
+     * @return mixed
+     */
+    public function getByPage()
+    {
+        try {
+
+            $items   = array();
+            $user    = $this->auth_service->getCurrentUser();
+            $clients = $user->getClients();
+
+            foreach ($clients as $client)
+            {
+                $data = $client->toArray();
+                $data['application_type'] = $client->getFriendlyApplicationType();
+                $data['is_own']           = $client->isOwner($this->auth_service->getCurrentUser());
+                $data['modified_by']      = $client->getEditedByNice();
+                array_push($items, $data);
+            }
+
+            return $this->ok
+            (
+                array
+                (
+                    'page'        => $items,
+                    'total_items' => count($items)
+                )
+            );
+
+        }
+        catch (Exception $ex)
+        {
+            $this->log_service->error($ex);
+            return $this->error500($ex);
+        }
+    }
 
     public function addAllowedScope($id, $scope_id)
     {
@@ -282,12 +301,10 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
         }
     }
 
-
     public function activate($id)
     {
         try {
             $res = $this->client_service->activateClient($id, true);
-
             return $res ? $this->ok() : $this->error404(array('error' => 'operation failed'));
         } catch (AbsentClientException $ex1) {
             $this->log_service->error($ex1);
@@ -316,7 +333,6 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
             return $this->error500($ex);
         }
     }
-
 
     public function regenerateClientSecret($id)
     {

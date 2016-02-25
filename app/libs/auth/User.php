@@ -217,7 +217,14 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
 
     public function getClients()
     {
-        return $this->clients()->get();
+        $own_clients = $this->clients()->get();
+        $managed_clients = $this->managed_clients()->get();
+        return $own_clients->merge($managed_clients);
+    }
+
+    public function managed_clients()
+    {
+        return $this->belongsToMany('Client', 'oauth2_client_admin_users', 'user_id', 'oauth2_client_id');
     }
 
     /**

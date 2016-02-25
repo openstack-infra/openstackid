@@ -106,8 +106,9 @@ return array(
         'Illuminate\Workbench\WorkbenchServiceProvider',
         'Illuminate\Redis\RedisServiceProvider',
         'services\utils\UtilsProvider',
-	    'repositories\RepositoriesProvider',
-	    'services\oauth2\OAuth2ServiceProvider',
+        'repositories\RepositoriesProvider',
+        'factories\FactoriesProvider',
+        'services\oauth2\OAuth2ServiceProvider',
         'services\openid\OpenIdProvider',
         'auth\AuthenticationServiceProvider',
         'services\ServicesProvider',
@@ -182,5 +183,5 @@ return array(
         'View'            => 'Illuminate\Support\Facades\View',
 		'RedisLV4'        => 'Illuminate\Support\Facades\Redis',
 	),
-
+    'version' => 'XX.XX.XX',
 );

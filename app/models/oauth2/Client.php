@@ -8,7 +8,7 @@ use oauth2\models\IClientPublicKey;
 use oauth2\models\JWTResponseInfo;
 use oauth2\models\TokenEndpointAuthInfo;
 use utils\model\BaseModelEloquent;
-
+use oauth2\models\IApiScope;
 /**
  * Class Client
  */
@@ -61,7 +61,8 @@ class Client extends BaseModelEloquent implements IClient
         'id_token_encrypted_response_alg',
         'id_token_encrypted_response_enc',
         'redirect_uris',
-        'allowed_origins'
+        'allowed_origins',
+        'edited_by_id',
     );
 
     public static  $valid_app_types = array
@@ -104,6 +105,14 @@ class Client extends BaseModelEloquent implements IClient
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function admin_users()
+    {
+        return $this->belongsToMany('auth\User','oauth2_client_admin_users','oauth2_client_id','user_id');
+    }
+
+    /**
      * @param string $value
      */
     public function setApplicationTypeAttribute($value)
@@ -129,7 +138,6 @@ class Client extends BaseModelEloquent implements IClient
         }
     }
 
-
     public function access_tokens()
     {
         return $this->hasMany('AccessToken');
@@ -145,6 +153,11 @@ class Client extends BaseModelEloquent implements IClient
         return $this->belongsTo('auth\User');
     }
 
+    public function edited_by()
+    {
+        return $this->belongsTo('auth\User','edited_by_id');
+    }
+
     public function resource_server()
     {
         return $this->belongsTo('ResourceServer');
@@ -153,6 +166,15 @@ class Client extends BaseModelEloquent implements IClient
     public function scopes()
     {
         return $this->belongsToMany('ApiScope','oauth2_client_api_scope','client_id','scope_id');
+    }
+
+    /**
+     * @return $this
+     */
+    public function removeAllScopes()
+    {
+        $this->scopes()->detach();
+        return $this;
     }
 
     public function getClientId()
@@ -585,5 +607,90 @@ class Client extends BaseModelEloquent implements IClient
             return str_contains($this->post_logout_redirect_uris, $logout_with_port );
         }
         return false;
+    }
+
+    /**
+     * @param mixed $user
+     */
+    public function addAdminUser($user)
+    {
+        $this->admin_users()->attach($user->id);
+        return $this;
+    }
+
+    /**
+     * @param mixed $user
+     */
+    public function removeAdminUser($user)
+    {
+        $this->admin_users()->detach($user->id);
+        return $this;
+    }
+
+    public function removeAllAdminUsers(){
+        $this->admin_users()->detach();
+        return $this;
+    }
+
+    /**
+     * @param $user
+     * @return bool
+     */
+    public function candEdit($user)
+    {
+        $is_admin = $this->admin_users()->where('id', '=', $user->id)->count() > 0;
+        $is_owner = intval($this->user_id) === intval($user->id);
+        return $is_owner || $is_admin;
+    }
+
+    /**
+     * @param $user
+     * @return bool
+     */
+    public function canDelete($user)
+    {
+        return $this->isOwner($user);
+    }
+
+    public function isOwner($user)
+    {
+        return intval($this->user_id) === intval($user->id);
+    }
+
+    public function setOwner($user)
+    {
+        $this->user()->associate($user);
+        return $this;
+    }
+
+    /**
+     * @param IApiScope $scope
+     * @return $this
+     */
+    public function addScope(IApiScope $scope)
+    {
+        $this->scopes()->attach($scope->id);
+        return $this;
+    }
+
+    /**
+     * @param $editing_user
+     * @return $this
+     */
+    public function setEditedBy($editing_user){
+        $this->edited_by()->associate($editing_user);
+        return $this;
+    }
+
+    public function getEditedByNice()
+    {
+        $user = $this->edited_by()->first();
+        return is_null($user)? 'N/A':$user->getEmail();
+    }
+
+    public function getOwnerNice()
+    {
+        $user = $this->user()->first();
+        return is_null($user)? 'N/A':$user->getEmail();
     }
 }

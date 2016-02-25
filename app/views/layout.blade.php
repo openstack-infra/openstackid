@@ -8,6 +8,7 @@
     {{ HTML::style('assets/css/main.css') }}
     {{ HTML::style('bower_assets/jquery-ui/themes/ui-darkness/jquery-ui.css') }}
     {{ HTML::style('bower_assets/fontawesome/css/font-awesome.min.css') }}
+    {{ HTML::style('bower_assets/sweetalert/dist/sweetalert.css') }}
     @yield('css')
 </head>
 <body>
@@ -31,10 +32,12 @@
     {{ HTML::script('bower_assets/jquery-validate/dist/additional-methods.min.js')}}
     {{ HTML::script('bower_assets/pure-templates/libs/pure.min.js')}}
     {{ HTML::script('bower_assets/uri.js/src/URI.min.js')}}
+    {{ HTML::script('bower_assets/sweetalert/dist/sweetalert.min.js')}}
     {{ HTML::script('assets/js/ajax.utils.js')}}
     {{ HTML::script('assets/js/jquery.cleanform.js')}}
     {{ HTML::script('assets/js/jquery.serialize.js')}}
     {{ HTML::script('assets/js/jquery.validate.additional.custom.methods.js')}}
     @yield('scripts')
+    <span class="version hidden">{{ Config::get('app.version') }}</span>
 </body>
 </html>

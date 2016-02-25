@@ -27,7 +27,12 @@ Service Account : The OpenstackId OAuth 2.0 Authorization Server supports server
                 <option value="SERVICE">Service Account</option>
                 <option value="NATIVE">Native Application</option>
             </select>
-     </div>
+    </div>
+
+    <div class="form-group">
+        <label class="control-label" for="admin_users">Admin Users&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="Choose which users would be administrator of this application"></span></label>
+        <input type="text" class="form-control" name="admin_users" id="admin_users">
+    </div>
 
     <div class="checkbox">
         <label>

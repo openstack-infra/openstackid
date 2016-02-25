@@ -16,19 +16,38 @@ use utils\services\ILogService;
 use openid\services\IUserService;
 use oauth2\services\ITokenService;
 use oauth2\exceptions\ExpiredAccessTokenException;
-
+use auth\IUserRepository;
 /**
  * Class UserApiController
  */
 class UserApiController extends AbstractRESTController implements ICRUDController {
 
+    /**
+     * @var IUserService
+     */
     private $user_service;
+    /**
+     * @var ITokenService
+     */
     private $token_service;
 
-    public function __construct(ILogService $log_service, IUserService $user_service,ITokenService $token_service){
+    /**
+     * @var IUserRepository
+     */
+    private $user_repository;
+
+    public function __construct
+    (
+        IUserRepository $user_repository,
+        ILogService $log_service,
+        IUserService $user_service,
+        ITokenService $token_service
+    ){
         parent::__construct($log_service);
-        $this->user_service   = $user_service;
-        $this->token_service = $token_service;
+
+        $this->user_service    = $user_service;
+        $this->token_service   = $token_service;
+        $this->user_repository = $user_repository;
     }
 
     /**
@@ -128,5 +147,28 @@ class UserApiController extends AbstractRESTController implements ICRUDControlle
     public function update()
     {
         // TODO: Implement update() method.
+    }
+
+    public function fetch()
+    {
+        $values = Input::all();
+        if(!isset($values['t'])) return $this->error404();
+        $term  = $values['t'];
+        $users = $this->user_repository->getByEmailOrName($term);
+        if(count($users) > 0)
+        {
+            $list = array();
+            foreach($users as $u)
+            {
+                array_push($list, array
+                    (
+                        'id' => $u->id,
+                        'value' => sprintf('%s', $u->getFullName())
+                    )
+                );
+            }
+            return $this->ok($list);
+        }
+        return $this->updated();
     }
 }

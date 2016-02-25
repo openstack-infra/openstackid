@@ -23,6 +23,7 @@ use ClientPublicKey;
 use oauth2\repositories\IClientRepository;
 use DB;
 use ValidationException;
+use utils\services\IAuthService;
 /**
  * Class ClienPublicKeyService
  * @package services\oauth2
@@ -35,13 +36,20 @@ final class ClienPublicKeyService extends AssymetricKeyService implements IClien
      */
     private $client_repository;
 
+    /**
+     * @var IAuthService
+     */
+    private $auth_service;
+
     public function __construct(
         IClientPublicKeyRepository $repository,
-        IClientRepository $client_repository,
-        ITransactionService $tx_service)
+        IClientRepository          $client_repository,
+        IAuthService               $auth_service,
+        ITransactionService        $tx_service
+    )
     {
-
         $this->client_repository = $client_repository;
+        $this->auth_service      = $auth_service;
         parent::__construct($repository, $tx_service);
     }
 
@@ -52,9 +60,9 @@ final class ClienPublicKeyService extends AssymetricKeyService implements IClien
     public function register(array $params)
     {
         $client_repository = $this->client_repository;
-        $repository = $this->repository;
-
-        return $this->tx_service->transaction(function() use($params, $repository, $client_repository)
+        $repository        = $this->repository;
+        $auth_service      = $this->auth_service;
+        return $this->tx_service->transaction(function() use($params, $repository, $client_repository, $auth_service)
         {
 
             if ($repository->getByPEM($params['pem_content']))
@@ -95,6 +103,8 @@ final class ClienPublicKeyService extends AssymetricKeyService implements IClien
             );
 
             $client->addPublicKey($public_key);
+            $client->setEditedBy($auth_service->getCurrentUser());
+            $client_repository->add($client);
             return $public_key;
         });
     }

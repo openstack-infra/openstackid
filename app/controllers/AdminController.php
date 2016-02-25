@@ -252,13 +252,17 @@ class AdminController extends BaseController {
             $friendly_scopes = $this->scope_service->getFriendlyScopesByName(explode(' ',$refresh_token->scope));
             $refresh_token->setFriendlyScopes(implode(', ',$friendly_scopes));
         }
-        return View::make("oauth2.profile.edit-user-grants",array(
-            'user_id'              => $user->getId(),
-            'access_tokens'        => $access_tokens ,
-            'refresh_tokens'       => $refresh_tokens ,
-            "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
-            "is_openstackid_admin" => $user->isOpenstackIdAdmin(),
-            ));
+
+        return View::make("oauth2.profile.edit-user-grants",
+            array
+            (
+                'user_id'              => $user->getId(),
+                'access_tokens'        => $access_tokens ,
+                'refresh_tokens'       => $refresh_tokens ,
+                'is_oauth2_admin'      => $user->isOAuth2ServerAdmin(),
+                'is_openstackid_admin' => $user->isOpenstackIdAdmin(),
+            )
+        );
     }
 
     public function listOAuth2Clients(){

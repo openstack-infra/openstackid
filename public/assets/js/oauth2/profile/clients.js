@@ -9,13 +9,17 @@ function loadClients(){
             success: function (data,textStatus,jqXHR) {
                 //load data...
                 var clients = data.page;
-                var template = $('<tbody><tr><td class="app-name"></td><td class="client-type"></td><td class="client-active"><input type="checkbox" class="app-active-checkbox"></td><td class="client-locked"><input type="checkbox" disabled="disabled" class="app-locked-checkbox"></td><td class="client-modified"></td><td class="client-actions">&nbsp;<a class="btn btn-default btn-md active edit-client" title="Edits a Registered Application">Edit</a>&nbsp;<a class="btn btn-default btn-md active del-client" title="Deletes a Registered Application">Delete</a></td></tr></tbody>');
+                var template = $('<tbody><tr><td class="admin-app"></td><td class="app-name"></td><td class="client-type"></td><td class="client-active"><input type="checkbox" class="app-active-checkbox"></td><td class="client-locked"><input type="checkbox" disabled="disabled" class="app-locked-checkbox"></td><td class="client-modified"></td><td class="client-modified-by"></td><td class="client-actions">&nbsp;<a class="btn btn-default btn-md active edit-client" title="Edits a Registered Application">Edit</a>&nbsp;<a class="btn btn-default btn-md active del-client" title="Deletes a Registered Application">Delete</a></td></tr></tbody>');
                 var directives = {
                     'tr':{
                         'client<-context':{
+                            'td.admin-app':function(arg){
+                                return arg.item.is_own?'':'<i title="you have admin rights on this application" class="fa fa-user"></i>';
+                            },
                             'td.app-name':'client.app_name',
                             'td.client-type':'client.application_type',
                             'td.client-modified':'client.updated_at',
+                            'td.client-modified-by':'client.modified_by',
                             '.app-active-checkbox@value':'client.id',
                             '.app-active-checkbox@checked':function(arg){
                                 return arg.item.active?'true':'';
@@ -41,12 +45,19 @@ function loadClients(){
                                 var client_id = arg.item.id;
                                 var href = clientsUrls.delete;
                                 return href.replace('@id',client_id);
+                            },
+                            'a.del-client@class+':function(arg)
+                            {
+                                return arg.item.is_own?'':' hidden';
+                            },
+                            '.app-active-checkbox@class+':function(arg){
+                                return arg.item.is_own?'':' hidden';
                             }
                         }
                     }
                 };
                 var body = template.render(clients, directives);
-                var table = $('<table id="tclients" class="table table-hover table-condensed"><thead><tr><th>Application Name</th><th>Type</th><th>Is Active</th><th>Is Locked</th><th>Modified</th><th>&nbsp;</th></tr></thead>'+body.html()+'</table>');
+                var table = $('<table id="tclients" class="table table-hover table-condensed"><thead><tr><th>&nbsp;</th><th>Application Name</th><th>Type</th><th>Is Active</th><th>Is Locked</th><th>Modified</th><th>Modified By</th><th>&nbsp;</th></tr></thead>'+body.html()+'</table>');
                 $('#tclients','#clients').remove();
                 $('#clients').append(table);
 
@@ -70,6 +81,35 @@ jQuery(document).ready(function($){
             "app_description" : {required: true, free_text:true,rangelength: [1, 512]},
             "website"         : {url:true}
         }
+    });
+
+    var users = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+            url: clientsUrls.fetchUsers+'?t=%QUERY',
+            wildcard: '%QUERY'
+        }
+    });
+
+    $('#admin_users').tagsinput({
+        itemValue: 'id',
+        itemText: 'value',
+        freeInput: false,
+        allowDuplicates: false,
+        trimValue: true,
+        typeaheadjs: [
+            {
+                hint: true,
+                highlight: true,
+                minLength: 1
+            },
+            {
+                name: 'users',
+                displayKey: 'value',
+                source: users
+            }
+        ]
     });
 
     application_dialog.modal({
@@ -104,6 +144,17 @@ jQuery(document).ready(function($){
                 success: function (data,textStatus,jqXHR) {
                     loadClients();
                     application_dialog.modal('hide');
+
+                    var client_id     = data.client_id;
+                    var client_secret = data.client_secret;
+
+                    swal({
+                        title: "Your Client Credentials!",
+                        text: "<p><strong>CLIENT ID</strong></p><p class='formatted-credential'>"+client_id+"</p><p><strong>CLIENT SECRET</strong></p><p class='formatted-credential'>"+client_secret+"</p>",
+                        html: true,
+                        type: "info",
+                        customClass: "auto-width"
+                    });
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     ajaxError(jqXHR, textStatus, errorThrown);
@@ -115,24 +166,33 @@ jQuery(document).ready(function($){
     });
 
     $("body").on('click',".del-client",function(event){
-        if(confirm("Are you sure to delete this registered application?")){
-            var url = $(this).attr('href');
-            $.ajax(
-                {
-                    type: "DELETE",
-                    url: url,
-                    contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    timeout:60000,
-                    success: function (data,textStatus,jqXHR) {
-                        loadClients();
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        ajaxError(jqXHR, textStatus, errorThrown);
+        var url = $(this).attr('href');
+        swal({
+                title: "Are you sure to delete this registered application?",
+                text: "This is an non reversible process!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Delete it!",
+                closeOnConfirm: true
+            },
+            function(){
+                $.ajax(
+                    {
+                        type: "DELETE",
+                        url: url,
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        timeout:60000,
+                        success: function (data,textStatus,jqXHR) {
+                            loadClients();
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            ajaxError(jqXHR, textStatus, errorThrown);
+                        }
                     }
-                }
-            );
-        }
+                );
+            });
         event.preventDefault();
         return false;
     });

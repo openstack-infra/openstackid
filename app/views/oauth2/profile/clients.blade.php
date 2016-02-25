@@ -15,25 +15,31 @@
                 <table id='tclients' class="table table-hover table-condensed">
                     <thead>
                     <tr>
+                        <th>&nbsp;</th>
                         <th>Application Name</th>
                         <th>Application Type</th>
                         <th>Is Active</th>
                         <th>Is Locked</th>
                         <th>Modified</th>
+                        <th>Modified By</th>
                         <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody id="body-registered-clients">
                     @foreach ($clients as $client)
+
                         <tr>
+                            <td>@if (!$client->isOwner(Auth::user()))<i title="you have admin rights on this application" class="fa fa-user"></i>@endif</td>
                             <td>{{ $client->app_name }}</td>
                             <td>{{ $client->getFriendlyApplicationType()}}</td>
                             <td>
+                                @if ($client->isOwner(Auth::user()))
                                 <input type="checkbox" class="app-active-checkbox" id="app-active_{{$client->id}}"
-                                @if ( $client->active)
+                                       @if ( $client->active)
                                        checked
                                        @endif
                                        value="{{$client->id}}"/>
+                                @endif
                             </td>
                             <td>
                                 <input type="checkbox" class="app-locked-checkbox" id="app-locked_{{$client->id}}"
@@ -43,9 +49,12 @@
                                        value="{{$client->id}}" disabled="disabled" />
                             </td>
                             <td>{{ $client->updated_at }}</td>
+                            <td>{{ $client->getEditedByNice() }}</td>
                             <td>&nbsp;
                                 {{ HTML::link(URL::action("AdminController@editRegisteredClient",array("id"=>$client->id)),'Edit',array('class'=>'btn btn-default btn-md active edit-client','title'=>'Edits a Registered Application')) }}
+                                @if ($client->canDelete(Auth::user()))
                                 {{ HTML::link(URL::action("ClientApiController@delete",array("id"=>$client->id)),'Delete',array('class'=>'btn btn-default btn-md active del-client','title'=>'Deletes a Registered Application')) }}</td>
+                                @endif
                         </tr>
                     @endforeach
                     </tbody>
@@ -87,8 +96,16 @@
             delete: '{{ URL::action("ClientApiController@delete",array("id"=>"@id")) }}',
             add: '{{URL::action("ClientApiController@create",null)}}',
             activate: '{{ URL::action("ClientApiController@activate",array("id"=>"@id")) }}',
-            deactivate: '{{ URL::action("ClientApiController@deactivate",array("id"=>"@id")) }}'
+            deactivate: '{{ URL::action("ClientApiController@deactivate",array("id"=>"@id")) }}',
+            fetchUsers: '{{URL::action("UserApiController@fetch",null)}}',
         };
     </script>
+    {{ HTML::script('bower_assets/typeahead.js/dist/typeahead.bundle.js')}}
+    {{ HTML::script('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.js')}}
     {{ HTML::script('assets/js/oauth2/profile/clients.js') }}
 @stop
+
+@section('css')
+    {{ HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.css') }}
+    {{ HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput-typeahead.css') }}
+@append

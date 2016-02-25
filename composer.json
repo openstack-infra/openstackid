@@ -42,7 +42,8 @@
       "app/strategies",
       "app/filters",
       "app/validators",
-      "app/providers"
+      "app/providers",
+      "app/factories"
     ]
   },
   "scripts": {

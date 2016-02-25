@@ -66,10 +66,10 @@ final class ApiScopeGroupController extends AbstractRESTController implements IC
     {
         parent::__construct($log_service);
 
-        $this->repository      = $repository;
-        $this->user_repository = $user_repository;
-        $this->scope_service  = $scope_service;
-        $this->service         = $service;
+        $this->repository                = $repository;
+        $this->user_repository           = $user_repository;
+        $this->scope_service             = $scope_service;
+        $this->service                   = $service;
         $this->allowed_filter_fields     = array('');
         $this->allowed_projection_fields = array('*');
     }
@@ -97,7 +97,7 @@ final class ApiScopeGroupController extends AbstractRESTController implements IC
                 'name'   => 'required|text|max:512',
                 'active' => 'required|boolean',
                 'scopes' => 'required',
-                'users'  => 'required',
+                'users'  => 'required|user_ids',
             );
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($values, $rules);
@@ -204,7 +204,7 @@ final class ApiScopeGroupController extends AbstractRESTController implements IC
                 'name'   => 'required|text|max:512',
                 'active' => 'required|boolean',
                 'scopes' => 'required',
-                'users'  => 'required',
+                'users'  => 'required|user_ids',
             );
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($values, $rules);
@@ -253,26 +253,4 @@ final class ApiScopeGroupController extends AbstractRESTController implements IC
         }
     }
 
-    public function fetchUsers()
-    {
-        $values = Input::all();
-        if(!isset($values['t'])) return $this->error404();
-        $term  = $values['t'];
-        $users = $this->user_repository->getByEmailOrName($term);
-        if(count($users) > 0)
-        {
-            $list = array();
-            foreach($users as $u)
-            {
-                array_push($list, array
-                    (
-                        'id' => $u->id,
-                        'value' => sprintf('%s (%s)', $u->getFullName(), $u->getEmail())
-                    )
-                );
-            }
-            return $this->ok($list);
-        }
-        return $this->updated();
-    }
 }

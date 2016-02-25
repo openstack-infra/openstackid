@@ -74,7 +74,7 @@
             activate : '{{ URL::action("ApiScopeGroupController@activate",array("id"=>"@id")) }}',
             deactivate : '{{ URL::action("ApiScopeGroupController@deactivate",array("id"=>"@id")) }}',
             add : '{{URL::action("ApiScopeGroupController@create",null)}}',
-            fetchUsers: '{{URL::action("ApiScopeGroupController@fetchUsers",null)}}'
+            fetchUsers: '{{URL::action("UserApiController@fetch",null)}}'
         };
         var all_scopes = [];
 

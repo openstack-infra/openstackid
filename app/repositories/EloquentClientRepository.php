@@ -40,7 +40,7 @@ final class EloquentClientRepository implements IClientRepository {
      * @param ILogService $log_service
      */
     public function __construct(Client $client, ILogService $log_service){
-        $this->client  = $client;
+        $this->client       = $client;
         $this->log_service = $log_service;
     }
 
