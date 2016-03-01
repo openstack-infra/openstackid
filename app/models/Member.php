@@ -19,8 +19,8 @@ class Member extends BaseModelEloquent
 
     public function checkPassword($password)
     {
-        $digest = AuthHelper::encrypt_password($password, $this->Salt, $this->PasswordEncryption);
-        $res    = AuthHelper::compare($this->Password, $digest);
+        $hash = AuthHelper::encrypt_password($password, $this->Salt, $this->PasswordEncryption);
+        $res  = AuthHelper::compare($this->Password, $hash , $this->PasswordEncryption);
         return $res;
     }
 

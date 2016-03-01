@@ -11,6 +11,13 @@ abstract class PasswordEncryptorStrategy {
      * @return string
      */
     abstract public function encrypt($password, $salt = null);
+
+    /**
+     * @param $hash1
+     * @param $hash2
+     * @return bool
+     */
+    abstract public function compare($hash1, $hash2);
 }
 
 final class PasswordEncryptor_Legacy extends PasswordEncryptorStrategy {
@@ -35,10 +42,25 @@ final class PasswordEncryptor_Legacy extends PasswordEncryptorStrategy {
             return Hash::compute(self::$algorithms[$this->algorithm], $password . $salt);
         return $password;
     }
+
+    /**
+     * @param $hash1
+     * @param $hash2
+     * @return bool
+     */
+    public function compare($hash1, $hash2)
+    {
+        // Due to flawed base_convert() floating poing precision,
+        // only the first 10 characters are consistently useful for comparisons.
+        return (substr($hash1, 0, 10) == substr($hash2, 0, 10));
+    }
 }
 
+/**
+ * Class PasswordEncryptor_Blowfish
+ * @package auth
+ */
 final class PasswordEncryptor_Blowfish extends PasswordEncryptorStrategy {
-
     /**
      * Cost of encryption.
      * Higher costs will increase security, but also increase server load.
@@ -51,8 +73,8 @@ final class PasswordEncryptor_Blowfish extends PasswordEncryptorStrategy {
     protected static $cost = 10;
 
     /**
-    /**
      * Sets the cost of the blowfish algorithm.
+     * See {@link PasswordEncryptor_Blowfish::$cost}
      * Cost is set as an integer but
      * Ensure that set values are from 4-31
      *
@@ -73,8 +95,7 @@ final class PasswordEncryptor_Blowfish extends PasswordEncryptorStrategy {
         return self::$cost;
     }
 
-    public function encrypt($password, $salt = null)
-    {
+    public function encrypt($password, $salt = null) {
         // See: http://nz.php.net/security/crypt_blowfish.php
         // There are three version of the algorithm - y, a and x, in order
         // of decreasing security. Attempt to use the strongest version.
@@ -177,6 +198,35 @@ final class PasswordEncryptor_Blowfish extends PasswordEncryptorStrategy {
 
         return 'unknown';
     }
+
+    /**
+     * self::$cost param is forced to be two digits with leading zeroes for ints 4-9
+     */
+    public function salt($password) {
+        $generator = new RandomGenerator();
+        return sprintf('%02d', self::$cost) . '$' . substr($generator->randomToken('sha1'), 0, 22);
+    }
+
+    public function check($hash, $password, $salt = null) {
+        if(strpos($hash, '$2y$') === 0) {
+            return $hash === $this->encryptY($password, $salt);
+        } elseif(strpos($hash, '$2a$') === 0) {
+            return $hash === $this->encryptA($password, $salt);
+        } elseif(strpos($hash, '$2x$') === 0) {
+            return $hash === $this->encryptX($password, $salt);
+        }
+        return false;
+    }
+
+    /**
+     * @param $hash1
+     * @param $hash2
+     * @return bool
+     */
+    public function compare($hash1, $hash2)
+    {
+        return $hash1 === $hash2;
+    }
 }
 
 class AuthHelper
@@ -210,10 +260,20 @@ class AuthHelper
         return $strategy->encrypt($password, $salt);
     }
 
-    public static function compare($hash1, $hash2)
+    /**
+     * @param string $hash1
+     * @param string $hash2
+     * @param string $algorithm
+     * @return bool
+     * @throws \Exception
+     */
+    public static function compare($hash1, $hash2, $algorithm = "sha1")
     {
-        // Due to flawed base_convert() floating poing precision,
-        // only the first 10 characters are consistently useful for comparisons.
-        return (substr($hash1, 0, 10) == substr($hash2, 0, 10));
+        if (!isset(self::$algorithms[$algorithm]))
+            throw new \Exception(sprintf("non supported algorithm %s", $algorithm));
+        $class = self::$algorithms[$algorithm];
+
+        $strategy = new $class($algorithm);
+        return $strategy->compare($hash1, $hash2);
     }
 }
