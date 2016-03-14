@@ -11,7 +11,7 @@ use openid\services\IUserService;
 use utils\db\ITransactionService;
 use utils\services\ICheckPointService;
 use utils\services\ILogService;
-
+use Log;
 /**
  * Class CustomAuthProvider
  * Custom Authentication Provider against SS DB
