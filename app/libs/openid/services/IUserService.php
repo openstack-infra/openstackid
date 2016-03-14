@@ -44,7 +44,7 @@ interface IUserService
 
     /**
      * @param $identifier
-     * @return mixed
+     * @return void
      */
     public function unlockUser($identifier);
 

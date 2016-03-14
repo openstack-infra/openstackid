@@ -6,6 +6,7 @@
 return array(
     //general default values
     'Assets_Url' => 'http://www.openstack.org/',
+    'Support_Email' => 'noreply@openstack.org',
     'MaxFailed_Login_Attempts' => 10,
     'MaxFailed_LoginAttempts_2ShowCaptcha' => 3,
     //openid default values

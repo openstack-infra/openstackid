@@ -27,7 +27,7 @@ abstract class JsonController extends BaseController  {
         return $res;
     }
 
-    protected function updated()
+    protected function updated($data='ok')
     {
         $res =  Response::json($data, 204);
         //jsonp

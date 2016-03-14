@@ -205,9 +205,6 @@ SQL;
             )
         );
 
-
-
-
         Member::create(
             array(
                 'ID'   => 2,
@@ -247,7 +244,6 @@ SQL;
                 'Locale' => 'ESP',
             )
         );
-
 
         Member::create(
             array(

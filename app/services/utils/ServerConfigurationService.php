@@ -42,6 +42,8 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
 
         //general
         $this->default_config_params["MaxFailed.Login.Attempts"] = Config::get('server.MaxFailed_Login_Attempts', 10);
+        $this->default_config_params["SupportEmail"]             = Config::get('server.Support_Email', 'noreply@openstack.org');
+
         $this->default_config_params["MaxFailed.LoginAttempts.2ShowCaptcha"] = Config::get('server.MaxFailed_LoginAttempts_2ShowCaptcha',
             3);
         $this->default_config_params["Assets.Url"] = Config::get('server.Assets_Url', self::DefaultAssetsUrl );

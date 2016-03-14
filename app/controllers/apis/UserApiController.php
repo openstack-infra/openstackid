@@ -56,8 +56,8 @@ class UserApiController extends AbstractRESTController implements ICRUDControlle
      */
     public function unlock($id){
         try {
-            $res = $this->user_service->unlockUser($id);
-            return $res ? $this->ok() : $this->error404(array('error' => 'operation failed'));
+            $this->user_service->unlockUser($id);
+            return $this->updated();
         }
         catch (AbsentClientException $ex1) {
             $this->log_service->error($ex1);

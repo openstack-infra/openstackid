@@ -10,7 +10,9 @@ use openid\model\IOpenIdUser;
 use openid\services\IUserService;
 use utils\db\ITransactionService;
 use utils\services\ILogService;
-use Log;
+use Illuminate\Support\Facades\Mail;
+use utils\services\IServerConfigurationService;
+
 /**
  * Class UserService
  * @package services\openid
@@ -37,10 +39,16 @@ final class UserService implements IUserService
     private $user_name_generator;
 
     /**
+     * @var IServerConfigurationService
+     */
+    private $configuration_service;
+
+    /**
      * UserService constructor.
      * @param IUserRepository $repository
      * @param IUserNameGeneratorService $user_name_generator
      * @param ITransactionService $tx_service
+     * @param IServerConfigurationService $configuration_service
      * @param ILogService $log_service
      */
     public function __construct
@@ -48,13 +56,15 @@ final class UserService implements IUserService
         IUserRepository $repository,
         IUserNameGeneratorService $user_name_generator,
         ITransactionService $tx_service,
+        IServerConfigurationService $configuration_service,
         ILogService $log_service
     )
     {
-        $this->repository          = $repository;
-        $this->user_name_generator = $user_name_generator;
-        $this->log_service         = $log_service;
-        $this->tx_service          = $tx_service;
+        $this->repository            = $repository;
+        $this->user_name_generator   = $user_name_generator;
+        $this->configuration_service = $configuration_service;
+        $this->log_service           = $log_service;
+        $this->tx_service            = $tx_service;
     }
 
 
@@ -109,8 +119,19 @@ final class UserService implements IUserService
 
                 $user->lock = true;
                 $this->repository->update($user);
-
-                Log::warning(sprintf("User %d locked ", $identifier));
+                $support_email = $this->configuration_service->getConfigValue('SupportEmail');
+                Mail::send('emails.auth.user_locked', array
+                (
+                    'user_name'     => $user->getFullName(),
+                    'attempts'      => $user->login_failed_attempt,
+                    'support_email' => $support_email,
+                ), function($message) use ($user, $support_email)
+                {
+                    $message
+                            ->from($support_email, 'OpenStack Support Team')
+                            ->to($user->getEmail(), $user->getFullName())
+                            ->subject('OpenStackId - your user has been locked!');
+                });
             }
         } catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -120,7 +141,7 @@ final class UserService implements IUserService
 
     /**
      * @param $identifier
-     * @return mixed|void
+     * @return void
      * @throws \Exception
      */
     public function unlockUser($identifier)
@@ -131,8 +152,6 @@ final class UserService implements IUserService
 
                 $user->lock = false;
                 $this->repository->update($user);
-
-                Log::warning(sprintf("User %d unlocked ", $identifier));
             }
         } catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -250,11 +269,9 @@ final class UserService implements IUserService
             $identifier            = $original_identifier = $user_name_generator->generate($member);
             do
             {
-                Log::debug(sprintf('proposed user identifer %s for member %s', $identifier, $member->ID));
                 $old_user = $repository->getByIdentifier($identifier);
                 if(!is_null($old_user))
                 {
-                    Log::debug(sprintf('proposed user identifer %s already exists!, trying new one ...', $identifier));
                     $identifier = $original_identifier . IUserNameGeneratorService::USER_NAME_CHAR_CONNECTOR . $fragment_nbr;
                     $fragment_nbr++;
                     continue;
