@@ -18,7 +18,7 @@ use utils\services\IServerConfigurationService;
 class ServerConfigurationService implements IOpenIdServerConfigurationService, IServerConfigurationService
 {
 
-    const DefaultAssetsUrl = 'http://www.openstack.org/';
+    const DefaultAssetsUrl = 'https://www.openstack.org/';
     const DefaultPrivateAssociationLifetime = 120;
     const DefaultSessionAssociationLifetime = 21600;
     const DefaultMaxFailedLoginAttempts = 10;
