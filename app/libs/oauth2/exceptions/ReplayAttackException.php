@@ -8,11 +8,12 @@ use oauth2\OAuth2Protocol;
  * Class ReplayAttackException
  * @package oauth2\exceptions
  */
-final class ReplayAttackException extends OAuth2BaseException
+class ReplayAttackException extends OAuth2BaseException
 {
 
     /**
-     * @param null|string $code
+     * ReplayAttackException constructor.
+     * @param null|string $token
      * @param null $description
      */
     public function __construct($token, $description = null)

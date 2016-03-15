@@ -1,17 +1,20 @@
 <?php
-namespace services\oauth2;
+namespace services;
 
 use DB;
-use Exception;
 use Log;
-use oauth2\exceptions\ReplayAttackException;
-use services\AbstractBlacklistSecurityPolicy;
+use Exception;
+use libs\oauth2\exceptions\ReplayAttackAuthCodeException;
 use utils\db\ITransactionService;
 use utils\services\ICacheService;
 use utils\services\ILockManagerService;
 use utils\services\IServerConfigurationService;
 
-class AuthorizationCodeRedeemPolicy extends AbstractBlacklistSecurityPolicy
+/**
+ * Class AuthorizationCodeRedeemPolicy
+ * @package services
+ */
+final class AuthorizationCodeRedeemPolicy extends AbstractBlacklistSecurityPolicy
 {
 
     /**
@@ -41,19 +44,20 @@ class AuthorizationCodeRedeemPolicy extends AbstractBlacklistSecurityPolicy
     /**
      * Apply security policy on a exception
      * @param Exception $ex
-     * @return mixed
+     * @return void
      */
     public function apply(Exception $ex)
     {
         try {
 
-            if ($ex instanceof ReplayAttackException) {
-                $token = $ex->getToken();
+            if ($ex instanceof ReplayAttackAuthCodeException) {
+                $auth_code = $ex->getToken();
+                Log::error(sprintf("AuthorizationCodeRedeemPolicy : auth code %s - message %s", $auth_code, $ex->getMessage()));
                 $this->counter_measure->trigger
                 (
                     array
                     (
-                        'auth_code' => $token
+                        'auth_code' => $auth_code
                     )
                 );
             }

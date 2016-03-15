@@ -48,7 +48,7 @@ class OpenIdMessage extends HttpMessage
 
     public function isValid()
     {
-        $ns = $this->getParam(OpenIdProtocol::OpenIDProtocol_NS);
+        $ns   = $this->getParam(OpenIdProtocol::OpenIDProtocol_NS);
         $mode = $this->getParam(OpenIdProtocol::OpenIDProtocol_Mode);
         if (!is_null($ns)
             && $ns == OpenIdProtocol::OpenID2MessageType

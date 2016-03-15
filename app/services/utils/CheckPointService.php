@@ -48,6 +48,7 @@ class CheckPointService implements ICheckPointService
             $user_trail                 = new UserExceptionTrail();
             $user_trail->from_ip        = $remote_ip;
             $user_trail->exception_type = $class_name;
+            $user_trail->stack_trace     = $ex->getTraceAsString();
             if(Auth::check()){
                 $user_trail->user_id = Auth::user()->getId();
             }
