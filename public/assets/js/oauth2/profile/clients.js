@@ -77,7 +77,7 @@ jQuery(document).ready(function($){
 
     var application_validator = application_form.validate({
         rules: {
-            "app_name"        : {required: true, nowhitespace:true,rangelength: [1, 255]},
+            "app_name"        : {required: true, free_text:true, rangelength: [1, 255]},
             "app_description" : {required: true, free_text:true,rangelength: [1, 512]},
             "website"         : {url:true}
         }
@@ -147,10 +147,13 @@ jQuery(document).ready(function($){
 
                     var client_id     = data.client_id;
                     var client_secret = data.client_secret;
+                    var credentials_txt = "<p><strong>CLIENT ID</strong></p><p class='formatted-credential'>"+client_id+"</p>";
+                    if(client_secret)
+                        credentials_txt += "<p><strong>CLIENT SECRET</strong></p><p class='formatted-credential'>"+client_secret+"</p>";
 
                     swal({
                         title: "Your Client Credentials!",
-                        text: "<p><strong>CLIENT ID</strong></p><p class='formatted-credential'>"+client_id+"</p><p><strong>CLIENT SECRET</strong></p><p class='formatted-credential'>"+client_secret+"</p>",
+                        text: credentials_txt,
                         html: true,
                         type: "info",
                         customClass: "auto-width"

@@ -1315,6 +1315,8 @@ final class OAuth2Protocol implements IOAuth2Protocol
 
     /**
      * http://openid.net/specs/openid-connect-session-1_0.html#RPLogout
+     * @param OAuth2Request|null $request
+     * @return null|OAuth2DirectErrorResponse
      */
     public function endSession(OAuth2Request $request = null)
     {
