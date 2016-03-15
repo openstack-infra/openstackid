@@ -190,7 +190,7 @@ class AuthorizationCodeGrantType extends InteractiveGrantType
             {
                 throw new UriNotAllowedException
                 (
-                    $redirect_uri
+                    $current_redirect_uri
                 );
             }
 

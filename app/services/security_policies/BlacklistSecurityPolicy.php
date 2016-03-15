@@ -162,9 +162,9 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
     }
 
     /**
-     * Apply security policy
      * @param Exception $ex
-     * @return mixed|void
+     * @throws Exception
+     * @return void
      */
     public function apply(Exception $ex)
     {

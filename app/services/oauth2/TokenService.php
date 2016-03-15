@@ -17,6 +17,8 @@ namespace services\oauth2;
 use AccessToken as DBAccessToken;
 use DB;
 use Event;
+use libs\oauth2\exceptions\ReplayAttackAuthCodeException;
+use libs\oauth2\exceptions\ReplayAttackRefreshTokenException;
 use oauth2\exceptions\RevokedAccessTokenException;
 use oauth2\exceptions\RevokedAccessTokenExceptionxtends;
 use oauth2\exceptions\RevokedRefreshTokenException;
@@ -376,7 +378,7 @@ final class TokenService implements ITokenService
         }
         catch (UnacquiredLockException $ex1)
         {
-            throw new ReplayAttackException
+            throw new ReplayAttackAuthCodeException
             (
                 $value,
                 sprintf
@@ -957,12 +959,12 @@ final class TokenService implements ITokenService
     }
 
     /**
-     * Get a refresh token by its value
-     * @param  $value refresh token value
-     * @param $is_hashed
+     * @param \oauth2\services\refresh $value
+     * @param bool $is_hashed
      * @return RefreshToken
-     * @throws \oauth2\exceptions\ReplayAttackException
-     * @throws \oauth2\exceptions\InvalidGrantTypeException
+     * @throws InvalidGrantTypeException
+     * @throws ReplayAttackException
+     * @throws RevokedRefreshTokenException
      */
     public function getRefreshToken($value, $is_hashed = false)
     {
@@ -981,7 +983,7 @@ final class TokenService implements ITokenService
 
         if ($refresh_token_db->void)
         {
-            throw new ReplayAttackException
+            throw new ReplayAttackRefreshTokenException
             (
                 $value,
                 sprintf
