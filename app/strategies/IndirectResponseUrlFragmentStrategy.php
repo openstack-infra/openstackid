@@ -5,7 +5,7 @@ namespace strategies;
 use utils\IHttpResponseStrategy;
 use Redirect;
 use Response;
-
+use Log;
 /**
  * Class IndirectResponseUrlFragmentStrategy
  * Redirect and http response using a 302 adding params on url fragment
@@ -28,6 +28,7 @@ class IndirectResponseUrlFragmentStrategy implements IHttpResponseStrategy
         }
 
         $return_to = (strpos($return_to, "#") == false) ? $return_to . "#" . $fragment : $return_to . "&" . $fragment;
+        Log::debug(sprintf("IndirectResponseUrlFragmentStrategy: return_to %s", $return_to));
         return Redirect::to($return_to);
     }
 }

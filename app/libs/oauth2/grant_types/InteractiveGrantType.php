@@ -17,7 +17,6 @@ namespace oauth2\grant_types;
 use jwe\IJWE;
 use jwk\impl\RSAJWKFactory;
 use jwk\impl\RSAJWKPEMPrivateKeySpecification;
-use jwk\JSONWebKeyPublicKeyUseValues;
 use jws\IJWS;
 use oauth2\exceptions\ConsentRequiredException;
 use oauth2\exceptions\InteractionRequiredException;
@@ -29,7 +28,6 @@ use oauth2\exceptions\LoginRequiredException;
 use oauth2\exceptions\OAuth2GenericException;
 use oauth2\exceptions\RecipientKeyNotFoundException;
 use oauth2\exceptions\ScopeNotAllowedException;
-use oauth2\exceptions\UnsupportedResponseTypeException;
 use oauth2\exceptions\UriNotAllowedException;
 use oauth2\heuristics\ClientSigningKeyFinder;
 use oauth2\heuristics\ServerEncryptionKeyFinder;
@@ -53,6 +51,7 @@ use oauth2\exceptions\AccessDeniedException;
 use utils\factories\BasicJWTFactory;
 use utils\services\IAuthService;
 use utils\services\ILogService;
+use Log;
 
 /**
  * Class InteractiveGrantType
@@ -198,7 +197,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
 
             //check requested scope
             $scope = $request->getScope();
-
+            Log::debug(sprintf("scope %s", $scope));
             if (!$client->isScopeAllowed($scope)) {
                 throw new ScopeNotAllowedException(sprintf("scope %s", $scope));
             }
@@ -246,6 +245,16 @@ abstract class InteractiveGrantType extends AbstractGrantType
             }
 
             $authorization_response = $this->auth_service->getUserAuthorizationResponse();
+
+            Log::debug(sprintf("authorization_response %s", $authorization_response));
+
+            if ($authorization_response == IAuthService::AuthorizationResponse_DenyOnce) {
+                if ($this->hadPromptConsent($request)) {
+                    throw new ConsentRequiredException('the user denied access to your application');
+                }
+                throw new AccessDeniedException;
+            }
+
             //check for former user consents
             $former_user_consent = $this->user_consent_service->get
             (
@@ -254,42 +263,30 @@ abstract class InteractiveGrantType extends AbstractGrantType
                 $scope
             );
 
-            $auto_approval = $approval_prompt == OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto;
-            $has_former_consent = !is_null($former_user_consent);
+            $auto_approval         = $approval_prompt == OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Auto;
+            $has_former_consent    = !is_null($former_user_consent);
             $should_prompt_consent = $this->shouldPromptConsent($request);
 
-            if ($should_prompt_consent || !($has_former_consent && $auto_approval)) {
-                if ($should_prompt_consent || $authorization_response == IAuthService::AuthorizationResponse_None) {
-                    if (!$this->canInteractWithEndUser($request)) {
-                        throw new InteractionRequiredException;
-                    }
-
-                    $this->memento_service->serialize($request->getMessage()->createMemento());
-
-                    return $this->auth_strategy->doConsent($request);
-                } else {
-                    if ($authorization_response == IAuthService::AuthorizationResponse_DenyOnce) {
-                        if ($this->hadPromptConsent($request)) {
-                            throw new ConsentRequiredException('the user denied access to your application');
-                        }
-
-                        throw new AccessDeniedException;
-                    }
-                }
-                //save possitive consent
+            if((!$should_prompt_consent && $has_former_consent && $auto_approval) || $authorization_response == IAuthService::AuthorizationResponse_AllowOnce) {
+                // emit response ...
+                $this->auth_service->registerRPLogin($client_id);
+                //save positive consent
                 if (is_null($former_user_consent)) {
                     $this->user_consent_service->add($user->getId(), $client->getId(), $scope);
                 }
+                $response = $this->buildResponse($request, $has_former_consent);
+                // clear save data ...
+                $this->auth_service->clearUserAuthorizationResponse();
+                $this->memento_service->forget();
+                return $response;
             }
-            $this->auth_service->registerRPLogin($client_id);
 
-            $response = $this->buildResponse($request, $has_former_consent);
+            if (!$this->canInteractWithEndUser($request))
+                throw new InteractionRequiredException;
 
-            // clear save data ...
-            $this->auth_service->clearUserAuthorizationResponse();
-            $this->memento_service->forget();
-
-            return $response;
+            $this->memento_service->serialize($request->getMessage()->createMemento());
+            Log::debug(sprintf("Doing consent ... authorization_response %s should_prompt_consent %s",$authorization_response, $should_prompt_consent));
+            return $this->auth_strategy->doConsent($request);
         }
         catch(\Exception $ex)
         {

@@ -4,7 +4,6 @@ use oauth2\services\IApiScopeService;
 use oauth2\services\IClientService;
 use oauth2\services\IResourceServerService;
 use oauth2\services\ITokenService;
-use openid\requests\OpenIdAuthenticationRequest;
 use openid\services\IMementoOpenIdSerializerService;
 use openid\services\IServerConfigurationService;
 use openid\services\ITrustedSitesService;
@@ -60,7 +59,7 @@ class UserController extends OpenIdController
      */
     private $login_strategy;
     /**
-     * @var null
+     * @var IConsentStrategy
      */
     private $consent_strategy;
     /**
@@ -286,7 +285,9 @@ class UserController extends OpenIdController
             $validator = Validator::make($data, $rules);
             if ($validator->passes())
             {
-                return $this->consent_strategy->postConsent(input::get("trust"));
+                $trust = Input::get("trust");
+                Log::debug(sprintf("postConsent trust %s", $trust));
+                return $this->consent_strategy->postConsent($trust);
             }
             return Redirect::action('UserController@getConsent')->withErrors($validator);
         }

@@ -5,11 +5,15 @@ namespace services;
 use DB;
 use Exception;
 use Log;
+use auth\exceptions\AuthenticationInvalidPasswordAttemptException;
 use utils\services\ISecurityPolicy;
 use utils\services\ISecurityPolicyCounterMeasure;
 
-
-class LockUserSecurityPolicy implements ISecurityPolicy
+/**
+ * Class LockUserSecurityPolicy
+ * @package services
+ */
+final class LockUserSecurityPolicy implements ISecurityPolicy
 {
     private $counter_measure;
     /**
@@ -29,21 +33,15 @@ class LockUserSecurityPolicy implements ISecurityPolicy
     /**
      * Apply security policy on a exception
      * @param Exception $ex
-     * @return mixed
+     * @return void
      */
     public function apply(Exception $ex)
     {
         try {
-            $exception_class = get_class($ex);
-
-            switch ($exception_class) {
-                case 'auth\exceptions\AuthenticationInvalidPasswordAttemptException':
-                {
-                    $user_identifier = $ex->getIdentifier();
-                    if (!is_null($user_identifier) && !empty($user_identifier))
-                        $this->counter_measure->trigger(array('user_identifier' => $user_identifier));
-                }
-                break;
+            if($ex instanceof AuthenticationInvalidPasswordAttemptException) {
+                $user_identifier = $ex->getIdentifier();
+                if (!is_null($user_identifier) && !empty($user_identifier))
+                    $this->counter_measure->trigger(array('user_identifier' => $user_identifier));
             }
         } catch (Exception $ex) {
             Log::error($ex);

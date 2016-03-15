@@ -1,6 +1,6 @@
 <?php
 
-namespace services\oauth2;
+namespace services;
 
 use Exception;
 use Log;
@@ -17,11 +17,13 @@ use utils\services\ISecurityPolicyCounterMeasure;
  * authorization server may want to revoke all tokens granted based on
  * the authorization grant.
  * Class RevokeAuthorizationCodeRelatedTokens
- * @package services\oauth2
+ * @package services
  */
-class RevokeAuthorizationCodeRelatedTokens implements ISecurityPolicyCounterMeasure {
+final class RevokeAuthorizationCodeRelatedTokens implements ISecurityPolicyCounterMeasure {
 
-
+    /**
+     * @var ITokenService
+     */
 	private $token_service;
 
 	/**
@@ -31,6 +33,9 @@ class RevokeAuthorizationCodeRelatedTokens implements ISecurityPolicyCounterMeas
 		$this->token_service = $token_service;
 	}
 
+    /**
+     * @param array $params
+     */
     public function trigger(array $params = array())
     {
         try {
