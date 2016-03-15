@@ -217,10 +217,6 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
         $user = User::where('identifier', '=', 'sebastian.marcet')->first();
         $this->be($user);
 
-        //already given consent
-
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
-
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
 
         $params = array
@@ -231,8 +227,7 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
             'scope' => 'openid profile email',
             OAuth2Protocol::OAuth2Protocol_LoginHint => 'sebastian@tipit.net',
             OAuth2Protocol::OAuth2Protocol_MaxAge => 3200,
-            OAuth2Protocol::OAuth2Protocol_Prompt => sprintf('%s %s', OAuth2Protocol::OAuth2Protocol_Prompt_Consent,
-                OAuth2Protocol::OAuth2Protocol_Prompt_Login)
+            OAuth2Protocol::OAuth2Protocol_Prompt => sprintf('%s %s', OAuth2Protocol::OAuth2Protocol_Prompt_Consent, OAuth2Protocol::OAuth2Protocol_Prompt_Login)
         );
 
         $response = $this->action("POST", "OAuth2ProviderController@authorize",

@@ -93,6 +93,43 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
     }
 
+    /**
+     * Get Auth Code Test
+     */
+    public function testCancelAuthCode()
+    {
+
+        Route::enableFilters();
+
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+
+        $params = array(
+            'client_id' => $client_id,
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'response_type' => 'code',
+            'scope' => sprintf('%s/resource-server/read', $this->current_realm),
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $consent_response = $this->call('POST', $url, array(
+            'trust'  => IAuthService::AuthorizationResponse_DenyOnce,
+            '_token' => Session::token()
+        ));
+
+        $this->assertResponseStatus(302);
+
+
+    }
+
     public function testAuthCodeInvalidRedirectUri()
     {
 
@@ -123,7 +160,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
     /** Get Token Test
      * @throws Exception
      */
-    public function testToken()
+    public function testToken($test_refresh_token = true)
     {
 
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
@@ -177,12 +214,22 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
         $response = json_decode($content);
         $access_token = $response->access_token;
-        $refresh_token = $response->refresh_token;
 
         $this->assertTrue(!empty($access_token));
-        $this->assertTrue(!empty($refresh_token));
+
+        if($test_refresh_token){
+            $refresh_token = $response->refresh_token;
+            $this->assertTrue(!empty($refresh_token));
+        }
 
     }
+
+    /*public function testTokenNTimes($n = 10000){
+
+        for($i=0; $i< $n ;$i++){
+            $this->testToken($i === 0);
+        }
+    }*/
 
     /** Get Token Test
      * @throws Exception
@@ -351,7 +398,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         }
     }
 
-    public function testResourceServerInstrospection()
+    public function testResourceServerIntrospection()
     {
         $access_token = $this->testValidateToken();
 
@@ -380,7 +427,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue($validate_access_token === $access_token);
     }
 
-    public function testResourceServerInstrospectionNotValidIP()
+    public function testResourceServerIntrospectionNotValidIP()
     {
         $access_token = $this->testValidateToken();
 
@@ -701,6 +748,95 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $this->assertTrue(!empty($new_refresh_token));
 
             //do re refresh and we will get a 400 http error ...
+            $response = $this->action("POST", "OAuth2ProviderController@token",
+                $params,
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+            $this->assertResponseStatus(400);
+
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
+
+    /**
+     * test refresh token replay attack
+     * @throws Exception
+     */
+    public function testRefreshTokenDeleted()
+    {
+        try {
+
+            $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+            $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
+
+            Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+
+            //do authorization ...
+
+            $params = array(
+                'client_id' => $client_id,
+                'redirect_uri' => 'https://www.test.com/oauth2',
+                'response_type' => OAuth2Protocol::OAuth2Protocol_ResponseType_Code,
+                'scope' => sprintf('%s/resource-server/read', $this->current_realm),
+                OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline
+            );
+
+            $response = $this->action("POST", "OAuth2ProviderController@authorize",
+                $params,
+                array(),
+                array(),
+                array());
+
+            $status = $response->getStatusCode();
+            $url = $response->getTargetUrl();
+            $content = $response->getContent();
+
+            // get auth code ...
+            $comps = @parse_url($url);
+            $query = $comps['query'];
+            $output = array();
+            parse_str($query, $output);
+
+
+            //do get auth token...
+            $params = array(
+                'code' => $output['code'],
+                'redirect_uri' => 'https://www.test.com/oauth2',
+                'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
+            );
+
+
+            $response = $this->action("POST", "OAuth2ProviderController@token",
+                $params,
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+            $this->assertResponseStatus(200);
+
+            $content = $response->getContent();
+
+            $response = json_decode($content);
+            //get access token and refresh token...
+            $access_token = $response->access_token;
+            $refresh_token = $response->refresh_token;
+
+            $this->assertTrue(!empty($access_token));
+            $this->assertTrue(!empty($refresh_token));
+
+            // delete from DB ...
+
+            DB::table('oauth2_refresh_token')->delete();
+
+            $params = array(
+                'refresh_token' => $refresh_token,
+                'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_RefreshToken,
+            );
+
             $response = $this->action("POST", "OAuth2ProviderController@token",
                 $params,
                 array(),

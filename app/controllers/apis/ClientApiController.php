@@ -100,8 +100,8 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
 
             // Build the validation constraint set.
             $rules = array(
-                'app_name'         => 'required|alpha_dash|max:255',
-                'app_description'  => 'required|freetext',
+                'app_name'         => 'required|freetext|max:255',
+                'app_description'  => 'required|freetext|max:512',
                 'website'          => 'url',
                 'admin_users'      => 'user_ids',
                 'application_type' => 'required|applicationtype',
@@ -159,8 +159,8 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
             $rules = array(
                 'id' => 'required|integer',
                 'application_type' =>'required|application_type',
-                'app_name' => 'sometimes|required|alpha_dash|max:255',
-                'app_description' => 'sometimes|required|freetext',
+                'app_name' => 'sometimes|required|freetext|max:255',
+                'app_description' => 'sometimes|required|freetext|max:512',
                 'website' => 'url',
                 'active' => 'sometimes|required|boolean',
                 'locked' => 'sometimes|required|boolean',

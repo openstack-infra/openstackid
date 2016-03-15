@@ -32,7 +32,8 @@ class OAuth2DirectErrorResponse extends OAuth2DirectResponse
     }
 
     /**
-     * @param string $error
+     * @param $error
+     * @return $this
      */
     public function setError($error)
     {
@@ -41,7 +42,8 @@ class OAuth2DirectErrorResponse extends OAuth2DirectResponse
     }
 
     /**
-     * @param string $state
+     * @param $state
+     * @return $this
      */
     public function setState($state)
     {
@@ -50,7 +52,8 @@ class OAuth2DirectErrorResponse extends OAuth2DirectResponse
     }
 
     /**
-     * @param string $error_description
+     * @param $error_description
+     * @return $this
      */
     public function setErrorDescription($error_description)
     {

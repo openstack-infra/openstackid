@@ -7,6 +7,7 @@ use openid\services\IMementoOpenIdSerializerService;
 use openid\strategies\OpenIdResponseStrategyFactoryMethod;
 use openid\OpenIdMessage;
 use openid\responses\OpenIdResponse;
+
 /**
  * Class OpenIdProviderController
  */
@@ -40,6 +41,8 @@ class OpenIdProviderController extends BaseController
     {
         $msg = new OpenIdMessage( Input::all() );
 
+        $r = print_r (Input::all());
+        Log::debug($r);
         if($this->memento_service->exists()){
             $msg = OpenIdMessage::buildFromMemento( $this->memento_service->load());
         }
