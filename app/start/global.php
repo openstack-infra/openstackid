@@ -48,7 +48,7 @@ $from        = Config::get('log.from_email');
 if(!empty($to) && !empty($from)){
     $subject     = 'openstackid error';
     $mono_log    = Log::getMonolog();
-    $handler = new NativeMailerHandler($to, $subject, $from,$level = Logger::WARNING);
+    $handler = new NativeMailerHandler($to, $subject, $from, $level = Logger::ERROR);
     $mono_log->pushHandler($handler);
 }
 
