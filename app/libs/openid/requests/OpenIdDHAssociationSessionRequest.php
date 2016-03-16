@@ -28,8 +28,8 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest
     public function __construct(OpenIdMessage $message)
     {
         parent::__construct($message);
-        $this->g_number = null;
-        $this->p_number = null;
+        $this->g_number   = null;
+        $this->p_number   = null;
         $this->rp_pub_key = null;
     }
 
@@ -57,11 +57,13 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest
     {
         $res = parent::isValid();
         if (!$res) return false;
-        $dh_modulus = $this->getDHModulus();
-        $dh_gen = $this->getDHGen();
+        $dh_modulus         = $this->getDHModulus();
+        $dh_gen             = $this->getDHGen();
         $dh_consumer_public = $this->getDHConsumerPublic();
         if (!empty($dh_modulus) && !empty($dh_gen) && !empty($dh_consumer_public))
             return true;
+        // not a positive natural number greater than 1 ...
+        if($dh_gen <= 1) return false;
         return true;
     }
 

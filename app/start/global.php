@@ -39,7 +39,7 @@ ClassLoader::addDirectories(array(
 
 $logFile = 'log-' . php_sapi_name() . '.txt';
 
-Log::useDailyFiles(storage_path() . '/logs/' . $logFile,$days = 0, $level = 'debug');
+Log::useDailyFiles(storage_path() . '/logs/' . $logFile, $days = 0, $level = 'debug');
 
 //set email log
 $to          = Config::get('log.to_email');
@@ -48,7 +48,7 @@ $from        = Config::get('log.from_email');
 if(!empty($to) && !empty($from)){
     $subject     = 'openstackid error';
     $mono_log    = Log::getMonolog();
-    $handler = new NativeMailerHandler($to, $subject, $from,$level = Logger::WARNING);
+    $handler = new NativeMailerHandler($to, $subject, $from, $level = Logger::ERROR);
     $mono_log->pushHandler($handler);
 }
 
