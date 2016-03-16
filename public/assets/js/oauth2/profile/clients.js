@@ -120,10 +120,12 @@ jQuery(document).ready(function($){
     application_dialog.on('hidden.bs.modal', function () {
         application_form.cleanForm();
         application_validator.resetForm();
+        $('.add-client').removeAttr('disabled');
     })
 
     $("body").on('click',".add-client",function(event){
         application_dialog.modal('show');
+        $('.add-client').attr('disabled','disabled');
         event.preventDefault();
         return false;
     });
@@ -131,6 +133,7 @@ jQuery(document).ready(function($){
     $("body").on('click',"#save-application",function(event){
         var is_valid        = application_form.valid();
         if (is_valid){
+            $('#save-application').attr('disabled','disabled');
             var application     = application_form.serializeForm();
             application.user_id = userId;
             var link = $(this).attr('href');
@@ -158,9 +161,11 @@ jQuery(document).ready(function($){
                         type: "info",
                         customClass: "auto-width"
                     });
+                    $('#save-application').removeAttr('disabled');
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     ajaxError(jqXHR, textStatus, errorThrown);
+                    $('#save-application').removeAttr('disabled');
                 }
             });
         }

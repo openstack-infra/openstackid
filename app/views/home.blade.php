@@ -1,6 +1,6 @@
 @extends('layout')
 @section('title')
-    <title>Welcome to openstackId</title>
+    <title>Welcome to openStackId</title>
 @stop
 @section('meta')
     <meta http-equiv="X-XRDS-Location" content="{{ URL::action("DiscoveryController@idp")}}" />
@@ -9,7 +9,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
-                <h1>OpenstackId Identity Provider</h1>
+                <h1>OpenStackId Identity Provider</h1>
                 <div class="panel">
                     <div class="panel-heading strong">Log in to OpenStack</div>
                     <div style="text-align: center">

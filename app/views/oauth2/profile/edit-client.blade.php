@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-<title>Welcome to openstackId - OAUTH2 Console - Edit Client</title>
+<title>Welcome to OpenStackId - OAUTH2 Console - Edit Client</title>
 @stop
 @section('css')
     {{ HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.css') }}

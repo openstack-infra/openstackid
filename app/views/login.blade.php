@@ -1,7 +1,7 @@
 @extends('layout')
 @section('title')
-    <title>Welcome to openstackId - Sign in </title>
-@stop
+    <title>Welcome to OpenStackId - Sign in </title>
+@append
 @section('meta')
     <meta http-equiv="X-XRDS-Location" content="{{ URL::action("DiscoveryController@idp")}}" />
 @append
@@ -22,7 +22,7 @@
 
     <div class="col-md-4" id="sidebar">
         <div class="well">
-            {{ Form::open(array('url' => URL::action('UserController@postLogin'), 'method' => 'post',  "autocomplete" => "off")) }}
+            {{ Form::open(array('id'=>'login_form','url' => URL::action('UserController@postLogin'), 'method' => 'post',  "autocomplete" => "off")) }}
 
                 <legend>Login</legend>
                 <div class="form-group">
@@ -84,4 +84,7 @@
     </div>
     <div class="col-md-8">
     </div>
-@stop
+@append
+@section('scripts')
+    {{ HTML::script('assets/js/login.js') }}
+@append

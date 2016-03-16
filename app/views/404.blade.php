@@ -1,6 +1,6 @@
 @extends('layout')
 @section('content')
-<h1>OpenstackId Idp - 404</h1>
+<h1>OpenStackId Idp - 404</h1>
 <div class="container">
     <p>
         404. That's an error.

@@ -59,7 +59,7 @@ jQuery(document).ready(function($){
     form.submit(function(e){
         var is_valid = $(this).valid();
         if (is_valid) {
-
+            $('#save-application-security').attr('disabled','disabled');
             var application_data = $(this).serializeForm();
 
             $.ajax(
@@ -71,9 +71,11 @@ jQuery(document).ready(function($){
                     dataType: "json",
                     timeout: 60000,
                     success: function (data, textStatus, jqXHR) {
+                        $('#save-application-security').removeAttr('disabled');
                         displaySuccessMessage('Data saved successfully.', form);
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
+                        $('#save-application-security').removeAttr('disabled');
                         ajaxError(jqXHR, textStatus, errorThrown);
                     }
                 }

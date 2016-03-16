@@ -1,6 +1,6 @@
 @extends('layout')
 @section('title')
-<title>Welcome to openstackId</title>
+<title>Welcome to OpenStackId</title>
 @stop
 @section('meta')
 <meta http-equiv="X-XRDS-Location" content="{{ URL::action("DiscoveryController@idp")}}" />

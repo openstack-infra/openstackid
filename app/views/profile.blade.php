@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-<title>Welcome to openstackId - OpenStack ID Account Settings</title>
+<title>Welcome to OpenStackId - OpenStack ID Account Settings</title>
 @stop
 
 @section('content')

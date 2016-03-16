@@ -1,13 +1,13 @@
 @extends('layout')
 @section('title')
 <title>Welcome to openstackId - consent </title>
-@stop
+@append
 
 @section('header_right')
 @if(Auth::check())
 Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()->identifier}}</a>
 @endif
-@stop
+@append
 
 @section('content')
 <div class="container">
@@ -40,13 +40,12 @@ Welcome, <a href="{{ URL::action("UserController@getProfile") }}">{{Auth::user()
         Deny Forever
         </label>
     </div>
-    {{ Form::submit('Ok',array("id" => "send_authorization", 'class' => 'btn btn-default btn-lg active')) }}
-    {{ Form::button('Cancel',array('id' => 'cancel_authorization', 'class' => 'btn active btn-lg btn-danger cancel_authorization')) }}
+    {{ Form::submit('Ok',array("id" => "send_authorization", 'class' => 'btn btn-default btn-lg active btn-consent-action')) }}
+    {{ Form::button('Cancel',array('id' => 'cancel_authorization', 'class' => 'btn active btn-lg btn-danger cancel_authorization btn-consent-action')) }}
     </fieldset>
     {{ Form::close() }}
-
 </div>
-@stop
+@append
 @section('scripts')
 {{ HTML::script('assets/js/openid/consent.js') }}
-@stop
+@append

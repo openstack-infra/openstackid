@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-<title>Welcome to openstackId - Server Admin - Banned Ips</title>
+<title>Welcome to OpenStackId - Server Admin - Banned Ips</title>
 @stop
 
 @section('content')

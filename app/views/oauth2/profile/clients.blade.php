@@ -1,6 +1,6 @@
 @extends('layout')
 @section('title')
-    <title>Welcome to openstackId - OAUTH2 Console - Clients</title>
+    <title>Welcome to OpenStackId - OAUTH2 Console - Clients</title>
 @stop
 @section('content')
     @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))

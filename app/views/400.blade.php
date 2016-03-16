@@ -1,6 +1,6 @@
 @extends('layout')
 @section('content')
-    <h1>OpenstackId Idp - 400</h1>
+    <h1>OpenStackId Idp - 400</h1>
     <div class="container">
         <p>
             400. That’s an error.

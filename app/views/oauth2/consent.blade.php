@@ -36,8 +36,8 @@
             </p>
             {{ Form::open(array('url' => URL::action("UserController@postConsent") ,'id'=>'authorization_form', 'method' => 'post',  "autocomplete" => "off")) }}
                 <input type="hidden"  name='trust' id='trust' value=""/>
-                <button class="btn btn-default btn-md" id="cancel-authorization" type="button">Cancel</button>
-                <button class="btn btn-primary btn-md" id="approve-authorization" type="button">Accept</button>
+                <button class="btn btn-default btn-md btn-consent-action" id="cancel-authorization" type="button">Cancel</button>
+                <button class="btn btn-primary btn-md btn-consent-action" id="approve-authorization" type="button">Accept</button>
             {{ Form::close() }}
         </div>
     </div>

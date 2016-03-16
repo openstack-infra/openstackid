@@ -1,6 +1,6 @@
 @extends('layout')
 @section('title')
-    <title>Welcome to openstackId - Server Admin - Server Private Keys</title>
+    <title>Welcome to OpenStackId - Server Admin - Server Private Keys</title>
 @stop
 @section('css')
     {{ HTML::style('bower_assets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}

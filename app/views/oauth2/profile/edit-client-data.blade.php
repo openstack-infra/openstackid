@@ -136,7 +136,7 @@
                     <input type="hidden" id="id" name="id" value="{{$client->id}}"/>
                     <input type="hidden" id="application_type" name="application_type" value="{{$client->application_type}}"/>
                     <input type="hidden" id="user_id"   name="user_id" value="{{$client->user_id}}"/>
-                    <button type="submit" class="btn btn-default btn-md active">Save</button>
+                    <button type="submit" class="btn btn-default btn-md active btn-save-client-data">Save</button>
                 </form>
             </div>
         </div>

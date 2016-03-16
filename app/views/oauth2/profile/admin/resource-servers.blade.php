@@ -1,7 +1,7 @@
 @extends('layout')
 
 @section('title')
-<title>Welcome to openstackId - Server Admin - Resource Server</title>
+<title>Welcome to OpenStackId - Server Admin - Resource Server</title>
 @stop
 
 @section('css')
