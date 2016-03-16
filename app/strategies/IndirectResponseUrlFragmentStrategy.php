@@ -29,6 +29,8 @@ class IndirectResponseUrlFragmentStrategy implements IHttpResponseStrategy
 
         $return_to = (strpos($return_to, "#") == false) ? $return_to . "#" . $fragment : $return_to . "&" . $fragment;
         Log::debug(sprintf("IndirectResponseUrlFragmentStrategy: return_to %s", $return_to));
-        return Redirect::to($return_to);
+        return Redirect::to($return_to)
+            ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+            ->header('Pragma','no-cache');
     }
 }
