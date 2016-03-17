@@ -1511,10 +1511,6 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     {
         // use a public client
 
-        //already given consent
-
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
-
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         $params = array
@@ -1595,10 +1591,6 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     {
         // use a public client
 
-        //already given consent
-
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
-
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         $params = array
@@ -1678,10 +1670,6 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     public function testImplicitFlowIdTokenMaxAge1000()
     {
         // use a public client
-
-        //already given consent
-
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
@@ -1790,10 +1778,6 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     {
         // use a public client
 
-        //already given consent
-
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
-
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         $params = array
@@ -1874,10 +1858,6 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     public function testImplicitFlowResponseModePost()
     {
         // use a public client
-
-        //already given consent
-
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 

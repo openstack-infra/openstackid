@@ -6,7 +6,11 @@ use Exception;
 use Log;
 use utils\services\ILogService;
 
-class LogService implements ILogService
+/**
+ * Class LogService
+ * @package services\utils
+ */
+final class LogService implements ILogService
 {
 
     public function error(Exception $exception)
@@ -32,5 +36,10 @@ class LogService implements ILogService
     public function error_msg($msg)
     {
         Log::error($msg);
+    }
+
+    public function debug_msg($msg)
+    {
+        Log::debug($msg);
     }
 }

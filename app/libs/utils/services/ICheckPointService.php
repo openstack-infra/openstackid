@@ -23,5 +23,9 @@ interface ICheckPointService {
      */
     public function trackException(Exception $ex);
 
+    /**
+     * @param ISecurityPolicy $policy
+     * @return mixed
+     */
     public function addPolicy(ISecurityPolicy $policy);
 } 

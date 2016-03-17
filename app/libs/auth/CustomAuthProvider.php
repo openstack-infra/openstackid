@@ -94,8 +94,7 @@ class CustomAuthProvider implements UserProviderInterface
             }
 
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
-
+            $this->log_service->warning($ex);
             return null;
         }
 
@@ -109,13 +108,12 @@ class CustomAuthProvider implements UserProviderInterface
      */
     public function retrieveByCredentials(array $credentials)
     {
-        $user_service = $this->user_service;
+        $user_service           = $this->user_service;
         $auth_extension_service = $this->auth_extension_service;
-        $user_repository = $this->user_repository;
-        $member_repository = $this->member_repository;
-        $log_service = $this->log_service;
-        $checkpoint_service = $this->checkpoint_service;
-
+        $user_repository        = $this->user_repository;
+        $member_repository      = $this->member_repository;
+        $log_service            = $this->log_service;
+        $checkpoint_service     = $this->checkpoint_service;
 
         return $this->tx_service->transaction(function () use (
             $credentials,
@@ -196,7 +194,7 @@ class CustomAuthProvider implements UserProviderInterface
             catch (Exception $ex)
             {
                 $checkpoint_service->trackException($ex);
-                $log_service->error($ex);
+                $log_service->warning($ex);
                 $user = null;
             }
 
@@ -234,11 +232,9 @@ class CustomAuthProvider implements UserProviderInterface
                 return false;
             }
         } catch (Exception $ex) {
-            $this->log_service->error($ex);
-
+            $this->log_service->warning($ex);
             return false;
         }
-
         return true;
     }
 

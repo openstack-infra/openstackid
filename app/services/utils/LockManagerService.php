@@ -27,7 +27,7 @@ final class LockManagerService implements ILockManagerService {
     }
 
     /**
-     * @param string $name
+     * @param $name
      * @param int $lifetime
      * @throws UnacquiredLockException
      */

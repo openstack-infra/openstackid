@@ -197,7 +197,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
 
             //check requested scope
             $scope = $request->getScope();
-            Log::debug(sprintf("scope %s", $scope));
+            $this->log_service->debug_msg(sprintf("scope %s", $scope));
             if (!$client->isScopeAllowed($scope)) {
                 throw new ScopeNotAllowedException(sprintf("scope %s", $scope));
             }
@@ -246,7 +246,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
 
             $authorization_response = $this->auth_service->getUserAuthorizationResponse();
 
-            Log::debug(sprintf("authorization_response %s", $authorization_response));
+            $this->log_service->debug_msg(sprintf("authorization_response %s", $authorization_response));
 
             if ($authorization_response == IAuthService::AuthorizationResponse_DenyOnce) {
                 if ($this->hadPromptConsent($request)) {
@@ -285,11 +285,12 @@ abstract class InteractiveGrantType extends AbstractGrantType
                 throw new InteractionRequiredException;
 
             $this->memento_service->serialize($request->getMessage()->createMemento());
-            Log::debug(sprintf("Doing consent ... authorization_response %s should_prompt_consent %s",$authorization_response, $should_prompt_consent));
+            $this->log_service->debug_msg(sprintf("Doing consent ... authorization_response %s should_prompt_consent %s",$authorization_response, $should_prompt_consent));
             return $this->auth_strategy->doConsent($request);
         }
         catch(\Exception $ex)
         {
+            $this->log_service->warning($ex);
             // clear save data ...
             $this->auth_service->clearUserAuthorizationResponse();
             $this->memento_service->forget();
@@ -376,7 +377,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
             else
             {
                 $user_id = $this->auth_service->unwrapUserId($login_hint);
-                $user    = $this->auth_service->getUserByExternaldId($user_id);
+                $user    = $this->auth_service->getUserByExternalId($user_id);
             }
         }
         else if(!empty($token_hint))
@@ -460,7 +461,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
 
             $sub     = $jwt->getClaimSet()->getSubject();
             $user_id = $this->auth_service->unwrapUserId($sub->getString());
-            $user    = $this->auth_service->getUserByExternaldId($user_id);
+            $user    = $this->auth_service->getUserByExternalId($user_id);
 
             $jti = $jwt->getClaimSet()->getJWTID();
             if(is_null($jti)) throw new InvalidLoginHint('invalid jti!');

@@ -923,13 +923,13 @@ final class OAuth2Protocol implements IOAuth2Protocol
         }
         catch (UriNotAllowedException $ex1)
         {
-            $this->log_service->error($ex1);
+            $this->log_service->warning($ex1);
             $this->checkpoint_service->trackException($ex1);
             throw $ex1;
         }
         catch(OAuth2BaseException $ex2)
         {
-            $this->log_service->error($ex2);
+            $this->log_service->warning($ex2);
             $this->checkpoint_service->trackException($ex2);
 
             $redirect_uri = $this->validateRedirectUri($this->last_request);
@@ -984,7 +984,7 @@ final class OAuth2Protocol implements IOAuth2Protocol
         }
         catch(OAuth2BaseException $ex1)
         {
-            $this->log_service->error($ex1);
+            $this->log_service->warning($ex1);
             $this->checkpoint_service->trackException($ex1);
 
             return new OAuth2DirectErrorResponse($ex1->getError(), $ex1->getMessage());;
@@ -1051,12 +1051,12 @@ final class OAuth2Protocol implements IOAuth2Protocol
         }
         catch(ExpiredAccessTokenException $ex1)
         {
-            $this->log_service->error($ex1);
+            $this->log_service->warning($ex1);
             return new OAuth2DirectErrorResponse($ex1->getError(), $ex1->getMessage());
         }
         catch(OAuth2BaseException $ex2)
         {
-            $this->log_service->error($ex2);
+            $this->log_service->warning($ex2);
             $this->checkpoint_service->trackException($ex2);
             return new OAuth2DirectErrorResponse($ex2->getError(), $ex2->getMessage());
         }
@@ -1361,7 +1361,7 @@ final class OAuth2Protocol implements IOAuth2Protocol
 
             $user_id = $this->auth_service->unwrapUserId(intval($user_id->getString()));
 
-            $user    = $this->auth_service->getUserByExternaldId($user_id);
+            $user    = $this->auth_service->getUserByExternalId($user_id);
 
             if(is_null($user)) throw new InvalidOAuth2Request('user not found!');
 
@@ -1380,14 +1380,14 @@ final class OAuth2Protocol implements IOAuth2Protocol
 
         catch(OAuth2BaseException $ex1)
         {
-            $this->log_service->error($ex1);
+            $this->log_service->warning($ex1);
             $this->checkpoint_service->trackException($ex1);
 
             return new OAuth2DirectErrorResponse($ex1->getError(), $ex1->getMessage());;
         }
         catch (UriNotAllowedException $ex2)
         {
-            $this->log_service->error($ex2);
+            $this->log_service->warning($ex2);
             $this->checkpoint_service->trackException($ex2);
 
             return new OAuth2DirectErrorResponse(OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient);

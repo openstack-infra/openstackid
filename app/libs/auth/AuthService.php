@@ -33,8 +33,6 @@ final class AuthService implements IAuthService
      * @var IUserService
      */
     private $user_service;
-
-
     /**
      * @var ICacheService
      */
@@ -113,6 +111,7 @@ final class AuthService implements IAuthService
         return IAuthService::AuthorizationResponse_None;
     }
 
+
     public function clearUserAuthorizationResponse()
     {
         if (Session::has("openid.authorization.response"))
@@ -163,7 +162,7 @@ final class AuthService implements IAuthService
 
     /**
      * @param int $id
-     * @return IOpenIdUser
+     * @return IOpenIdUsergetUserAuthorizationResponse
      */
     public function getUserById($id)
     {
@@ -202,7 +201,7 @@ final class AuthService implements IAuthService
      */
     public function unwrapUserId($user_id)
     {
-        $user = $this->getUserByExternaldId($user_id);
+        $user = $this->getUserByExternalId($user_id);
         if(!is_null($user))
             return $user_id;
 
@@ -250,7 +249,7 @@ final class AuthService implements IAuthService
      * @param int $external_id
      * @return IOpenIdUser
      */
-    public function getUserByExternaldId($external_id)
+    public function getUserByExternalId($external_id)
     {
         $member = Member::where('ID', '=', $external_id)->first();
         if (!is_null($member))
@@ -320,7 +319,7 @@ final class AuthService implements IAuthService
 
     /**
      * @param string $jti
-     * @return void
+     * @throws \Exception
      */
     public function reloadSession($jti)
     {

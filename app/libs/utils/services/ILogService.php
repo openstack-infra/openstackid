@@ -19,4 +19,6 @@ interface ILogService {
     public function error_msg($msg);
 
     public function info(Exception $exception);
+
+    public function debug_msg($msg);
 }

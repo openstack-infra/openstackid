@@ -285,6 +285,11 @@ class UserController extends OpenIdController
             $validator = Validator::make($data, $rules);
             if ($validator->passes())
             {
+                if (is_null($this->consent_strategy))
+                {
+                    return View::make("404");
+                }
+
                 return $this->consent_strategy->postConsent(Input::get("trust"));
             }
             return Redirect::action('UserController@getConsent')->withErrors($validator);

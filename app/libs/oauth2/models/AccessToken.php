@@ -15,8 +15,10 @@ class AccessToken extends Token {
 
     private $refresh_token;
 
+    const Length = 128;
+
     public function __construct(){
-        parent::__construct(72);
+        parent::__construct(self::Length);
     }
 
     public static function create(AuthorizationCode $auth_code,  $lifetime = 3600){

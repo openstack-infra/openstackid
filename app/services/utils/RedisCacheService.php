@@ -122,6 +122,7 @@ class RedisCacheService implements ICacheService {
     }
 
     public function addSingleValue($key, $value, $ttl = 0){
+        //http://redis.io/commands/setnx
         $res = $this->redis->setnx($key , $value);
         if($res && $ttl>0)
             $this->redis->expire($key,$ttl);

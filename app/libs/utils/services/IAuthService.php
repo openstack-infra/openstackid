@@ -94,7 +94,7 @@ interface IAuthService
      * @param int $external_id
      * @return IOpenIdUser
      */
-    public function getUserByExternaldId($external_id);
+    public function getUserByExternalId($external_id);
 
     /**
      * @return string

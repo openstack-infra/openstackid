@@ -224,12 +224,12 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
     }
 
-    /*public function testTokenNTimes($n = 10000){
+    public function testTokenNTimes($n = 10000){
 
         for($i=0; $i< $n ;$i++){
             $this->testToken($i === 0);
         }
-    }*/
+    }
 
     /** Get Token Test
      * @throws Exception
@@ -626,6 +626,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
             $params = array(
                 'refresh_token' => $refresh_token,
+                'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_RefreshToken,
                 'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_RefreshToken,
             );
 

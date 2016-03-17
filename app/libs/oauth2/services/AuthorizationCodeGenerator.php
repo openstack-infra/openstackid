@@ -16,9 +16,9 @@ namespace oauth2\services;
 
 use oauth2\OAuth2Protocol;
 use utils\model\Identifier;
-use utils\services\IdentifierGenerator;
 use utils\services\UniqueIdentifierGenerator;
 use Zend\Math\Rand;
+use Auth;
 
 /**
  * Class AuthorizationCodeGenerator
@@ -32,7 +32,11 @@ final class AuthorizationCodeGenerator extends UniqueIdentifierGenerator {
      */
     protected function _generate(Identifier $identifier)
     {
-        $identifier->setValue(Rand::getString($identifier->getLenght(), OAuth2Protocol::VsChar, true));
-        return $identifier;
+        $current_user = Auth::user();
+        $user_id      = !is_null($current_user) ? strval($current_user->getId()): '';
+        $now          = \DateTime::createFromFormat('U.u', microtime(true));
+        $salt         = $now->format("YmdHisu").$user_id;
+        $value        = Rand::getString($identifier->getLenght() - ( strlen($salt) + 1), OAuth2Protocol::VsChar, true);
+        return $identifier->setValue($value.'.'.$salt);
     }
 }

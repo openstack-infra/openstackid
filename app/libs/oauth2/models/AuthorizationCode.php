@@ -71,9 +71,11 @@ class AuthorizationCode extends Token
      */
     private $auth_time;
 
+    const Length = 128;
+
     public function __construct()
     {
-        parent::__construct(64);
+        parent::__construct(self::Length);
     }
 
     /**

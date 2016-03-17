@@ -29,8 +29,10 @@ use oauth2\OAuth2Protocol;
  */
 class RefreshToken extends Token {
 
+    const Length = 128;
+
     public function __construct(){
-        parent::__construct(46);
+        parent::__construct(self::Length);
     }
 
     public static function create(AccessToken $access_token, $lifetime = 0){

@@ -34,9 +34,8 @@ interface IPrincipalService
     public function save(IPrincipal $principal);
 
     /**
-     * @param int $user_id
-     * @param int $auth_time
-     * @param string $ops
+     * @param $user_id
+     * @param $auth_time
      * @return mixed
      */
     public function register($user_id, $auth_time);
