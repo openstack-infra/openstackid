@@ -28,7 +28,7 @@ class IndirectResponseQueryStringStrategy implements IHttpResponseStrategy
             return Response::view('404', array(), 404);
         }
         $return_to = (strpos($return_to, "?") == false) ? $return_to . "?" . $query_string : $return_to . "&" . $query_string;
-        Log::debug(sprintf("IndirectResponseQueryStringStrategy: return_to %s", $return_to));
+
         return Redirect::to($return_to)
             ->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
             ->header('Pragma','no-cache');

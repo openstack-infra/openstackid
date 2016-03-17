@@ -56,8 +56,8 @@ class OpenIdDHAssociationSessionRequest extends OpenIdAssociationSessionRequest
         $dh_gen             = $this->getDHGen();
         $dh_consumer_public = $this->getDHConsumerPublic();
 
-        if (!empty($dh_modulus) && !empty($dh_gen) && !empty($dh_consumer_public))
-            return true;
+        if (empty($dh_modulus) || empty($dh_gen) || empty($dh_consumer_public))
+            return false;
 
         if (!preg_match('/^\d+$/', $dh_modulus) || $dh_modulus  < 11) {
             return false;

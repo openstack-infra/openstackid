@@ -26,7 +26,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     public function __construct()
     {
         //DH openid values
-        $this->g = '2';
+        $this->g = '1';
         $this->private = '84009535308644335779530519631942543663544485189066558731295758689838227409144125540638118058012144795574289866857191302071807568041343083679600155026066530597177004145874642611724010339353151653679189142289183802715816551715563883085859667759854344959305451172754264893136955464706052993052626766687910313992';
         $this->public = '93500922748114712465435925279613158240858799671601934136793652488458659380414896628304484614933937038790006320444306607890979422427297815641372302594684991758687126229761033142429422299990743006497200988301031430937819368909849994628108111270360657896230712920491471398605159969300956278883668998797148755353';
         $this->mod = '155172898181473697471232257763715539915724801966915404479707795314057629378541917580651227423698188993727816152646631438561595825688188889951272158842675419950341258706556549803580104870537681476726513255747040765857479291291572334510643245094715007229621094194349783925984760375594985848253359305585439638443';
@@ -341,6 +341,29 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]));
     }
 
+    public function testAuthenticationSetupModeSessionAssociationDHSha256InvalidParams()
+    {
+
+        $b64_public = base64_encode(OpenIdCryptoHelper::convert($this->public, DiffieHellman::FORMAT_NUMBER,
+            DiffieHellman::FORMAT_BTWOC));
+
+        $this->assertTrue($b64_public === 'AIUmVPMheb/hEupD5m6veEEstnBVteyZPy+mlYX7ygxygLG/XuHFa8q4lZERJ9u1DNFOpXHRDq5RbjsaUYRDOtyrbkGbeKo5tPqjsynjXtoMAItxkxCU4jpQLvH85P+u7DeA0h3kKNHFa90ijZTIGSSDRF5wW9N+QPCUCt4G4xWZ');
+
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS) => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode) => OpenIdProtocol::AssociateMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_AssocType) => OpenIdProtocol::SignatureAlgorithmHMAC_SHA256,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_SessionType) => OpenIdProtocol::AssociationSessionTypeDHSHA256,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIdProtocol_DHGen) => base64_encode(OpenIdCryptoHelper::convert(1, DiffieHellman::FORMAT_NUMBER, DiffieHellman::FORMAT_BTWOC)),
+            OpenIdProtocol::param(OpenIdProtocol::OpenIdProtocol_DHModulus) => base64_encode(OpenIdCryptoHelper::convert(PHP_INT_MAX, DiffieHellman::FORMAT_NUMBER, DiffieHellman::FORMAT_BTWOC)),
+            OpenIdProtocol::param(OpenIdProtocol::OpenIdProtocol_DHConsumerPublic) => $b64_public,
+        );
+
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(400);
+
+    }
 
     public function testAuthenticationCheckImmediateAuthenticationPrivateSession()
     {
