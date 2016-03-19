@@ -59,11 +59,6 @@ class OpenIdMessage extends HttpMessage
         return false;
     }
 
-    public function toString()
-    {
-        $string = var_export($this->container, true);
-        return $string;
-    }
 
     protected function setMode($mode)
     {

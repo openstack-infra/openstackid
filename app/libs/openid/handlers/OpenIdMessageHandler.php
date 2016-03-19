@@ -62,8 +62,8 @@ abstract class OpenIdMessageHandler
         } else if (isset($this->successor) && !is_null($this->successor)) {
             return $this->successor->handleMessage($message);
         }
-        $this->log_service->warning_msg(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
-        $ex = new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::UnhandledMessage, $message->toString()));
+        $this->log_service->warning_msg(sprintf(OpenIdErrorMessages::UnhandledMessage, $message));
+        $ex = new InvalidOpenIdMessageException(sprintf(OpenIdErrorMessages::UnhandledMessage, $message));
         $this->checkpoint_service->trackException($ex);
         throw $ex;
     }

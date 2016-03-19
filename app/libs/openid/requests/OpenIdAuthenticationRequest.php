@@ -63,17 +63,21 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
      */
     public function isValid()
     {
-
-        $return_to = $this->getReturnTo();
-        $claimed_id = $this->getClaimedId();
-        $identity = $this->getIdentity();
-        $mode = $this->getMode();
-        $realm = $this->getRealm();
-        $valid_id = $this->isValidIdentifier($claimed_id, $identity);
-        $valid_realm = OpenIdUriHelper::checkRealm($realm, $return_to);
+        $return_to       = $this->getReturnTo();
+        $claimed_id      = $this->getClaimedId();
+        $identity        = $this->getIdentity();
+        $mode            = $this->getMode();
+        $realm           = $this->getRealm();
+        $valid_id        = $this->isValidIdentifier($claimed_id, $identity);
+        $valid_return_to = OpenIdUriHelper::checkReturnTo($return_to);
+        $valid_realm     = OpenIdUriHelper::checkRealm($realm, $return_to);
 
         if (empty($return_to)) {
             throw new InvalidOpenIdMessageException('return_to is empty.');
+        }
+
+        if (!$valid_return_to) {
+            throw new InvalidOpenIdMessageException(sprintf('invalid return_to %s', $return_to));
         }
 
         if (empty($realm)) {
@@ -111,9 +115,7 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
 
     public function getReturnTo()
     {
-        $return_to = $this->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo);
-
-        return (OpenIdUriHelper::checkReturnTo($return_to)) ? $return_to : "";
+        return  $this->getParam(OpenIdProtocol::OpenIDProtocol_ReturnTo);
     }
 
     public function getClaimedId()
