@@ -18,7 +18,6 @@ use Monolog\Logger;
 use Monolog\Handler\NativeMailerHandler;
 use Illuminate\Support\Facades\App;
 
-
 ClassLoader::addDirectories(array(
     app_path() . '/commands',
     app_path() . '/controllers',
@@ -91,7 +90,6 @@ if (Config::get('database.log', false)){
 |
 */
 
-
 App::error(function (Exception $exception, $code) {
     Log::error($exception);
     if(!App::runningInConsole()) {
@@ -103,20 +101,40 @@ App::error(function (Exception $exception, $code) {
     }
 });
 
-
 App::error(function (InvalidOpenIdMessageException $exception, $code) {
-    Log::error($exception);
+    Log::warning($exception);
     if(!App::runningInConsole()) {
         $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
         if ($checkpoint_service) {
             $checkpoint_service->trackException($exception);
         }
+        return Response::view('404', array(), 404);
+    }
+});
+
+App::error(function(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $exception, $code){
+    Log::warning($exception);
+    if(!App::runningInConsole()) {
+        return Response::view('404', array(), 404);
+    }
+});
+
+App::error(function(\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $exception, $code){
+    Log::warning($exception);
+    if(!App::runningInConsole()) {
+        return Response::view('404', array(), 404);
+    }
+});
+
+App::error(function(Illuminate\Session\TokenMismatchException $exception, $code){
+    Log::warning($exception);
+    if(!App::runningInConsole()) {
         return Response::view('404', array(), 404);
     }
 });
 
 App::error(function (InvalidOAuth2Request $exception, $code) {
-    Log::error($exception);
+    Log::warning($exception);
     if(!App::runningInConsole()) {
         $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
         if ($checkpoint_service) {
@@ -125,8 +143,6 @@ App::error(function (InvalidOAuth2Request $exception, $code) {
         return Response::view('404', array(), 404);
     }
 });
-
-
 
 /*
 |--------------------------------------------------------------------------

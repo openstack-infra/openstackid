@@ -365,6 +365,44 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
 
     }
 
+    public function testAuthenticationSetupModeSessionAssociationDHSha1InvalidParamsFromWWWSite()
+    {
+
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS) => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode) => OpenIdProtocol::AssociateMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_AssocType) => OpenIdProtocol::SignatureAlgorithmHMAC_SHA1,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_SessionType) => OpenIdProtocol::AssociationSessionTypeDHSHA1,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIdProtocol_DHGen) => 'AQ==',
+            OpenIdProtocol::param(OpenIdProtocol::OpenIdProtocol_DHModulus) => 'AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=',
+            OpenIdProtocol::param(OpenIdProtocol::OpenIdProtocol_DHConsumerPublic) => 'AQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQE=',
+        );
+
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(400);
+    }
+
+    public function testAuthenticationInvalidParamsFromWWWSite()
+    {
+
+        $params = array(
+            'openid_ns' => 'http://specs.openid.net/auth/2.0',
+            'openid_ns_sreg' => 'http://openid.net/extensions/sreg/1.1',
+            'openid_sreg_required' => 'email,fullname',
+            'openid_sreg_optional' => 'country,language',
+            'openid_realm' => '../index.html',
+            'openid_mode' => 'checkid_setup',
+            'openid_return_to' => 'badlogin.html?url=/OpenStackIdAuthenticator&BackURL=%2Fsummit%2Faustin-2016%2Fcall-for-speakers%2Fshow%2F8234',
+            'openid_identity' => 'http://specs.openid.net/auth/2.0/identifier_select',
+            'openid_claimed_id' => 'http://specs.openid.net/auth/2.0/identifier_select',
+        );
+
+        $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(400);
+    }
+
     public function testAuthenticationCheckImmediateAuthenticationPrivateSession()
     {
         //set login info
