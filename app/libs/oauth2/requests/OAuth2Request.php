@@ -54,10 +54,9 @@ abstract class OAuth2Request {
     /**
      * @return string
      */
-    public function toString()
+    public function __toString()
     {
-        $string = $this->message->toString();
-        return $string;
+        return $this->message->__toString();
     }
 
     /**

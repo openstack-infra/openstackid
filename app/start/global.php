@@ -14,10 +14,9 @@ use openid\exceptions\InvalidOpenIdMessageException;
 use utils\services\ServiceLocator;
 use utils\services\UtilsServiceCatalog;
 use oauth2\exceptions\InvalidOAuth2Request;
-use Monolog\Logger;
 use Monolog\Handler\NativeMailerHandler;
 use Illuminate\Support\Facades\App;
-
+use Illuminate\Support\Facades\Config;
 
 ClassLoader::addDirectories(array(
     app_path() . '/commands',
@@ -39,7 +38,7 @@ ClassLoader::addDirectories(array(
 
 $logFile = 'log-' . php_sapi_name() . '.txt';
 
-Log::useDailyFiles(storage_path() . '/logs/' . $logFile, $days = 0, $level = 'debug');
+Log::useDailyFiles(storage_path() . '/logs/' . $logFile, $days = 0, Config::get('server.FileLog_Level', 'warning'));
 
 //set email log
 $to          = Config::get('log.to_email');
@@ -48,7 +47,8 @@ $from        = Config::get('log.from_email');
 if(!empty($to) && !empty($from)){
     $subject     = 'openstackid error';
     $mono_log    = Log::getMonolog();
-    $handler = new NativeMailerHandler($to, $subject, $from, $level = Logger::ERROR);
+    $handler = new NativeMailerHandler($to, $subject, $from);
+    $handler->setLevel(Config::get('server.EmailLog_Level', 'error'));
     $mono_log->pushHandler($handler);
 }
 
@@ -91,7 +91,6 @@ if (Config::get('database.log', false)){
 |
 */
 
-
 App::error(function (Exception $exception, $code) {
     Log::error($exception);
     if(!App::runningInConsole()) {
@@ -103,20 +102,40 @@ App::error(function (Exception $exception, $code) {
     }
 });
 
-
 App::error(function (InvalidOpenIdMessageException $exception, $code) {
-    Log::error($exception);
+    Log::warning($exception);
     if(!App::runningInConsole()) {
         $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
         if ($checkpoint_service) {
             $checkpoint_service->trackException($exception);
         }
+        return Response::view('404', array(), 404);
+    }
+});
+
+App::error(function(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $exception, $code){
+    Log::warning($exception);
+    if(!App::runningInConsole()) {
+        return Response::view('404', array(), 404);
+    }
+});
+
+App::error(function(\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $exception, $code){
+    Log::warning($exception);
+    if(!App::runningInConsole()) {
+        return Response::view('404', array(), 404);
+    }
+});
+
+App::error(function(Illuminate\Session\TokenMismatchException $exception, $code){
+    Log::warning($exception);
+    if(!App::runningInConsole()) {
         return Response::view('404', array(), 404);
     }
 });
 
 App::error(function (InvalidOAuth2Request $exception, $code) {
-    Log::error($exception);
+    Log::warning($exception);
     if(!App::runningInConsole()) {
         $checkpoint_service = ServiceLocator::getInstance()->getService(UtilsServiceCatalog::CheckPointService);
         if ($checkpoint_service) {
@@ -125,8 +144,6 @@ App::error(function (InvalidOAuth2Request $exception, $code) {
         return Response::view('404', array(), 404);
     }
 });
-
-
 
 /*
 |--------------------------------------------------------------------------

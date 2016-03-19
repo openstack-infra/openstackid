@@ -54,4 +54,6 @@ return array(
     'OAuth2SecurityPolicy_MaxInvalidRedeemAuthCodeAttempts' => 10,
     'OAuth2SecurityPolicy_MaxInvalidClientCredentialsAttempts' => 5,
     'Banning_Enable' => true,
+    'FileLog_Level'  => 'warning',
+    'EmailLog_Level' => 'error',
 );

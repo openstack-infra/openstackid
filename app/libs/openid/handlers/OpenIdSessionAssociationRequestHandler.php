@@ -46,28 +46,28 @@ final class OpenIdSessionAssociationRequestHandler extends OpenIdMessageHandler
             $response = new OpenIdAssociationSessionUnsuccessfulResponse($inv_session_ex->getMessage());
             $this->log_service->warning($inv_session_ex);
             if(!is_null($this->current_request))
-                $this->log_service->warning_msg("current request: ".$this->current_request->toString());
+                $this->log_service->warning_msg("current request: ".$this->current_request);
             return $response;
         } catch (InvalidAssociationTypeException $inv_assoc_ex) {
             $this->checkpoint_service->trackException($inv_assoc_ex);
             $response = new OpenIdAssociationSessionUnsuccessfulResponse($inv_assoc_ex->getMessage());
             $this->log_service->warning($inv_assoc_ex);
             if(!is_null($this->current_request))
-                $this->log_service->warning_msg("current request: ".$this->current_request->toString());
+                $this->log_service->warning_msg("current request: ".$this->current_request);
             return $response;
         } catch (InvalidOpenIdMessageException $inv_msg_ex) {
             $response = new OpenIdDirectGenericErrorResponse($inv_msg_ex->getMessage());
             $this->checkpoint_service->trackException($inv_msg_ex);
             $this->log_service->warning($inv_msg_ex);
             if(!is_null($this->current_request))
-                $this->log_service->warning_msg("current request: ".$this->current_request->toString());
+                $this->log_service->warning_msg("current request: ".$this->current_request);
             return $response;
         } catch (Exception $ex) {
             $this->checkpoint_service->trackException($ex);
             $response = new OpenIdDirectGenericErrorResponse('Server Error');
             $this->log_service->error($ex);
             if(!is_null($this->current_request))
-                $this->log_service->error_msg("current request: ".$this->current_request->toString());
+                $this->log_service->warning_msg("current request: ".$this->current_request);
             return $response;
         }
     }
