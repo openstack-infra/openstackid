@@ -17,13 +17,14 @@ namespace services\oauth2;
 use AccessToken as DBAccessToken;
 use DB;
 use Event;
+use Session;
+use Crypt;
+use Log;
 use libs\oauth2\exceptions\ReplayAttackAuthCodeException;
 use libs\oauth2\exceptions\ReplayAttackRefreshTokenException;
 use oauth2\exceptions\RevokedAccessTokenException;
 use oauth2\exceptions\RevokedAccessTokenExceptionxtends;
 use oauth2\exceptions\RevokedRefreshTokenException;
-use Session;
-use Crypt;
 use jwa\cryptographic_algorithms\HashFunctionAlgorithm;
 use jwt\IBasicJWT;
 use jwt\impl\JWTClaimSet;
@@ -38,7 +39,6 @@ use oauth2\exceptions\InvalidClientCredentials;
 use oauth2\exceptions\InvalidGrantTypeException;
 use oauth2\exceptions\RecipientKeyNotFoundException;
 use oauth2\exceptions\ReplayAttackException;
-use oauth2\heuristics\ClientEncryptionKeyFinder;
 use oauth2\heuristics\EncryptionClientPublicKeyFinder;
 use oauth2\heuristics\SigningClientPublicKeyFinder;
 use oauth2\models\AccessToken;
@@ -449,6 +449,21 @@ final class TokenService implements ITokenService
 
             $access_token_db->save();
             //check if use refresh tokens...
+            Log::debug
+            (
+                sprintf
+                (
+                    'use_refresh_token: %s - app_type: %s - scopes: %s - auth_code_access_type: %s - prompt: %s - approval_prompt: %s',
+                    $client->use_refresh_token,
+                    $client->getApplicationType(),
+                    $auth_code->getScope(),
+                    $auth_code->getAccessType(),
+                    $auth_code->getPrompt(),
+                    $auth_code->getApprovalPrompt()
+
+                )
+            );
+
             if
             (
                 $client->use_refresh_token &&
@@ -468,11 +483,12 @@ final class TokenService implements ITokenService
                 (
                     !$auth_code->getHasPreviousUserConsent() ||
                      // google oauth2 protocol
-                     $auth_code->getApprovalPrompt() == OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Force ||
+                     strpos($auth_code->getApprovalPrompt(),OAuth2Protocol::OAuth2Protocol_Approval_Prompt_Force) !== false ||
                      // http://openid.net/specs/openid-connect-core-1_0.html#OfflineAccess
-                     $auth_code->getPrompt()         == OAuth2Protocol::OAuth2Protocol_Prompt_Consent
+                     strpos($auth_code->getPrompt(), OAuth2Protocol::OAuth2Protocol_Prompt_Consent) !== false
                 )
                 {
+                    Log::debug('creating refresh token ....');
                     $this_var->createRefreshToken($access_token);
                 }
             }
@@ -1401,14 +1417,13 @@ final class TokenService implements ITokenService
      * @param string $nonce
      * @param string $client_id
      * @param AccessToken|null $access_token
-     * @param AuthorizationCode $auth_code
+     * @param AuthorizationCode|null $auth_code
      * @return IBasicJWT
      * @throws AbsentClientException
+     * @throws AbsentCurrentUserException
+     * @throws ConfigurationException
      * @throws InvalidClientCredentials
-     * @throws RecipientKeyNotFoundException
      * @throws \jwt\exceptions\ClaimAlreadyExistsException
-     * @throws \oauth2\exceptions\InvalidClientType
-     * @throws \oauth2\exceptions\ServerKeyNotFoundException
      */
     public function createIdToken
     (
