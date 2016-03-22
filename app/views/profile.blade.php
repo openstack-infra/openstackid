@@ -45,8 +45,9 @@
             </div>
             @if (count($sites)>0)
             <div class="row">
-                <div id="trusted_sites" class="col-md-12 col-xs-12">
+                <div id="trusted_sites" class="col-md-12">
                     <legend><span class="glyphicon glyphicon-info-sign pointable" aria-hidden="true" title="Users can keep track of their trusted sites and manage them"></span>&nbsp;Trusted Sites</legend>
+                    <div class="table-responsive">
                     <table class="table table-hover table-condensed">
                         <thead>
                         <tr>
@@ -71,14 +72,17 @@
                         @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
             @endif
 
             @if (count($actions)>0)
             <div class="row">
-                <div id="actions" class="col-md-12 col-xs-12">
+                <div id="actions" class="col-md-12">
                     <legend><span class="glyphicon glyphicon-info-sign pointable" aria-hidden="true" title="Users actions"></span>&nbsp;User Actions</legend>
+                    <div class="table-responsive">
+
                     <table class="table table-hover table-condensed">
                         <thead>
                         <tr>
@@ -103,6 +107,7 @@
                         @endforeach
                         </tbody>
                     </table>
+                    </div>
                 </div>
             </div>
             @endif

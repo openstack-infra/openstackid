@@ -224,7 +224,7 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
     }
 
-    public function testTokenNTimes($n = 10000){
+    public function testTokenNTimes($n = 100){
 
         for($i=0; $i< $n ;$i++){
             $this->testToken($i === 0);

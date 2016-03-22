@@ -179,7 +179,9 @@ PPK;
           State varchar(64),
           Postcode varchar(64),
           Country varchar(2),
-          Gender varchar(32)
+          Gender varchar(32),
+          EmailVerified integer,
+          Active integer
       );
 SQL;
 
@@ -202,6 +204,8 @@ SQL;
                 'Postcode' => '1824',
                 'Country' => 'AR',
                 'Locale' => 'ESP',
+                'Active' => 1,
+                'EmailVerified' => 1,
             )
         );
 
@@ -222,6 +226,8 @@ SQL;
                 'Postcode' => '1824',
                 'Country' => 'AR',
                 'Locale' => 'ESP',
+                'Active' => 1,
+                'EmailVerified' => 1,
             )
         );
 
@@ -242,6 +248,8 @@ SQL;
                 'Postcode' => '1824',
                 'Country' => 'AR',
                 'Locale' => 'ESP',
+                'Active' => 1,
+                'EmailVerified' => 1,
             )
         );
 
@@ -262,6 +270,8 @@ SQL;
                 'Postcode' => '1824',
                 'Country' => 'AR',
                 'Locale' => 'ESP',
+                'Active' => 1,
+                'EmailVerified' => 1,
             )
         );
 
@@ -282,6 +292,8 @@ SQL;
                 'Postcode' => '1824',
                 'Country' => 'AR',
                 'Locale' => 'ESP',
+                'Active' => 1,
+                'EmailVerified' => 1,
             )
         );
 
@@ -302,6 +314,8 @@ SQL;
                 'Postcode' => '1824',
                 'Country' => 'AR',
                 'Locale' => 'ESP',
+                'Active' => 1,
+                'EmailVerified' => 1,
             )
         );
 
@@ -322,6 +336,8 @@ SQL;
                 'Postcode' => '1824',
                 'Country' => 'AR',
                 'Locale' => 'ESP',
+                'Active' => 1,
+                'EmailVerified' => 1,
             )
         );
 

@@ -642,7 +642,6 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
             'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
         );
 
-
         $response = $this->action("POST", "OAuth2ProviderController@token",
             $params,
             array(),
@@ -696,7 +695,151 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
         return $access_token;
     }
 
-    public function testGetResfreshTokenFromNativeAppNTimes($n=5)
+    public function testGetRefreshTokenWithPromptSetToConsentLogin(){
+
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+        $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
+        $use_enc = true;
+
+        $params = array(
+            'client_id' => $client_id,
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'response_type' => 'code',
+            'scope' => sprintf('%s profile email address %s', OAuth2Protocol::OpenIdConnect_Scope,
+                OAuth2Protocol::OfflineAccess_Scope),
+            OAuth2Protocol::OAuth2Protocol_LoginHint => 'sebastian@tipit.net',
+            OAuth2Protocol::OAuth2Protocol_Nonce => 'test_nonce',
+            OAuth2Protocol::OAuth2Protocol_Prompt => sprintf('%s %s',OAuth2Protocol::OAuth2Protocol_Prompt_Login, OAuth2Protocol::OAuth2Protocol_Prompt_Consent),
+            OAuth2Protocol::OAuth2Protocol_MaxAge => 3200
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $response = $this->call('GET', $url);
+
+        $this->assertResponseStatus(200);
+
+        // verify that login hint (email) is populated
+        $this->assertTrue(str_contains($response->getContent(), 'sebastian@tipit.net'));
+
+        // do login
+        $response = $this->call('POST', $url,
+            array
+            (
+                'username' => 'sebastian@tipit.net',
+                'password' => '1qaz2wsx',
+                '_token' => Session::token()
+            )
+        );
+
+        $this->assertResponseStatus(302);
+
+        $response = $this->action("GET", "OAuth2ProviderController@authorize",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $response = $this->action('GET', 'UserController@getConsent');
+
+        $this->assertResponseStatus(200);
+
+        $response = $this->action('POST', 'UserController@getConsent', array(
+            'trust' => 'AllowOnce',
+            '_token' => Session::token()
+        ));
+
+        $this->assertResponseStatus(302);
+
+        // get auth code
+
+        $response = $this->action("GET", "OAuth2ProviderController@authorize",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $comps = @parse_url($url);
+        $query = $comps['query'];
+        $output = array();
+        parse_str($query, $output);
+
+        $this->assertTrue(array_key_exists('code', $output));
+        $this->assertTrue(!empty($output['code']));
+
+        $params = array(
+            'code' => $output['code'],
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@token",
+            $params,
+            array(),
+            array(),
+            // Symfony interally prefixes headers with "HTTP", so
+            array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+
+        $this->assertResponseStatus(200);
+
+        $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
+
+        $content = $response->getContent();
+
+        $response = json_decode($content);
+        $access_token = $response->access_token;
+        $refresh_token = $response->refresh_token;
+        $id_token = $response->id_token;
+
+        $this->assertTrue(!empty($access_token));
+        $this->assertTrue(!empty($refresh_token));
+        $this->assertTrue(!empty($id_token));
+
+        $jwt = BasicJWTFactory::build($id_token);
+
+        if ($use_enc) {
+            $this->assertTrue($jwt instanceof IJWE);
+
+            $recipient_key = RSAJWKFactory::build
+            (
+                new RSAJWKPEMPrivateKeySpecification
+                (
+                    TestSeeder::$client_private_key_1,
+                    RSAJWKPEMPrivateKeySpecification::WithoutPassword,
+                    $jwt->getJOSEHeader()->getAlgorithm()->getString()
+                )
+            );
+
+            $recipient_key->setKeyUse(JSONWebKeyPublicKeyUseValues::Encryption)->setId('recipient_public_key');
+
+
+            $jwt->setRecipientKey($recipient_key);
+
+            $payload = $jwt->getPlainText();
+
+            $jwt = BasicJWTFactory::build($payload);
+
+            $this->assertTrue($jwt instanceof IJWS);
+        }
+
+    }
+
+    public function testGetRefreshTokenFromNativeAppNTimes($n=5)
     {
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.android.openstack.client';
         $client_secret = '11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhg11c/6Y5N7kOtGKhgfdfdfdf';

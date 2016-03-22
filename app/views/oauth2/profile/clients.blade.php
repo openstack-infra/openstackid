@@ -6,6 +6,7 @@
     @include('menu',array('is_oauth2_admin' => $is_oauth2_admin, 'is_openstackid_admin' => $is_openstackid_admin))
     <div class="row">
         <div id="clients" class="col-md-12">
+            <div class="table-responsive">
             <legend><span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true"
                           title="Users can keep track of their registered applications and manage them"></span>&nbsp;Registered
                 Applications
@@ -60,9 +61,9 @@
                     </tbody>
                 </table>
             @endif
+           </div>
         </div>
     </div>
-
     <div id="dialog-form-application" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

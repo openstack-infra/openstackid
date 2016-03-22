@@ -400,7 +400,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
 
         $response = $this->action("POST", "OpenIdProviderController@endpoint", $params);
 
-        $this->assertResponseStatus(400);
+        $this->assertResponseStatus(404);
     }
 
     public function testAuthenticationCheckImmediateAuthenticationPrivateSession()
