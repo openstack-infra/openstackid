@@ -35,12 +35,16 @@ class Member extends BaseModelEloquent
      */
     public function canLogin()
     {
+        return $this->isEmailVerified() && $this->isActive();
+    }
+
+    public function isActive(){
         $attr = $this->getAttributes();
         if(isset($attr['Active']))
         {
             return (bool)$attr['Active'];
         }
-        return true;
+        return false;
     }
 
     /**

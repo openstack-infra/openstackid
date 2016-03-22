@@ -149,6 +149,8 @@ class CustomAuthProvider implements UserProviderInterface
 
                 if(!$member->canLogin())
                 {
+                    if(!$member->isEmailVerified())
+                        throw new AuthenticationException(sprintf("member %s is not verified yet!", $email));
                     throw new AuthenticationException(sprintf("member %s does not exists!", $email));
                 }
 
@@ -159,7 +161,6 @@ class CustomAuthProvider implements UserProviderInterface
                     throw new AuthenticationInvalidPasswordAttemptException($member->ID,
                         sprintf("invalid login attempt for user %s ", $email));
                 }
-
 
                 $user = $user_repository->getByExternalId($member->ID);
 

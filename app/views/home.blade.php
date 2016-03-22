@@ -12,10 +12,20 @@
                 <h1>OpenStackId Identity Provider</h1>
                 <div class="panel">
                     <div class="panel-heading strong">Log in to OpenStack</div>
-                    <div style="text-align: center">
-                        <a href="{{ URL::action("UserController@getLogin")}}" class="btn btn-default btn-md active">Sign in to your account</a>
-                        <a href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}join/register"
-                           class="btn btn-default btn-md active">Register for an OpenStack ID</a>
+                    <div class="row" style="text-align: center;">
+                        <div class="col-md-12">
+                            <div class="row" style="padding-top: 5px;padding-bottom: 5px;">
+                                <div class="col-md-12">
+                                    <a href="{{ URL::action("UserController@getLogin")}}" class="btn btn-default btn-md active">Sign in to your account</a>
+                                </div>
+                            </div>
+                            <div class="row" style="padding-top: 5px;padding-bottom: 5px;">
+                                <div class="col-md-12">
+                                    <a href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}join/register"
+                                       class="btn btn-default btn-md active">Register for an OpenStack ID</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <p class="text-info margin-top-20">Once you're signed in, you can manage your trusted sites, change
                         your settings and more.</p>

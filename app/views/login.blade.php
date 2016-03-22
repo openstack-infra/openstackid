@@ -7,17 +7,15 @@
 @append
 @section('content')
 
-    <h4>Please use your OpenStack ID to log in</h4>
+    <h4 style="margin-left: 15px;">Please use your OpenStack ID to log in</h4>
     @if(isset($identity_select))
+        <legend style="margin-left: 15px;">
         @if(!$identity_select)
-            <legend>
-                Sign in to <b>{{$realm}}</b> using <b>{{$identity}}</b>
-            </legend>
+        Sign in to <b>{{$realm}}</b> using <b>{{$identity}}</b>
         @else
-            <legend>
-                Sign in to <b>{{$realm}}</b> using your openstackid
-            </legend>
+        Sign in to <b>{{$realm}}</b> using your OpenStackID
         @endif
+        </legend>
     @endif
 
     <div class="col-md-4" id="sidebar">
@@ -54,17 +52,26 @@
                     <a class="btn btn-primary" href="{{ URL::action('UserController@cancelLogin') }}">Cancel</a>
                 </div>
                 <div style="clear:both;padding-top:15px;" class="row">
-                    <div class="col-md-5">
+                    <div class="col-md-12">
                         <a title="forgot password"
                            href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}Security/lostpassword">Forgot
                             password?</a>
                     </div>
-                    <div class="col-md-7">
-                        <a title="register new account"
-                           href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}join/register">Register
-                            for an OpenStack ID</a>
-                    </div>
+
                 </div>
+            <div style="clear:both;padding-top:15px;" class="row">
+                <div class="col-md-12">
+                    <a title="register new account"
+                       href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}join/register">Register
+                        for an OpenStack ID</a>
+                </div>
+            </div>
+            <div style="clear:both;padding-top:15px;" class="row">
+                <div class="col-md-12">
+                    <a title="verify account"
+                       href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}members/verification/resend">Verify OpenStack ID</a>
+                </div>
+            </div>
             </fieldset>
             {{ Form::close() }}
         </div>

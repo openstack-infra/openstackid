@@ -19,11 +19,11 @@ use utils\services\IAuthService;
 use utils\services\IServerConfigurationService as IUtilsServerConfigurationService;
 use oauth2\services\IMementoOAuth2SerializerService;
 use oauth2\services\ISecurityContextService;
-
+use auth\exceptions\AuthenticationException;
 /**
  * Class UserController
  */
-class UserController extends OpenIdController
+final class UserController extends OpenIdController
 {
 
     /**
@@ -226,8 +226,10 @@ class UserController extends OpenIdController
                 {
                     return $this->login_strategy->postLogin();
                 }
+
                 //failed login attempt...
                 $user = $this->auth_service->getUserByUsername($username);
+
                 if ($user)
                 {
                     $login_attempts = $user->login_failed_attempt;
@@ -240,7 +242,7 @@ class UserController extends OpenIdController
                         'max_login_attempts_2_show_captcha' => $max_login_attempts_2_show_captcha,
                         'login_attempts'                    => $login_attempts,
                         'username'                          => $username,
-                        'error_message'                     => "We\'re sorry, your username or password does not match an existing record."
+                        'error_message'                     => "We are sorry, your username or password does not match an existing record."
                     )
                 );
             }
@@ -254,6 +256,10 @@ class UserController extends OpenIdController
                     'validator'                         => $validator
                 )
             );
+        }
+        catch(AuthenticationException $ex1){
+            Log::warning($ex1);
+            return Redirect::action('UserController@getLogin');
         }
         catch (Exception $ex)
         {

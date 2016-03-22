@@ -1,6 +1,15 @@
-<div class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid">
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+<nav class="navbar navbar-default navbar-static-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
             <ul id='main-menu' class="nav navbar-nav">
                 <li id="profile"><a href='{{ URL::action("UserController@getProfile") }}'>Settings</a></li>
                 @if( ServerConfigurationService::getConfigValue("OAuth2.Enable") == true)
@@ -44,6 +53,6 @@
                 @endif
                 <li><a href='{{ URL::action("UserController@logout") }}'>Logout</a></li>
             </ul>
-        </div>
+        </div><!--/.nav-collapse -->
     </div>
-</div>
+</nav>

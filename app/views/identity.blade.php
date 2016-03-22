@@ -31,9 +31,17 @@
                 @endif
         @endif
     @else
-        Welcome, {{{ $username }}}.
-        <a class="btn btn-default btn-sm active" href="{{ URL::action("UserController@getProfile") }}"">edit your profile</a>
-        <a class="btn btn-default btn-sm active" href="{{ URL::action("UserController@logout") }}"">logout</a>
+        <div class="row">
+            <div class="col-md-12">
+                Welcome, {{{ $username }}}.
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a class="btn btn-default btn-sm active" href="{{ URL::action('UserController@getProfile') }}">edit your profile</a>
+                <a class="btn btn-default btn-sm active" href="{{ URL::action('UserController@logout') }}">logout</a>
+            </div>
+        </div>
         @if( $show_fullname === 0 && $show_email===0 && $show_pic === 0)
         <p>
             This is your identity page. You are currently displaying no information on this page. You can display information such as your name, contact info and a photo.
