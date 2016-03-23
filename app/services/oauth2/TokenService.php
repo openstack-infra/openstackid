@@ -586,7 +586,6 @@ final class TokenService implements ITokenService
         return $access_token;
     }
 
-
     /**
      * @param RefreshToken $refresh_token
      * @param null $scope
@@ -760,16 +759,17 @@ final class TokenService implements ITokenService
         }
 
         $user_id = !is_null($access_token->user_id) ? $access_token->user_id : 0;
+        $client  = $access_token->client()->first();
 
         $this->cache_service->storeHash($access_token->value, array(
-                'user_id' => $user_id,
-                'client_id' => $access_token->client_id,
-                'scope' => $access_token->scope,
-                'auth_code' => $access_token->associated_authorization_code,
-                'issued' => $access_token->created_at,
-                'lifetime' => $access_token->lifetime,
-                'from_ip' => $access_token->from_ip,
-                'audience' => $access_token->audience,
+                'user_id'       => $user_id,
+                'client_id'     => $client->client_id,
+                'scope'         => $access_token->scope,
+                'auth_code'     => $access_token->associated_authorization_code,
+                'issued'        => $access_token->created_at,
+                'lifetime'      => $access_token->lifetime,
+                'from_ip'       => $access_token->from_ip,
+                'audience'      => $access_token->audience,
                 'refresh_token' => $refresh_token_value
             )
             , intval($access_token->lifetime));

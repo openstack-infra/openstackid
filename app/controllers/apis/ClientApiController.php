@@ -432,7 +432,8 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
                     if (is_null($token)) {
                         return $this->error404(array('error' => sprintf('access token %s does not exists!', $value)));
                     }
-                    if (intval($token->getClientId()) !== intval($client->id)) {
+                    Log::debug(sprintf('access token client id %s - client id %s ',$token->getClientId() , $client->client_id));
+                    if ($token->getClientId() !== $client->client_id) {
                         return $this->error412(array(
                             'error' => sprintf('access token %s does not belongs to client id !', $value, $id)
                         ));
@@ -445,7 +446,8 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
                     if (is_null($token)) {
                         return $this->error404(array('error' => sprintf('refresh token %s does not exists!', $value)));
                     }
-                    if (intval($token->getClientId()) !== intval($client->id)) {
+                    Log::debug(sprintf('refresh token client id %s - client id %s ',$token->getClientId() , $client->client_id));
+                    if ($token->getClientId() !== $client->client_id) {
                         return $this->error412(array(
                             'error' => sprintf('refresh token %s does not belongs to client id !', $value, $id)
                         ));
