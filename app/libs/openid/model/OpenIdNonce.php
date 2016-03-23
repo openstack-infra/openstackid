@@ -106,4 +106,12 @@ final class OpenIdNonce extends Identifier
 
         return $nonce->setValue($value);
     }
-} 
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return 'nonce';
+    }
+}

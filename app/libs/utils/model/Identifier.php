@@ -89,4 +89,9 @@ abstract class Identifier
         $this->value = $value;
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    abstract public function getType();
 }

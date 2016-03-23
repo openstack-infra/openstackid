@@ -15,6 +15,7 @@
 namespace utils\services;
 
 use utils\model\Identifier;
+use Zend\Crypt\Hash;
 
 /**
  * Class UniqueIdentifierGenerator
@@ -42,11 +43,9 @@ abstract class UniqueIdentifierGenerator implements IdentifierGenerator
      */
     public function generate(Identifier $identifier){
 
-        $reflect    = new \ReflectionClass($identifier);
-        $class_name = strtolower($reflect->getShortName());
         do
         {
-            $key = sprintf("%s.value.%s", $class_name, $this->_generate($identifier)->getValue());
+            $key = sprintf("%s.%s", $identifier->getType(), Hash::compute('sha256', $this->_generate($identifier)->getValue()));
         }
         while(!$this->cache_service->addSingleValue($key, $key));
         return $identifier;

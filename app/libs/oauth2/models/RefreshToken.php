@@ -70,4 +70,12 @@ class RefreshToken extends Token {
     {
         // TODO: Implement fromJSON() method.
     }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return 'refresh_token';
+    }
 }

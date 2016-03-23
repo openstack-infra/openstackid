@@ -95,4 +95,12 @@ class AccessToken extends Token {
     public function fromJSON($json){
 
     }
-} 
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return 'access_token';
+    }
+}

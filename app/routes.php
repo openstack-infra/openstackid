@@ -156,7 +156,7 @@ Route::group(array('prefix' => 'admin/api/v1', 'before' => 'ssl|auth'), function
 
     });
 
-    // resouce servers
+    // resource servers
     Route::group(array('prefix' => 'resource-servers', 'before' => 'oauth2.server.admin.json'), function () {
         Route::get('/{id}', "ApiResourceServerController@get");
         Route::get('/', "ApiResourceServerController@getByPage");

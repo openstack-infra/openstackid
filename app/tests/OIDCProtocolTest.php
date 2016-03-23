@@ -88,7 +88,7 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
 
     }
 
-    public function testLoginWithTralingSpace()
+    public function testLoginWithTrailingSpace()
     {
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
 
@@ -837,6 +837,120 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
             $this->assertTrue($jwt instanceof IJWS);
         }
 
+    }
+
+    public function testFlowNativeDisplay(){
+
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+        $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
+
+        $params = array(
+            'client_id' => $client_id,
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'response_type' => 'code',
+            'scope' => sprintf('%s profile email address %s', OAuth2Protocol::OpenIdConnect_Scope, OAuth2Protocol::OfflineAccess_Scope),
+            OAuth2Protocol::OAuth2Protocol_LoginHint => 'sebastian@tipit.net',
+            OAuth2Protocol::OAuth2Protocol_Nonce => 'test_nonce',
+            OAuth2Protocol::OAuth2Protocol_Prompt => sprintf('%s %s',OAuth2Protocol::OAuth2Protocol_Prompt_Login, OAuth2Protocol::OAuth2Protocol_Prompt_Consent),
+            OAuth2Protocol::OAuth2Protocol_MaxAge => 3200,
+            OAuth2Protocol::OAuth2Protocol_Display   => OAuth2Protocol::OAuth2Protocol_Display_Native
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@authorize",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $response = $this->call('GET', $response->getTargetUrl());
+
+        $this->assertResponseStatus(412);
+
+        $json_response = json_decode($response->getContent(),true);
+
+        // do login
+        $response = $this->call($json_response['method'], $json_response['url'],
+            array
+            (
+                'username' => 'sebastian@tipit.net',
+                'password' => '1qaz2wsx',
+                '_token' => $json_response['required_params_valid_values']["_token"]
+            )
+        );
+
+        $this->assertResponseStatus(302);
+
+        $response = $this->action("GET", "OAuth2ProviderController@authorize",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $response = $this->action('GET', 'UserController@getConsent');
+
+        $this->assertResponseStatus(412);
+
+        $json_response = json_decode($response->getContent(),true);
+
+        $response = $this->call($json_response['method'], $json_response['url'], array(
+            'trust' => 'AllowOnce',
+            '_token' =>  $json_response['required_params_valid_values']["_token"]
+        ));
+
+        $this->assertResponseStatus(302);
+
+        // get auth code
+
+        $response = $this->action("GET", "OAuth2ProviderController@authorize",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $comps = @parse_url($url);
+        $query = $comps['query'];
+        $output = array();
+        parse_str($query, $output);
+
+        $this->assertTrue(array_key_exists('code', $output));
+        $this->assertTrue(!empty($output['code']));
+
+        $params = array(
+            'code' => $output['code'],
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
+        );
+
+        $response = $this->action("POST", "OAuth2ProviderController@token",
+            $params,
+            array(),
+            array(),
+            // Symfony interally prefixes headers with "HTTP", so
+            array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+
+        $this->assertResponseStatus(200);
+
+        $this->assertEquals('application/json;charset=UTF-8', $response->headers->get('Content-Type'));
+
+        $content = $response->getContent();
+
+        $response = json_decode($content);
+        $access_token = $response->access_token;
+        $refresh_token = $response->refresh_token;
+        $id_token = $response->id_token;
+
+        $this->assertTrue(!empty($access_token));
+        $this->assertTrue(!empty($refresh_token));
+        $this->assertTrue(!empty($id_token));
     }
 
     public function testGetRefreshTokenFromNativeAppNTimes($n=5)
