@@ -4,6 +4,7 @@ namespace auth;
 use auth\exceptions\AuthenticationException;
 use auth\exceptions\AuthenticationInvalidPasswordAttemptException;
 use auth\exceptions\AuthenticationLockedUserLoginAttempt;
+use auth\exceptions\UnverifiedEmailMemberException;
 use Exception;
 use Illuminate\Auth\UserInterface;
 use Illuminate\Auth\UserProviderInterface;
@@ -150,7 +151,7 @@ class CustomAuthProvider implements UserProviderInterface
                 if(!$member->canLogin())
                 {
                     if(!$member->isEmailVerified())
-                        throw new AuthenticationException(sprintf("member %s is not verified yet!", $email));
+                        throw new UnverifiedEmailMemberException(sprintf("member %s is not verified yet!", $email));
                     throw new AuthenticationException(sprintf("member %s does not exists!", $email));
                 }
 
@@ -191,6 +192,11 @@ class CustomAuthProvider implements UserProviderInterface
                 }
 
 
+            }
+            catch(UnverifiedEmailMemberException $ex1){
+                $checkpoint_service->trackException($ex1);
+                $log_service->warning($ex1);
+                throw $ex1;
             }
             catch (Exception $ex)
             {

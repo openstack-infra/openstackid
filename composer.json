@@ -24,7 +24,8 @@
     "way/laravel-test-helpers": "dev-master",
     "guzzlehttp/guzzle": "3.8.1",
     "smarcet/jose4php": "dev-master",
-    "glenscott/url-normalizer" : "1.4.0"
+    "glenscott/url-normalizer" : "1.4.0",
+    "jenssegers/agent": "^2.3"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "2.*",

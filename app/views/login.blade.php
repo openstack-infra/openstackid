@@ -53,23 +53,18 @@
                 </div>
                 <div style="clear:both;padding-top:15px;" class="row">
                     <div class="col-md-12">
-                        <a title="forgot password"
-                           href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}Security/lostpassword">Forgot
-                            password?</a>
+                        <a title="forgot password" target="_blank" href="{{ ExternalUrlService::getForgotPasswordUrl() }}">Forgot password?</a>
                     </div>
 
                 </div>
             <div style="clear:both;padding-top:15px;" class="row">
                 <div class="col-md-12">
-                    <a title="register new account"
-                       href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}join/register">Register
-                        for an OpenStack ID</a>
+                    <a title="register new account" target="_blank" href="{{ ExternalUrlService::getCreateAccountUrl() }}">Register for an OpenStack ID</a>
                 </div>
             </div>
             <div style="clear:both;padding-top:15px;" class="row">
                 <div class="col-md-12">
-                    <a title="verify account"
-                       href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}members/verification/resend">Verify OpenStack ID</a>
+                    <a title="verify account" target="_blank" href="{{ ExternalUrlService::getVerifyAccountUrl() }}">Verify OpenStack ID</a>
                 </div>
             </div>
             </fieldset>

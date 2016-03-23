@@ -20,6 +20,8 @@ use utils\services\IServerConfigurationService as IUtilsServerConfigurationServi
 use oauth2\services\IMementoOAuth2SerializerService;
 use oauth2\services\ISecurityContextService;
 use auth\exceptions\AuthenticationException;
+use auth\exceptions\UnverifiedEmailMemberException;
+
 /**
  * Class UserController
  */
@@ -191,9 +193,12 @@ final class UserController extends OpenIdController
 
     public function postLogin()
     {
+        $max_login_attempts_2_show_captcha = $this->server_configuration_service->getConfigValue("MaxFailed.LoginAttempts.2ShowCaptcha");
+        $login_attempts                    = 0;
+        $username                          = '';
         try
         {
-            $max_login_attempts_2_show_captcha = $this->server_configuration_service->getConfigValue("MaxFailed.LoginAttempts.2ShowCaptcha");
+
             $data = Input::all();
 
             if(isset($data['username']))
@@ -257,8 +262,22 @@ final class UserController extends OpenIdController
                 )
             );
         }
-        catch(AuthenticationException $ex1){
+        catch(UnverifiedEmailMemberException $ex1)
+        {
             Log::warning($ex1);
+            return $this->login_strategy->errorLogin
+            (
+                array
+                (
+                    'max_login_attempts_2_show_captcha' => $max_login_attempts_2_show_captcha,
+                    'login_attempts'                    => $login_attempts,
+                    'username'                          => $username,
+                    'error_message'                     => $ex1->getMessage()
+                )
+            );
+        }
+        catch(AuthenticationException $ex2){
+            Log::warning($ex2);
             return Redirect::action('UserController@getLogin');
         }
         catch (Exception $ex)

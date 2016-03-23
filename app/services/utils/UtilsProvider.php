@@ -28,10 +28,15 @@ class UtilsProvider extends ServiceProvider {
             return new ServerConfigurationService(App::make(UtilsServiceCatalog::CacheService),App::make(UtilsServiceCatalog::TransactionService));
         });
 
+        $this->app['externalurlservice'] = App::share(function ($app) {
+            return new ExternalUrlService();
+        });
+
         // Shortcut so developers don't need to add an Alias in app/config/app.php
         App::booting(function () {
             $loader = AliasLoader::getInstance();
             $loader->alias('ServerConfigurationService', 'services\\facades\\ServerConfigurationService');
+            $loader->alias('ExternalUrlService', 'services\\facades\\ExternalUrlService');
         });
 
         App::singleton(UtilsServiceCatalog::LogService, 'services\\utils\\LogService');

@@ -21,8 +21,7 @@
                             </div>
                             <div class="row" style="padding-top: 5px;padding-bottom: 5px;">
                                 <div class="col-md-12">
-                                    <a href="{{ ServerConfigurationService::getConfigValue("Assets.Url") }}join/register"
-                                       class="btn btn-default btn-md active">Register for an OpenStack ID</a>
+                                    <a href="{{ ExternalUrlService::getCreateAccountUrl() }}" class="btn btn-default btn-md active">Register for an OpenStack ID</a>
                                 </div>
                             </div>
                         </div>
