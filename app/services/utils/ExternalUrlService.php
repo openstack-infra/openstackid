@@ -15,7 +15,7 @@
 namespace services\utils;
 
 use Jenssegers\Agent\Agent;
-use services\facades\ServerConfigurationService;
+use services\facades\ServerConfigurationService as ConfigFacade;
 
 
 /**
@@ -27,17 +27,16 @@ final class ExternalUrlService
     public function getCreateAccountUrl(){
         $agent = new Agent();
         $path  = $agent->isMobile() ? 'join/register/mobile/community' : 'join/register';
-        $url   = sprintf("%s%s",ServerConfigurationService::getConfigValue("Assets.Url"),$path);
-        return $url;
+        return sprintf("%s%s",ConfigFacade::getConfigValue("Assets.Url"),$path);
     }
 
     public function getVerifyAccountUrl(){
-        $url = ServerConfigurationService::getConfigValue("Assets.Url").'members/verification/resend';
-        return $url;
+        $path  = 'members/verification/resend';
+        return sprintf("%s%s",ConfigFacade::getConfigValue("Assets.Url"),$path);
     }
 
     public function getForgotPasswordUrl(){
-        $url = ServerConfigurationService::getConfigValue("Assets.Url").'Security/lostpassword';
-        return $url;
+        $path  = 'Security/lostpassword';
+        return sprintf("%s%s",ConfigFacade::getConfigValue("Assets.Url"),$path);
     }
 }
