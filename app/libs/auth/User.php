@@ -5,11 +5,11 @@ namespace auth;
 use Eloquent;
 use Illuminate\Auth\UserInterface;
 use Member;
-use MemberPhoto;
 use oauth2\models\IApiScope;
 use oauth2\models\IApiScopeGroup;
 use oauth2\models\IOAuth2User;
 use openid\model\IOpenIdUser;
+use utils\exceptions\EntityNotFoundException;
 use utils\model\BaseModelEloquent;
 use utils\model\IEntity;
 
@@ -71,7 +71,7 @@ class User extends BaseModelEloquent implements UserInterface, IOpenIdUser, IOAu
         if (is_null($this->member)) {
             $this->member = Member::where('ID', '=', $this->external_identifier)->first();
         }
-
+        if (is_null($this->member)) throw new EntityNotFoundException(sprintf('member id %s',$this->external_identifier));
         return $this->member;
     }
 

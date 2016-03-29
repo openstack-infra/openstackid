@@ -41,7 +41,9 @@ final class NonceUniqueIdentifierGenerator extends UniqueIdentifierGenerator {
      protected function _generate(Identifier $identifier){
 
          $salt      = Rand::getString(self::NonceSaltLength, self::NoncePopulation, true);
-         $raw_nonce = gmdate('Y-m-d\TH:i:s\Z') . $salt;
+         $date_part = false;
+         do{ $date_part = gmdate('Y-m-d\TH:i:s\Z'); } while($date_part === false);
+         $raw_nonce = $date_part. $salt;
          $identifier->setValue($raw_nonce);
          return $identifier;
      }
