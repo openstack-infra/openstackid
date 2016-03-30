@@ -248,7 +248,7 @@ class ClientService implements IClientService
         $this_var          = $this;
         $client_repository = $this->client_repository;
         $user_repository   = $this->user_repository;
-        $editing_user     = $this->auth_service->getCurrentUser();
+        $editing_user      = $this->auth_service->getCurrentUser();
 
         return $this->tx_service->transaction(function () use ($id, $editing_user, $params, $client_repository, $user_repository, &$this_var) {
 
@@ -257,7 +257,12 @@ class ClientService implements IClientService
             if (is_null($client)) {
                 throw new AbsentClientException(sprintf('client id %s does not exists.', $id));
             }
-
+            $app_name   = isset($params['app_name']) ? trim($params['app_name']) : null;
+            if(!empty($app_name)) {
+                $old_client = $client_repository->getByApplicationName($app_name);
+                if(!is_null($old_client) && $old_client->id !== $client->id)
+                    throw new \ValidationException('there is already another application with that name, please choose another one.');
+            }
             $current_app_type = $client->getApplicationType();
             if($current_app_type !== $params['application_type'])
             {
@@ -407,7 +412,7 @@ class ClientService implements IClientService
                                 $params[$param] = $normalized_uris;
                             }
                         }
-                        $client->{$param} = $params[$param];
+                        $client->{$param} = trim($params[$param]);
                     }
                 }
 

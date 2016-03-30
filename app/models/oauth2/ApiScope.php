@@ -10,7 +10,7 @@ class ApiScope extends BaseModelEloquent implements IApiScope
 {
 
     protected $table    = 'oauth2_api_scope';
-    protected $hidden   = array ('id', 'active', 'default', 'system', 'created_at', 'updated_at', 'api_id', 'assigned_by_groups', 'pivot');
+    protected $hidden   = array ('created_at', 'updated_at', 'pivot');
     protected $fillable = array('name' ,'short_description', 'description','active','default','system', 'api_id', 'assigned_by_groups');
 
     public function getActiveAttribute(){

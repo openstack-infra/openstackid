@@ -57,7 +57,7 @@
     <span aria-hidden="true" class="glyphicon glyphicon-info-sign pointable"
           title="OAuth 2.0 allows users to share specific data with you (for example, contact lists) while keeping their usernames, passwords, and other information private.">
 
-    </span>&nbsp;{{$client->getFriendlyApplicationType()}} - Client {{ $client->app_name }}
+    </span>&nbsp;{{$client->getFriendlyApplicationType()}} - Client # {{ $client->id }}
 </legend>
 <div class="row">
     <div style="padding-left:15px" class="col-md-2 clear-padding"><strong>Created By:&nbsp;</strong></div><div class="col-md-10 clear-padding">{{ $client->getOwnerNice() }}</div>

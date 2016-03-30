@@ -6,15 +6,15 @@ function loadScopes(){
         timeout:60000,
         success: function (data,textStatus,jqXHR) {
             var scopes = data.page;
-            if(scopes.length>0){
+            if(scopes.length > 0){
                 $('#info-scopes').hide();
                 $('#table-scopes').show();
                 var template = $('<tbody><tr>' +
-                    '<td class="name"></td>' +
-                    '<td><input type="checkbox" class="scope-active-checkbox"></td>' +
-                    '<td class="default"><input type="checkbox" class="scope-default-checkbox"></td>' +
-                    '<td class="system"><input type="checkbox" class="scope-system-checkbox"></td>' +
-                    '<td>&nbsp;' +
+                    '<td width="70%" class="name"></td>' +
+                    '<td width="5%"><input type="checkbox" class="scope-active-checkbox"></td>' +
+                    '<td width="5%" class="default"><input type="checkbox" class="scope-default-checkbox"></td>' +
+                    '<td width="5%" class="system"><input type="checkbox" class="scope-system-checkbox"></td>' +
+                    '<td width="15%">&nbsp;' +
                     '<a class="btn btn btn-default active edit-scope" title="Edits a Registered API Scope">Edit</a>&nbsp;' +
                     '<a class="btn btn-default btn-delete active delete-scope" title="Deletes a Registered API Scope">Delete</a>' +
                     '</td></tr></tbody>');
@@ -92,11 +92,11 @@ function loadEndpoints(){
                 $('#info-endpoints').hide();
                 $('#table-endpoints').show();
                 var template = $('<tbody><tr>' +
-                    '<td class="name"></td>' +
-                    '<td><input type="checkbox" class="endpoint-active-checkbox"></td>' +
-                    '<td class="route"></td>' +
-                    '<td class="method"></td>' +
-                    '<td>&nbsp;' +
+                    '<td width="30%" class="name"></td>' +
+                    '<td width="5%"><input type="checkbox" class="endpoint-active-checkbox"></td>' +
+                    '<td width="45%" class="route"></td>' +
+                    '<td width="5%" class="method"></td>' +
+                    '<td width="15%">&nbsp;' +
                     '<a class="btn btn-default active edit-endpoint" title="Edits a Registered API Endpoint">Edit</a>&nbsp;' +
                     '<a class="btn btn-default btn-delete active  delete-endpoint" title="Deletes a Registered API Endpoint">Delete</a>' +
                     '</td></tr></tbody>');

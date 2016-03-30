@@ -166,11 +166,12 @@ jQuery(document).ready(function($){
 
     var validator = form.validate({
         rules: {
+            app_name : {required: true, free_text:true, rangelength: [1, 255]},
+            app_description : {required: true, free_text:true,rangelength: [1, 512]},
             website: {url: true},
             logo_uri: {url: true},
             tos_uri: {url: true},
             policy_uri: {url: true},
-            app_description : {required: true, free_text:true,rangelength: [1, 512]},
         }
     });
 

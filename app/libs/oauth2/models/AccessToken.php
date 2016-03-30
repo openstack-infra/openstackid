@@ -25,6 +25,7 @@ class AccessToken extends Token {
         $instance = new self();
         $instance->user_id      = $auth_code->getUserId();
         $instance->scope        = $auth_code->getScope();
+        // client id (oauth2) not client identifier
         $instance->client_id    = $auth_code->getClientId();
         $instance->auth_code    = $auth_code->getValue();
         $instance->audience     = $auth_code->getAudience();

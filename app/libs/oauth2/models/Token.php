@@ -19,6 +19,10 @@ abstract class Token extends Identifier
     const DefaultByteLength = 32;
 
     protected $issued;
+    /**
+     * oauth2 client id
+     * @var string
+     */
     protected $client_id;
     protected $len;
     protected $scope;
@@ -46,6 +50,10 @@ abstract class Token extends Identifier
         return $this->scope;
     }
 
+    /**
+     * oauth2 client id
+     * @return string
+     */
     public function getClientId()
     {
         return $this->client_id;

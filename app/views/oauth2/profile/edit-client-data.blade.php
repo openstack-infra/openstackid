@@ -1,6 +1,7 @@
 <div class="row">
 
     <div class="col-md-12">
+
         <h4>Client Credentials&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true"
                                           title=""></span></h4>
         <hr/>
@@ -75,12 +76,20 @@
         <div class="row">
             <div class="col-md-12">
                 <form id="form-application-main-data" name="form-application-main-data">
-
+                     <div class="form-group">
+                        <label class="control-label" for="app_name">Application Name&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="Choose which users would be administrator of this application"></span></label>
+                        <input class="form-control"  type="text" name="app_name" id="app_name" value="{{ $client->app_name }}" />
+                    </div>
+                    <div class="form-group">
+                        <label for="app_description">Application Description&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true"
+                                                                                        title=""></span></label>
+                        <textarea class="form-control" style="resize: none;" rows="4" cols="50" name="app_description"
+                                  id="app_description">{{$client->app_description}}</textarea>
+                    </div>
                     <div class="form-group">
                         <label class="control-label" for="admin_users">Admin Users&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true" title="Choose which users would be administrator of this application"></span></label>
                         <input type="text" class="form-control" name="admin_users" id="admin_users" @if (!$client->isOwner(Auth::user()))disabled @endif>
                     </div>
-
                     <div class="form-group">
                         <label for="website">Application Web Site Url (optional)&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true"
                                                                                             title="URL of the home page of the Client"></span></label>
@@ -104,12 +113,6 @@
                                                                                              title="URL that the Relying Party Client provides to the End-User to read about the how the profile data will be used"></span></label>
                         <input class="form-control" type="text" name="policy_uri" id="policy_uri"
                                value="{{$client->policy_uri}}">
-                    </div>
-                    <div class="form-group">
-                        <label for="app_description">Application Description&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true"
-                                                                                        title=""></span></label>
-                        <textarea class="form-control" style="resize: none;" rows="4" cols="50" name="app_description"
-                                  id="app_description">{{$client->app_description}}</textarea>
                     </div>
                     <div class="form-group">
                         <label for="contacts">Contact Emails (optional)&nbsp;<span class="glyphicon glyphicon-info-sign accordion-toggle" aria-hidden="true"

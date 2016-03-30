@@ -104,11 +104,14 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
 
     /**
      * @param OAuth2Request $request
-     * @return mixed|OAuth2AccessTokenValidationResponse|void
-     * @throws \oauth2\exceptions\InvalidOAuth2Request
-     * @throws \oauth2\exceptions\LockedClientException
-     * @throws \oauth2\exceptions\InvalidApplicationType
-     * @throws \oauth2\exceptions\BearerTokenDisclosureAttemptException
+     * @return OAuth2AccessTokenValidationResponse
+     * @throws BearerTokenDisclosureAttemptException
+     * @throws ExpiredAccessTokenException
+     * @throws InvalidApplicationType
+     * @throws InvalidOAuth2Request
+     * @throws LockedClientException
+     * @throws \oauth2\exceptions\InvalidClientCredentials
+     * @throws \oauth2\exceptions\InvalidClientException
      */
     public function completeFlow(OAuth2Request $request)
     {
@@ -200,6 +203,7 @@ class ValidateBearerTokenGrantType extends AbstractGrantType
                     );
                 }
             }
+            $this->log_service->debug_msg(sprintf("access token client id %s", $access_token->getClientId()));
 
             $issued_client = $this->client_service->getClientById($access_token->getClientId());
 

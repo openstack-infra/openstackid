@@ -70,4 +70,13 @@ final class EloquentClientRepository implements IClientRepository {
     {
         $client->delete();
     }
+
+    /**
+     * @param string $app_name
+     * @return IClient
+     */
+    public function getByApplicationName($app_name)
+    {
+        return $this->client->where('app_name', '=', trim($app_name))->first();
+    }
 }

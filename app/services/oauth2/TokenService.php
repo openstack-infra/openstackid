@@ -425,6 +425,7 @@ final class TokenService implements ITokenService
 
             $value        = $access_token->getValue();
             $hashed_value = Hash::compute('sha256', $value);
+            //oauth2 client id
             $client_id    = $access_token->getClientId();
             $user_id      = $access_token->getUserId();
             $client       = $client_service->getClientById($client_id);
@@ -728,14 +729,14 @@ final class TokenService implements ITokenService
         $user_id = !is_null($access_token->getUserId()) ? $access_token->getUserId() : 0;
 
         $this->cache_service->storeHash($hashed_value, array(
-            'user_id' => $user_id,
-            'client_id' => $access_token->getClientId(),
-            'scope' => $access_token->getScope(),
-            'auth_code' => $auth_code,
-            'issued' => $access_token->getIssued(),
-            'lifetime' => $access_token->getLifetime(),
-            'audience' => $access_token->getAudience(),
-            'from_ip' => IPHelper::getUserIp(),
+            'user_id'       => $user_id,
+            'client_id'     => $access_token->getClientId(),
+            'scope'         => $access_token->getScope(),
+            'auth_code'     => $auth_code,
+            'issued'        => $access_token->getIssued(),
+            'lifetime'      => $access_token->getLifetime(),
+            'audience'      => $access_token->getAudience(),
+            'from_ip'       => IPHelper::getUserIp(),
             'refresh_token' => $refresh_token_value
         ), intval($access_token->getLifetime()));
     }

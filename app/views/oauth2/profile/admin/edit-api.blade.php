@@ -72,29 +72,29 @@
                     <tbody id="body-scopes">
                     @foreach($api->scopes()->get() as $scope)
                     <tr>
-                        <td>{{ $scope->name}}</td>
-                        <td>
+                        <td width="70%">{{ $scope->name}}</td>
+                        <td width="5%">
                             <input type="checkbox" data-scope-id="{{$scope->id}}" class="scope-active-checkbox" id="scope-active_{{$scope->id}}"
                             @if ( $scope->active)
                             checked
                             @endif
                             value="{{$scope->id}}"/>
                         </td>
-                        <td>
+                        <td width="5%">
                             <input type="checkbox" data-scope-id="{{$scope->id}}" class="scope-default-checkbox" id="scope-default_{{$scope->id}}"
                             @if ( $scope->default)
                             checked
                             @endif
                             value="{{$scope->id}}"/>
                         </td>
-                        <td>
+                        <td width="5%">
                             <input type="checkbox" data-scope-id="{{$scope->id}}" class="scope-system-checkbox" id="scope-system_{{$scope->id}}"
                             @if ( $scope->system)
                             checked
                             @endif
                             value="{{$scope->id}}"/>
                         </td>
-                        <td>
+                        <td width="15%">
                             &nbsp;
                             {{ HTML::link(URL::action("AdminController@editScope",array("id"=>$scope->id)),'Edit',array('class'=>'btn btn-default active edit-scope','title'=>'Edits a Registered API Scope')) }}
                             {{ HTML::link(URL::action("ApiScopeController@delete",array("id"=>$scope->id)),'Delete',array('class'=>'btn btn-default btn-delete active delete-scope','title'=>'Deletes a Registered API Scope'))}}
@@ -147,17 +147,17 @@
                     <tbody id="body-endpoints">
                     @foreach($api->endpoints()->get() as $endpoint)
                     <tr>
-                        <td>{{ $endpoint->name }}</td>
-                        <td>
+                        <td width="30%">{{ $endpoint->name }}</td>
+                        <td width="5%">
                             <input type="checkbox" data-endpoint-id="{{$endpoint->id}}" class="endpoint-active-checkbox" id="endpoint-active_{{$endpoint->id}}"
                             @if ( $endpoint->active)
                             checked
                             @endif
                             value="{{$endpoint->id}}"/>
                         </td>
-                        <td>{{$endpoint->route}}</td>
-                        <td>{{$endpoint->http_method}}</td>
-                        <td>
+                        <td width="45%">{{$endpoint->route}}</td>
+                        <td width="5%">{{$endpoint->http_method}}</td>
+                        <td width="15%">
                             &nbsp;
                             {{ HTML::link(URL::action("AdminController@editEndpoint",array("id"=>$endpoint->id)),'Edit',array('class'=>'btn btn-default active edit-endpoint','title'=>'Edits a Registered API Endpoint')) }}
                             {{ HTML::link(URL::action("ApiEndpointController@delete",array("id"=>$endpoint->id)),'Delete',array('class'=>'btn btn-default btn-delete active delete-endpoint','title'=>'Deletes a Registered API Endpoint'))}}

@@ -40,4 +40,10 @@ interface IClientRepository
      * @return void
      */
     public function delete(IClient $client);
+
+    /**
+     * @param string $app_name
+     * @return IClient
+     */
+    public function getByApplicationName($app_name);
 }
