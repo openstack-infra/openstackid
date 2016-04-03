@@ -53,12 +53,12 @@ class DisplayResponseUserAgentStrategy implements IDisplayResponseStrategy
             ->with('max_login_attempts_2_show_captcha', $data['max_login_attempts_2_show_captcha'])
             ->with('login_attempts', $data['login_attempts']);
 
-        if(isset($params['username']))
-            $response= $response->with('username', $params['username']);
-        if(isset($params['error_message']))
-            $response = $response->with('flash_notice', $params['error_message']);
-        if(isset($params['validator']))
-            $response = $response->withErrors($params['validator']);
+        if(isset($data['username']))
+            $response= $response->with('username', $data['username']);
+        if(isset($data['error_message']))
+            $response = $response->with('flash_notice', $data['error_message']);
+        if(isset($data['validator']))
+            $response = $response->withErrors($data['validator']);
 
         return $response;
     }

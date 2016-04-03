@@ -199,3 +199,8 @@ textarea {
 {
     width: auto !important;
 }
+
+.error-message
+{
+    color:#c40022;
+}
