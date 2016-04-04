@@ -22,13 +22,20 @@
                 <div class="form-group">
                     {{ Form::email('username',Session::has('username')? Session::get('username'):null, array
                     (
-                        'placeholder' => 'Username',
-                        'class'       =>'form-control',
-                        'required'    => 'true'
+                        'placeholder'  => 'Username',
+                        'class'        =>'form-control',
+                        'required'     => 'true',
+                        'autocomplete' => 'off'
                     )) }}
                 </div>
                 <div class="form-group">
-                    {{ Form::password('password', array('placeholder' => 'Password', 'class' => 'form-control', 'required'    => 'true')) }}
+                    {{ Form::password('password', array
+                    (
+                        'placeholder'  => 'Password',
+                        'class'        => 'form-control',
+                        'required'     => 'true',
+                        'autocomplete' => 'off'
+                    )) }}
                 </div>
                 <div class="form-group">
                     @if(Session::has('flash_notice'))

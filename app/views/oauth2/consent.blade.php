@@ -19,7 +19,7 @@
         <div class="col-md-6 col-md-offset-3">
             <div class="row">
                 <div class="col-md-12 col-xs-12">
-                    <h2> <a target='_blank' href="{{$website}}">{{$app_name}}</a>&nbsp; <span class="glyphicon glyphicon-info-sign pointable info" aria-hidden="true" data-content="Developer Email: <a href='mailto:{{$dev_info_email}}'>{{$dev_info_email}}</a>.<br> Clicking 'Accept' will redirect you to: <a href='{{$website}}' target='_blank'>{{$website}}</a>" title="Developer Info"></span></h2>
+                    <h2> <a target='_blank' href="{{$website}}">{{$app_name}}</a>&nbsp;<span style="font-size: 10pt;" class="glyphicon glyphicon-info-sign pointable info" aria-hidden="true" data-content="Developer Email: <a href='mailto:{{$dev_info_email}}'>{{$dev_info_email}}</a>.<br> Clicking 'Accept' will redirect you to: <a href='{{$website}}' target='_blank'>{{$website}}</a>" title="Developer Info"></span></h2>
                 </div>
             </div>
             <legend>This app would like to:</legend>
