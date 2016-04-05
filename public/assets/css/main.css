@@ -4,7 +4,7 @@ body {
 
 .header
 {
-    padding-top: 3em;
+    padding-top: 1em;
 }
 
 #logo a {
@@ -203,4 +203,8 @@ textarea {
 .error-message
 {
     color:#c40022;
+}
+
+.privacy-policy{
+    padding-top: 5px;
 }
