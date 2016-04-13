@@ -1,15 +1,14 @@
-
-function updateAccessTokenList(){
+function updateAccessTokenList(page, page_size){
     //reload access tokens
     $.ajax({
             type: "GET",
-            url: TokensUrls.AccessTokenUrls.get ,
+            url: TokensUrls.AccessTokenUrls.get +'?offset='+page+'&limit='+page_size,
             dataType: "json",
             timeout:60000,
             success: function (data,textStatus,jqXHR) {
                 //load data...
 
-                if(data.access_tokens.length===0){
+                if(data.items.length === 0){
                     $('#table-access-tokens').hide();
                     $('#info-access-tokens').show();
                 }
@@ -33,8 +32,13 @@ function updateAccessTokenList(){
                             }
                         }
                     };
-                    var html = template.render(data.access_tokens, directives);
+                    var html = template.render(data.items, directives);
                     $('#body-access-tokens').html(html.html());
+                    var pages_html = '';
+                    for(var i = 0 ; i <  data.pages ; i++){
+                        pages_html += "<li><a class='access_token_page' href='#' data-page-nbr='"+(i+1)+"'>"+(i+1)+"</a></li>";
+                    }
+                    $('#access_token_paginator').html(pages_html)
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -43,17 +47,17 @@ function updateAccessTokenList(){
     });
 }
 
-function updateRefreshTokenList(){
+function updateRefreshTokenList(page, page_size){
     //reload access tokens
     $.ajax({
             type: "GET",
-            url: TokensUrls.RefreshTokenUrl.get,
+            url: TokensUrls.RefreshTokenUrl.get+'?offset='+page+'&limit='+page_size,
             dataType: "json",
             timeout:60000,
             success: function (data,textStatus,jqXHR) {
                 //load data...
 
-                if(data.refresh_tokens.length===0){
+                if(data.items.length===0){
                     $('#table-refresh-tokens').hide();
                     $('#info-refresh-tokens').show();
                 }
@@ -80,8 +84,12 @@ function updateRefreshTokenList(){
                             }
                         }
                     };
-                    var html = template.render(data.refresh_tokens, directives);
+                    var html = template.render(data.items, directives);
                     $('#body-refresh-tokens').html(html.html());
+                    for(var i = 0 ; i <  data.pages ; i++){
+                        pages_html += "<li><a class='refresh_token_page' href='#' data-page-nbr='"+(i+1)+"'>"+(i+1)+"</a></li>";
+                    }
+                    $('#refresh_token_paginator').html(pages_html)
                     updateAccessTokenList();
                 }
             },
@@ -93,7 +101,9 @@ function updateRefreshTokenList(){
 
 jQuery(document).ready(function($){
 
-    if($('#table-access-tokens tr').length===1){
+    var pageSize = 25;
+
+    if($('#table-access-tokens tr').length == 1){
         $('#info-access-tokens').show();
         $('#table-access-tokens').hide();
     }
@@ -102,7 +112,7 @@ jQuery(document).ready(function($){
         $('#table-access-tokens').show();
     }
 
-    if($('#table-refresh-tokens tr').length===1){
+    if($('#table-refresh-tokens tr').length == 1){
         $('#info-refresh-tokens').show();
         $('#table-refresh-tokens').hide();
     }
@@ -111,15 +121,33 @@ jQuery(document).ready(function($){
         $('#table-refresh-tokens').show();
     }
 
-    $("body").on('click','.refresh-refresh-tokens',function(event){
-        updateRefreshTokenList();
+    $("body").on('click','.refresh-access-tokens',function(event){
+        updateAccessTokenList(1, pageSize);
         event.preventDefault();
         return false;
     });
 
     $("body").on('click','.refresh-access-tokens',function(event){
-        updateAccessTokenList();
+        updateRefreshTokenList(1, pageSize);
         event.preventDefault();
+        return false;
+    });
+
+    $("body").on("click",".access_token_page", function(event){
+        event.preventDefault();
+        var page = $(this).data('page-nbr');
+
+        updateAccessTokenList(page, pageSize);
+
+        return false;
+    });
+
+    $("body").on("click",".refresh_token_page", function(event){
+        event.preventDefault();
+        var page = $(this).data('page-nbr');
+
+        updateRefreshTokenList(page, pageSize);
+
         return false;
     });
 
