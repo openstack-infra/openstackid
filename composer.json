@@ -1,75 +1,69 @@
 {
-  "name": "OpenStackid",
-  "description": "OpenstackId Idp",
-  "keywords": [
-    "OpenStackid",
-    "OpenStack",
-    "openid",
-    "oauth2",
-    "openid connect",
-    "OIDC",
-    "OP OIDC"
-  ],
-  "license": "MIT",
-  "require": {
-    "php": ">=5.3.7",
-    "laravel/framework": "4.1.*",
-    "phpunit/phpunit": "3.7.*",
-    "zendframework/zend-crypt": "2.4.*",
-    "zendframework/zend-math": "*",
-    "ircmaxell/random-lib": "*",
-    "greggilbert/recaptcha": "1.1.*",
-    "mockery/mockery": "0.9.4",
-    "doctrine/dbal": "~2.3",
-    "way/laravel-test-helpers": "dev-master",
-    "guzzlehttp/guzzle": "3.8.1",
-    "smarcet/jose4php": "1.0.15",
-    "glenscott/url-normalizer" : "1.4.0",
-    "jenssegers/agent": "^2.3"
-  },
-  "require-dev": {
-    "squizlabs/php_codesniffer": "2.*",
-    "behat/behat": "@stable",
-    "behat/mink": "@stable",
-    "behat/mink-extension": "@stable",
-    "behat/mink-goutte-driver": "@stable",
-    "behat/mink-selenium2-driver": "@stable"
-  },
-  "autoload": {
-    "classmap": [
-      "app/commands",
-      "app/controllers",
-      "app/models",
-      "app/database/migrations",
-      "app/database/seeds",
-      "app/tests",
-      "app/tests/TestCase.php",
-      "app/libs",
-      "app/services",
-      "app/repositories",
-      "app/strategies",
-      "app/filters",
-      "app/validators",
-      "app/providers",
-      "app/factories"
-    ]
-  },
-  "scripts": {
-    "post-install-cmd": [
-      "php artisan clear-compiled",
-      "php artisan optimize"
-    ],
-    "post-update-cmd": [
-      "php artisan clear-compiled",
-      "php artisan optimize"
-    ],
-    "post-create-project-cmd": [
-      "php artisan key:generate"
-    ]
-  },
-  "config": {
-    "preferred-install": "dist"
-  },
-  "prefer-stable": true,
-  "minimum-stability": "stable"
+    "name": "laravel/laravel",
+    "description": "The Laravel Framework.",
+    "keywords": ["framework", "laravel"],
+    "license": "MIT",
+    "type": "project",
+    "require": {
+        "php": ">=5.5.9",
+        "laravel/framework": "5.2.*",
+        "zendframework/zend-crypt": "2.6.*",
+        "zendframework/zend-math": "2.7.*",
+        "ircmaxell/random-lib": "1.1.*",
+        "greggilbert/recaptcha": "2.1.*",
+        "guzzlehttp/guzzle": "5.3.0",
+        "smarcet/jose4php": "1.0.15",
+        "glenscott/url-normalizer" : "1.4.*",
+        "jenssegers/agent": "2.3.*",
+        "predis/predis": "1.0.1",
+        "laravelcollective/html": "5.2.4"
+    },
+    "require-dev": {
+        "fzaninotto/faker": "~1.4",
+        "phpunit/phpunit": "~4.0",
+        "symfony/css-selector": "2.8.*|3.0.*",
+        "symfony/dom-crawler": "2.8.*|3.0.*",
+        "doctrine/dbal": "*",
+        "mockery/mockery": "*",
+        "way/laravel-test-helpers": "dev-master"
+    },
+    "autoload": {
+        "classmap": [
+            "database",
+            "app",
+            "tests"
+        ],
+        "psr-4": {
+            "App\\"    : "app/",
+            "Auth\\"   : "app/libs/Auth/",
+            "OAuth2\\" : "app/libs/OAuth2/",
+            "OpenId\\" : "app/libs/OpenId/",
+            "Utils\\"  : "app/libs/Utils/",
+            "Models\\" : "app/Models/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/TestCase.php"
+        ]
+    },
+    "scripts": {
+        "post-root-package-install": [
+            "php -r \"copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "php artisan key:generate"
+        ],
+        "post-install-cmd": [
+            "Illuminate\\Foundation\\ComposerScripts::postInstall",
+            "php artisan optimize"
+        ],
+        "post-update-cmd": [
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+            "php artisan optimize"
+        ]
+    },
+    "config": {
+        "preferred-install": "dist"
+    }
 }

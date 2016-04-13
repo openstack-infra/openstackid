@@ -16,7 +16,8 @@
                 }
                 o[this.name].push(this.value || '');
             } else {
-                o[this.name] = this.value || '';
+                if(this.value)
+                    o[this.name] = this.value;
             }
         });
         //add missing checkboxes (non checked ones)
