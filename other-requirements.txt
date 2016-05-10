@@ -1,0 +1,2 @@
+mcrypt
+php5-mcrypt
