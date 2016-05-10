@@ -3,7 +3,7 @@
 <title>Welcome to OpenStackId</title>
 @stop
 @section('meta')
-<meta http-equiv="X-XRDS-Location" content="{{ URL::action("DiscoveryController@idp")}}" />
+    <meta http-equiv="X-XRDS-Location" content="{{ URL::action("DiscoveryController@user", ['identifier'=> $identifier ])}}" />
 @append
 @section('content')
 <div class="container">
