@@ -1,0 +1,2 @@
+mcrypt [platform:dpkg]
+php5-mcrypt [platform:dpkg]
