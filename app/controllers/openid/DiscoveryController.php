@@ -14,8 +14,8 @@ class DiscoveryController extends OpenIdController
 
     public function __construct(IOpenIdProtocol $openid_protocol, IAuthService $auth_service, IServerConfigurationService $server_config_service)
     {
-        $this->openid_protocol = $openid_protocol;
-        $this->auth_service = $auth_service;
+        $this->openid_protocol      = $openid_protocol;
+        $this->auth_service         = $auth_service;
         $this->server_config_service = $server_config_service;
     }
 
@@ -46,12 +46,8 @@ class DiscoveryController extends OpenIdController
             return View::make("404");
 
         $local_identifier = $this->server_config_service->getUserIdentityEndpointURL($identifier);
-        if ($this->isDiscoveryRequest()) {
-            $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeUser, $local_identifier), 200);
-            $this->setDiscoveryResponseType($response);
-        } else {
-            $response = View::make("identity");
-        }
+        $response = Response::make($this->openid_protocol->getXRDSDiscovery(IOpenIdProtocol::OpenIdXRDSModeUser, $local_identifier), 200);
+        $this->setDiscoveryResponseType($response);
         return $response;
     }
 
