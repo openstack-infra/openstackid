@@ -1,0 +1,28 @@
+mcrypt
+
+php [platform:ubuntu-xenial]
+php5 [platform:dpkg !platform:ubuntu-xenial]
+
+php-cli [platform:rpm platform:ubuntu-xenial]
+php5-cli [platform:dpkg !platform:ubuntu-xenial]
+
+php-common  [platform:ubuntu-xenial]
+php5-common [platform:dpkg !platform:ubuntu-xenial]
+
+php-curl [platform:rpm platform:ubuntu-xenial]
+php5-curl [platform:dpkg !platform:ubuntu-xenial]
+
+php-gd [platform:rpm platform:ubuntu-xenial]
+php5-gd [platform:dpkg !platform:ubuntu-xenial]
+
+php-json [platform:rpm platform:ubuntu-xenial]
+php5-json [platform:dpkg !platform:ubuntu-xenial]
+
+php-mysql [platform:rpm platform:ubuntu-xenial]
+php5-mysql [platform:dpkg !platform:ubuntu-xenial]
+
+php-gmp [platform:rpm platform:ubuntu-xenial]
+php5-gmp [platform:dpkg !platform:ubuntu-xenial]
+
+php-mcrypt [platform:ubuntu-xenial]
+php5-mcrypt [platform:dpkg !platform:ubuntu-xenial]
