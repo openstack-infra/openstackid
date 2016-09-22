@@ -1352,7 +1352,8 @@ final class TokenService implements ITokenService
             throw new AbsentClientException(sprintf("client id %d does not exists!", $client_id));
         }
         $res = array();
-        $access_tokens = $client->access_tokens()->get();
+        // not void condition
+        $access_tokens = $client->access_tokens()->whereRaw(" DATE_ADD(created_at, INTERVAL lifetime second) >= UTC_TIMESTAMP() ")->get();
         foreach ($access_tokens as $access_token) {
             if (!$access_token->isVoid()) {
                 array_push($res, $access_token);
