@@ -12,7 +12,7 @@ class InvalidTLDException extends Exception {
 
     public function __construct($message = "")
     {
-        $message = "Invalid TDL: " . $message;
+        $message = "Invalid Top Level Domain: " . $message;
         parent::__construct($message, 0, null);
     }
 }
