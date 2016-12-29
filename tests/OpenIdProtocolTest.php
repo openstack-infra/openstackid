@@ -260,6 +260,139 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue($openid_response['is_valid'] === 'true');
     }
 
+    public function testInvalidTLD_Wilcard_COM_UK()
+    {
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)      => OpenIdProtocol::SetupMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)     => "https://*.com.uk",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)  => "https://devbranch.openstack.com.uk/return_to.php",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)  => "http://specs.openid.net/auth/2.0/identifier_select",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
+        );
+
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(302);
+
+        $url        = $response->getTargetUrl();
+        $parsed_url = @parse_url($url);
+        $query      = isset($parsed_url['query']) ?  $parsed_url['query']: null;
+        $this->assertTrue(!empty($query));
+        parse_str($query, $query_array);
+        $this->assertTrue(isset($query_array['openid_error']));
+        $error = $query_array['openid_error'];
+        $this->assertTrue(str_contains($error,"Invalid OpenId Message : realm is not valid" ));
+    }
+
+    public function testInvalidTLD_Wilcard_UK()
+    {
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)      => OpenIdProtocol::SetupMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)     => "https://*.uk",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)  => "https://devbranch.openstack.com.uk/return_to.php",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)  => "http://specs.openid.net/auth/2.0/identifier_select",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
+        );
+
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(302);
+
+        $url        = $response->getTargetUrl();
+        $parsed_url = @parse_url($url);
+        $query      = isset($parsed_url['query']) ?  $parsed_url['query']: null;
+        $this->assertTrue(!empty($query));
+        parse_str($query, $query_array);
+        $this->assertTrue(isset($query_array['openid_error']));
+        $error = $query_array['openid_error'];
+        $this->assertTrue(str_contains($error,"Invalid OpenId Message : realm is not valid" ));
+    }
+
+    public function testValidTLD_Wilcard()
+    {
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)      => OpenIdProtocol::SetupMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)     => "https://*.openstack.org",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)  => "https://devbranch.openstack.org/return_to.php",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)  => "http://specs.openid.net/auth/2.0/identifier_select",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
+        );
+
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(302);
+
+        $url        = $response->getTargetUrl();
+        $parsed_url = @parse_url($url);
+        $this->assertTrue(!isset($parsed_url['query']));
+        $this->assertTrue(str_contains($url, "https://local.openstackid.openstack.org/accounts/user/consent"));
+    }
+
+    public function testValidTLD_SameDomain()
+    {
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)      => OpenIdProtocol::SetupMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)     => "https://devbranch.openstack.org",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)  => "https://devbranch.openstack.org/return_to.php",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)  => "http://specs.openid.net/auth/2.0/identifier_select",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
+        );
+
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(302);
+
+        $url        = $response->getTargetUrl();
+        $parsed_url = @parse_url($url);
+        $this->assertTrue(!isset($parsed_url['query']));
+        $this->assertTrue(str_contains($url, "https://local.openstackid.openstack.org/accounts/user/consent"));
+    }
+
+    public function testValidTLD_SingleLevelDomain()
+    {
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)      => OpenIdProtocol::SetupMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)     => "https://myrefstack",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)  => "https://myrefstack/return_to.php",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)  => "http://specs.openid.net/auth/2.0/identifier_select",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
+        );
+
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(302);
+
+        $url        = $response->getTargetUrl();
+        $parsed_url = @parse_url($url);
+        $this->assertTrue(!isset($parsed_url['query']));
+        $this->assertTrue(str_contains($url, "https://local.openstackid.openstack.org/accounts/user/consent"));
+    }
+
+    public function testValidTLD_IPDomain()
+    {
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)      => OpenIdProtocol::SetupMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)     => "https://192.0.0.1",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)  => "https://192.0.0.1/return_to.php",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)  => "http://specs.openid.net/auth/2.0/identifier_select",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
+        );
+
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(302);
+
+        $url        = $response->getTargetUrl();
+        $parsed_url = @parse_url($url);
+        $this->assertTrue(!isset($parsed_url['query']));
+        $this->assertTrue(str_contains($url, "https://local.openstackid.openstack.org/accounts/user/consent"));
+    }
 
     public function testAuthenticationSetupModeSessionAssociationDHSha256()
     {

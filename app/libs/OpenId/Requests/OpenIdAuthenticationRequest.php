@@ -71,21 +71,18 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
      */
     public function isValid()
     {
-        $return_to       = $this->getReturnTo();
-        $claimed_id      = $this->getClaimedId();
-        $identity        = $this->getIdentity();
-        $mode            = $this->getMode();
-        $realm           = $this->getRealm();
-        $valid_id        = $this->isValidIdentifier($claimed_id, $identity);
-        $valid_return_to = OpenIdUriHelper::checkReturnTo($return_to);
-        $valid_realm     = OpenIdUriHelper::checkRealm($realm, $return_to);
+        $return_to                     = $this->getReturnTo();
+        $claimed_id                    = $this->getClaimedId();
+        $identity                      = $this->getIdentity();
+        $mode                          = $this->getMode();
+        $realm                         = $this->getRealm();
+        $valid_id                      = $this->isValidIdentifier($claimed_id, $identity);
+        $valid_realm                   = OpenIdUriHelper::isValidRealm($realm);
+        $valid_return_to_against_realm = OpenIdUriHelper::checkRealm($realm, $return_to);
+        $valid_return_to               = OpenIdUriHelper::checkReturnTo($return_to);
 
         if (empty($return_to)) {
             throw new InvalidOpenIdMessageException('return_to is empty.');
-        }
-
-        if (!$valid_return_to) {
-            throw new InvalidOpenIdMessageException(sprintf('invalid return_to %s', $return_to));
         }
 
         if (empty($realm)) {
@@ -93,8 +90,30 @@ class OpenIdAuthenticationRequest extends OpenIdRequest
         }
 
         if (!$valid_realm) {
-            throw new InvalidOpenIdMessageException(sprintf('realm check is not valid realm %s - return_to %s.', $realm,
-                $return_to));
+            throw new InvalidOpenIdMessageException
+            (
+                sprintf
+                (
+                    'realm is not valid ( %s )',
+                    $realm
+                )
+            );
+        }
+
+        if (!$valid_return_to_against_realm) {
+            throw new InvalidOpenIdMessageException
+            (
+                sprintf
+                (
+                    'return to url check against provided realm is not valid ( realm %s - return_to %s).',
+                    $realm,
+                    $return_to
+                )
+            );
+        }
+
+        if (!$valid_return_to) {
+            throw new InvalidOpenIdMessageException(sprintf('invalid return_to url ( %s )', $return_to));
         }
 
         if (empty($claimed_id)) {

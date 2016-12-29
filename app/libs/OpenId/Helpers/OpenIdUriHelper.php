@@ -11,27 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use OpenId\Exceptions\InvalidTLDException;
-
-define('OpenIdUriHelper_TLDs',
-    '/\.(ac|ad|ae|aero|af|ag|ai|al|am|an|ao|aq|ar|arpa|as|asia' .
-    '|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|biz|bj|bm|bn|bo|br' .
-    '|bs|bt|bv|bw|by|bz|ca|cat|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co' .
-    '|com|coop|cr|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|edu|ee|eg' .
-    '|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl' .
-    '|gm|gn|gov|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie' .
-    '|il|im|in|info|int|io|iq|ir|is|it|je|jm|jo|jobs|jp|ke|kg|kh' .
-    '|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly' .
-    '|ma|mc|md|me|mg|mh|mil|mk|ml|mm|mn|mo|mobi|mp|mq|mr|ms|mt' .
-    '|mu|museum|mv|mw|mx|my|mz|na|name|nc|ne|net|nf|ng|ni|nl|no' .
-    '|np|nr|nu|nz|om|org|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|pro|ps|pt' .
-    '|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl' .
-    '|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tel|tf|tg|th|tj|tk|tl|tm' .
-    '|tn|to|tp|tr|travel|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve' .
-    '|vg|vi|vn|vu|wf|ws|xn--0zwm56d|xn--11b5bs3a9aj6g' .
-    '|xn--80akhbyknj4f|xn--9t4b11yi5a|xn--deba0ad|xn--g6w251d' .
-    '|xn--hgbk6aj7f53bba|xn--hlcj6aya9esc7a|xn--jxalpdlp' .
-    '|xn--kgbechtv|xn--zckzah|ye|yt|yu|za|zm|zw)\.?$/');
 
 define('OpenIdUriHelper_HostSegmentRe', "/^(?:[-a-zA-Z0-9!$&'\\(\\)\\*+,;=._~]|%[a-zA-Z0-9]{2})*$/");
 
@@ -239,13 +218,13 @@ final class OpenIdUriHelper
 
 	/**
 	 * @param $trust_root
-	 * @return bool|mixed
+	 * @return bool
 	 */
 	public static function isValidRealm($trust_root){
-		if (!self::_isSane($trust_root)) return false;
 
-		$trust_root_parsed = self::_parse($trust_root);
-		return $trust_root_parsed;
+		if (!self::isSaneRealm($trust_root)) return false;
+
+		return self::_parse($trust_root) != false;
 	}
 
     /**
@@ -264,8 +243,7 @@ final class OpenIdUriHelper
      */
     public static function checkRealm($trust_root, $url)
     {
-        if (!filter_var($url, FILTER_VALIDATE_URL)) return false;
-        if (!self::_isSane($trust_root)) return false;
+        if (!self::isSaneRealm($trust_root)) return false;
 
         $trust_root_parsed = self::_parse($trust_root);
         $url_parsed = self::_parse($url);
@@ -324,6 +302,11 @@ final class OpenIdUriHelper
     }
 
     /**
+     * http://openid.net/specs/openid-authentication-2_0.html#realms
+     * It is RECOMMENDED that OPs protect their users from making assertions with overly-general realms, like
+     * http://*.com/ or http://*.co.uk/. Overly general realms can be dangerous when the realm is used for identifying
+     * a particular Relying Party. Whether a realm is overly-general is at the discretion of the OP.
+     *
      * Is this trust root sane?
      *
      * A trust root is sane if it is syntactically valid and it has a
@@ -346,18 +329,23 @@ final class OpenIdUriHelper
      *
      * @static
      * @param string $trust_root The trust root to check
-     * @throws InvalidTLDException
      * @return bool $sanity Whether the trust root looks OK
      */
-    private static function _isSane($trust_root)
+    private static function isSaneRealm($trust_root)
     {
         $parts = self::_parse($trust_root);
+
         if ($parts === false) {
             return false;
         }
 
         // Localhost is a special case
         if ($parts['host'] == 'localhost') {
+            return true;
+        }
+        // if host its a valid ip address
+        if( filter_var($parts['host'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== FALSE ||
+            filter_var($parts['host'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== FALSE){
             return true;
         }
 
@@ -380,24 +368,17 @@ final class OpenIdUriHelper
             return false;
         }
 
-        // Get the top-level domain of the host. If it is not a valid TLD,
-        // it's not sane.
-        preg_match(OpenIdUriHelper_TLDs, $parts['host'], $matches);
-        if (!$matches) {
-            throw new InvalidTLDException(sprintf("current host %s",$parts['host']));
-        }
-        $tld = $matches[1];
-
-        if (count($host_parts) == 1) {
-            return false;
-        }
-
         if ($parts['wildcard']) {
+
+            if(count($host_parts) == 1) {
+                // like *.uk
+                return false;
+            }
             // It's a 2-letter tld with a short second to last segment
             // so there needs to be more than two segments specified
             // (e.g. *.co.uk is insane)
             $second_level = $host_parts[count($host_parts) - 2];
-            if (strlen($tld) == 2 && strlen($second_level) <= 3) {
+            if (strlen($second_level) <= 3) {
                 return count($host_parts) > 2;
             }
         }
@@ -425,9 +406,10 @@ final class OpenIdUriHelper
             return false;
         }
 
-        $required_parts = array('scheme', 'host');
-        $forbidden_parts = array('user', 'pass', 'fragment');
-        $keys = array_keys($parts);
+        $required_parts  = ['scheme', 'host'];
+        $forbidden_parts = ['user', 'pass', 'fragment'];
+        $keys            = array_keys($parts);
+
         if (array_intersect($keys, $required_parts) != $required_parts) {
             return false;
         }
@@ -440,15 +422,18 @@ final class OpenIdUriHelper
             return false;
         }
 
-        $scheme = strtolower($parts['scheme']);
-        $allowed_schemes = array('http', 'https');
+        $scheme          = strtolower($parts['scheme']);
+        $allowed_schemes = ['http', 'https'];
+
         if (!in_array($scheme, $allowed_schemes)) {
             return false;
         }
+
         $parts['scheme'] = $scheme;
 
-        $host = strtolower($parts['host']);
+        $host      = strtolower($parts['host']);
         $hostparts = explode('*', $host);
+
         switch (count($hostparts)) {
             case 1:
                 $parts['wildcard'] = false;
@@ -484,7 +469,6 @@ final class OpenIdUriHelper
         if (!isset($parts['port'])) {
             $parts['port'] = false;
         }
-
 
         $parts['unparsed'] = $trust_root;
 
