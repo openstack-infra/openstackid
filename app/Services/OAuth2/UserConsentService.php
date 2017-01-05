@@ -33,57 +33,27 @@ class UserConsentService implements IUserConsentService
      */
     public function get($user_id, $client_id, $scopes)
     {
+        $scope_set = explode(' ', $scopes);
+        sort($scope_set);
 
-        $set   = explode(' ', $scopes);
-        $size  = count($set) - 1;
-        $perm  = range(0, $size);
-        $j     = 0;
-        $perms = [];
+        $consent  = UserConsent
+             ::where('user_id', '=', $user_id)
+            ->where('client_id', '=', $client_id)
+            ->where('scopes', 'like', '%' . join(' ', $scope_set).'%')->first();
 
-        do
-        {
-            foreach ($perm as $i)
-            {
-                $perms[$j][] = $set[$i];
+        if(is_null($consent)){
+            $consents = UserConsent
+                ::where('user_id', '=', $user_id)
+                ->where('client_id', '=', $client_id)->get();
+
+            foreach($consents as $aux_consent){
+                // check if the requested scopes are on the former consent present
+                 if(str_contains($aux_consent->scopes, $scope_set)){
+                     $consent = $aux_consent;
+                     break;
+                 }
             }
-        } while ($perm = MathUtils::nextPermutation($perm, $size) and ++$j);
-
-
-        $query1 = UserConsent::where('user_id', '=', $user_id)->where('client_id', '=', $client_id);
-
-        $query2 = UserConsent::where('user_id', '=', $user_id)->where('client_id', '=', $client_id);
-
-
-        $query1 = $query1->where(function ($query) use($perms)
-        {
-            foreach ($perms as $p)
-            {
-                $str = join(' ', $p);
-                $query = $query->orWhere('scopes', '=', $str);
-            }
-
-            return $query;
-        });
-
-
-        $query2 = $query2->where(function ($query) use($perms)
-        {
-            foreach ($perms as $p)
-            {
-                $str = join(' ', $p);
-                $query = $query->orWhere('scopes', 'like', '%'.$str.'%');
-            }
-
-            return $query;
-        });
-
-
-        $consent = $query1->first();
-
-        if (is_null($consent)) {
-            $consent = $query2->first();
         }
-
         return $consent;
     }
 
@@ -96,15 +66,16 @@ class UserConsentService implements IUserConsentService
      */
     public function add($user_id, $client_id, $scopes)
     {
-        $consent = new UserConsent();
-
+        $consent   = new UserConsent();
+        $scope_set = explode(' ', $scopes);
+        sort($scope_set);
         if (is_null(Client::find($client_id))) {
             throw new EntityNotFoundException();
         }
 
         $consent->client_id = $client_id;
         $consent->user_id   = $user_id;
-        $consent->scopes    = $scopes;
+        $consent->scopes    = join(' ', $scope_set);
         $consent->Save();
     }
 }
