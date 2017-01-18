@@ -9,7 +9,8 @@ jQuery(document).ready(function($){
             "name"  :     {required: true, nowhitespace:true,rangelength: [1, 255]},
             "description":{required: true, free_text:true,rangelength: [1, 1024]},
             "route":      {required: true, endpointroute:true,rangelength: [1, 1024]},
-            "rate_limit": {required: true, number:true}
+            "rate_limit": {required: true, number:true},
+            "http_method": {required: true}
         }
     });
 

@@ -443,9 +443,9 @@ final class UserController extends OpenIdController
 
     public function postUserProfileOptions()
     {
-        $show_full_name = Input::get("show_full_name");
-        $show_email     = Input::get("show_email");
-        $show_pic       = Input::get("show_pic");
+        $show_full_name = intval(Input::get("show_full_name", 0));
+        $show_email     = intval(Input::get("show_email", 0));
+        $show_pic       = intval(Input::get("show_pic", 0));
 
         $user = $this->auth_service->getCurrentUser();
         $this->user_service->saveProfileInfo($user->getId(), $show_pic, $show_full_name, $show_email);

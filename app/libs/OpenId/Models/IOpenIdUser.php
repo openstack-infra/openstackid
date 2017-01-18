@@ -88,12 +88,24 @@ interface IOpenIdUser
 
     public function getDateOfBirth();
 
+    /**
+     * @return bool
+     */
     public function getShowProfileFullName();
 
+    /**
+     * @return bool
+     */
     public function getShowProfilePic();
 
+    /**
+     * @return bool
+     */
     public function getShowProfileBio();
 
+    /**
+     * @return bool
+     */
     public function getShowProfileEmail();
 
     public function getBio();

@@ -42,14 +42,11 @@ final class RepositoriesProvider extends ServiceProvider
         App::singleton(\OpenId\Repositories\IOpenIdTrustedSiteRepository::class, \Repositories\EloquentOpenIdTrustedSiteRepository::class);
 
         App::singleton(\Auth\Repositories\IUserRepository::class, function(){
-            return new CacheUserRepository
-            (
-                new EloquentUserRepository
+                return new EloquentUserRepository
                 (
                     new User(),
                     App::make(UtilsServiceCatalog::LogService)
-                )
-            );
+                );
         });
 
         App::singleton(\Auth\Repositories\IMemberRepository::class, \Repositories\EloquentMemberRepository::class);
@@ -57,36 +54,33 @@ final class RepositoriesProvider extends ServiceProvider
         App::singleton(\OAuth2\Repositories\IServerPrivateKeyRepository::class, \Repositories\EloquentServerPrivateKeyRepository::class);
 
         App::singleton(\OAuth2\Repositories\IClientRepository::class, function(){
-            return new CacheClientRepository(
-                new EloquentClientRepository(new Client(), App::make(UtilsServiceCatalog::LogService))
-            );
+                return new EloquentClientRepository(new Client(), App::make(UtilsServiceCatalog::LogService));
         });
 
         App::singleton(\OAuth2\Repositories\IResourceServerRepository::class, function(){
-            return new CacheResourceServerRepository(new EloquentResourceServerRepository(new ResourceServer()));
+            return new EloquentResourceServerRepository(new ResourceServer());
         });
 
         App::singleton(\Models\IWhiteListedIPRepository::class, function (){
-           return new CacheWhiteListedIPRepository(new EloquentWhiteListedIPRepository(new WhiteListedIP()));
+           return new EloquentWhiteListedIPRepository(new WhiteListedIP());
         });
 
         App::singleton(\OAuth2\Repositories\IApiRepository::class, function(){
-            return new CacheApiRepository(new EloquentApiRepository(new Api()));
+            return new EloquentApiRepository(new Api());
         });
 
         App::singleton(\OAuth2\Repositories\IApiScopeRepository::class, function(){
-            return new CacheApiScopeRepository(new EloquentApiScopeRepository(new ApiScope()));
+            return new EloquentApiScopeRepository(new ApiScope());
         });
 
         App::singleton(\OAuth2\Repositories\IApiEndpointRepository::class, function(){
-            return new CacheApiEndpointRepository(new EloquentApiEndpointRepository(new ApiEndpoint()));
+            return new EloquentApiEndpointRepository(new ApiEndpoint());
         });
 
         App::singleton(\OAuth2\Repositories\IApiScopeGroupRepository::class, \Repositories\EloquentApiScopeGroupRepository::class);
 
         App::singleton(\OAuth2\Repositories\IRefreshTokenRepository::class, function(){
-            return new CacheRefreshTokenRepository
-            (
+            return new CacheRefreshTokenRepository(
                 new EloquentRefreshTokenRepository
                 (
                     new RefreshToken(),
@@ -96,15 +90,18 @@ final class RepositoriesProvider extends ServiceProvider
         });
 
         App::singleton(\OAuth2\Repositories\IAccessTokenRepository::class, function(){
-            return new CacheAccessTokenRepository
-            (
-                new EloquentAccessTokenRepository
+                return new CacheAccessTokenRepository
                 (
-                    new AccessToken(),
-                    App::make(UtilsServiceCatalog::LogService)
-                )
-            );
+                    new EloquentAccessTokenRepository
+                    (
+                        new AccessToken(),
+                        App::make(UtilsServiceCatalog::LogService)
+                    )
+                );
         });
+
+        // https://laravel.com/docs/5.2/container#contextual-binding
+        //App::when(AdminController::class)->needs()
 
     }
 

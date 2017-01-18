@@ -106,6 +106,8 @@ class ApiEndpointService implements IApiEndpointService {
             );
 
             $this->repository->add($instance);
+
+            return $instance;
         });
 
     }

@@ -192,24 +192,36 @@ class User extends BaseModelEloquent implements AuthenticatableContract, IOpenId
         return (int)$this->id;
     }
 
+    /**
+     * @return bool
+     */
     public function getShowProfileFullName()
     {
-        return $this->public_profile_show_fullname;
+        return $this->public_profile_show_fullname > 0 ;
     }
 
+    /**
+     * @return bool
+     */
     public function getShowProfilePic()
     {
-        return $this->public_profile_show_photo;
+        return $this->public_profile_show_photo > 0;
     }
 
+    /**
+     * @return bool
+     */
     public function getShowProfileBio()
     {
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function getShowProfileEmail()
     {
-        return $this->public_profile_show_email;
+        return $this->public_profile_show_email > 0;
     }
 
     public function getBio()

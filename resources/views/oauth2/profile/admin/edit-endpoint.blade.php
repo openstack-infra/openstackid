@@ -37,7 +37,7 @@
                     <label for="http_method">HTTP Method&nbsp;<span aria-hidden="true"
                                                                     class="glyphicon glyphicon-info-sign pointable"
                                                                     title=''></span></label>
-                    {!! Form::select('http_method', array('GET' => 'GET', 'POST' => 'POST', 'PUT' => 'PUT', 'DELETE' => 'DELETE'), $endpoint->http_method,array('class' => 'form-control', 'id' => 'http_method')); !!}
+                    {!! Form::select('http_method', array('GET' => 'GET', 'POST' => 'POST', 'PUT' => 'PUT', 'DELETE' => 'DELETE'), $endpoint->http_method, array('class' => 'form-control', 'id' => 'http_method')); !!}
                 </div>
                 <div class="checkbox">
                     <label>
