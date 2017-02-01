@@ -76,6 +76,23 @@ class User extends BaseModelEloquent implements AuthenticatableContract, IOpenId
         $this->member = $member;
     }
 
+    public function getMember(){
+        return $this->getAssociatedMember();
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasMember(){
+        try{
+            return $this->getMember() != null;
+        }
+        catch (EntityNotFoundException $ex){
+            return false;
+        }
+        return false;
+    }
+
     private function getAssociatedMember()
     {
         if (is_null($this->member)) {
@@ -413,5 +430,15 @@ class User extends BaseModelEloquent implements AuthenticatableContract, IOpenId
         $this->getAssociatedMember();
 
         return $this->member->isEmailVerified();
+    }
+
+    public function delete()
+    {
+        $this->access_tokens()->delete();
+        $this->actions()->delete();
+        $this->clients()->delete();
+        $this->consents()->delete();
+        $this->trusted_sites()->delete();
+        return parent::delete();
     }
 }

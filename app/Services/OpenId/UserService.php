@@ -212,7 +212,7 @@ final class UserService implements IUserService
      * @param Member $member
      * @return IOpenIdUser
      */
-    public function buildUser(Member $member)
+    public function  buildUser(Member $member)
     {
         $repository          = $this->repository;
         $user_name_generator = $this->user_name_generator;

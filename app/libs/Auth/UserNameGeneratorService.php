@@ -88,9 +88,9 @@ final class UserNameGeneratorService implements IUserNameGeneratorService
      */
     public function generate(Member $member)
     {
-        $fname = self::normalizeChars($member->FirstName);
-        $lname = self::normalizeChars($member->Surname);
-        $user_name     = strtolower
+        $fname     = self::normalizeChars(trim($member->FirstName));
+        $lname     = self::normalizeChars(trim($member->Surname));
+        $user_name = strtolower
         (
             preg_replace('/[^\d\w_-]+/i', IUserNameGeneratorService::USER_NAME_INVALID_CHAR_REPLACEMENT, $fname)
             . IUserNameGeneratorService::USER_NAME_CHAR_CONNECTOR .
