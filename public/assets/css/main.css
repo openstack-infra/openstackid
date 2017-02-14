@@ -8,7 +8,7 @@ body {
 }
 
 #logo a {
-    background: url("../img/open-stack-cloud-computing-logo.png") no-repeat scroll left center rgba(0, 0, 0, 0);
+    background: url("../img/openstack-logo-full.svg") no-repeat scroll left center rgba(0, 0, 0, 0);
     display: block;
     height: 54px;
     margin-left: -10px;
