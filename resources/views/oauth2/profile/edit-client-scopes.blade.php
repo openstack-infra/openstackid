@@ -5,7 +5,7 @@
             @foreach ($scopes as $scope)
             <?php $current_api      = $scope->getApiName(); ?>
             <?php $current_api_logo = $scope->getApiLogo(); ?>
-            @if($last_api!=$current_api && !empty($current_api))
+            @if($last_api != $current_api && !empty($current_api))
                 @if(!empty($last_api))
                     </li></ul>
                 @endif

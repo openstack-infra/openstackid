@@ -93,14 +93,7 @@ class ApiScope extends BaseModelEloquent implements IApiScope
      * @return IApi
      */
     public function getApi(){
-        return Cache::remember
-        (
-            'api_'.$this->api_id,
-            Config::get("cache_regions.region_api_lifetime", 1140),
-            function() {
-                return $this->api()->first();
-            }
-       );
+        return $this->api()->first();
     }
 
     public function getApiName()

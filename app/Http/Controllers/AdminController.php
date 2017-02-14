@@ -195,8 +195,23 @@ class AdminController extends Controller {
             array_push($aux_scopes, $scope->id);
         }
 
-        $scopes        = $this->scope_service->getAvailableScopes();
-        $group_scopes  = $user->getGroupScopes();
+        // scope pre processing
+        $scopes           = $this->scope_service->getAvailableScopes();
+        $group_scopes     = $user->getGroupScopes();
+        $merged_scopes    = array_merge($scopes, $group_scopes);
+        $final_scopes     = [];
+        $processed_scopes = [];
+        foreach($merged_scopes as  $test_scope){
+            if(isset($processed_scopes[$test_scope->id])) continue;
+
+            $processed_scopes[$test_scope->id] = $test_scope->id;
+            $final_scopes[] = $test_scope;
+        }
+
+        usort($final_scopes, function($elem1, $elem2){
+            return $elem1->api_id > $elem2->api_id;
+        });
+        // scope pre processing
 
         $access_tokens = $this->access_token_repository->getAllValidByClientIdentifier($client->getId(), 1 , self::TokenPageSize);
 
@@ -216,7 +231,7 @@ class AdminController extends Controller {
             [
                 'client'               => $client,
                 'selected_scopes'      => $aux_scopes,
-                'scopes'               => array_merge($scopes, $group_scopes),
+                'scopes'               => $final_scopes,
                 'access_tokens'        => $access_tokens->items(),
                 'access_tokens_pages'  => $access_tokens->total() > 0 ? intval(ceil($access_tokens->total() / self::TokenPageSize)) : 0,
                 "is_oauth2_admin"      => $user->isOAuth2ServerAdmin(),
