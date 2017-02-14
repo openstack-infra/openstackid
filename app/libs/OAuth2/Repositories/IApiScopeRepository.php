@@ -26,6 +26,12 @@ interface IApiScopeRepository extends IBaseRepository
     public function getByName(array $scopes_names);
 
     /**
+     * @param string $scope_name
+     * @return IApiScope
+     */
+    public function getFirstByName($scope_name);
+
+    /**
      * @return IApiScope[]
      */
     public function getDefaults();

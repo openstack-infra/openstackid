@@ -160,7 +160,7 @@ final class ApiScopeService implements IApiScopeService
 
                     if ($param == 'name') {
                         //check if we have a former scope with selected name
-                        $former_scope = $this->repository->getByName($params[$param]);
+                        $former_scope = $this->repository->getFirstByName($params[$param]);
 
                         if (!is_null($former_scope) && $former_scope->id != $id) {
                             throw new InvalidApiScope(sprintf('scope name %s already exists!', $params[$param]));
