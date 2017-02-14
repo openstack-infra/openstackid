@@ -69,4 +69,13 @@ final class EloquentApiScopeRepository extends AbstractEloquentEntityRepository 
             ->where('assigned_by_groups', '=', true)
             ->orderBy('api_id')->get();
     }
+
+    /**
+     * @param string $scope_name
+     * @return IApiScope
+     */
+    public function getFirstByName($scope_name)
+    {
+        return $this->entity->where('active', '=', true)->where('name', $scope_name)->first();
+    }
 }

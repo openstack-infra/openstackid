@@ -70,4 +70,15 @@ final class CacheApiScopeRepository extends BaseCacheRepository implements IApiS
             return $this->repository->getAssignableByGroups();
         });
     }
+
+    /**
+     * @param string $scope_name
+     * @return IApiScope
+     */
+    public function getFirstByName($scope_name)
+    {
+        return Cache::remember($this->cache_base_key.'_'.$scope_name, $this->cache_minutes_lifetime, function() use($scope_name) {
+            return $this->repository->getFirstByName($scope_name);
+        });
+    }
 }
