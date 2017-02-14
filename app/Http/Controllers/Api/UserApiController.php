@@ -93,7 +93,7 @@ class UserApiController extends AbstractRESTController implements ICRUDControlle
             $hint = Input::get('hint','none');
 
             switch($hint){
-                case 'access_token':{
+                case 'access-token':{
                     $token = $this->token_service->getAccessToken($value,true);
                     if(is_null($token))
                         throw new Exception(sprintf("access token %s expired!.",$value));
@@ -102,7 +102,7 @@ class UserApiController extends AbstractRESTController implements ICRUDControlle
                     $this->token_service->revokeAccessToken($value,true);
                 }
                     break;
-                case 'refresh_token':
+                case 'refresh-token':
                     $token = $this->token_service->getRefreshToken($value,true);
                     if(is_null($token))
                         throw new Exception(sprintf("access token %s expired!.",$value));

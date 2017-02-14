@@ -32,7 +32,7 @@
                             <td>{!!$access_token->client()->first()->getFriendlyApplicationType()!!}</td>
                             <td>{!!$access_token->client()->first()->app_name!!}</td>
                             <td>{!!$access_token->scope!!}</td>
-                            <td>{!! HTML::link(URL::action("Api\\UserApiController@revokeToken",array("id"=>$user_id,"value"=>$access_token->value, "hint"=>'access_token')),'Revoke Access',array('data-value' => $access_token->value,'data-hint'=>'access_token','class'=>'btn btn-default btn-md active btn-delete revoke-token','title'=>'Revoke Access Token')) !!}</td>
+                            <td>{!! HTML::link(URL::action("Api\\UserApiController@revokeToken",array("id"=>$user_id,"value"=>$access_token->value, "hint"=>'access-token')),'Revoke Access',array('data-value' => $access_token->value,'data-hint'=>'access-token','class'=>'btn btn-default btn-md active btn-delete revoke-token','title'=>'Revoke Access Token')) !!}</td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -44,7 +44,7 @@
             <div class="col-md-12">
                 <ul class="pagination" id="access_token_paginator">
                     <?php for($i = 0 ; $i < $access_tokens_pages ; $i++){  ?>
-                    <li><a class="access_token_page" href="#" data-page-nbr="{!! $i+1 !!}">{!! $i+1 !!}</a></li>
+                    <li <?php if($i == 0) echo "class='active'" ?>><a class="access_token_page" href="#" data-page-nbr="{!! $i+1 !!}">{!! $i+1 !!}</a></li>
                     <?php } ?>
                 </ul>
             </div>
@@ -75,7 +75,7 @@
                             <td>{!!$refresh_token->client()->first()->getFriendlyApplicationType()!!}</td>
                             <td>{!!$refresh_token->client()->first()->app_name!!}</td>
                             <td>{!!$refresh_token->scope!!}</td>
-                            <td>{!! HTML::link(URL::action("Api\\UserApiController@revokeToken",array("id" => $user_id,"value" => $refresh_token->value, "hint" => 'refresh_token')),'Revoke Access',array('data-value' => $refresh_token->value,'data-hint' => 'refresh_token','class' => 'btn btn-default btn-md active btn-delete revoke-token','title' => 'Revoke Access Token')) !!}</td>
+                            <td>{!! HTML::link(URL::action("Api\\UserApiController@revokeToken",array("id" => $user_id,"value" => $refresh_token->value, "hint" => 'refresh-token')),'Revoke Access',array('data-value' => $refresh_token->value,'data-hint' => 'refresh_token','class' => 'btn btn-default btn-md active btn-delete revoke-token','title' => 'Revoke Access Token')) !!}</td>
                         </tr>
                     @endforeach
                     </tbody>
@@ -87,7 +87,7 @@
             <div class="col-md-12">
                 <ul class="pagination" id="refresh_token_paginator">
                     <?php for($i = 0 ; $i < $refresh_tokens_pages ; $i++){  ?>
-                    <li><a class="refresh_token_page" href="#" data-page-nbr="{!! $i+1 !!}">{!! $i+1 !!}</a></li>
+                    <li <?php if($i == 0) echo "class='active'" ?> ><a class="refresh_token_page" href="#" data-page-nbr="{!! $i+1 !!}">{!! $i+1 !!}</a></li>
                     <?php } ?>
                 </ul>
             </div>
@@ -101,11 +101,11 @@
         var TokensUrls = {
             AccessTokenUrls : {
                 get : '{!! URL::action("Api\\ClientApiController@getAccessTokensByCurrentUser", array() )!!}',
-                delete :'{!! URL::action("Api\\UserApiController@revokeToken",array("id" => $user_id, "value" => -1, "hint" =>"access_token")) !!}'
+                delete :'{!! URL::action("Api\\UserApiController@revokeToken",array("id" => $user_id, "value" => -1, "hint" =>"access-token")) !!}'
             },
             RefreshTokenUrl : {
                 get: '{!! URL::action("Api\\ClientApiController@getRefreshTokensByCurrentUser", array() )!!}',
-                delete :'{!! URL::action("Api\\UserApiController@revokeToken",array("id" => $user_id, "value" => -1, "hint" => "refresh_token")) !!}'
+                delete :'{!! URL::action("Api\\UserApiController@revokeToken",array("id" => $user_id, "value" => -1, "hint" => "refresh-token")) !!}'
             }
         };
 </script>

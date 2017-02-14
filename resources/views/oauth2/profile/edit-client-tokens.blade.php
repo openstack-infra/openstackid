@@ -36,7 +36,7 @@
                     <div class="col-md-12">
                         <ul class="pagination" id="access_token_paginator">
                              <?php for($i = 0 ; $i < $access_tokens_pages ; $i++){  ?>
-                            <li><a class="access_token_page" href="#" data-page-nbr="{!! $i+1 !!}">{!! $i+1 !!}</a></li>
+                            <li <?php if($i == 0) echo "class='active'" ?>><a class="access_token_page" href="#" data-page-nbr="{!! $i+1 !!}">{!! $i+1 !!}</a></li>
                             <?php } ?>
                         </ul>
                     </div>
@@ -88,7 +88,7 @@
                     <div class="col-md-12">
                         <ul class="pagination" id="refresh_token_paginator">
                             <?php for($i = 0 ; $i < $refresh_tokens_pages ; $i++){  ?>
-                            <li><a class="refresh_token_page" href="#" data-page-nbr="{!! $i+1 !!}">{!! $i+1 !!}</a></li>
+                            <li <?php if($i == 0) echo "class='active'" ?>><a class="refresh_token_page" href="#" data-page-nbr="{!! $i+1 !!}">{!! $i+1 !!}</a></li>
                             <?php } ?>
                         </ul>
                     </div>

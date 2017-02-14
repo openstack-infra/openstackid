@@ -31,4 +31,19 @@ final class EloquentRefreshTokenRepository extends AbstractEloquentOAuth2TokenRe
         $this->log_service = $log_service;
     }
 
+    protected function getAllValidByClientIdentifierFilterCondition($client_identifier){
+
+       return [
+            ['name' => 'client_id', 'op' => '=','value' => $client_identifier ],
+            ['name' => 'void', 'op' => '=','value' => 0],
+       ];
+    }
+
+    protected function getAllValidByUserIdFilterCondition($user_id){
+        return [
+            ['name' => 'user_id', 'op' => '=','value' => $user_id ],
+            ['name' => 'void', 'op' => '=','value' => 0],
+        ];
+    }
+
 }

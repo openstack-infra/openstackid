@@ -48,10 +48,14 @@ abstract class AbstractEloquentOAuth2TokenRepository extends AbstractEloquentEnt
      */
     function getAllValidByClientIdentifier($client_identifier, $page_nbr = 1, $page_size = 10)
     {
-        return $this->getAll($page_nbr, $page_size, [
+        return $this->getAll($page_nbr, $page_size, $this->getAllValidByClientIdentifierFilterCondition($client_identifier));
+    }
+
+    protected function getAllValidByClientIdentifierFilterCondition($client_identifier){
+        return [
             ['name' => 'client_id', 'op' => '=','value' => $client_identifier ],
             ['raw'  => 'DATE_ADD(created_at, INTERVAL lifetime second) >= UTC_TIMESTAMP()'],
-        ]);
+        ];
     }
 
     /**
@@ -62,10 +66,14 @@ abstract class AbstractEloquentOAuth2TokenRepository extends AbstractEloquentEnt
      */
     function getAllValidByUserId($user_id, $page_nbr = 1, $page_size = 10)
     {
-        return $this->getAll($page_nbr, $page_size, [
+        return $this->getAll($page_nbr, $page_size, $this->getAllValidByUserIdFilterCondition($user_id));
+    }
+
+    protected function getAllValidByUserIdFilterCondition($user_id){
+        return [
             ['name' => 'user_id', 'op' => '=','value' => $user_id ],
             ['raw'  => 'DATE_ADD(created_at, INTERVAL lifetime second) >= UTC_TIMESTAMP()'],
-        ]);
+        ];
     }
 
     /**

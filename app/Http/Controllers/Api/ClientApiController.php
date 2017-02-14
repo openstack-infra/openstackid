@@ -596,7 +596,7 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
             }
             return $this->ok([
                 'total' => $paginator->total(),
-                'pages' => $paginator->total() > 0 ? ceil($paginator->total()/$page_size) : 0,
+                'pages' => $paginator->total() > 0  && $page_size > 0 ? ceil($paginator->total()/$page_size) : 0,
                 'items' => $res
             ]);
         }
