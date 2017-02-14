@@ -12,7 +12,7 @@ jQuery(document).ready(function($){
         // event.item: contains the item
         // event.cancel: set to true to prevent the item getting added
         var regex_email = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/ig;
-        var current = regex_email.test( event.item );
+        var current     = regex_email.test( event.item );
         if(!current)
             event.cancel = true;
     });

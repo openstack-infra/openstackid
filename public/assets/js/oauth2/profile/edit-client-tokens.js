@@ -1,3 +1,5 @@
+var pageSizeTokens = 25;
+
 function updateAccessTokenList(page, page_size){
     //reload access tokens
     $.ajax({
@@ -86,11 +88,12 @@ function updateRefreshTokenList(page, page_size){
                     };
                     var html = template.render(data.items, directives);
                     $('#body-refresh-tokens').html(html.html());
+                    var pages_html = '';
                     for(var i = 0 ; i <  data.pages ; i++){
                         pages_html += "<li><a class='refresh_token_page' href='#' data-page-nbr='"+(i+1)+"'>"+(i+1)+"</a></li>";
                     }
-                    $('#refresh_token_paginator').html(pages_html)
-                    updateAccessTokenList();
+                    $('#refresh_token_paginator').html(pages_html);
+                    updateAccessTokenList(1, pageSizeTokens);
                 }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -101,7 +104,7 @@ function updateRefreshTokenList(page, page_size){
 
 jQuery(document).ready(function($){
 
-    var pageSize = 25;
+
 
     if($('#table-access-tokens tr').length == 1){
         $('#info-access-tokens').show();
@@ -122,13 +125,13 @@ jQuery(document).ready(function($){
     }
 
     $("body").on('click','.refresh-access-tokens',function(event){
-        updateAccessTokenList(1, pageSize);
+        updateAccessTokenList(1, pageSizeTokens);
         event.preventDefault();
         return false;
     });
 
-    $("body").on('click','.refresh-access-tokens',function(event){
-        updateRefreshTokenList(1, pageSize);
+    $("body").on('click','.refresh-refresh-tokens',function(event){
+        updateRefreshTokenList(1, pageSizeTokens);
         event.preventDefault();
         return false;
     });
@@ -137,7 +140,7 @@ jQuery(document).ready(function($){
         event.preventDefault();
         var page = $(this).data('page-nbr');
 
-        updateAccessTokenList(page, pageSize);
+        updateAccessTokenList(page, pageSizeTokens);
 
         return false;
     });
@@ -146,7 +149,7 @@ jQuery(document).ready(function($){
         event.preventDefault();
         var page = $(this).data('page-nbr');
 
-        updateRefreshTokenList(page, pageSize);
+        updateRefreshTokenList(page, pageSizeTokens);
 
         return false;
     });
@@ -154,39 +157,48 @@ jQuery(document).ready(function($){
     $("body").on('click',".revoke-token",function(event){
 
         var link        = $(this);
-        var value       = link.attr('data-value');
-        var hint        = link.attr('data-hint');
+        var value       = link.data('value');
+        var hint        = link.data('hint');
         var url         = link.attr('href');
         var table_id    = hint ==='refresh-token'? 'table-refresh-tokens':'table-access-tokens';
         var info_id     = hint ==='refresh-token'? 'info-refresh-tokens':'info-access-tokens';
-        var confirm_msg = hint ==='refresh-token'? 'Are you sure?, revoking this refresh token also will become void all related Access Tokens':'Are you sure?';
-        if(confirm(confirm_msg)){
+        var confirm_msg = hint ==='refresh-token'? 'Revoking this refresh token also will become void all related Access Tokens.':'Revoke Access Token?';
 
-            $.ajax(
-                {
-                    type: "DELETE",
-                    url: url,
-                    dataType: "json",
-                    timeout:60000,
-                    success: function (data,textStatus,jqXHR) {
-                        //load data...
-                        var row = $('#'+value);
-                        row.remove();
-                        var row_qty = $('#'+table_id+' tr').length;
-                        if(row_qty===1){ //only we have the header ...
-                            $('#'+table_id).hide();
-                            $('#'+info_id).show();
+        swal({
+                title: "Are you sure?",
+                text: confirm_msg,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, revoke it!",
+                closeOnConfirm: true
+            },
+            function(){
+                $.ajax(
+                    {
+                        type: "DELETE",
+                        url: url,
+                        dataType: "json",
+                        timeout:60000,
+                        success: function (data,textStatus,jqXHR) {
+                            //load data...
+                            var row = $('#'+value);
+                            row.remove();
+                            var row_qty = $('#'+table_id+' tr').length;
+                            if(row_qty===1){ //only we have the header ...
+                                $('#'+table_id).hide();
+                                $('#'+info_id).show();
+                            }
+                            if(hint=='refresh-token'){
+                                updateAccessTokenList(1, pageSizeTokens);
+                            }
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            ajaxError(jqXHR, textStatus, errorThrown);
                         }
-                        if(hint=='refresh-token'){
-                            updateAccessTokenList();
-                        }
-                    },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        ajaxError(jqXHR, textStatus, errorThrown);
                     }
-                }
-            );
-        }
+                );
+            });
         event.preventDefault();
         return false;
     });

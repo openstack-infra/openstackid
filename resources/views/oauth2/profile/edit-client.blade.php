@@ -13,6 +13,7 @@
     {!! HTML::script('bower_assets/typeahead.js/dist/typeahead.bundle.js')!!}
     {!! HTML::script('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.js')!!}
     {!! HTML::script('bower_assets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')!!}
+
     <script type="application/javascript">
 
         var dataClientUrls =
@@ -37,18 +38,22 @@
             key_management_algorihtms: {!!Utils\ArrayUtils::toJson(OAuth2\OAuth2Protocol::$supported_key_management_algorithms)!!},
             content_encryption_algorihtms:  {!!Utils\ArrayUtils::toJson(OAuth2\OAuth2Protocol::$supported_content_encryption_algorithms)!!}
         };
+
         var current_admin_users  = [];
 
         @foreach($client->admin_users()->get() as $user)
         current_admin_users.push({ "id": {!!$user->id!!} , "value": "{!! $user->getFullName() !!}" });
         @endforeach
 
-        $(document).ready
-        (
-                function()
-                {
-                }
-        );
+        $(document).ready(function () {
+            $('.panel-collapse').collapse('hide');
+            location.hash && $(location.hash + '.collapse').collapse('show');
+
+            $(document).on('click', '.head-button', function(e){
+                $('.panel-collapse').collapse('hide');
+                window.location.hash = $(this).attr('href');
+            });
+        });
     </script>
 @append
 @section('content')
@@ -77,17 +82,18 @@
     </ul>
 </div>
 @endif
+
 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
     <!-- main data -->
     <div class="panel panel-default" style="padding-bottom:0px">
-        <div class="panel-heading" role="tab" id="headingOne" style="margin-bottom:0px">
+        <div class="panel-heading" role="tab" id="main_data_heading" style="margin-bottom:0px">
             <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                <a role="button" class="head-button" data-toggle="collapse" data-parent="#accordion" href="#main_data" aria-expanded="true" aria-controls="main_data">
                     OAuth 2.0 Client Data
                 </a>
             </h4>
         </div>
-        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+        <div id="main_data" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="main_data_heading">
             <div class="panel-body">
                 @include('oauth2.profile.edit-client-data',array('access_tokens' => $access_tokens, 'refresh_tokens' => $refresh_tokens,'client' => $client))
             </div>
@@ -95,14 +101,14 @@
     </div>
     <!-- scopes -->
     <div class="panel panel-default" style="padding-bottom:0px">
-        <div class="panel-heading" role="tab" id="heading4" style="margin-bottom:0px">
+        <div class="panel-heading" role="tab" id="allowed_scopes_heading" style="margin-bottom:0px">
             <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse4" aria-expanded="false" aria-controls="collapse4">
+                <a class="collapsed head-button" role="button" data-toggle="collapse" data-parent="#accordion" href="#allowed_scopes" aria-expanded="false" aria-controls="allowed_scopes">
                     Application Allowed Scopes
                 </a>
             </h4>
         </div>
-        <div id="collapse4" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading4">
+        <div id="allowed_scopes" class="panel-collapse collapse" role="tabpanel" aria-labelledby="allowed_scopes_heading">
             <div class="panel-body">
                 @include('oauth2.profile.edit-client-scopes',array('access_tokens' => $access_tokens, 'refresh_tokens' => $refresh_tokens,'client'=>$client) )
             </div>
@@ -110,14 +116,14 @@
     </div>
     <!-- grants -->
     <div class="panel panel-default" style="padding-bottom:0px">
-        <div class="panel-heading" role="tab" id="heading5" style="margin-bottom:0px">
+        <div class="panel-heading" role="tab" id="grants_heading" style="margin-bottom:0px">
             <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse5" aria-expanded="false" aria-controls="collapse5">
+                <a class="collapsed head-button" role="button" data-toggle="collapse" data-parent="#accordion" href="#grants" aria-expanded="false" aria-controls="grants">
                     Application Grants
                 </a>
             </h4>
         </div>
-        <div id="collapse5" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading5">
+        <div id="grants" class="panel-collapse collapse" role="tabpanel" aria-labelledby="grants_heading">
             <div class="panel-body">
                 @include('oauth2.profile.edit-client-tokens',array('access_tokens' => $access_tokens, 'refresh_tokens' => $refresh_tokens,'client'=>$client) )
             </div>
@@ -125,14 +131,14 @@
     </div>
     <!-- security settings -->
     <div class="panel panel-default" style="padding-bottom:0px">
-        <div class="panel-heading" role="tab" id="heading6" style="margin-bottom:0px">
+        <div class="panel-heading" role="tab" id="security_heading" style="margin-bottom:0px">
             <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse6" aria-expanded="false" aria-controls="collapse6">
+                <a class="collapsed head-button" role="button" data-toggle="collapse" data-parent="#accordion" href="#security" aria-expanded="false" aria-controls="security">
                     Security Settings
                 </a>
             </h4>
         </div>
-        <div id="collapse6" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading6">
+        <div id="security" class="panel-collapse collapse" role="tabpanel" aria-labelledby="security_heading">
             <div class="panel-body">
                 @include('oauth2.profile.edit-client-security-main-settings',array('client' => $client) )
                 <hr/>
