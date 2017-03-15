@@ -434,6 +434,28 @@ SQL;
             )
         );
 
+        Member::create(
+            array(
+                'ID'   => 9,
+                'FirstName' => 'Ian Y.',
+                'Surname' => 'Choi',
+                'Email' => 'ianyrchoi@gmail.com',
+                'Password' => '1qaz2wsx',
+                'PasswordEncryption' => 'none',
+                'Salt' => 'none',
+                'Gender' => 'male',
+                'Address' => 'Av. Siempre Viva 111',
+                'Suburb' => 'Lanus Este',
+                'State' => 'Buenos Aires',
+                'City' => 'Lanus',
+                'Postcode' => '1824',
+                'Country' => 'AR',
+                'Locale' => 'ESP',
+                'Active' => 1,
+                'EmailVerified' => 1,
+            )
+        );
+
         DB::table('banned_ips')->delete();
         DB::table('user_exceptions_trail')->delete();
         DB::table('server_configuration')->delete();

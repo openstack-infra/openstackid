@@ -32,11 +32,14 @@ class UserTest extends TestCase
         $member6 = Member::findOrFail(6);
         $member7 = Member::findOrFail(7);
         $member8 = Member::findOrFail(8);
+        $member9 = Member::findOrFail(9);
         $id6 = $generator->generate($member6);
         $this->assertTrue( $id6 == 'bharath.kumar.m.r');
         $id7 = $generator->generate($member7);
         $this->assertTrue( $id7 == 'yuanying');
         $id8 = $generator->generate($member8);
         $this->assertTrue( $id8 == 'sebastian.german.marcet.gomez');
+        $id9 = $generator->generate($member9);
+        $this->assertTrue( $id9 == 'ian.y.choi');
     }
 }

@@ -90,11 +90,13 @@ final class UserNameGeneratorService implements IUserNameGeneratorService
     {
         $fname     = self::normalizeChars(trim($member->FirstName));
         $lname     = self::normalizeChars(trim($member->Surname));
+        $fname     = preg_replace('/[^\d\w_-]+/i', IUserNameGeneratorService::USER_NAME_INVALID_CHAR_REPLACEMENT, $fname);
+        $lname     = preg_replace('/[^\d\w_-]+/i', IUserNameGeneratorService::USER_NAME_INVALID_CHAR_REPLACEMENT, $lname);
         $user_name = strtolower
         (
-            preg_replace('/[^\d\w_-]+/i', IUserNameGeneratorService::USER_NAME_INVALID_CHAR_REPLACEMENT, $fname)
+            trim($fname, '.')
             . IUserNameGeneratorService::USER_NAME_CHAR_CONNECTOR .
-            preg_replace('/[^\d\w_-]+/i', IUserNameGeneratorService::USER_NAME_INVALID_CHAR_REPLACEMENT, $lname)
+            trim($lname,'.')
         );
         //if all characters were replaced by a connector, then is not a latin character based user name
         if(strlen($user_name) === substr_count($user_name, IUserNameGeneratorService::USER_NAME_CHAR_CONNECTOR))
