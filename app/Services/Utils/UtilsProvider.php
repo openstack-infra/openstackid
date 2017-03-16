@@ -33,8 +33,6 @@ final class UtilsProvider extends ServiceProvider {
      */
     public function register()
     {
-        Log::debug("UtilsProvider::register");
-
         App::singleton(UtilsServiceCatalog::CacheService, 'Services\\Utils\\RedisCacheService');
 	    App::singleton(UtilsServiceCatalog::TransactionService, 'Services\\Utils\\EloquentTransactionService');
         App::singleton(UtilsServiceCatalog::LogService, 'Services\\Utils\\LogService');
