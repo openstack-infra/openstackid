@@ -1,0 +1,9 @@
+Code-Review+1: Jimmy McArthur <jimmy@tipit.net>
+Code-Review+2: sebastian marcet <smarcet@gmail.com>
+Workflow+1: sebastian marcet <smarcet@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 10 Apr 2017 23:28:00 +0000
+Reviewed-on: https://review.openstack.org/455453
+Project: openstack-infra/openstackid
+Branch: refs/heads/master
