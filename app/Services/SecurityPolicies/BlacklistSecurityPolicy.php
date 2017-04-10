@@ -67,7 +67,8 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
         ICacheService               $cache_service,
         IResourceServerRepository   $resource_server_repository,
         ITransactionService         $tx_service
-    ) {
+    )
+    {
         parent::__construct($server_configuration_service, $lock_manager_service, $cache_service, $tx_service);
         $this->resource_server_repository = $resource_server_repository;
         // here we configure on which exceptions are we interested and the max occurrence attempts and initial delay on tar pit for
@@ -249,10 +250,17 @@ class BlacklistSecurityPolicy extends AbstractBlacklistSecurityPolicy
      */
     private function isIPAddressWhiteListed($ip)
     {
+        $cache_value = $this->cache_service->getSingleValue($ip.".whitelisted");
+        if(!empty($cache_value)) return true;
+
         $resource_server = $this->resource_server_repository->getByIp($ip);
         $white_listed_ip = $this->white_listed_ip_repository->getByIp($ip);
 
-        return !is_null($resource_server) || !is_null($white_listed_ip);
+        $white_listed    = !is_null($resource_server) || !is_null($white_listed_ip);
+        if($white_listed)
+            $this->cache_service->setSingleValue($ip.".whitelisted", $ip.".whitelisted");
+
+        return $white_listed;
     }
 
 }

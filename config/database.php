@@ -100,10 +100,11 @@ return [
         'cluster' => false,
 
         'default' => [
-            'host'     => env('REDIS_HOST'),
-            'port'     => env('REDIS_PORT'),
-            'database' => env('REDIS_DB', 0),
-            'password' => env('REDIS_PASSWORD'),
+            'host'       => env('REDIS_HOST'),
+            'port'       => env('REDIS_PORT'),
+            'database'   => env('REDIS_DB', 0),
+            'password'   => env('REDIS_PASSWORD'),
+            'persistent' => 1,
         ],
 
     ],
