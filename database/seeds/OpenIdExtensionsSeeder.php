@@ -5,6 +5,7 @@ use Illuminate\Database\Seeder;
 use OpenId\Extensions\Implementations\OpenIdAXExtension;
 use OpenId\Extensions\Implementations\OpenIdSREGExtension;
 use OpenId\Extensions\Implementations\OpenIdOAuth2Extension;
+use OpenId\Extensions\Implementations\OpenIdSREGExtension_1_0;
 
 /**
  * Class OpenIdExtensionsSeeder
@@ -28,15 +29,25 @@ class OpenIdExtensionsSeeder extends Seeder {
 
         ServerExtension::create(
             array(
-                'name'            => 'SREG',
-                'namespace'       => 'http://openid.net/extensions/sreg/1.1',
+                'name'            => 'SREG_1_0',
+                'namespace'       => 'http://openid.net/sreg/1.0',
                 'active'          => true,
-                'extension_class' => OpenIdSREGExtension::class,
-                'description'     => 'OpenID Simple Registration is an extension to the OpenID Authentication protocol that allows for very light-weight profile exchange.',
+                'extension_class' => OpenIdSREGExtension_1_0::class,
+                'description'     => 'OpenID Simple Registration 1.0 is an extension to the OpenID Authentication protocol that allows for very light-weight profile exchange.',
                 'view_name'       => 'extensions.sreg',
             )
         );
 
+        ServerExtension::create(
+            array(
+                'name'            => 'SREG',
+                'namespace'       => 'http://openid.net/extensions/sreg/1.1',
+                'active'          => true,
+                'extension_class' => OpenIdSREGExtension::class,
+                'description'     => 'OpenID Simple Registration 1.1 is an extension to the OpenID Authentication protocol that allows for very light-weight profile exchange.',
+                'view_name'       => 'extensions.sreg',
+            )
+        );
 
         ServerExtension::create(
             array(

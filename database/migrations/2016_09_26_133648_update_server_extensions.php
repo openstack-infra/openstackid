@@ -38,7 +38,6 @@ class UpdateServerExtensions extends Migration
             )
         );
 
-
         ServerExtension::create(
             array(
                 'name'            => 'OAUTH2',

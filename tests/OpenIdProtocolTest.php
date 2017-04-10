@@ -10,6 +10,7 @@ use Zend\Crypt\PublicKey\DiffieHellman;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Config;
 use Models\OpenId\OpenIdTrustedSite;
+use OpenId\Extensions\Implementations\OpenIdSREGExtension_1_0;
 /**
  * Class OpenIdProtocolTest
  * Test Suite for OpenId Protocol
@@ -629,8 +630,81 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
 
     //extension tests
 
+    public function testCheckSetupSREGExtension1_0()
+    {
 
-    public function testCheckSetupSREGExtension()
+        //set login info
+        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
+        $sreg_required_params = array('email', 'fullname');
+
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS) => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode) => OpenIdProtocol::SetupMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm) => "https://www.test.com/",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo) => "https://www.test.com/oauth2",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity) => "http://specs.openid.net/auth/2.0/identifier_select",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
+            //sreg
+            OpenIdSREGExtension::paramNamespace() => OpenIdSREGExtension_1_0::NamespaceUrl,
+            OpenIdSREGExtension::param(OpenIdSREGExtension::Required) => implode(",", $sreg_required_params),
+
+        );
+
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(302);
+
+        $openid_response = $this->parseOpenIdResponse($response->getTargetUrl());
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)]));
+        $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)]));
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)]));
+        $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)]));
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]));
+        $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]));
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Sig)]));
+        $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Sig)]));
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Signed)]));
+        $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Signed)]));
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)]));
+        $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)]));
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_OpEndpoint)]));
+        $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_OpEndpoint)]));
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)]));
+        $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)]));
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]));
+        $this->assertTrue(!empty($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId)]));
+
+        //sreg
+
+        $this->assertTrue(isset($openid_response[OpenIdSREGExtension::paramNamespace()]));
+        $this->assertTrue($openid_response[OpenIdSREGExtension::paramNamespace()] === OpenIdSREGExtension_1_0::NamespaceUrl);
+
+        $this->assertTrue(isset($openid_response[OpenIdSREGExtension::param(OpenIdSREGExtension::FullName)]));
+        $full_name = $openid_response[OpenIdSREGExtension::param(OpenIdSREGExtension::FullName)];
+        $this->assertTrue(!empty($full_name) && $full_name === 'Sebastian Marcet');
+
+        $this->assertTrue(isset($openid_response[OpenIdSREGExtension::param(OpenIdSREGExtension::Email)]));
+        $email = $openid_response[OpenIdSREGExtension::param(OpenIdSREGExtension::Email)];
+        $this->assertTrue(!empty($email) && $email === 'sebastian@tipit.net');
+
+        //http://openid.net/specs/openid-authentication-2_0.html#check_auth
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint",
+            $this->prepareCheckAuthenticationParams($openid_response));
+        $openid_response = $this->getOpenIdResponseLineBreak($response->getContent());
+        $this->assertResponseStatus(200);
+        $this->assertTrue($openid_response['is_valid'] === 'true');
+    }
+
+    public function testCheckSetupSREGExtension1_1()
     {
 
         //set login info

@@ -23,6 +23,7 @@ use OpenId\Extensions\Implementations\OpenIdAXExtension;
 use OpenId\Extensions\Implementations\OpenIdSREGExtension;
 use OpenId\Extensions\Implementations\OpenIdOAuth2Extension;
 use Models\Group;
+use OpenId\Extensions\Implementations\OpenIdSREGExtension_1_0;
 /**
  * Class OAuth2ApplicationSeeder
  * This seeder is only for testing purposes
@@ -743,6 +744,18 @@ SQL;
     }
 
     private function seedServerExtensions(){
+
+        ServerExtension::create(
+            array(
+                'name'            => 'SREG_1_0',
+                'namespace'       => 'http://openid.net/sreg/1.0',
+                'active'          => true,
+                'extension_class' => OpenIdSREGExtension_1_0::class,
+                'description'     => 'OpenID Simple Registration 1.0 is an extension to the OpenID Authentication protocol that allows for very light-weight profile exchange.',
+                'view_name'       => 'extensions.sreg',
+            )
+        );
+
         ServerExtension::create(
             array(
                 'name'            => 'AX',
