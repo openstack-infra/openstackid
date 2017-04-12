@@ -635,7 +635,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
 
         //set login info
         Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
-        $sreg_required_params = array('email', 'fullname');
+        $sreg_required_params = array('email', 'fullname', 'nickname');
 
         $params = array(
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS) => OpenIdProtocol::OpenID2MessageType,

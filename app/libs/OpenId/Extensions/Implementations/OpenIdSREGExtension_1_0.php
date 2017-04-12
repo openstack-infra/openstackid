@@ -76,15 +76,15 @@ class OpenIdSREGExtension_1_0 extends OpenIdExtension
 
         $this->auth_service = $auth_service;
 
-        self::$available_properties[OpenIdSREGExtension::Nickname] = OpenIdSREGExtension::Nickname;
-        self::$available_properties[OpenIdSREGExtension::Email] = OpenIdSREGExtension::Email;
-        self::$available_properties[OpenIdSREGExtension::FullName] = OpenIdSREGExtension::FullName;
-        self::$available_properties[OpenIdSREGExtension::Country] = OpenIdSREGExtension::Country;
-        self::$available_properties[OpenIdSREGExtension::Language] = OpenIdSREGExtension::Language;
-        self::$available_properties[OpenIdSREGExtension::Gender] = OpenIdSREGExtension::Gender;
+        self::$available_properties[OpenIdSREGExtension::Nickname]       = OpenIdSREGExtension::Nickname;
+        self::$available_properties[OpenIdSREGExtension::Email]          = OpenIdSREGExtension::Email;
+        self::$available_properties[OpenIdSREGExtension::FullName]       = OpenIdSREGExtension::FullName;
+        self::$available_properties[OpenIdSREGExtension::Country]        = OpenIdSREGExtension::Country;
+        self::$available_properties[OpenIdSREGExtension::Language]       = OpenIdSREGExtension::Language;
+        self::$available_properties[OpenIdSREGExtension::Gender]         = OpenIdSREGExtension::Gender;
         self::$available_properties[OpenIdSREGExtension::DateOfBirthday] = OpenIdSREGExtension::DateOfBirthday;
-        self::$available_properties[OpenIdSREGExtension::Postcode] = OpenIdSREGExtension::Postcode;
-        self::$available_properties[OpenIdSREGExtension::Timezone] = OpenIdSREGExtension::Timezone;
+        self::$available_properties[OpenIdSREGExtension::Postcode]       = OpenIdSREGExtension::Postcode;
+        self::$available_properties[OpenIdSREGExtension::Timezone]       = OpenIdSREGExtension::Timezone;
     }
 
     /**
@@ -151,6 +151,9 @@ class OpenIdSREGExtension_1_0 extends OpenIdExtension
                 }
                 if ($attr == self::Nickname || $attr == self::FullName) {
                     $response->addParam(self::param($attr), $user->getFullName());
+                }
+                if ($attr == self::Nickname) {
+                    $response->addParam(self::param($attr), $user->getIdentifier());
                 }
                 if ($attr == self::Language) {
                     $response->addParam(self::param($attr), $user->getLanguage());

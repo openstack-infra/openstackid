@@ -127,13 +127,14 @@ class UserService extends OAuth2ProtectedService implements IUserService
                 $pic_url    = $current_user->getPic();
                 $pic_url    = str_contains($pic_url, 'http') ? $pic_url : $assets_url . $pic_url;
 
-                $data[StandardClaims::Name]       = $current_user->getFullName();
-                $data[StandardClaims::GivenName]  = $current_user->getFirstName();
-                $data[StandardClaims::FamilyName] = $current_user->getLastName();
-                $data[StandardClaims::NickName]   = $current_user->getNickName();
-                $data[StandardClaims::Picture]    = $pic_url;
-                $data[StandardClaims::Birthdate]  = $current_user->getDateOfBirth();
-                $data[StandardClaims::Gender]     = $current_user->getGender();
+                $data[StandardClaims::Name]                = $current_user->getFullName();
+                $data[StandardClaims::GivenName]           = $current_user->getFirstName();
+                $data[StandardClaims::FamilyName]          = $current_user->getLastName();
+                $data[StandardClaims::NickName]            = $current_user->getIdentifier();
+                $data[StandardClaims::SubjectIdentifier]   = $current_user->getAuthIdentifier();
+                $data[StandardClaims::Picture]             = $pic_url;
+                $data[StandardClaims::Birthdate]           = $current_user->getDateOfBirth();
+                $data[StandardClaims::Gender]              = $current_user->getGender();
             }
             if (in_array(self::UserProfileScope_Email, $scopes)) {
                 // Email Claim

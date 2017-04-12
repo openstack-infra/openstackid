@@ -39,6 +39,7 @@ final class EloquentResourceServerRepository
      */
     public function getByHost($host)
     {
+        if(!is_array($host)) $host = [$host];
         return $this->entity->whereIn('host', $host)->first();
     }
 
