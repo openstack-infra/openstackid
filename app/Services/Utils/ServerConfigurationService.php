@@ -61,7 +61,7 @@ class ServerConfigurationService implements IOpenIdServerConfigurationService, I
 
         $this->default_config_params["MaxFailed.LoginAttempts.2ShowCaptcha"] = Config::get('server.MaxFailed_LoginAttempts_2ShowCaptcha',
             3);
-        $this->default_config_params["Assets.Url"] = Config::get('server.Assets_Url', self::DefaultAssetsUrl );
+        $this->default_config_params["Assets.Url"] = Config::get('server.assets_base_url', self::DefaultAssetsUrl );
         // remember me cookie lifetime (minutes)
         $this->default_config_params["Remember.ExpirationTime"] = Config::get('Remember.ExpirationTime', 120);
 
