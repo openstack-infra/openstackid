@@ -56,13 +56,6 @@
                 <div class="checkbox">
                     <label class="checkbox">
                         {!! Form::checkbox('remember', '1', false) !!}Remember me
-                        for @if(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")<60) !!}
-                        {!! ServerConfigurationService::getConfigValue("Remember.ExpirationTime") !!} Minutes
-                        @elseif(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")>60 && ServerConfigurationService::getConfigValue("Remember.ExpirationTime")< (24*60))
-                            {!! intval(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")/60) !!} Hours
-                        @elseif(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")> (24*60) )
-                            {!! intval(ServerConfigurationService::getConfigValue("Remember.ExpirationTime")/(24*60)) !!} Days
-                        @endif
                     </label>
                 </div>
                 <div class="pull-right">
