@@ -81,6 +81,33 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
     /**
      * Get Auth Code Test
      */
+    public function testAuthCodeNoResponseType()
+    {
+
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+
+        $params = array(
+            'client_id' => $client_id,
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'response_type' => '',
+            'scope' => sprintf('%s/resource-server/read', $this->current_realm),
+        );
+
+        $response = $this->action("POST", "OAuth2\OAuth2ProviderController@auth",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(400);
+
+
+    }
+
+
+    /**
+     * Get Auth Code Test
+     */
     public function testCancelAuthCode()
     {
 
@@ -109,8 +136,6 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         ));
 
         $this->assertResponseStatus(302);
-
-
     }
 
     public function testAuthCodeInvalidRedirectUri()

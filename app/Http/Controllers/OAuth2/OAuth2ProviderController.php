@@ -16,7 +16,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\View;
-use OAuth2\Exceptions\UriNotAllowedException;
+use OAuth2\Exceptions\OAuth2BaseException;
 use OAuth2\Factories\OAuth2AuthorizationRequestFactory;
 use OAuth2\IOAuth2Protocol;
 use OAuth2\OAuth2Message;
@@ -26,13 +26,13 @@ use OAuth2\Requests\OAuth2LogoutRequest;
 use OAuth2\Requests\OAuth2TokenRequest;
 use OAuth2\Requests\OAuth2TokenRevocationRequest;
 use OAuth2\Responses\OAuth2Response;
-use OAuth2\Services\IClientService;
 use OAuth2\Strategies\OAuth2ResponseStrategyFactoryMethod;
 use Utils\Http\HttpContentType;
 use Utils\Services\IAuthService;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
+use Exception;
 
 /**
  * Class OAuth2ProviderController
@@ -104,7 +104,7 @@ final class OAuth2ProviderController extends Controller
 
             return $response;
         }
-        catch(UriNotAllowedException $ex1)
+        catch(OAuth2BaseException $ex1)
         {
             return Response::view
             (
@@ -113,6 +113,20 @@ final class OAuth2ProviderController extends Controller
                 (
                     'error_code'        => $ex1->getError(),
                     'error_description' => $ex1->getMessage()
+                ),
+                400
+            );
+        }
+        catch(Exception $ex)
+        {
+            Log::error($ex);
+            return Response::view
+            (
+                'errors.400',
+                array
+                (
+                    'error_code'        => "Generic Error",
+                    'error_description' => "Generic Error"
                 ),
                 400
             );

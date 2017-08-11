@@ -14,6 +14,7 @@
  **/
 
 use Exception;
+use OAuth2\Exceptions\UnsupportedResponseTypeException;
 use OAuth2\Requests\OAuth2Request;
 use OAuth2\Responses\OAuth2IndirectErrorResponse;
 use OAuth2\Responses\OAuth2IndirectFragmentErrorResponse;
@@ -68,7 +69,7 @@ final class OAuth2IndirectErrorResponseFactoryMethod
                 );
             }
 
-            throw new Exception
+            throw new UnsupportedResponseTypeException
             (
                 sprintf
                 (
