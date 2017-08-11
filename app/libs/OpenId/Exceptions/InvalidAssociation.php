@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Exception;
+
 /**
  * Class InvalidAssociation
  * @package OpenId\Exceptions
  */
-class InvalidAssociation extends Exception {
+class InvalidAssociation extends OpenIdBaseException {
 
     public function __construct($message = "")
     {

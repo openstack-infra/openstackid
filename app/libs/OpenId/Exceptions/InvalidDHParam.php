@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Exception;
+
 /**
  * Class InvalidDHParam
  * @package OpenId\Exceptions
  */
-class InvalidDHParam extends Exception {
+class InvalidDHParam extends OpenIdBaseException {
 
     public function __construct($message = "")
     {

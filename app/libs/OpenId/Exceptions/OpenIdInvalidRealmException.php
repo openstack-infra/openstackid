@@ -11,12 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Exception;
 /**
  * Class OpenIdInvalidRealmException
  * @package OpenId\Exceptions
  */
-class OpenIdInvalidRealmException extends Exception {
+class OpenIdInvalidRealmException extends OpenIdBaseException {
 
     public function __construct($message = "")
     {

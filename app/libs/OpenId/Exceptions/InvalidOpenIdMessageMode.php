@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Exception;
+
 /**
  * Class InvalidOpenIdMessageMode
  * @package OpenId\Exceptions
  */
-class InvalidOpenIdMessageMode extends Exception {
+class InvalidOpenIdMessageMode extends OpenIdBaseException {
     public function __construct($message = "")
     {
         $message = "Invalid OpenId Message Mode : " . $message;

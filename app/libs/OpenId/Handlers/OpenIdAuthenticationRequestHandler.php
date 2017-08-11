@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use Exception;
+use OpenId\Exceptions\InvalidAssociation;
 use OpenId\Exceptions\InvalidAssociationTypeException;
 use OpenId\Exceptions\InvalidOpenIdAuthenticationRequestMode;
 use OpenId\Exceptions\InvalidOpenIdMessageException;
@@ -194,7 +195,16 @@ final class OpenIdAuthenticationRequestHandler extends OpenIdMessageHandler
                 $this->log_service->warning_msg("current request: ".$this->current_request);;
             }
             return new OpenIdIndirectGenericErrorResponse($inv_msg_ex->getMessage(), null, null, $this->current_request);
-        } catch (Exception $ex) {
+        }
+        catch(InvalidAssociation $inv_assoc_ex){
+            $this->checkpoint_service->trackException($inv_assoc_ex);
+            $this->log_service->warning($inv_assoc_ex);
+            if (!is_null($this->current_request)) {
+                $this->log_service->warning_msg("current request: ".$this->current_request);;
+            }
+            return new OpenIdIndirectGenericErrorResponse($inv_assoc_ex->getMessage(), null, null, $this->current_request);
+        }
+        catch (Exception $ex) {
             $this->checkpoint_service->trackException($ex);
             $this->log_service->error($ex);
             if (!is_null($this->current_request)) {

@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Exception;
+
 /**
  * Class InvalidSessionTypeException
  * @package OpenId\Exceptions
  */
-class InvalidSessionTypeException extends Exception {
+class InvalidSessionTypeException extends OpenIdBaseException {
 
     public function __construct($message = "")
     {

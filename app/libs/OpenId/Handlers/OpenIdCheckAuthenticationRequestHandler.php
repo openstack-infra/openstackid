@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use Exception;
+use OpenId\Exceptions\InvalidAssociation;
 use OpenId\Exceptions\InvalidAssociationTypeException;
 use OpenId\Exceptions\InvalidNonce;
 use OpenId\Exceptions\InvalidOpenIdMessageException;
@@ -169,19 +170,28 @@ final class OpenIdCheckAuthenticationRequestHandler extends OpenIdMessageHandler
             return $response;
         } catch (InvalidNonce $inv_nonce_ex) {
             $this->checkpoint_service->trackException($inv_nonce_ex);
-            $this->log_service->error($inv_nonce_ex);
+            $this->log_service->warning($inv_nonce_ex);
             $response = new OpenIdDirectGenericErrorResponse($inv_nonce_ex->getMessage());
             if(!is_null($this->current_request))
                 $this->log_service->warning_msg("current request: ".$this->current_request);
             return $response;
         } catch (InvalidOpenIdMessageException $inv_msg_ex) {
             $this->checkpoint_service->trackException($inv_msg_ex);
-            $this->log_service->error($inv_msg_ex);
+            $this->log_service->warning($inv_msg_ex);
             $response = new OpenIdDirectGenericErrorResponse($inv_msg_ex->getMessage());
             if(!is_null($this->current_request))
                 $this->log_service->warning_msg("current request: ".$this->current_request);
             return $response;
-        } catch (Exception $ex) {
+        }
+        catch(InvalidAssociation $inv_assoc_ex){
+            $this->checkpoint_service->trackException($inv_assoc_ex);
+            $this->log_service->warning($inv_assoc_ex);
+            $response = new OpenIdDirectGenericErrorResponse($inv_assoc_ex->getMessage());
+            if(!is_null($this->current_request))
+                $this->log_service->warning_msg("current request: ".$this->current_request);
+            return $response;
+        }
+        catch (Exception $ex) {
             $this->checkpoint_service->trackException($ex);
             $this->log_service->error($ex);
             if(!is_null($this->current_request))

@@ -1199,4 +1199,65 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue(strpos($content, 'http://specs.openid.net/auth/2.0/server') !== false);
     }
 
+    public function testInvalidRequestK()
+    {
+        $params = [];
+
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(400);
+
+    }
+
+    public function testInvalidAssociation()
+    {
+        //set login info
+
+        $params = array(
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)        => OpenIdProtocol::OpenID2MessageType,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)      => OpenIdProtocol::SetupMode,
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Realm)     => "https://www.newsite.com/",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)  => "https://www.newsite.com/return_to/",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Identity)  => "http://specs.openid.net/auth/2.0/identifier_select",
+            OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ClaimedId) => "http://specs.openid.net/auth/2.0/identifier_select",
+        );
+
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        // post consent response ...
+
+        $consent_response = $this->call('POST', $url, array
+            (
+                'trust'  => array('AllowOnce'),
+                '_token' => Session::token()
+            )
+        );
+
+        $this->assertResponseStatus(302);
+
+        $auth_response = $this->action("GET", "OpenId\OpenIdProviderController@endpoint",
+            array(),
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $openid_response = $this->parseOpenIdResponse($auth_response->getTargetUrl());
+
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_Mode)]));
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS)]));
+        $this->assertTrue(isset($openid_response[OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_ReturnTo)]));
+
+        //http://openid.net/specs/openid-authentication-2_0.html#check_auth
+        $params   = $this->prepareCheckAuthenticationParams($openid_response);
+        $params['openid.assoc_handle'] = "FAKE";
+        $response = $this->action("POST", "OpenId\OpenIdProviderController@endpoint", $params);
+        $openid_response = $this->getOpenIdResponseLineBreak($response->getContent());
+        $this->assertResponseStatus(400);
+    }
 }

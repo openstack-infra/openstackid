@@ -125,7 +125,7 @@ final class OAuth2ProviderController extends Controller
                 'errors.400',
                 array
                 (
-                    'error_code'        => "Generic Error",
+                    'error_code'        => "Bad Request",
                     'error_description' => "Generic Error"
                 ),
                 400

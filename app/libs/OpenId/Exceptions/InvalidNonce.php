@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Exception;
+
 /**
  * Class InvalidNonce
  * @package OpenId\Exceptions
  */
-class InvalidNonce extends Exception {
+class InvalidNonce extends OpenIdBaseException {
 
     public function __construct($message = "")
     {

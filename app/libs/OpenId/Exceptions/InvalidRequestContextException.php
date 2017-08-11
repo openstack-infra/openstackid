@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Exception;
+
 /**
  * Class InvalidRequestContextException
  * @package OpenId\Exceptions
  */
-class InvalidRequestContextException extends Exception {
+class InvalidRequestContextException extends OpenIdBaseException {
 
     public function __construct($message = "")
     {

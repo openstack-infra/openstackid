@@ -15,7 +15,10 @@
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use OpenId\Exceptions\InvalidOpenIdMessageException;
+use OpenId\Exceptions\OpenIdBaseException;
 use OpenId\Helpers\OpenIdErrorMessages;
 use OpenId\IOpenIdProtocol;
 use OpenId\OpenIdMessage;
@@ -55,22 +58,50 @@ class OpenIdProviderController extends Controller
      */
     public function endpoint()
     {
-        $msg = new OpenIdMessage(Input::all());
+        try {
+            $msg = new OpenIdMessage(Input::all());
 
-        if ($this->memento_service->exists()) {
-            $msg = OpenIdMessage::buildFromMemento($this->memento_service->load());
+            if (!$msg->isValid() && $this->memento_service->exists()) {
+                $msg = OpenIdMessage::buildFromMemento($this->memento_service->load());
+            }
+
+            if (!$msg->isValid())
+                throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidOpenIdMessage);
+
+            //get response and manage it taking in consideration its type (direct or indirect)
+            $response = $this->openid_protocol->handleOpenIdMessage($msg);
+
+            if ($response instanceof OpenIdResponse) {
+                $strategy = OpenIdResponseStrategyFactoryMethod::buildStrategy($response);
+                return $strategy->handle($response);
+            }
+            return $response;
         }
-
-        if (!$msg->isValid())
-            throw new InvalidOpenIdMessageException(OpenIdErrorMessages::InvalidOpenIdMessage);
-
-        //get response and manage it taking in consideration its type (direct or indirect)
-        $response = $this->openid_protocol->handleOpenIdMessage($msg);
-
-        if ($response instanceof OpenIdResponse) {
-            $strategy = OpenIdResponseStrategyFactoryMethod::buildStrategy($response);
-            return $strategy->handle($response);
+        catch(OpenIdBaseException $ex1){
+            Log::warning($ex1);
+            return Response::view
+            (
+                'errors.400',
+                array
+                (
+                    'error_code'        => "Bad Request",
+                    'error_description' => $ex1->getMessage()
+                ),
+                400
+            );
         }
-        return $response;
+        catch(Exception $ex){
+            Log::error($ex);
+            return Response::view
+            (
+                'errors.400',
+                array
+                (
+                    'error_code'        => "Bad Request",
+                    'error_description' => "Generic Error"
+                ),
+                400
+            );
+        }
     }
 }

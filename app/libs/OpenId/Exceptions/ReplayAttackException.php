@@ -11,12 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Exception;
+
 /**
  * Class ReplayAttackException
  * @package OpenId\Exceptions
  */
-class ReplayAttackException extends Exception {
+class ReplayAttackException extends OpenIdBaseException {
 
     public function __construct($message = "")
     {
