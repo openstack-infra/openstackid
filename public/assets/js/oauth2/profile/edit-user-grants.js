@@ -20,14 +20,15 @@ function updateAccessTokenList(page, page_size){
             else{
                 $('#info-access-tokens').hide();
                 $('#table-access-tokens').show();
-                var template   = $('<tbody><tr><td class="issued"></td><td class="scope"></td><td class="lifetime"></td><td><a title="Revoke Access Token" class="btn btn-default btn-md active btn-delete revoke-token revoke-access-token" data-hint="access-token">Revoke</a></td></tr></tbody>');
+                var template   = $('<tbody><tr><td class="app_type"></td><td class="issued"></td><td class="scope"></td><td class="lifetime"></td><td><a title="Revoke Access Token" class="btn btn-default btn-md active btn-delete revoke-token revoke-access-token" data-hint="access-token">Revoke</a></td></tr></tbody>');
                 var directives = {
                     'tr':{
                         'token<-context':{
-                            '@id'        :'token.value',
-                            'td.issued'  :'token.issued',
-                            'td.scope'   :'token.scope',
-                            'td.lifetime':'token.lifetime',
+                            '@id'         :'token.value',
+                            'td.app_type' :'token.app_type',
+                            'td.issued'   :'token.issued',
+                            'td.scope'    :'token.scope',
+                            'td.lifetime' :'token.lifetime',
                             'a@href':function(arg){
                                 var token_value = arg.item.value;
                                 var href = TokensUrls.AccessTokenUrls.delete;
@@ -71,14 +72,15 @@ function updateRefreshTokenList(page, page_size){
             else{
                 $('#info-refresh-tokens').hide();
                 $('#table-refresh-tokens').show();
-                var template   = $('<tbody><tr><td class="issued"></td><td class="scope"></td><td class="lifetime"></td><td><a title="Revoke Refresh Token" class="btn btn-default btn-md active btn-delete revoke-token revoke-refresh-token" data-hint="refresh-token">Revoke</a></td></tr></tbody>');
+                var template   = $('<tbody><tr><td class="app_type"></td><td class="issued"></td><td class="scope"></td><td class="lifetime"></td><td><a title="Revoke Refresh Token" class="btn btn-default btn-md active btn-delete revoke-token revoke-refresh-token" data-hint="refresh-token">Revoke</a></td></tr></tbody>');
                 var directives = {
                     'tr':{
                         'token<-context':{
-                            '@id'        :'token.value',
-                            'td.issued'  :'token.issued',
-                            'td.scope'   :'token.scope',
-                            'td.lifetime':function(arg){
+                            '@id'         :'token.value',
+                            'td.app_type' :'token.app_type',
+                            'td.issued'   :'token.issued',
+                            'td.scope'    :'token.scope',
+                            'td.lifetime' : function(arg){
                                 var token_lifetime = arg.item.lifetime;
                                 return token_lifetime===0?'Not Expire':token_lifetime;
                             },

@@ -21,6 +21,7 @@
                     <thead>
                     <tr>
                         <th>Application Type</th>
+                        <th>Issued</th>
                         <th>Application Name</th>
                         <th>Granted Scopes</th>
                         <th>&nbsp;</th>
@@ -30,6 +31,7 @@
                     @foreach($access_tokens as $access_token)
                         <tr id="{!!$access_token->value!!}">
                             <td>{!!$access_token->client()->first()->getFriendlyApplicationType()!!}</td>
+                            <td>{!!$access_token->created_at!!}</td>
                             <td>{!!$access_token->client()->first()->app_name!!}</td>
                             <td>{!!$access_token->scope!!}</td>
                             <td>{!! HTML::link(URL::action("Api\\UserApiController@revokeToken",array("id"=>$user_id,"value"=>$access_token->value, "hint"=>'access-token')),'Revoke Access',array('data-value' => $access_token->value,'data-hint'=>'access-token','class'=>'btn btn-default btn-md active btn-delete revoke-token','title'=>'Revoke Access Token')) !!}</td>
@@ -64,6 +66,7 @@
                     <thead>
                     <tr>
                         <th>Application Type</th>
+                        <th>Issued</th>
                         <th>Application Name</th>
                         <th>Granted Scopes</th>
                         <th>&nbsp;</th>
@@ -73,6 +76,7 @@
                     @foreach($refresh_tokens as $refresh_token)
                         <tr id="{!!$refresh_token->value!!}">
                             <td>{!!$refresh_token->client()->first()->getFriendlyApplicationType()!!}</td>
+                            <td>{!!$refresh_token->created_at!!}</td>
                             <td>{!!$refresh_token->client()->first()->app_name!!}</td>
                             <td>{!!$refresh_token->scope!!}</td>
                             <td>{!! HTML::link(URL::action("Api\\UserApiController@revokeToken",array("id" => $user_id,"value" => $refresh_token->value, "hint" => 'refresh-token')),'Revoke Access',array('data-value' => $refresh_token->value,'data-hint' => 'refresh_token','class' => 'btn btn-default btn-md active btn-delete revoke-token','title' => 'Revoke Access Token')) !!}</td>

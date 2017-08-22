@@ -669,6 +669,7 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
 
             foreach ($paginator->items() as $token) {
                 $res[] =  [
+                    'app_type' => $token->client()->first()->getFriendlyApplicationType(),
                     'value'    => $token->value,
                     'scope'    => $token->scope,
                     'lifetime' => $token->getRemainingLifetime(),
@@ -706,6 +707,7 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
 
             foreach ($paginator->items() as $token) {
                 $res[] = [
+                    'app_type' => $token->client()->first()->getFriendlyApplicationType(),
                     'value'    => $token->value,
                     'scope'    => $token->scope,
                     'lifetime' => $token->getRemainingLifetime(),
