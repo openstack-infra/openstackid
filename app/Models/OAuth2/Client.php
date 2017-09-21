@@ -18,6 +18,7 @@ use OAuth2\Models\IClient;
 use OAuth2\Models\IClientPublicKey;
 use OAuth2\Models\JWTResponseInfo;
 use OAuth2\Models\TokenEndpointAuthInfo;
+use Services\Facades\ServerConfigurationService;
 use Utils\Model\BaseModelEloquent;
 use OAuth2\Models\IApiScope;
 use Exception;
