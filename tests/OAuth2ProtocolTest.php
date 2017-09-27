@@ -1170,4 +1170,31 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
         }
 
     }
+
+    public function testMissingScope()
+    {
+
+        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
+
+        $params = array(
+            'client_id' => $client_id,
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'response_type' => 'code',
+        );
+
+        $response = $this->action("POST", "OAuth2\OAuth2ProviderController@auth",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $comps = @parse_url($url);
+
+        $this->assertTrue(isset($comps["query"]));
+        $this->assertTrue($comps["query"] == "error=invalid_scope&error_description=missing+scope+param");
+    }
 }

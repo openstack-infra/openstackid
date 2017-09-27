@@ -18,6 +18,14 @@ use OAuth2\OAuth2Protocol;
  */
 final class ScopeNotAllowedException extends OAuth2BaseException
 {
+    /**
+     * @param string $scope
+     */
+    public function __construct($scope = null)
+    {
+        $description = empty($scope) ? "missing scope param" : sprintf("scope not allowed %s", $scope);
+        parent::__construct($description);
+    }
 
     /**
      * @return string

@@ -235,8 +235,13 @@ class Client extends BaseModelEloquent implements IClient
         return explode(',',$this->redirect_uris);
     }
 
+    /**
+     * @param string $scope
+     * @return bool
+     */
     public function isScopeAllowed($scope)
     {
+        if(empty($scope)) return false;
         $res            = true;
         $desired_scopes = explode(" ",$scope);
         foreach($desired_scopes as $desired_scope){

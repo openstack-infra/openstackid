@@ -210,8 +210,8 @@ abstract class InteractiveGrantType extends AbstractGrantType
             //check requested scope
             $scope = $request->getScope();
             $this->log_service->debug_msg(sprintf("scope %s", $scope));
-            if (!$client->isScopeAllowed($scope)) {
-                throw new ScopeNotAllowedException(sprintf("scope %s", $scope));
+            if (empty($scope) || !$client->isScopeAllowed($scope)) {
+                throw new ScopeNotAllowedException($scope);
             }
 
             $authentication_response = $this->auth_service->getUserAuthenticationResponse();
