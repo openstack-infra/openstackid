@@ -123,9 +123,10 @@ interface ITokenService {
     /**
      * Creates a new refresh token and associate it with given access token
      * @param AccessToken $access_token
+     * @param boolean $refresh_cache
      * @return RefreshToken
      */
-    public function createRefreshToken(AccessToken &$access_token);
+    public function createRefreshToken(AccessToken &$access_token, $refresh_cache = false);
 
     /**
      * Get a refresh token by its value
@@ -136,7 +137,6 @@ interface ITokenService {
      * @throws InvalidGrantTypeException
      */
     public function getRefreshToken($value, $is_hashed = false);
-
 
     /**
      * Revokes all related tokens to a specific auth code
@@ -180,7 +180,6 @@ interface ITokenService {
      * @return bool
      */
     public function invalidateRefreshToken($value, $is_hashed = false);
-
 
     /**
      * Revokes a give refresh token and all related access tokens

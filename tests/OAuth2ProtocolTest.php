@@ -1,5 +1,16 @@
 <?php
-
+/**
+ * Copyright 2016 OpenStack Foundation
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
 use Auth\User;
 use Illuminate\Support\Facades\App;
 use OAuth2\OAuth2Protocol;
@@ -11,7 +22,7 @@ use Illuminate\Support\Facades\Session;
  * Class OAuth2ProtocolTest
  * Test Suite for OAuth2 Protocol
  */
-class OAuth2ProtocolTest extends OpenStackIDBaseTest
+final class OAuth2ProtocolTest extends OpenStackIDBaseTest
 {
 
     private $current_realm;
@@ -103,7 +114,6 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
 
     }
-
 
     /**
      * Get Auth Code Test
@@ -365,7 +375,6 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
             );
 
-
             $response = $this->action("POST", "OAuth2\OAuth2ProviderController@token",
                 $params,
                 array(),
@@ -518,7 +527,6 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
                 'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
             );
 
-
             $response = $this->action("POST", "OAuth2\OAuth2ProviderController@token",
                 $params,
                 array(),
@@ -616,14 +624,12 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $output = array();
             parse_str($query, $output);
 
-
             //do get auth token...
             $params = array(
                 'code' => $output['code'],
                 'redirect_uri' => 'https://www.test.com/oauth2',
                 'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_AuthCode,
             );
-
 
             $response = $this->action("POST", "OAuth2\OAuth2ProviderController@token",
                 $params,
@@ -644,7 +650,6 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
             $this->assertTrue(!empty($access_token));
             $this->assertTrue(!empty($refresh_token));
-
 
             $params = array(
                 'refresh_token' => $refresh_token,
@@ -667,11 +672,27 @@ class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $response = json_decode($content);
 
             //get new access token and new refresh token...
-            $new_access_token = $response->access_token;
+            $new_access_token  = $response->access_token;
             $new_refresh_token = $response->refresh_token;
 
             $this->assertTrue(!empty($new_access_token));
             $this->assertTrue(!empty($new_refresh_token));
+
+
+            //do token validation ....
+            $params = array(
+                'token' => $new_access_token,
+            );
+
+            $response = $this->action("POST", "OAuth2\OAuth2ProviderController@introspection",
+                $params,
+                array(),
+                array(),
+                array(),
+                // Symfony interally prefixes headers with "HTTP", so
+                array("HTTP_Authorization" => " Basic " . base64_encode($client_id . ':' . $client_secret)));
+
+            $this->assertResponseStatus(200);
 
         } catch (Exception $ex) {
             throw $ex;

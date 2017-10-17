@@ -43,7 +43,7 @@ class RefreshToken extends Token {
     }
 
     public static function create(AccessToken $access_token, $lifetime = 0){
-        $instance = new self();
+        $instance               = new self();
         $instance->scope        = $access_token->getScope();
         $instance->user_id      = $access_token->getUserId();
         $instance->client_id    = $access_token->getClientId();
