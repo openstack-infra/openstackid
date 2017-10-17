@@ -159,9 +159,8 @@ final class RefreshBearerTokenGrantType extends AbstractGrantType
             );
         }
 
-        $access_token = $this->token_service->createAccessTokenFromRefreshToken($refresh_token, $scope);
-
         $new_refresh_token = null;
+        $access_token      = $this->token_service->createAccessTokenFromRefreshToken($refresh_token, $scope);
         /*
          * the authorization server could employ refresh token
          * rotation in which a new refresh token is issued with every access
@@ -174,7 +173,7 @@ final class RefreshBearerTokenGrantType extends AbstractGrantType
         if ($this->current_client->useRotateRefreshTokenPolicy())
         {
             $this->token_service->invalidateRefreshToken($refresh_token_value);
-            $new_refresh_token = $this->token_service->createRefreshToken($access_token);
+            $new_refresh_token = $this->token_service->createRefreshToken($access_token, true);
         }
 
         $response = new OAuth2AccessTokenResponse

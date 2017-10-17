@@ -30,7 +30,7 @@ class RefreshToken extends BaseModelEloquent {
 
     private $friendly_scopes;
 
-    protected $fillable = array('value', 'from_ip', 'lifetime','scope','audience','void','created_at','updated_at','client_id');
+    protected $fillable = ['value', 'from_ip', 'lifetime','scope','audience','void','created_at','updated_at','client_id'];
 
     public function access_tokens()
     {
