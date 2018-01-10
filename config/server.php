@@ -18,4 +18,5 @@ return array
     'db_log_enabled'  => env('DB_LOG_ENABLED', false),
     'assets_base_url' => env('ASSETS_BASE_URL', null),
     'banning_enable'  => env('BANNING_ENABLE', true),
+    'support_email'   => env('SUPPORT_EMAIL', 'info@openstack.org'),
 );
