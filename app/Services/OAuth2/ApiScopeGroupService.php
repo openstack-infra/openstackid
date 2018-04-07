@@ -112,7 +112,7 @@ final class ApiScopeGroupService implements IApiScopeGroupService
                     }
                     if($param === 'scopes')
                     {
-                        $ids = $group->scopes()->getRelatedIds();
+                        $ids = $group->scopes()->getRelatedIds()->all();
                         $group->scopes()->detach($ids);
                         $scopes = explode(',', $params['scopes']);
                         foreach($scopes as $scope_id)

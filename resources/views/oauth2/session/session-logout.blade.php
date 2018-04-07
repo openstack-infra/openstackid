@@ -33,6 +33,6 @@
     </div>
 @stop
 @section('scripts')
-    {!! HTML::script('bower_assets/crypto-js/crypto-js.js')!!}
-    {!! HTML::script('bower_assets/jquery-cookie/jquery.cookie.js')!!}
+    {!! HTML::script('assets/crypto-js/crypto-js.js')!!}
+    {!! HTML::script('assets/jquery-cookie/jquery.cookie.js')!!}
 @append

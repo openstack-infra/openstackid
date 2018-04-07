@@ -81,14 +81,5 @@
         @endforeach
 
     </script>
-    {!! HTML::script('bower_assets/typeahead.js/dist/typeahead.bundle.js')!!}
-    {!! HTML::script('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.js')!!}
     {!! HTML::script('assets/js/oauth2/profile/admin/edit-api-scope-group.js') !!}
-
-
-@append
-
-@section('css')
-    {!! HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.css') !!}
-    {!! HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput-typeahead.css') !!}
 @append

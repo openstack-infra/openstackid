@@ -156,11 +156,11 @@ jQuery(document).ready(function($){
 
                     swal({
                         title: "Your Client Credentials!",
-                        text: credentials_txt,
-                        html: true,
+                        html: credentials_txt,
                         type: "info",
                         customClass: "auto-width"
                     });
+
                     $('#save-application').removeAttr('disabled');
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
@@ -183,24 +183,25 @@ jQuery(document).ready(function($){
                 confirmButtonColor: "#DD6B55",
                 confirmButtonText: "Yes, Delete it!",
                 closeOnConfirm: true
-            },
-            function(){
-                $.ajax(
-                    {
-                        type: "DELETE",
-                        url: url,
-                        contentType: "application/json; charset=utf-8",
-                        dataType: "json",
-                        timeout:60000,
-                        success: function (data,textStatus,jqXHR) {
-                            loadClients();
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            ajaxError(jqXHR, textStatus, errorThrown);
+            }).then(
+                function(result){
+                    if(!result) return;
+                    $.ajax(
+                        {
+                            type: "DELETE",
+                            url: url,
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                            timeout:60000,
+                            success: function (data,textStatus,jqXHR) {
+                                loadClients();
+                            },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                ajaxError(jqXHR, textStatus, errorThrown);
+                            }
                         }
-                    }
-                );
-            });
+                    );
+                });
         event.preventDefault();
         return false;
     });

@@ -9,11 +9,11 @@
     <link rel="manifest" href="/favicon/manifest.json">
     <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#5bbad5">
     @yield('meta')
-    {!! HTML::style('bower_assets/bootstrap/dist/css/bootstrap.min.css') !!}
+    {!! HTML::style('assets/css/index.css') !!}
     {!! HTML::style('assets/css/main.css') !!}
-    {!! HTML::style('bower_assets/jquery-ui/themes/ui-darkness/jquery-ui.css') !!}
-    {!! HTML::style('bower_assets/fontawesome/css/font-awesome.min.css') !!}
-    {!! HTML::style('bower_assets/sweetalert/dist/sweetalert.css') !!}
+    {!! HTML::style('assets/bootstrap-tagsinput/bootstrap-tagsinput-typeahead.css') !!}
+    {!! HTML::style('assets/bootstrap-tagsinput/bootstrap-tagsinput.css') !!}
+    {!! HTML::style('assets/sweetalert2/sweetalert2.css') !!}
     @yield('css')
 </head>
 <body>
@@ -31,17 +31,15 @@
         </div>
         <footer class="row"></footer>
     </div>
-    {!! HTML::script('bower_assets/jquery/dist/jquery.min.js')!!}
-    {!! HTML::script('bower_assets/bootstrap/dist/js/bootstrap.min.js')!!}
-    {!! HTML::script('bower_assets/jquery-validate/dist/jquery.validate.min.js')!!}
-    {!! HTML::script('bower_assets/jquery-validate/dist/additional-methods.min.js')!!}
-    {!! HTML::script('bower_assets/pure-templates/libs/pure.min.js')!!}
-    {!! HTML::script('bower_assets/uri.js/src/URI.min.js')!!}
-    {!! HTML::script('bower_assets/sweetalert/dist/sweetalert.min.js')!!}
+    {!! HTML::script('assets/__common__.js')!!}
+    {!! HTML::script('assets/index.js')!!}
     {!! HTML::script('assets/js/ajax.utils.js')!!}
     {!! HTML::script('assets/js/jquery.cleanform.js')!!}
     {!! HTML::script('assets/js/jquery.serialize.js')!!}
     {!! HTML::script('assets/js/jquery.validate.additional.custom.methods.js')!!}
+    {!! HTML::script('assets/typeahead/typeahead.bundle.js')!!}
+    {!! HTML::script('assets/bootstrap-tagsinput/bootstrap-tagsinput.js')!!}
+    {!! HTML::script('assets/sweetalert2/sweetalert2.js')!!}
     @yield('scripts')
     <span class="version hidden">{!! Config::get('app.version') !!}</span>
 </body>

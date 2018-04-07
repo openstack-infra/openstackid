@@ -86,8 +86,9 @@
                     confirmButtonColor: "#DD6B55",
                     confirmButtonText: "Yes, Delete it!",
                     closeOnConfirm: true
-                },
-                function(){
+                }).thern(
+                function(result){
+                    if(!result) return;
                     $.ajax(
                         {
                             type: "DELETE",

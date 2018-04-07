@@ -94,8 +94,9 @@ jQuery(document).ready(function($){
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "Yes, Regenerate it!",
             closeOnConfirm: true
-        },
-        function(){
+        }).then(
+        function(result){
+            if(!result) return;
             $.ajax(
                 {
                     type: "PUT",
