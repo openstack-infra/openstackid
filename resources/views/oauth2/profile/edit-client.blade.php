@@ -4,15 +4,9 @@
 <title>Welcome to OpenStackId - OAUTH2 Console - Edit Client</title>
 @stop
 @section('css')
-    {!! HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.css') !!}
-    {!! HTML::style('bower_assets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') !!}
-    {!! HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput-typeahead.css') !!}
     {!! HTML::style('assets/css/edit-client.css') !!}
 @append
 @section('scripts')
-    {!! HTML::script('bower_assets/typeahead.js/dist/typeahead.bundle.js')!!}
-    {!! HTML::script('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.js')!!}
-    {!! HTML::script('bower_assets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')!!}
 
     <script type="application/javascript">
 

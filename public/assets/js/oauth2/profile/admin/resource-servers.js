@@ -58,9 +58,9 @@ $(document).ready(function() {
 
     var resource_server_validator = resource_server_form.validate({
         rules: {
-            "host"  :        {required: true, nowhitespace:true,rangelength: [1, 512]},
-            "friendly_name": {required: true, free_text:true,rangelength: [1, 255]},
-            "ips":           { required: true},
+            "host"  :        {required: true, nowhitespace:true, rangelength: [1, 512]},
+            "friendly_name": {required: true, free_text:true, rangelength: [1, 255]},
+            "ips":           {required: true},
         }
     });
 

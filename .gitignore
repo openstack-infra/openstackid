@@ -8,8 +8,6 @@ ChangeLog
 doc/build
 *.egg
 *.egg-info
-public/bower_assets
-public/bower_assets/*
 *.log
 /node_modules
 /public/storage
@@ -18,3 +16,18 @@ Homestead.json
 .env
 .env.testing
 
+/public/assets/jquery-cookie/
+/public/assets/crypto-js/
+/public/assets/bootstrap-tagsinput/
+/public/assets/fonts/
+/public/assets/typeahead/
+/public/assets/__common__.js
+/public/assets/index.js
+public/assets/index.js.map
+public/assets/__common__.js.map
+public/assets/images/
+public/assets/svg/
+public/assets/css/index.css.map
+public/assets/css/index.css
+/public/assets/pwstrength-bootstrap/
+/public/assets/sweetalert2/

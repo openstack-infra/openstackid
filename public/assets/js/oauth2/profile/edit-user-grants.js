@@ -166,8 +166,9 @@ jQuery(document).ready(function($){
                 confirmButtonColor: "#DD6B55",
                 confirmButtonText: "Yes, revoke it!",
                 closeOnConfirm: true
-            },
-            function(){
+            }).then(
+            function(result){
+                if(!result) return;
                 $.ajax(
                     {
                         type: "DELETE",

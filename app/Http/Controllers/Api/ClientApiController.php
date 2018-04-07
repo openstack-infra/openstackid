@@ -135,11 +135,10 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
     public function delete($id)
     {
         try {
-            $res = $this->client_service->deleteClientByIdentifier($id);
-            return $res ? $this->deleted() : $this->error404(array('error' => 'operation failed'));
+            $this->client_service->deleteClientByIdentifier($id);
+            return $this->deleted();
         } catch (Exception $ex) {
             $this->log_service->error($ex);
-
             return $this->error500($ex);
         }
     }

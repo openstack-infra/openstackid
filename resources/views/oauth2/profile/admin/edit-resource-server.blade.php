@@ -5,7 +5,7 @@
 @stop
 
 @section('css')
-    {!! HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.css') !!}
+
 @append
 
 @section('content')
@@ -154,6 +154,5 @@
 		success : '@lang("messages.global_successfully_save_entity", array("entity" => "Resource Server"))'
 	};
 </script>
-{!! HTML::script('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.js')!!}
 {!! HTML::script('assets/js/oauth2/profile/admin/edit-resource-server.js') !!}
 @append
