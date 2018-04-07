@@ -3,12 +3,9 @@
     <title>Welcome to OpenStackId - Server Admin - Server Private Keys</title>
 @stop
 @section('css')
-    {!! HTML::style('bower_assets/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') !!}
     {!! HTML::style('assets/css/private-keys.css') !!}
 @append
 @section('scripts')
-    {!! HTML::script('bower_assets/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js')!!}
-    {!! HTML::script('bower_assets/pwstrength-bootstrap/dist/pwstrength-bootstrap-1.2.7.min.js')!!}
     {!! HTML::script('assets/js/oauth2/profile/admin/server-private-keys.js') !!}
 
     <script type="application/javascript">

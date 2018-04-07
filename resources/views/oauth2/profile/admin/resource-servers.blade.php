@@ -5,7 +5,7 @@
 @stop
 
 @section('css')
-    {!! HTML::style('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.css') !!}
+
 @append
 
 @section('content')
@@ -77,6 +77,6 @@
 		add : '{!!URL::action("Api\ApiResourceServerController@create",null)!!}'
 	};
 </script>
-{!! HTML::script('bower_assets/bootstrap-tagsinput/dist/bootstrap-tagsinput.js')!!}
+
 {!! HTML::script('assets/js/oauth2/profile/admin/resource-servers.js') !!}
 @append
