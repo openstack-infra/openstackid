@@ -15,6 +15,12 @@
         @endif
         </legend>
     @endif
+
+    <div id="cookies-disabled-dialog" class="alert alert-warning alert-dismissible" style="display: none;" role="alert">
+        <button type="button" class="close"onclick="$('#cookies-disabled-dialog').hide()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong>Warning!</strong> Cookies are not enabled, please enabled them in order to use OpenStackId.
+    </div>
+
     <div class="col-md-4" id="sidebar">
         <div class="well">
             {!! Form::open(array('id'=>'login_form','url' => URL::action('UserController@postLogin'), 'method' => 'post',  "autocomplete" => "off")) !!}
@@ -80,7 +86,6 @@
             </fieldset>
             {!! Form::close() !!}
         </div>
-
     </div>
     <div class="col-md-8">
     </div>
