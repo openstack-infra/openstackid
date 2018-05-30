@@ -12,7 +12,8 @@ class RenameTableOauth2AssymetricKeys extends Migration
      */
     public function up()
     {
-        Schema::rename("oauth2_assymetric_keys", "oauth2_asymmetric_keys");
+        if(Schema::hasTable('oauth2_assymetric_keys'))
+            Schema::rename("oauth2_assymetric_keys", "oauth2_asymmetric_keys");
     }
 
     /**

@@ -18,7 +18,7 @@ class ResourceServerSeeder extends Seeder {
             array(
                 'friendly_name'   => 'openstack id server',
                 'host'            =>  $res['host'],
-                'ip'              => '127.0.0.1'
+                'ips'              => '127.0.0.1'
             )
         );
     }

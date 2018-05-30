@@ -1,9 +1,9 @@
 <?php
-
-use oauth2\OAuth2Protocol;
+use OAuth2\OAuth2Protocol;
 use Models\OAuth2\Api;
 use Models\OAuth2\ApiScope;
 use Illuminate\Database\Seeder;
+
 /**
  * Class ApiScopeSeeder
  */

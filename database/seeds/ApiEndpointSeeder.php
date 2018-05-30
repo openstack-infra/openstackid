@@ -2,6 +2,7 @@
 
 use Models\OAuth2\Api;
 use Models\OAuth2\ApiEndpoint;
+use Models\OAuth2\ApiScope;
 use Illuminate\Database\Seeder;
 
 /**
