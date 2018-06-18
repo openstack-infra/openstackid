@@ -40,6 +40,7 @@
     {!! HTML::script('assets/typeahead/typeahead.bundle.js')!!}
     {!! HTML::script('assets/bootstrap-tagsinput/bootstrap-tagsinput.js')!!}
     {!! HTML::script('assets/sweetalert2/sweetalert2.js')!!}
+    {!! HTML::script('assets/urijs/URI.min.js')!!}
     @yield('scripts')
     <span class="version hidden">{!! Config::get('app.version') !!}</span>
 </body>

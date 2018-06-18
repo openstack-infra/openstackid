@@ -37,7 +37,8 @@ var plugins = [
             {from: './node_modules/jquery.cookie/jquery.cookie.js', to: 'jquery-cookie/jquery.cookie.js'},
             {from: './node_modules/crypto-js/crypto-js.js', to: 'crypto-js/crypto-js.js'},
             {from: './node_modules/pwstrength-bootstrap/dist', to: 'pwstrength-bootstrap'},
-            {from: './node_modules/sweetalert2/dist', to: 'sweetalert2'}
+            {from: './node_modules/sweetalert2/dist', to: 'sweetalert2'},
+            {from: './node_modules/urijs/src', to: 'urijs'},
         ],
         {copyUnmodified: false}
     ),
