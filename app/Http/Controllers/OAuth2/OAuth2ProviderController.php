@@ -283,23 +283,25 @@ final class OAuth2ProviderController extends Controller
 
         if(Request::isMethod('get') )
         {
-            $rps     = $this->auth_service->getLoggedRPs();
-            $clients = array();
+            $clients = [];
             foreach($this->auth_service->getLoggedRPs() as $client_id)
             {
                 $client = $this->client_repository->getClientById($client_id);
-                if(!is_null($client)) array_push($clients, $client);
+                if(!is_null($client)){
+                    $clients[] = $client;
+                    Log::info(sprintf("added RP %s", $client->getApplicationName()));
+                }
             }
 
             // At the logout endpoint, the OP SHOULD ask the End-User whether he wants to log out of the OP as well.
             // If the End-User says "yes", then the OP MUST log out the End-User.
-            return View::make('oauth2.session.session-logout', array
-            (
+            return View::make('oauth2.session.session-logout',
+            [
                 'clients'                  => $clients,
                 'id_token_hint'            => $request->getIdTokenHint(),
                 'post_logout_redirect_uri' => $request->getPostLogoutRedirectUri(),
                 'state'                    => $request->getState(),
-            ));
+            ]);
         }
 
         $consent = Input::get('oidc_endsession_consent');
@@ -318,7 +320,7 @@ final class OAuth2ProviderController extends Controller
         }
 
         Log::error('invalid consent response!');
-        return Response::view('errors.404', array(), 404);
+        return Response::view('errors.404', [], 404);
     }
 
     public function cancelLogout()
