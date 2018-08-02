@@ -906,7 +906,7 @@ SQL;
                 'app_name'             => 'oauth2_test_app_public',
                 'app_description'      => 'oauth2_test_app_public',
                 'app_logo'             => null,
-                'client_id'            => 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client',
+                'client_id'            => '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client',
                 'client_secret'        => null,
                 'application_type'     => IClient::ApplicationType_JS_Client,
                 'token_endpoint_auth_method' => OAuth2Protocol::TokenEndpoint_AuthMethod_PrivateKeyJwt,

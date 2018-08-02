@@ -12,7 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use OAuth2\Exceptions\AbsentClientException;
+use OAuth2\Exceptions\AbsentCurrentUserException;
 use OAuth2\Exceptions\AccessDeniedException;
 use OAuth2\Exceptions\InvalidClientException;
 use OAuth2\Exceptions\OAuth2GenericException;
@@ -23,7 +24,6 @@ use OAuth2\Exceptions\UriNotAllowedException;
 use OAuth2\Requests\OAuth2Request;
 use OAuth2\Exceptions\InvalidOAuth2Request;
 use OAuth2\IOAuth2Protocol;
-
 /**
  * Class AuthorizationEndpoint
  * Authorization Endpoint Implementation
@@ -63,6 +63,8 @@ class AuthorizationEndpoint implements IOAuth2Endpoint
      * @throws UnAuthorizedClientException
      * @throws AccessDeniedException
      * @throws OAuth2GenericException
+     * @throws AbsentClientException
+     * @throws AbsentCurrentUserException
      */
     public function handle(OAuth2Request $request)
     {

@@ -1433,10 +1433,8 @@ final class TokenService implements ITokenService
             );
         }
 
-        $user = $this->auth_service->getUserById
-        (
-            $this->principal_service->get()->getUserId()
-        );
+        
+        $user = $this->auth_service->getCurrentUser();
 
         if(!$user)
             throw new AbsentCurrentUserException;

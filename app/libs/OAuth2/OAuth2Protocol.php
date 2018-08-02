@@ -25,6 +25,8 @@ use OAuth2\Endpoints\AuthorizationEndpoint;
 use OAuth2\Endpoints\TokenEndpoint;
 use OAuth2\Endpoints\TokenIntrospectionEndpoint;
 use OAuth2\Endpoints\TokenRevocationEndpoint;
+use OAuth2\Exceptions\AbsentClientException;
+use OAuth2\Exceptions\AbsentCurrentUserException;
 use OAuth2\Exceptions\ExpiredAccessTokenException;
 use OAuth2\Exceptions\InvalidClientException;
 use OAuth2\Exceptions\InvalidOAuth2Request;
@@ -949,6 +951,38 @@ final class OAuth2Protocol implements IOAuth2Protocol
                 $this->last_request,
                 $ex2->getError(),
                 $ex2->getMessage(),
+                $redirect_uri
+            );
+        }
+        catch (AbsentClientException $ex3){
+            $this->log_service->warning($ex3);
+            $this->checkpoint_service->trackException($ex3);
+
+            $redirect_uri = $this->validateRedirectUri($this->last_request);
+            if (is_null($redirect_uri))
+                throw $ex3;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse
+            (
+                $this->last_request,
+                OAuth2Protocol::OAuth2Protocol_Error_ServerError,
+                $ex3->getMessage(),
+                $redirect_uri
+            );
+        }
+        catch (AbsentCurrentUserException $ex4){
+            $this->log_service->warning($ex4);
+            $this->checkpoint_service->trackException($ex4);
+
+            $redirect_uri = $this->validateRedirectUri($this->last_request);
+            if (is_null($redirect_uri))
+                throw $ex4;
+
+            return OAuth2IndirectErrorResponseFactoryMethod::buildResponse
+            (
+                $this->last_request,
+                OAuth2Protocol::OAuth2Protocol_Error_ServerError,
+                $ex4->getMessage(),
                 $redirect_uri
             );
         }

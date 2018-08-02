@@ -244,6 +244,13 @@ abstract class InteractiveGrantType extends AbstractGrantType
             $approval_prompt = $request->getApprovalPrompt();
             $user = $this->auth_service->getCurrentUser();
 
+            $this->principal_service->clear();
+            $this->principal_service->register
+            (
+                $user->getId(),
+                time()
+            );
+
             // check if logged user its the same as login hint
             $requested_user_id = $this->security_context_service->get()->getRequestedUserId();
 

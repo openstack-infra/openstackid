@@ -214,7 +214,7 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     {
         //already logged user
         $user = User::where('identifier', '=', 'sebastian.marcet')->first();
-        $this->be($user);
+        $this->be($user, 'web');
 
         $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
 
@@ -1935,7 +1935,7 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     {
         // use a public client
 
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         $params = array
         (
@@ -2015,7 +2015,7 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     {
         // use a public client
 
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         $params = array
         (
@@ -2095,7 +2095,7 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     {
         // use a public client
 
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         $params = array
         (
@@ -2208,7 +2208,7 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
     {
         // use a public client
 
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         $params = array
         (
@@ -2285,11 +2285,63 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
 
     }
 
+    public function testImplicitFlowAccessTokenAbsentUserError()
+    {
+        // use a public client
+
+        //already logged user
+        $user = User::where('identifier', '=', 'sebastian.marcet')->first();
+        $this->be($user, 'web');
+
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $scopes = sprintf('%s profile email', OAuth2Protocol::OpenIdConnect_Scope);
+
+        $client = \Models\OAuth2\Client::where('client_id', '=', $client_id)->first();
+
+        $former_consent = new \Models\OAuth2\UserConsent();
+        $former_consent->client_id = $client->id;
+        $former_consent->user_id   = $user->id;
+        $former_consent->scopes    = $scopes;
+        $former_consent->Save();
+
+        $params = array
+        (
+            'client_id' => $client_id,
+            'redirect_uri' => 'https://www.test.com/oauth2',
+            'response_type' => sprintf("%s %s", OAuth2Protocol::OAuth2Protocol_ResponseType_Token, OAuth2Protocol::OAuth2Protocol_IdToken),
+            'scope' => $scopes,
+            OAuth2Protocol::OAuth2Protocol_Nonce => 'ctqg5FeNoYnZ',
+        );
+
+        $response = $this->action("POST", "OAuth2\OAuth2ProviderController@auth",
+            $params,
+            array(),
+            array(),
+            array());
+
+        $this->assertResponseStatus(302);
+
+        $url = $response->getTargetUrl();
+
+        $comps = @parse_url($url);
+        $fragment = $comps['fragment'];
+
+        $this->assertTrue(!empty($fragment));
+        $output = array();
+        parse_str($fragment, $output);
+
+        $this->assertTrue(array_key_exists('access_token', $output));
+        $this->assertTrue(!empty($output['access_token']));
+        $this->assertTrue(array_key_exists('id_token', $output));
+        $this->assertTrue(!empty($output['id_token']));
+
+    }
+
     public function testImplicitFlowResponseModePost()
     {
         // use a public client
 
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
         $params = array
         (
