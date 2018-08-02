@@ -12,7 +12,7 @@
                 <p>
                     <ul>
                     @foreach ($clients as $client)
-                        <li><b>{!!$client->app_namw!!}</b></li>
+                        <li><b>{!!$client->app_name!!}</b></li>
                     @endforeach
                     </ul>
                  </p>
