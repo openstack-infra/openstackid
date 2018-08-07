@@ -323,10 +323,30 @@ abstract class InteractiveGrantType extends AbstractGrantType
      * @param string $session_id
      * @return string
      */
-    static public function getSessionState($origin, $client_id, $session_id)
+    public function getSessionState($origin, $client_id, $session_id)
     {
-        $salt          = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
-        $session_state = hash('sha256', "{$client_id}{$origin}{$session_id}{$salt}") . '.' . $salt;
+        $this->log_service->info(sprintf(
+            "InteractiveGrantType::getSessionState origin %s client_id %s session_id %s",
+            $origin,
+            $client_id,
+            $session_id
+        ));
+        $salt    = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
+        $message = "{$client_id}{$origin}{$session_id}{$salt}";
+        $this->log_service->info(sprintf(
+            "InteractiveGrantType::getSessionState message %s",
+            $message
+        ));
+        $hash = hash('sha256', $message);
+        $this->log_service->info(sprintf(
+            "InteractiveGrantType::getSessionState hash %s",
+            $hash
+        ));
+        $session_state = $hash. '.' . $salt;
+        $this->log_service->info(sprintf(
+            "InteractiveGrantType::getSessionState session_state %s",
+            $session_state
+        ));
         return $session_state;
     }
 

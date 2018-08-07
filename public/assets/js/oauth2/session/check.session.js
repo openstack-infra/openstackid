@@ -1,12 +1,13 @@
 (function( $ ){
 
     /**
-     * @param string value
+     * @param string message
      * @returns string
      */
-    function hash(value)
+    function hash(message)
     {
-        var hash = CryptoJS.SHA256(value);
+        var hash = CryptoJS.SHA256(message).toString();
+        console.log('calculated hash '+hash+' from message '+message);
         return hash;
     }
 
