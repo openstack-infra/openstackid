@@ -1363,51 +1363,75 @@ final class OAuth2Protocol implements IOAuth2Protocol
     {
         try
         {
+            $this->log_service->debug_msg("OAuth2Protocol::endSession");
+
             $this->last_request = $request;
 
-            if (is_null($this->last_request))
+            if (is_null($this->last_request)) {
+                $this->log_service->debug_msg("OAuth2Protocol::endSession last request is null");
                 throw new InvalidOAuth2Request;
+            }
 
-            if(!$this->last_request->isValid())
+            if(!$this->last_request->isValid()) {
+                $this->log_service->debug_msg(sprintf("OAuth2Protocol::endSession last request is invalid error %s", $this->last_request->getLastValidationError()));
                 throw new InvalidOAuth2Request($this->last_request->getLastValidationError());
+            }
 
-            if(! $this->last_request instanceof OAuth2LogoutRequest) throw new InvalidOAuth2Request;
+            if(!$this->last_request instanceof OAuth2LogoutRequest) throw new InvalidOAuth2Request;
 
             $id_token_hint = $this->last_request->getIdTokenHint();
 
             $jwt = BasicJWTFactory::build($id_token_hint);
 
-            if((!$jwt instanceof IJWT))
+            if((!$jwt instanceof IJWT)) {
+                $this->log_service->debug_msg("OAuth2Protocol::endSession invalid id_token_hint!");
                 throw new InvalidOAuth2Request('invalid id_token_hint!');
+            }
 
             $client_id = $jwt->getClaimSet()->getAudience();
 
-            if(is_null($client_id)) throw new InvalidClientException('claim aud not set on id_token_hint!');
+            if(is_null($client_id)) {
+                $this->log_service->debug_msg("OAuth2Protocol::endSession claim aud not set on id_token_hint!");
+                throw new InvalidClientException('claim aud not set on id_token_hint!');
+            }
 
             $client = $this->client_repository->getClientById($client_id->getString());
 
-            if(is_null($client)) throw new InvalidClientException('client not found!');
+            if(is_null($client)){
+                $this->log_service->debug_msg("OAuth2Protocol::endSession client not found!");
+                throw new InvalidClientException('client not found!');
+            }
 
             $redirect_logout_uri = $this->last_request->getPostLogoutRedirectUri();
 
             $state               = $this->last_request->getState();
 
 
-            if(!empty($redirect_logout_uri) && !$client->isPostLogoutUriAllowed($redirect_logout_uri))
+            if(!empty($redirect_logout_uri) && !$client->isPostLogoutUriAllowed($redirect_logout_uri)) {
+                $this->log_service->debug_msg("OAuth2Protocol::endSession post_logout_redirect_uri not allowed!");
                 throw new InvalidOAuth2Request('post_logout_redirect_uri not allowed!');
+            }
 
             $user_id = $jwt->getClaimSet()->getSubject();
 
-            if(is_null($user_id)) throw new InvalidOAuth2Request('claim sub not set on id_token_hint!');
+            if(is_null($user_id)){
+                $this->log_service->debug_msg("OAuth2Protocol::endSession claim sub not set on id_token_hint!");
+                throw new InvalidOAuth2Request('claim sub not set on id_token_hint!');
+            }
 
             $user_id = $this->auth_service->unwrapUserId(intval($user_id->getString()));
 
             $user    = $this->auth_service->getUserByExternalId($user_id);
 
-            if(is_null($user)) throw new InvalidOAuth2Request('user not found!');
+            if(is_null($user)){
+                $this->log_service->debug_msg("OAuth2Protocol::endSession user not found!");
+                throw new InvalidOAuth2Request('user not found!');
+            }
 
-            if($this->principal_service->get()->getUserId() !== $user->getId())
+            if($this->principal_service->get()->getUserId() !== $user->getId()) {
+                $this->log_service->debug_msg("OAuth2Protocol::endSession user does not match with current session!");
                 throw new InvalidOAuth2Request('user does not match with current session!');
+            }
 
             $this->auth_service->logout();
 

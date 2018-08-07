@@ -15,7 +15,8 @@ class EncryptCookies extends BaseEncrypter
      * @var array
      */
     protected $except = [
-        //
+        'opbs',
+        'rps',
     ];
 
     protected function decrypt(Request $request)

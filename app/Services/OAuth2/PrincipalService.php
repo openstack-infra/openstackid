@@ -14,6 +14,7 @@
 
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 use OAuth2\Models\IPrincipal;
 use OAuth2\Models\Principal;
 use OAuth2\Services\IPrincipalService;
@@ -59,6 +60,8 @@ final class PrincipalService implements IPrincipalService
      */
     public function save(IPrincipal $principal)
     {
+        Log::debug("PrincipalService::save");
+
         $this->register
         (
             $principal->getUserId(),
@@ -73,10 +76,12 @@ final class PrincipalService implements IPrincipalService
      */
     public function register($user_id, $auth_time)
     {
+        Log::debug(sprintf("PrincipalService::register user_id %s auth_time %s", $user_id, $auth_time));
         Session::put(self::UserIdParam, $user_id);
         Session::put(self::AuthTimeParam, $auth_time);
         $opbs = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
         Cookie::queue('opbs', $opbs, $minutes = 2628000, $path = '/', $domain = null, $secure = false, $httpOnly = false);
+        Log::debug(sprintf("PrincipalService::register opbs %s", $opbs));
         Session::put(self::OPBrowserState, $opbs);
         Session::save();
     }
@@ -86,6 +91,7 @@ final class PrincipalService implements IPrincipalService
      */
     public function clear()
     {
+        Log::debug("PrincipalService::clear");
         Session::remove(self::UserIdParam);
         Session::remove(self::AuthTimeParam);
         Session::remove(self::OPBrowserState);

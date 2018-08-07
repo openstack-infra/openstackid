@@ -264,8 +264,10 @@ final class OAuth2ProviderController extends Controller
      */
     public function endSession()
     {
-        if(!$this->auth_service->isUserLogged())
+        if(!$this->auth_service->isUserLogged()) {
+            Log::debug("OAuth2ProviderController::endSession user is not logged!");
             return Response::view('errors.404', array(), 404);
+        }
 
         $request = new OAuth2LogoutRequest
         (
