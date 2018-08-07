@@ -193,7 +193,7 @@ class ImplicitGrantType extends InteractiveGrantType
         );
 
         // http://openid.net/specs/openid-connect-session-1_0.html#CreatingUpdatingSessions
-        $session_state = self::getSessionState
+        $session_state = $this->getSessionState
         (
             self::getOrigin
             (

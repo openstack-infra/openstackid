@@ -244,13 +244,6 @@ abstract class InteractiveGrantType extends AbstractGrantType
             $approval_prompt = $request->getApprovalPrompt();
             $user = $this->auth_service->getCurrentUser();
 
-            $this->principal_service->clear();
-            $this->principal_service->register
-            (
-                $user->getId(),
-                time()
-            );
-
             // check if logged user its the same as login hint
             $requested_user_id = $this->security_context_service->get()->getRequestedUserId();
 
@@ -325,28 +318,32 @@ abstract class InteractiveGrantType extends AbstractGrantType
      */
     public function getSessionState($origin, $client_id, $session_id)
     {
-        $this->log_service->info(sprintf(
+
+        $this->log_service->debug_msg(sprintf(
             "InteractiveGrantType::getSessionState origin %s client_id %s session_id %s",
             $origin,
             $client_id,
             $session_id
         ));
+
+        // warning: mcrypt_create_iv deprecated on php 7.x
         $salt    = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
         $message = "{$client_id}{$origin}{$session_id}{$salt}";
-        $this->log_service->info(sprintf(
+        $this->log_service->debug_msg(sprintf(
             "InteractiveGrantType::getSessionState message %s",
             $message
         ));
         $hash = hash('sha256', $message);
-        $this->log_service->info(sprintf(
+        $this->log_service->debug_msg(sprintf(
             "InteractiveGrantType::getSessionState hash %s",
             $hash
         ));
         $session_state = $hash. '.' . $salt;
-        $this->log_service->info(sprintf(
+        $this->log_service->debug_msg(sprintf(
             "InteractiveGrantType::getSessionState session_state %s",
             $session_state
         ));
+
         return $session_state;
     }
 

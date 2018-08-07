@@ -226,12 +226,6 @@ class AuthorizationCodeGrantType extends InteractiveGrantType
                     )
             );
 
-            $this->principal_service->register
-            (
-                $auth_code->getUserId(),
-                $auth_code->getAuthTime()
-            );
-
             //ensure that the authorization code was issued to the authenticated
             //confidential client, or if the client is public, ensure that the
             //code was issued to "client_id" in the request
@@ -374,7 +368,7 @@ class AuthorizationCodeGrantType extends InteractiveGrantType
             throw new OAuth2GenericException("Invalid Auth Code");
         }
         // http://openid.net/specs/openid-connect-session-1_0.html#CreatingUpdatingSessions
-        $session_state = self::getSessionState
+        $session_state = $this->getSessionState
         (
             self::getOrigin
             (
