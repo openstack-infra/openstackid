@@ -250,6 +250,12 @@ class AuthorizationCodeGrantType extends InteractiveGrantType
                 throw new UriNotAllowedException($current_redirect_uri);
             }
 
+            $this->principal_service->register
+            (
+                $auth_code->getUserId(),
+                $auth_code->getAuthTime()
+            );
+
             $response = OAuth2AccessTokenResponseFactory::build
             (
                 $this->token_service,

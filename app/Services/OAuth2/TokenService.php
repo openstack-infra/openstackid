@@ -1436,7 +1436,13 @@ final class TokenService implements ITokenService
         
         $user = $this->auth_service->getCurrentUser();
 
-        if(!$user)
+        if(is_null($user)){
+            $user_id = $this->principal_service->get()->getUserId();
+            Log::debug(sprintf("user id is %s", $user_id));
+            $user = $this->auth_service->getUserById($user_id);
+        }
+
+        if(is_null($user))
             throw new AbsentCurrentUserException;
 
         // build claim set
