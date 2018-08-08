@@ -44,4 +44,5 @@ interface IPrincipalService
      */
     public function clear();
 
+    const OP_BROWSER_STATE_COOKIE_NAME = 'op_bs';
 }

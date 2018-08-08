@@ -26,6 +26,7 @@ use Utils\Services\ICacheService;
 use jwe\compression_algorithms\CompressionAlgorithms_Registry;
 use jwe\compression_algorithms\CompressionAlgorithmsNames;
 use Exception;
+use Illuminate\Support\Facades\Log;
 /**
  * Class AuthService
  * @package Auth
@@ -122,7 +123,7 @@ final class AuthService implements IAuthService
     {
         Auth::logout();
         $this->principal_service->clear();
-        Cookie::queue('rps', null, $minutes = -2628000, $path = '/', $domain = null, $secure = false, $httpOnly = false);
+        Cookie::queue(IAuthService::LOGGED_RELAYING_PARTIES_COOKIE_NAME, null, $minutes = -2628000, $path = '/', $domain = null, $secure = false, $httpOnly = false);
     }
 
     /**
@@ -309,23 +310,28 @@ final class AuthService implements IAuthService
      */
     public function registerRPLogin($client_id)
     {
-        $rps  = Cookie::get('rps');
-        $zlib = CompressionAlgorithms_Registry::getInstance()->get(CompressionAlgorithmsNames::ZLib);
 
-        if(!empty($rps))
-        {
-            $rps = $this->decrypt($rps);
-            $rps = $zlib->uncompress($rps);
-            $rps .= '|';
+        try {
+            $rps = Cookie::get(IAuthService::LOGGED_RELAYING_PARTIES_COOKIE_NAME);
+            $zlib = CompressionAlgorithms_Registry::getInstance()->get(CompressionAlgorithmsNames::ZLib);
+
+            if (!empty($rps)) {
+                $rps = $this->decrypt($rps);
+                $rps = $zlib->uncompress($rps);
+                $rps .= '|';
+            }
+
+            if (!str_contains($rps, $client_id))
+                $rps .= $client_id;
+
+            $rps = $zlib->compress($rps);
+            $rps = $this->encrypt($rps);
         }
-
-        if(!str_contains($rps, $client_id))
-            $rps .= $client_id;
-
-        $rps  = $zlib->compress($rps);
-        $rps  = $this->encrypt($rps);
-
-        Cookie::queue('rps', $rps, $minutes = 2628000, $path = '/', $domain = null, $secure = false, $httpOnly = false);
+        catch(Exception $ex){
+            Log::warning($ex);
+            $rps = "";
+        }
+        Cookie::queue(IAuthService::LOGGED_RELAYING_PARTIES_COOKIE_NAME, $rps, $minutes = config("session.op_browser_state_lifetime"), $path = '/', $domain = null, $secure = false, $httpOnly = false);
     }
 
     /**
@@ -333,7 +339,7 @@ final class AuthService implements IAuthService
      */
     public function getLoggedRPs()
     {
-        $rps  = Cookie::get('rps');
+        $rps  = Cookie::get(IAuthService::LOGGED_RELAYING_PARTIES_COOKIE_NAME);
         $zlib = CompressionAlgorithms_Registry::getInstance()->get(CompressionAlgorithmsNames::ZLib);
 
         if(!empty($rps))

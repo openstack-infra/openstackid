@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Log;
 use OAuth2\Models\IPrincipal;
 use OAuth2\Models\Principal;
 use OAuth2\Services\IPrincipalService;
-
 /**
  * Class PrincipalService
  * @package Services\OAuth2
@@ -80,7 +79,7 @@ final class PrincipalService implements IPrincipalService
         Session::put(self::UserIdParam, $user_id);
         Session::put(self::AuthTimeParam, $auth_time);
         $opbs = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
-        Cookie::queue('opbs', $opbs, $minutes = 2628000, $path = '/', $domain = null, $secure = false, $httpOnly = false);
+        Cookie::queue(IPrincipalService::OP_BROWSER_STATE_COOKIE_NAME, $opbs, $minutes = config("session.op_browser_state_lifetime"), $path = '/', $domain = null, $secure = false, $httpOnly = false);
         Log::debug(sprintf("PrincipalService::register opbs %s", $opbs));
         Session::put(self::OPBrowserState, $opbs);
         Session::save();
@@ -96,7 +95,7 @@ final class PrincipalService implements IPrincipalService
         Session::remove(self::AuthTimeParam);
         Session::remove(self::OPBrowserState);
         Session::save();
-        Cookie::queue('opbs', null, $minutes = -2628000, $path = '/', $domain = null, $secure = false, $httpOnly = false);
+        Cookie::queue(IPrincipalService::OP_BROWSER_STATE_COOKIE_NAME, null, $minutes = -2628000, $path = '/', $domain = null, $secure = false, $httpOnly = false);
     }
 
 }

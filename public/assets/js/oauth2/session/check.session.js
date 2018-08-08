@@ -67,7 +67,7 @@
                 return "error";
             }
 
-            var opbs         = $.cookie('opbs');
+            var opbs         = $.cookie('op_bs');
             var expectedHash = computeSessionStateHash(clientId, origin, opbs, salt);
             return clientHash === expectedHash ? "unchanged" : "changed";
         }

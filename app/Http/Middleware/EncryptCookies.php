@@ -1,5 +1,6 @@
 <?php namespace App\Http\Middleware;
 
+use OAuth2\Services\IPrincipalService;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Cookie\Middleware\EncryptCookies as BaseEncrypter;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -15,8 +16,7 @@ class EncryptCookies extends BaseEncrypter
      * @var array
      */
     protected $except = [
-        'opbs',
-        'rps',
+        IPrincipalService::OP_BROWSER_STATE_COOKIE_NAME
     ];
 
     protected function decrypt(Request $request)

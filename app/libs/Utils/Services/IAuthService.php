@@ -125,4 +125,6 @@ interface IAuthService
      */
     public function reloadSession($jti);
 
+    const LOGGED_RELAYING_PARTIES_COOKIE_NAME = 'rps';
+
 }
