@@ -1,4 +1,44 @@
 <?php
+$use_ssl = env('DB_USE_SSL', false);
+
+$idp_db_config =  [
+    'driver'    => 'mysql',
+    'host'      => env('DB_HOST'),
+    'database'  => env('DB_DATABASE'),
+    'username'  => env('DB_USERNAME'),
+    'password'  => env('DB_PASSWORD'),
+    'port'      => env('DB_PORT', 3306),
+    'charset'   => 'utf8',
+    'collation' => 'utf8_unicode_ci',
+    'prefix'    => '',
+];
+
+$ss_db_config =  [
+    'driver'    => env('SS_DB_DRIVER'),
+    'host'      => env('SS_DB_HOST'),
+    'database'  => env('SS_DATABASE'),
+    'username'  => env('SS_DB_USERNAME'),
+    'password'  => env('SS_DB_PASSWORD'),
+    'port'      => env('SS_DB_PORT', 3306),
+    'charset'   => 'utf8',
+    'collation' => 'utf8_unicode_ci',
+    'prefix'    => '',
+];
+
+if($use_ssl){
+    $idp_db_config['options'] = [
+        PDO::MYSQL_ATTR_SSL_CA => env('DB_MYSQL_ATTR_SSL_CA','/etc/client-ssl/ca-cert.pem'),
+        PDO::MYSQL_ATTR_SSL_KEY =>  env('DB_MYSQL_ATTR_SSL_KEY','/etc/client-ssl/client-key.pem'),
+        PDO::MYSQL_ATTR_SSL_CERT  =>  env('DB_MYSQL_ATTR_SSL_CERT','/etc/client-ssl/client-cert.pem'),
+        PDO::MYSQL_ATTR_SSL_CIPHER =>  env('DB_MYSQL_ATTR_SSL_CIPHER', 'DHE-RSA-AES256-SHA'),
+    ];
+    $ss_db_config['options'] = [
+        PDO::MYSQL_ATTR_SSL_CA => env('DB_MYSQL_ATTR_SSL_CA','/etc/mysql-client-ssl/ca-cert.pem'),
+        PDO::MYSQL_ATTR_SSL_KEY =>  env('DB_MYSQL_ATTR_SSL_KEY','/etc/mysql-client-ssl/client-key.pem'),
+        PDO::MYSQL_ATTR_SSL_CERT  =>  env('DB_MYSQL_ATTR_SSL_CERT','/etc/mysql-client-ssl/client-cert.pem'),
+        PDO::MYSQL_ATTR_SSL_CIPHER =>  env('DB_MYSQL_ATTR_SSL_CIPHER', 'DHE-RSA-AES256-SHA'),
+    ];
+}
 
 return [
 
@@ -46,29 +86,9 @@ return [
 
     'connections' => [
         //primary DB
-        'openstackid' => array(
-            'driver'    => 'mysql',
-            'host'      => env('DB_HOST'),
-            'database'  => env('DB_DATABASE'),
-            'username'  => env('DB_USERNAME'),
-            'password'  => env('DB_PASSWORD'),
-            'port'      => env('DB_PORT', 3306),
-            'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
-        ),
+        'openstackid' => $idp_db_config,
         //secondary DB (SS OS)
-        'ss' => array(
-            'driver'    => env('SS_DB_DRIVER'),
-            'host'      => env('SS_DB_HOST'),
-            'database'  => env('SS_DATABASE'),
-            'username'  => env('SS_DB_USERNAME'),
-            'password'  => env('SS_DB_PASSWORD'),
-            'port'      => env('SS_DB_PORT', 3306),
-            'charset'   => 'utf8',
-            'collation' => 'utf8_unicode_ci',
-            'prefix'    => '',
-        ),
+        'ss' => $ss_db_config,
     ],
 
     /*
