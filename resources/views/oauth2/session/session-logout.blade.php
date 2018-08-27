@@ -8,7 +8,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6 col-sm-6">
-                <p>Would you like to logout from following realms ? </p>
+                <p> Would you like to log out from the following? </p>
                 <p>
                     <ul>
                     @foreach ($clients as $client)
