@@ -103,12 +103,7 @@ final class ResourceServerService implements IResourceServerService
                 );
             }
 
-            if ($this->repository->getByIp($ips) != null) {
-                throw new InvalidResourceServer
-                (
-                    sprintf('there is already another resource server with that ip (%s).', $ips)
-                );
-            }
+
 
             if ($this->repository->getByFriendlyName($friendly_name) != null) {
                 throw new InvalidResourceServer

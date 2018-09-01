@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\libs\OAuth2\Exceptions\ReloadSessionException;
 use Auth\Repositories\IMemberRepository;
 use Auth\Repositories\IUserRepository;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,7 @@ use OAuth2\Models\IClient;
 use OAuth2\Services\IPrincipalService;
 use OpenId\Models\IOpenIdUser;
 use OpenId\Services\IUserService;
+use utils\Base64UrlRepresentation;
 use Utils\Services\IAuthService;
 use Utils\Services\ICacheService;
 use jwe\compression_algorithms\CompressionAlgorithms_Registry;
@@ -104,10 +106,12 @@ final class AuthService implements IAuthService
      */
     public function login($username, $password, $remember_me)
     {
+        Log::debug("AuthService::login");
         $res = Auth::attempt(array('username' => $username, 'password' => $password), $remember_me);
 
         if ($res)
         {
+            Log::debug("AuthService::login: clearing principal");
             $this->principal_service->clear();
             $this->principal_service->register
             (
@@ -121,6 +125,7 @@ final class AuthService implements IAuthService
 
     public function logout()
     {
+        $this->invalidateSession();
         Auth::logout();
         $this->principal_service->clear();
         Cookie::queue(IAuthService::LOGGED_RELAYING_PARTIES_COOKIE_NAME, null, $minutes = -2628000, $path = '/', $domain = null, $secure = false, $httpOnly = false);
@@ -348,7 +353,7 @@ final class AuthService implements IAuthService
             $rps = $zlib->uncompress($rps);
             return explode('|', $rps);
         }
-        return null;
+        return [];
     }
 
     /**
@@ -357,16 +362,51 @@ final class AuthService implements IAuthService
      */
     public function reloadSession($jti)
     {
+        Log::debug(sprintf("AuthService::reloadSession jti %s", $jti ));
         $session_id = $this->cache_service->getSingleValue($jti);
-        if(empty($session_id)) throw new Exception('session not found!');
+
+        Log::debug(sprintf("AuthService::reloadSession session_id %s", $session_id ));
+        if(empty($session_id))
+            throw new ReloadSessionException('session not found!');
+
+        if($this->cache_service->exists($session_id."invalid")){
+            // session was marked as void, check if we are authenticated
+            if(!Auth::check())
+                throw new ReloadSessionException('user not found!');
+        }
+
         Session::setId(Crypt::decrypt($session_id));
         Session::start();
         if(!Auth::check())
         {
+
             $user_id      = $this->principal_service->get()->getUserId();
+            Log::debug(sprintf("AuthService::reloadSession user_id %s", $user_id ));
             $user         = $this->getUserById($user_id);
-            if(is_null($user)) throw new Exception('user not found!');
+            if(is_null($user))
+                throw new ReloadSessionException('user not found!');
             Auth::login($user);
         }
+    }
+
+    /**
+     * @param string $client_id
+     * @param int $id_token_lifetime
+     * @return string
+     */
+    public function generateJTI($client_id, $id_token_lifetime){
+        $session_id  = Crypt::encrypt(Session::getId());
+        $encoder     = new Base64UrlRepresentation();
+        $jti         = $encoder->encode(hash('sha512', $session_id.$client_id, true));
+
+        $this->cache_service->addSingleValue($jti, $session_id, $id_token_lifetime);
+
+        return $jti;
+    }
+
+
+    public function invalidateSession(){
+        $session_id  = Crypt::encrypt(Session::getId());
+        $this->cache_service->addSingleValue($session_id."invalid", $session_id);
     }
 }

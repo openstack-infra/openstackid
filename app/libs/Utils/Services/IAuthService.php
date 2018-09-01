@@ -127,4 +127,13 @@ interface IAuthService
 
     const LOGGED_RELAYING_PARTIES_COOKIE_NAME = 'rps';
 
+    /**
+     * @param string $client_id
+     * @param int $id_token_lifetime
+     * @return string
+     */
+    public function generateJTI($client_id, $id_token_lifetime);
+
+    public function invalidateSession();
+
 }

@@ -563,6 +563,7 @@ final class OAuth2Protocol implements IOAuth2Protocol
     //http://tools.ietf.org/html/rfc6750#section-3-1
     const OAuth2Protocol_Error_InvalidToken = 'invalid_token';
     const OAuth2Protocol_Error_InsufficientScope = 'insufficient_scope';
+    const OAuth2Protocol_Error_Session_Cant_Reload = 'session_cant_reload';
 
     // http://openid.net/specs/openid-connect-core-1_0.html#AuthError
 
@@ -1427,8 +1428,9 @@ final class OAuth2Protocol implements IOAuth2Protocol
                 $this->log_service->debug_msg("OAuth2Protocol::endSession user not found!");
                 throw new InvalidOAuth2Request('user not found!');
             }
+            $logged_user = $this->auth_service->getCurrentUser();
 
-            if($this->principal_service->get()->getUserId() !== $user->getId()) {
+            if(is_null($logged_user) || $logged_user->getId() !== $user->getId()) {
                 $this->log_service->debug_msg("OAuth2Protocol::endSession user does not match with current session!");
                 throw new InvalidOAuth2Request('user does not match with current session!');
             }

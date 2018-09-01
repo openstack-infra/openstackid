@@ -1447,11 +1447,8 @@ final class TokenService implements ITokenService
 
         // build claim set
         $epoch_now   = time();
-        $session_id  = Crypt::encrypt(Session::getId());
-        $encoder     = new Base64UrlRepresentation();
-        $jti         = $encoder->encode(hash('sha512', $session_id.$client_id, true));
 
-        $this->cache_service->addSingleValue($jti, $session_id, $id_token_lifetime);
+        $jti = $this->auth_service->generateJTI($client_id, $id_token_lifetime);
 
         $claim_set = new JWTClaimSet
         (

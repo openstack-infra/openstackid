@@ -14,6 +14,7 @@
  **/
 
 use Exception;
+use Illuminate\Support\Facades\Session;
 use jwe\IJWE;
 use jwk\exceptions\InvalidJWKAlgorithm;
 use jws\IJWS;
@@ -399,7 +400,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
     {
         $login_hint = $request->getLoginHint();
         $token_hint = $request->getIdTokenHint();
-
+        $this->log_service->debug_msg("InteractiveGrantType::processUserHint");
         // process login hint
         $user = null;
 
@@ -418,6 +419,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
         }
         else if(!empty($token_hint))
         {
+            $this->log_service->debug_msg("InteractiveGrantType::processUserHint has token hint");
             $client_id = $request->getClientId();
             $client    = $this->client_repository->getClientById($client_id);
 
@@ -437,6 +439,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
 
             if($jwt instanceof IJWE)
             {
+                $this->log_service->debug_msg("InteractiveGrantType::processUserHint token hint is IJWE");
                 // decrypt using server key
                 $heuristic              = new ServerEncryptionKeyFinder($this->server_private_key_repository);
                 $server_enc_private_key = $heuristic->find
@@ -452,6 +455,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
             }
             if($jwt instanceof IJWS)
             {
+                $this->log_service->debug_msg("InteractiveGrantType::processUserHint token hint is IJWS");
                 // signed by client ?
                 try
                 {
@@ -467,7 +471,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
                 catch(RecipientKeyNotFoundException $ex)
                 {
                     // try to find the server signing key used ...
-
+                    $this->log_service->debug_msg("InteractiveGrantType::processUserHint token hint is IJWS -> RecipientKeyNotFoundException");
                     $heuristic = new ServerSigningKeyFinder($this->server_private_key_repository);
                     $server_private_sig_key = $heuristic->find
                     (
@@ -497,19 +501,20 @@ abstract class InteractiveGrantType extends AbstractGrantType
 
         if($user)
         {
-            $principal = $this->principal_service->get();
-
+            $this->log_service->debug_msg("InteractiveGrantType::processUserHint: checking principal");
+            $logged_user = $this->auth_service->getCurrentUser();
             if
             (
-                !is_null($principal) &&
-                !is_null($principal->getUserId()) &&
-                $principal->getUserId() !== $user->getId()
+                !is_null($logged_user) &&
+                $logged_user->getId() !== $user->getId()
             )
             {
-                if(!$this->canInteractWithEndUser($request))
-                    throw new InteractionRequiredException;
-
                 $this->auth_service->logout();
+
+                if(!$this->canInteractWithEndUser($request)) {
+                    $this->log_service->debug_msg("InteractiveGrantType::processUserHint: cant interact with user");
+                    throw new InteractionRequiredException;
+                }
             }
 
             $this->security_context_service->save
