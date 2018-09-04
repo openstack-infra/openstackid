@@ -264,11 +264,6 @@ final class OAuth2ProviderController extends Controller
      */
     public function endSession()
     {
-        if(!$this->auth_service->isUserLogged()) {
-            Log::debug("OAuth2ProviderController::endSession user is not logged!");
-            return Response::view('errors.404', array(), 404);
-        }
-
         $request = new OAuth2LogoutRequest
         (
             new OAuth2Message
@@ -280,7 +275,7 @@ final class OAuth2ProviderController extends Controller
         if(!$request->isValid())
         {
             Log::error('invalid OAuth2LogoutRequest!');
-            return Response::view('errors.404', array(), 404);
+            return Response::view('errors.404', [], 404);
         }
 
         if(Request::isMethod('get') )
@@ -314,7 +309,6 @@ final class OAuth2ProviderController extends Controller
 
             if (!is_null($response) && $response instanceof OAuth2Response) {
                 $strategy = OAuth2ResponseStrategyFactoryMethod::buildStrategy($request, $response);
-
                 return $strategy->handle($response);
             }
 

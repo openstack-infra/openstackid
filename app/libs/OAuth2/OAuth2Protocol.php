@@ -1428,14 +1428,16 @@ final class OAuth2Protocol implements IOAuth2Protocol
                 $this->log_service->debug_msg("OAuth2Protocol::endSession user not found!");
                 throw new InvalidOAuth2Request('user not found!');
             }
+
             $logged_user = $this->auth_service->getCurrentUser();
 
-            if(is_null($logged_user) || $logged_user->getId() !== $user->getId()) {
+            if(!is_null($logged_user) && $logged_user->getId() !== $user->getId()) {
                 $this->log_service->debug_msg("OAuth2Protocol::endSession user does not match with current session!");
                 throw new InvalidOAuth2Request('user does not match with current session!');
             }
 
-            $this->auth_service->logout();
+            if(!is_null($logged_user))
+                $this->auth_service->logout();
 
             if(!empty($redirect_logout_uri))
             {
