@@ -11,20 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Auth\IUserNameGeneratorService;
 use Auth\Repositories\IUserRepository;
 use Auth\User;
 use Models\Member;
 use OpenId\Models\IOpenIdUser;
 use OpenId\Services\IUserService;
-use Services\Exceptions\ValidationException;
 use Utils\Db\ITransactionService;
 use Utils\Exceptions\EntityNotFoundException;
 use Utils\Services\ILogService;
 use Illuminate\Support\Facades\Mail;
 use Utils\Services\IServerConfigurationService;
-
+use Services\Exceptions\ValidationException;
 /**
  * Class UserService
  * @package Services\OpenId
@@ -189,20 +187,28 @@ final class UserService implements IUserService
      * @param bool $show_pic
      * @param bool $show_full_name
      * @param bool $show_email
+     * @param string $identifier
      * @return bool
      * @throws EntityNotFoundException
+     * @throws ValidationException
      */
-    public function saveProfileInfo($user_id, $show_pic, $show_full_name, $show_email)
+    public function saveProfileInfo($user_id, $show_pic, $show_full_name, $show_email, $identifier)
     {
 
-        return $this->tx_service->transaction(function() use($user_id, $show_pic, $show_full_name, $show_email){
+        return $this->tx_service->transaction(function() use($user_id, $show_pic, $show_full_name, $show_email, $identifier){
             $user = $this->repository->get($user_id);
             if(is_null($user)) throw new EntityNotFoundException();
+
+            $former_user = $this->repository->getByIdentifier($identifier);
+
+            if(!is_null($former_user) && $former_user->id != $user_id){
+                throw new ValidationException("there is already another user with that openid identifier");
+            }
 
             $user->public_profile_show_photo    = $show_pic;
             $user->public_profile_show_fullname = $show_full_name;
             $user->public_profile_show_email    = $show_email;
-
+            $user->identifier                   = $identifier;
             $this->repository->update($user);
             return true;
         });

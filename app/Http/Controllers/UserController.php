@@ -35,6 +35,7 @@ use OAuth2\Services\ISecurityContextService;
 use OAuth2\Services\ITokenService;
 use OpenId\Services\IMementoOpenIdSerializerService;
 use OpenId\Services\ITrustedSitesService;
+use Services\Exceptions\ValidationException;
 use Services\IUserActionService;
 use Strategies\DefaultLoginStrategy;
 use Strategies\IConsentStrategy;
@@ -434,6 +435,7 @@ final class UserController extends OpenIdController
             "openid_url"           => $this->server_configuration_service->getUserIdentityEndpointURL($user->getIdentifier()),
             "identifier "          => $user->getIdentifier(),
             "sites"                => $sites,
+            'identifier'           => $user->getIdentifier(),
             "show_pic"             => $user->getShowProfilePic(),
             "show_full_name"       => $user->getShowProfileFullName(),
             "show_email"           => $user->getShowProfileEmail(),
@@ -443,14 +445,28 @@ final class UserController extends OpenIdController
 
     public function postUserProfileOptions()
     {
+        $values = Input::all();
         $show_full_name = intval(Input::get("show_full_name", 0));
         $show_email     = intval(Input::get("show_email", 0));
         $show_pic       = intval(Input::get("show_pic", 0));
+        $identifier     = Input::get("identifier", null);
 
-        $user = $this->auth_service->getCurrentUser();
-        $this->user_service->saveProfileInfo($user->getId(), $show_pic, $show_full_name, $show_email);
+        $validator = Validator::make($values, ['identifier' => 'required|openid.identifier']);
 
-        return Redirect::action("UserController@getProfile");
+        if ($validator->fails()) {
+            return Redirect::back()->withErrors($validator);
+        }
+
+        try {
+            $user = $this->auth_service->getCurrentUser();
+            $this->user_service->saveProfileInfo($user->getId(), $show_pic, $show_full_name, $show_email, $identifier);
+
+            return Redirect::action("UserController@getProfile");
+        }
+        catch(ValidationException $ex1){
+            $validator->errors()->add('identifier', $ex1->getMessage());
+            return Redirect::back()->withErrors($validator);
+        }
     }
 
     public function deleteTrustedSite($id)

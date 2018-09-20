@@ -22,23 +22,34 @@
                     {!! Form::open(array('url' => URL::action('UserController@postUserProfileOptions'), 'method' => 'post')) !!}
                     <legend><span class="glyphicon glyphicon-info-sign pointable" aria-hidden="true" title="this information will be public on your profile page"></span>&nbsp;OpenStack ID Account Settings:</legend>
                     <div class="checkbox">
-                        <label class="checkbox">
-                            {!! Form::checkbox('show_full_name', '1', $show_full_name) !!}Show Full Name
-                        </label>
-                        </div>
+                        <span class="glyphicon glyphicon-info-sign pointable" aria-hidden="true" title="this is your openid identifier"></span>
+                        {!! Form::label('identifier', 'OpenId Identifier') !!}
+                        {!! Form::text('identifier', $identifier) !!}
+                        @if ($errors->has('identifier'))
+                            <div class="alert alert-warning alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <strong>Warning!</strong> {{ $errors->first('identifier') }}
+                            </div>
+                        @endif
+                    </div>
                     <div class="checkbox">
                         <label class="checkbox">
-                            {!! Form::checkbox('show_email', '1', $show_email) !!}Show Email
+                        {!! Form::checkbox('show_full_name', '1', $show_full_name) !!}Show Full Name
                         </label>
-                        </div>
+                    </div>
                     <div class="checkbox">
                         <label class="checkbox">
-                            {!! Form::checkbox('show_pic', '1', $show_pic) !!}Show Photo
+                        {!! Form::checkbox('show_email', '1', $show_email) !!}Show Email
                         </label>
-                        </div>
-                        <div class="pull-right">
-                            {!! Form::submit('Save',array('id'=>'save','class'=>'btn btn-default btn-md active')) !!}
-                        </div>
+                    </div>
+                    <div class="checkbox">
+                        <label class="checkbox">
+                        {!! Form::checkbox('show_pic', '1', $show_pic) !!}Show Photo
+                        </label>
+                    </div>
+                    <div class="pull-right">
+                        {!! Form::submit('Save',array('id'=>'save','class'=>'btn btn-default btn-md active')) !!}
+                    </div>
 
                     {!! Form::close() !!}
                 </div>

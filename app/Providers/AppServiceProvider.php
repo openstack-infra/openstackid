@@ -56,6 +56,15 @@ class AppServiceProvider extends ServiceProvider
         {
             return new CustomValidator($translator, $data, $rules, $messages);
         });
+
+        Validator::extend('openid.identifier', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('openid.identifier', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be a valid openid identifier", $attribute);
+            });
+
+            return preg_match('/^(\w|\.)+$/', $value);
+        });
     }
 
     /**

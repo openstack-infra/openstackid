@@ -14,7 +14,7 @@
 use OpenId\Models\IOpenIdUser;
 use Models\Member;
 use Utils\Exceptions\EntityNotFoundException;
-
+use Services\Exceptions\ValidationException;
 /**
  * Interface IUserService
  * @package OpenId\Services
@@ -75,9 +75,11 @@ interface IUserService
      * @param bool $show_pic
      * @param bool $show_full_name
      * @param bool $show_email
+     * @param string $identifier
      * @return bool
      * @throws EntityNotFoundException
+     * @throws ValidationException
      */
-    public function saveProfileInfo($user_id, $show_pic, $show_full_name, $show_email);
+    public function saveProfileInfo($user_id, $show_pic, $show_full_name, $show_email, $identifier);
 
 }
