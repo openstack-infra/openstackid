@@ -10,7 +10,7 @@
             todayBtn: "linked",
             clearBtn: true,
             todayHighlight: true,
-            orientation: "top right",
+            orientation: "bottom right",
             autoclose: true
         });
 

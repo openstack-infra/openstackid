@@ -68,7 +68,7 @@ final class OAuth2ProviderController extends Controller
     {
         $this->oauth2_protocol    = $oauth2_protocol;
         $this->auth_service       = $auth_service;
-        $this->client_repository = $client_repository;
+        $this->client_repository  = $client_repository;
     }
 
     /**

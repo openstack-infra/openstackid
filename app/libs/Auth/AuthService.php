@@ -132,7 +132,7 @@ final class AuthService implements IAuthService
     }
 
     /**
-     * @return AuthorizationResponse_*
+     * @return string
      */
     public function getUserAuthorizationResponse()
     {
@@ -158,7 +158,7 @@ final class AuthService implements IAuthService
 
     public function setUserAuthorizationResponse($auth_response)
     {
-        Session::set("openid.authorization.response", $auth_response);
+        Session::put("openid.authorization.response", $auth_response);
         Session::save();
     }
 
@@ -216,7 +216,7 @@ final class AuthService implements IAuthService
 
     public function setUserAuthenticationResponse($auth_response)
     {
-        Session::set("openstackid.authentication.response", $auth_response);
+        Session::put("openstackid.authentication.response", $auth_response);
         Session::save();
     }
 
