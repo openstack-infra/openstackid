@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +13,11 @@
  **/
 use Auth\UserNameGeneratorService;
 use Auth\Repositories\IMemberRepository;
-
+use Tests\BrowserKitTestCase;
 /**
  * Class UserGeneratorServiceTest
  */
-class UserGeneratorServiceTest extends TestCase {
-
-    public function __construct(){
-
-    }
+final class UserGeneratorServiceTest extends BrowserKitTestCase {
 
     protected function prepareForTests()
     {

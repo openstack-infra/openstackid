@@ -1,28 +1,21 @@
-mcrypt
+php7.2 [platform:dpkg]
 
-php [platform:ubuntu-xenial]
-php5 [platform:dpkg !platform:ubuntu-xenial]
+php7.2-cli [platform:dpkg]
 
-php-cli [platform:rpm platform:ubuntu-xenial]
-php5-cli [platform:dpkg !platform:ubuntu-xenial]
+php7.2-common [platform:dpkg]
 
-php-common  [platform:ubuntu-xenial]
-php5-common [platform:dpkg !platform:ubuntu-xenial]
+php7.2-curl [platform:dpkg]
 
-php-curl [platform:rpm platform:ubuntu-xenial]
-php5-curl [platform:dpkg !platform:ubuntu-xenial]
+php7.2-gd [platform:dpkg]
 
-php-gd [platform:rpm platform:ubuntu-xenial]
-php5-gd [platform:dpkg !platform:ubuntu-xenial]
+php7.2-json [platform:dpkg]
 
-php-json [platform:rpm platform:ubuntu-xenial]
-php5-json [platform:dpkg !platform:ubuntu-xenial]
+php7.2-mysqlnd [platform:dpkg]
 
-php-mysql [platform:rpm platform:ubuntu-xenial]
-php5-mysql [platform:dpkg !platform:ubuntu-xenial]
+php7.2-xml [platform:dpkg]
 
-php-gmp [platform:rpm platform:ubuntu-xenial]
-php5-gmp [platform:dpkg !platform:ubuntu-xenial]
+php7.2-mbstring [platform:dpkg]
 
-php-mcrypt [platform:ubuntu-xenial]
-php5-mcrypt [platform:dpkg !platform:ubuntu-xenial]
+php7.2-gmp [platform:dpkg]
+
+php7.2-ssh2 [platform:dpkg]

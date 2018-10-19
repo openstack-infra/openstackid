@@ -69,7 +69,7 @@ class TrustedSitesService implements ITrustedSitesService
 			$site->user_id = $user->getId();
 			$site->data    = json_encode($data);
 
-			return $this->repository->add($site)?$site:false;
+			return $this->repository->add($site) ? $site : false;
 
 		} catch (Exception $ex) {
 			$this->log_service->error($ex);

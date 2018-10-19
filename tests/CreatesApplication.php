@@ -1,4 +1,4 @@
-<?php
+<?php namespace Tests;
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Tests\TestCase;
+use Illuminate\Contracts\Console\Kernel;
 /**
- * Class TokenRepositoryTest
+ * Trait CreatesApplication
+ * @package Tests
  */
-final class TokenRepositoryTest extends TestCase
+trait CreatesApplication
 {
-    public function testAccessTokenRepository(){
-        $repository = $this->app[\OAuth2\Repositories\IAccessTokenRepository::class];
-        $this->assertTrue(!is_null($repository));
-        $this->assertTrue($repository instanceof \OAuth2\Repositories\IAccessTokenRepository);
-        $paginator = $repository->getAllValidByClientIdentifier(105);
-        $this->assertTrue($paginator->total() == 0);
+    /**
+     * Creates the application.
+     *
+     * @return \Illuminate\Foundation\Application
+     */
+    public function createApplication()
+    {
+        $app = require __DIR__.'/../bootstrap/app.php';
+
+        $app->make(Kernel::class)->bootstrap();
+
+        return $app;
     }
 }

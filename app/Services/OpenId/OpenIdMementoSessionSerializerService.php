@@ -14,7 +14,6 @@
 use OpenId\Requests\OpenIdMessageMemento;
 use OpenId\Services\IMementoOpenIdSerializerService;
 use Illuminate\Support\Facades\Session;
-
 /**
  * Class OpenIdMementoSessionSerializerService
  * @package Services\OpenId
