@@ -1,5 +1,16 @@
 <?php
-
+/**
+ * Copyright 2016 OpenStack Foundation
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
 use Auth\User;
 use OpenId\Extensions\Implementations\OpenIdOAuth2Extension;
 use OpenId\Extensions\Implementations\OpenIdSREGExtension;
@@ -15,7 +26,7 @@ use OpenId\Extensions\Implementations\OpenIdSREGExtension_1_0;
  * Class OpenIdProtocolTest
  * Test Suite for OpenId Protocol
  */
-class OpenIdProtocolTest extends OpenStackIDBaseTest
+final class OpenIdProtocolTest extends OpenStackIDBaseTest
 {
     private $current_realm;
     private $g;
@@ -26,8 +37,9 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     private $oauth2_client_secret;
     private $user;
 
-    public function __construct()
+    public function __construct($name = null, array $data = [], $dataName = '')
     {
+        parent::__construct($name, $data, $dataName);
         //DH openid values
         $this->g = '1';
         $this->private = '84009535308644335779530519631942543663544485189066558731295758689838227409144125540638118058012144795574289866857191302071807568041343083679600155026066530597177004145874642611724010339353151653679189142289183802715816551715563883085859667759854344959305451172754264893136955464706052993052626766687910313992';
@@ -428,7 +440,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue(isset($openid_response['enc_mac_key']));
         $this->assertTrue(isset($openid_response['expires_in']));
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $params = array(
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS) => OpenIdProtocol::OpenID2MessageType,
@@ -539,7 +551,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     public function testAuthenticationCheckImmediateAuthenticationPrivateSession()
     {
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         //add trusted site
         $site = new OpenIdTrustedSite;
@@ -598,7 +610,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     public function testAuthenticationCheckImmediateAuthenticationPrivateSession_SetupNeeded()
     {
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
         $this->user->trusted_sites()->delete();
         $params = array(
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS) => OpenIdProtocol::OpenID2MessageType,
@@ -634,7 +646,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
         $sreg_required_params = array('email', 'fullname', 'nickname');
 
         $params = array(
@@ -708,7 +720,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
         $sreg_required_params = array('email', 'fullname');
 
         $params = array(
@@ -782,7 +794,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
         $sreg_required_params = array('email', 'fullname');
 
         $params = array(
@@ -982,7 +994,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $scope = array(
             sprintf('%s/resource-server/read', $this->current_realm),
@@ -1063,7 +1075,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $scope = array(
             sprintf('%s/resource-server/read', $this->current_realm),
