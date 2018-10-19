@@ -11,10 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Closure;
 use Illuminate\Support\Facades\Auth;
-
 /**
  * Class RedirectIfAuthenticated
  * @package App\Http\Middleware
@@ -32,7 +30,7 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (Auth::guard($guard)->check()) {
-            return redirect('/');
+            return redirect('/home');
         }
 
         return $next($request);

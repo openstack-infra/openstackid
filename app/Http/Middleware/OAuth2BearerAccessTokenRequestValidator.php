@@ -117,7 +117,7 @@ final class OAuth2BearerAccessTokenRequestValidator
         $realm  = $request->getHost();
 
         try {
-            $route_path  = Route::getCurrentRoute()->getPath();
+            $route_path  = Route::getCurrentRoute()->uri();
             if (strpos($route_path, '/') != 0)
                 $route_path = '/' . $route_path;
 
