@@ -16,7 +16,7 @@ use jwk\impl\RSAJWKFactory;
 use jwk\impl\RSAJWKPEMPrivateKeySpecification;
 use OAuth2\Models\IServerPrivateKey;
 use DateTime;
-use Crypt_RSA;
+use phpseclib\Crypt\RSA;
 use Illuminate\Support\Facades\Crypt;
 /**
  * Class ServerPrivateKey
@@ -122,7 +122,7 @@ final class ServerPrivateKey extends AsymmetricKey implements IServerPrivateKey
     public function getPublicKeyPEM()
     {
         $private_key_pem =  $this->pem_content;
-        $rsa             = new Crypt_RSA();
+        $rsa             = new RSA();
 
         if(!empty($this->password)){
             $rsa->setPassword($this->password);

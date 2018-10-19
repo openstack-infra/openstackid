@@ -67,7 +67,7 @@ abstract class OAuth2ProtectedApiTest extends OpenStackIDBaseTest {
             OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
         );
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $response = $this->action("POST", "OAuth2\OAuth2ProviderController@auth",
             $params,
