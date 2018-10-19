@@ -45,10 +45,10 @@ class CurrentUserCheckRouteParams
                 $used_id            = Input::get('id',null);
 
             if(is_null($used_id))
-                $used_id =  $route->getParameter('user_id');
+                $used_id =  $route->parameter('user_id');
 
             if(is_null($used_id))
-                $used_id =  $route->getParameter('id');
+                $used_id =  $route->parameter('id');
 
             $user                   = $authentication_service->getCurrentUser();
             if (is_null($used_id) || intval($used_id) !== intval($user->getId()))

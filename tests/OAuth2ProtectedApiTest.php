@@ -11,13 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use OAuth2\OAuth2Protocol;
 use Auth\User;
 use Utils\Services\IAuthService;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Config;
-
 /**
  * Class OAuth2ProtectedApiTest
  */
@@ -67,7 +65,7 @@ abstract class OAuth2ProtectedApiTest extends OpenStackIDBaseTest {
             OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
         );
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $response = $this->action("POST", "OAuth2\OAuth2ProviderController@auth",
             $params,

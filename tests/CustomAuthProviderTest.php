@@ -18,7 +18,7 @@ use OpenId\Services\OpenIdServiceCatalog;
 use Auth\Repositories\IUserRepository;
 use Auth\Repositories\IMemberRepository;
 use Auth\IAuthenticationExtensionService;
-
+use Tests\TestCase;
 /**
  * Class CustomAuthProviderTest
  */
