@@ -1,14 +1,14 @@
 <?php
-
 use Auth\User;
 use Models\Member;
 use OpenId\Services\OpenIdServiceCatalog;
 use Illuminate\Support\Facades\App;
 use Auth\UserNameGeneratorService;
+use Tests\BrowserKitTestCase;
 /**
  * Class UserTest
  */
-class UserTest extends TestCase
+class UserTest extends BrowserKitTestCase
 {
 
     public function testMember()

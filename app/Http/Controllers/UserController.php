@@ -112,6 +112,11 @@ final class UserController extends OpenIdController
     private $utils_configuration_service;
 
     /**
+     * @var ISecurityContextService
+     */
+    private $security_context_service;
+
+    /**
      * UserController constructor.
      * @param IMementoOpenIdSerializerService $openid_memento_service
      * @param IMementoOAuth2SerializerService $oauth2_memento_service
@@ -160,51 +165,56 @@ final class UserController extends OpenIdController
         $this->token_service                = $token_service;
         $this->resource_server_service      = $resource_server_service;
         $this->utils_configuration_service  = $utils_configuration_service;
+        $this->security_context_service     = $security_context_service;
 
-        if ($this->openid_memento_service->exists())
-        {
-            //openid stuff
-            $this->login_strategy   = new OpenIdLoginStrategy
-            (
-                $openid_memento_service,
-                $user_action_service,
-                $auth_service
-            );
+        $this->middleware(function ($request, $next) {
+            if ($this->openid_memento_service->exists())
+            {
+                //openid stuff
+                $this->login_strategy   = new OpenIdLoginStrategy
+                (
+                    $this->openid_memento_service,
+                    $this->user_action_service,
+                    $this->auth_service
+                );
 
-            $this->consent_strategy = new OpenIdConsentStrategy
-            (
-                $openid_memento_service,
-                $auth_service,
-                $server_configuration_service,
-                $user_action_service
-            );
+                $this->consent_strategy = new OpenIdConsentStrategy
+                (
+                    $this->openid_memento_service,
+                    $this->auth_service,
+                    $this->server_configuration_service,
+                    $this->user_action_service
+                );
 
-        }
-        else if ($this->oauth2_memento_service->exists())
-        {
+            }
+            else if ($this->oauth2_memento_service->exists())
+            {
 
                 $this->login_strategy = new OAuth2LoginStrategy
                 (
-                    $auth_service,
-                    $oauth2_memento_service,
-                    $user_action_service,
-                    $security_context_service
+                    $this->auth_service,
+                    $this->oauth2_memento_service,
+                    $this->user_action_service,
+                    $this->security_context_service
                 );
 
                 $this->consent_strategy = new OAuth2ConsentStrategy
                 (
-                    $auth_service,
-                    $oauth2_memento_service,
-                    $scope_repository,
-                    $client_repository
+                    $this->auth_service,
+                    $this->oauth2_memento_service,
+                    $this->scope_repository,
+                    $this->client_repository
                 );
-        }
-        else
-        {
-            //default stuff
-            $this->login_strategy   = new DefaultLoginStrategy($user_action_service, $auth_service);
-            $this->consent_strategy = null;
-        }
+            }
+            else
+            {
+                //default stuff
+                $this->login_strategy   = new DefaultLoginStrategy($this->user_action_service, $this->auth_service);
+                $this->consent_strategy = null;
+            }
+
+            return $next($request);
+        });
     }
 
     public function getLogin()

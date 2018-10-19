@@ -13,13 +13,13 @@
  **/
 use Illuminate\Validation\Validator;
 use Models\OAuth2\Client;
-use Symfony\Component\Translation\TranslatorInterface;
+use Illuminate\Contracts\Translation\Translator;
 use jwk\JSONWebKeyPublicKeyUseValues;
 use jwk\JSONWebKeyTypes;
 use OAuth2\OAuth2Protocol;
 use OAuth2\Models\IClient;
 use Utils\Services\IAuthService;
-use Crypt_RSA;
+use phpseclib\Crypt\RSA;
 
 /**
  * Class CustomValidator
@@ -37,7 +37,7 @@ class CustomValidator extends Validator
         'RequiredWithoutField'
     );
 
-    public function __construct(TranslatorInterface $translator, $data, $rules, $messages = array())
+    public function __construct(Translator $translator, $data, $rules, $messages = array())
     {
         parent::__construct($translator, $data, $rules, $messages);
         $this->isImplicit('fail');
@@ -221,7 +221,7 @@ class CustomValidator extends Validator
         $PKCS8 = $res1 !== false && $res3 !== false;
         $PKCS1 = $res2 !== false && $res4 !== false;
 
-        $rsa    = new Crypt_RSA;
+        $rsa    = new RSA;
         $parsed = $rsa->loadKey($value);
 
         return ($PKCS8 || $PKCS1) && $parsed;
@@ -229,7 +229,7 @@ class CustomValidator extends Validator
 
     public function validatePublicKeyPemLength($attribute, $value)
     {
-        $rsa    = new Crypt_RSA();
+        $rsa    = new RSA();
         $parsed = $rsa->loadKey($value);
 
         return $parsed && $rsa->getSize() > 1024;
@@ -247,7 +247,7 @@ class CustomValidator extends Validator
 
         $encrypted      = strpos($value,'ENCRYPTED') !== false ;
         $password_param = $parameters[0];
-        $rsa            = new Crypt_RSA;
+        $rsa            = new RSA;
         if(isset($this->data[$password_param]) && $encrypted){
             $rsa->setPassword($this->data[$password_param]);
         }
@@ -262,7 +262,7 @@ class CustomValidator extends Validator
 
         $encrypted      = strpos($value,'ENCRYPTED') !== false ;
         $password_param = $parameters[0];
-        $rsa            = new Crypt_RSA;
+        $rsa            = new RSA;
         if(isset($this->data[$password_param]) && $encrypted){
             $rsa->setPassword($this->data[$password_param]);
         }
@@ -286,7 +286,7 @@ class CustomValidator extends Validator
        $pem_param = $parameters[0];
        if(!isset($this->data[$pem_param])) return true;
        $pem_content = $this->data[$pem_param];
-       $rsa    = new Crypt_RSA;
+       $rsa    = new RSA;
        $rsa->setPassword($value);
        $parsed = $rsa->loadKey($pem_content);
        return $parsed;
@@ -301,7 +301,7 @@ class CustomValidator extends Validator
         $urls = explode(',', $value);
         $res = true;
         foreach ($urls as $url) {
-            $res = $app_type === IClient::ApplicationType_Native ? $this->validateCustomUrl($attribute, $url, $parameters): $this->validateSslurl($attribute, $url, $parameters);
+            $res = $app_type === IClient::ApplicationType_Native ? $this->validateCustomUrl($attribute, $url, $parameters): $this->validateSslurl($attribute, $url);
             if (!$res) {
                 break;
             }
@@ -324,7 +324,7 @@ class CustomValidator extends Validator
         $urls = explode(',', $value);
         $res = true;
         foreach ($urls as $url) {
-            $res = $this->validateSslurl($attribute, $url, $parameters);
+            $res = $this->validateSslurl($attribute, $url);
             if (!$res) {
                 break;
             }
