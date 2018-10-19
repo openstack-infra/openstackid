@@ -17,7 +17,7 @@ use OAuth2\OAuth2Protocol;
 use Utils\Services\IAuthService;
 use Utils\Services\UtilsServiceCatalog;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Facades\Config;
 /**
  * Class OAuth2ProtocolTest
  * Test Suite for OAuth2 Protocol
@@ -191,7 +191,7 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
             OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
         );
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $response = $this->action("POST", "OAuth2\OAuth2ProviderController@auth",
             $params,
@@ -271,7 +271,7 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
             OAuth2Protocol::OAuth2Protocol_AccessType => OAuth2Protocol::OAuth2Protocol_AccessType_Offline,
         );
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $response = $this->action("POST", "OAuth2\OAuth2ProviderController@auth",
             $params,
@@ -339,7 +339,7 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
             $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
-            Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+            Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
             //do authorization ...
 
@@ -491,7 +491,7 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
             $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
-            Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+            Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
             //do authorization ...
 
@@ -596,7 +596,7 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
 
-            Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+            Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
             //do authorization ...
 
@@ -710,7 +710,7 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
             $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
-            Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+            Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
             //do authorization ...
 
@@ -822,7 +822,7 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwTlfSyQ3x.openstack.client';
             $client_secret = 'ITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhgITc/6Y5N7kOtGKhg';
 
-            Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+            Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
             //do authorization ...
 
@@ -905,9 +905,9 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
     public function testImplicitFlow()
     {
 
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $params = array(
             'client_id' => $client_id,
@@ -943,9 +943,9 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
     public function testTokenRevocation()
     {
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $params = array(
             'client_id' => $client_id,
@@ -997,9 +997,9 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
 
     public function testTokenRevocationInvalidClient()
     {
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $params = array(
             'client_id' => $client_id,
@@ -1052,9 +1052,9 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
     public function testTokenRevocationInvalidHint()
     {
 
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $params = array(
             'client_id' => $client_id,
@@ -1107,9 +1107,9 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
     public function testTokenRevocationInvalidToken()
     {
 
-        $client_id = 'Jiz87D8/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
+        $client_id = '1234/Vcvr6fvQbH4HyNgwKlfSyQ3x.openstack.client';
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $params = array(
             'client_id' => $client_id,

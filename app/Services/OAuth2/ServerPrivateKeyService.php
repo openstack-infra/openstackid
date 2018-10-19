@@ -18,7 +18,7 @@ use OAuth2\Repositories\IServerPrivateKeyRepository;
 use Utils\Db\ITransactionService;
 use Models\OAuth2\ServerPrivateKey;
 use DateTime;
-use Crypt_RSA;
+use phpseclib\Crypt\RSA;
 use Services\Exceptions\ValidationException;
 
 /**
@@ -29,7 +29,7 @@ final class ServerPrivateKeyService extends AsymmetricKeyService implements ISer
 {
 
     /**
-     * @var Crypt_RSA
+     * @var RSA
      */
     private $rsa;
 
@@ -45,7 +45,7 @@ final class ServerPrivateKeyService extends AsymmetricKeyService implements ISer
     )
     {
         parent::__construct($repository, $tx_service);
-        $this->rsa = new Crypt_RSA();
+        $this->rsa = new RSA();
     }
 
     /**

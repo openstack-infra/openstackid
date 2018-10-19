@@ -18,7 +18,8 @@ use OAuth2\Services\IClientJWKSetReader;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\RequestException as HttpRequestException;
 use Utils\Http\HttpContentType;
-use Log;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Config;
 /**
  * Class HttpIClientJWKSetReader
  * @package Services\OAuth2
@@ -28,7 +29,9 @@ final class HttpIClientJWKSetReader implements IClientJWKSetReader
 
     /**
      * @param IClient $client
-     * @return IJWKSet
+     * @return IJWKSet|null
+     * @throws \jwk\exceptions\InvalidJWKAlgorithm
+     * @throws \jwk\exceptions\JWKInvalidIdentifierException
      */
     public function read(IClient $client)
     {
