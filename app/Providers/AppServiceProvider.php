@@ -31,9 +31,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $monolog = Log::getMonolog();
 
-        foreach($monolog->getHandlers() as $handler) {
+        $logger = Log::getLogger();
+
+        foreach($logger->getHandlers() as $handler) {
             $handler->setLevel(Config::get('log.level', 'error'));
         }
 
@@ -44,11 +45,9 @@ class AppServiceProvider extends ServiceProvider
         if (!empty($to) && !empty($from)) {
 
             $subject  = 'openstackid error';
-            $mono_log = Log::getMonolog();
             $handler  = new NativeMailerHandler($to, $subject, $from);
-
             $handler->setLevel(Config::get('log.email_level', 'error'));
-            $mono_log->pushHandler($handler);
+            $logger->pushHandler($handler);
         }
 
 

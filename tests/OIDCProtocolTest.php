@@ -83,8 +83,7 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
 
         $this->assertTrue(array_key_exists('error', $output));
         $this->assertTrue(!empty($output['error']));
-        $this->assertTrue($output['error'] === OAuth2Protocol::OAuth2Protocol_Error_Interaction_Required);
-
+        $this->assertTrue($output['error'] === OAuth2Protocol::OAuth2Protocol_Error_Login_Required);
     }
 
     public function testLoginWithTrailingSpace()

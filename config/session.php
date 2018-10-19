@@ -162,9 +162,26 @@ return [
     */
 
     'http_only' => env('SESSION_COOKIE_HTTP_ONLY', true),
+
+    /*
+   |--------------------------------------------------------------------------
+   | Same-Site Cookies
+   |--------------------------------------------------------------------------
+   |
+   | This option determines how your cookies behave when cross-site requests
+   | take place, and can be used to mitigate CSRF attacks. By default, we
+   | do not enable this as other CSRF protection services are in place.
+   |
+   | Supported: "lax", "strict"
+   |
+   */
+
+    'same_site' => null,
+
     /*
      * http://openid.net/specs/openid-connect-session-1_0.html#OPiframe
      * OP Browser state lifetime
      */
     'op_browser_state_lifetime' => env('SESSION_OP_BROWSER_STATE_LIFETIME', 120)
+
 ];

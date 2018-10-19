@@ -57,7 +57,7 @@ use utils\exceptions\InvalidCompactSerializationException;
 use utils\factories\BasicJWTFactory;
 use Utils\Services\IAuthService;
 use Utils\Services\ILogService;
-
+use phpseclib\Crypt\Random;
 /**
  * Class InteractiveGrantType
  * @package OAuth2\GrantTypes
@@ -327,8 +327,7 @@ abstract class InteractiveGrantType extends AbstractGrantType
             $session_id
         ));
 
-        // warning: mcrypt_create_iv deprecated on php 7.x
-        $salt    = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
+        $salt    = bin2hex(Random::string(16));
         $message = "{$client_id}{$origin}{$session_id}{$salt}";
         $this->log_service->debug_msg(sprintf(
             "InteractiveGrantType::getSessionState message %s",

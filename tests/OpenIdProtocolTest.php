@@ -26,8 +26,9 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     private $oauth2_client_secret;
     private $user;
 
-    public function __construct()
+    public function __construct($name = null, array $data = [], $dataName = '')
     {
+        parent::__construct($name, $data, $dataName);
         //DH openid values
         $this->g = '1';
         $this->private = '84009535308644335779530519631942543663544485189066558731295758689838227409144125540638118058012144795574289866857191302071807568041343083679600155026066530597177004145874642611724010339353151653679189142289183802715816551715563883085859667759854344959305451172754264893136955464706052993052626766687910313992';
@@ -428,7 +429,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
         $this->assertTrue(isset($openid_response['enc_mac_key']));
         $this->assertTrue(isset($openid_response['expires_in']));
 
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $params = array(
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS) => OpenIdProtocol::OpenID2MessageType,
@@ -539,7 +540,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     public function testAuthenticationCheckImmediateAuthenticationPrivateSession()
     {
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         //add trusted site
         $site = new OpenIdTrustedSite;
@@ -598,7 +599,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     public function testAuthenticationCheckImmediateAuthenticationPrivateSession_SetupNeeded()
     {
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
         $this->user->trusted_sites()->delete();
         $params = array(
             OpenIdProtocol::param(OpenIdProtocol::OpenIDProtocol_NS) => OpenIdProtocol::OpenID2MessageType,
@@ -634,7 +635,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
         $sreg_required_params = array('email', 'fullname', 'nickname');
 
         $params = array(
@@ -708,7 +709,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
         $sreg_required_params = array('email', 'fullname');
 
         $params = array(
@@ -782,7 +783,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowForever);
         $sreg_required_params = array('email', 'fullname');
 
         $params = array(
@@ -982,7 +983,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $scope = array(
             sprintf('%s/resource-server/read', $this->current_realm),
@@ -1063,7 +1064,7 @@ class OpenIdProtocolTest extends OpenStackIDBaseTest
     {
 
         //set login info
-        Session::set("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
+        Session::put("openid.authorization.response", IAuthService::AuthorizationResponse_AllowOnce);
 
         $scope = array(
             sprintf('%s/resource-server/read', $this->current_realm),
