@@ -11,13 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use OpenId\Xrds\XRDSDocumentBuilder;
 use OpenId\Xrds\XRDSService;
+use Tests\BrowserKitTestCase;
 /**
  * Class XRDSDocumentTest
  */
-class XRDSDocumentTest extends TestCase
+class XRDSDocumentTest extends BrowserKitTestCase
 {
     public function testBuildDocument()
     {

@@ -58,10 +58,10 @@ final class CurrentUserCanEditOAuth2Client
     {
         try{
             $route                  = Route::getCurrentRoute();
-            $client_id              = $route->getParameter('id');
+            $client_id              = $route->parameter('id');
 
             if(is_null($client_id))
-                $client_id          = $route->getParameter('client_id');
+                $client_id          = $route->parameter('client_id');
 
             if(is_null($client_id))
                 $client_id          = Input::get('client_id',null);;

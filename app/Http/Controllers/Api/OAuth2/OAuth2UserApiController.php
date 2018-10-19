@@ -57,7 +57,7 @@ class OAuth2UserApiController extends OAuth2ProtectedController
         IdTokenBuilder $id_token_builder
     )
     {
-        parent::__construct($resource_server_context,$log_service);
+        parent::__construct($resource_server_context, $log_service);
 
         $this->user_service      = $user_service;
         $this->client_repository = $client_repository;
