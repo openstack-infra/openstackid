@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use phpseclib\Crypt\Random;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Log;
@@ -78,7 +78,7 @@ final class PrincipalService implements IPrincipalService
         Log::debug(sprintf("PrincipalService::register user_id %s auth_time %s", $user_id, $auth_time));
         Session::put(self::UserIdParam, $user_id);
         Session::put(self::AuthTimeParam, $auth_time);
-        $opbs = bin2hex(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM));
+        $opbs = bin2hex(Random::string(16));
         Cookie::queue(IPrincipalService::OP_BROWSER_STATE_COOKIE_NAME, $opbs, $minutes = config("session.op_browser_state_lifetime"), $path = '/', $domain = null, $secure = false, $httpOnly = false);
         Log::debug(sprintf("PrincipalService::register opbs %s", $opbs));
         Session::put(self::OPBrowserState, $opbs);
