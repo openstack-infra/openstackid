@@ -71,6 +71,12 @@ interface IApiEndpointService {
 
     /**
      * @param int $id
+     * @return mixed
+     */
+    public function get($id);
+
+    /**
+     * @param int $id
      * @param array $params
      * @return bool
      * @throws EntityNotFoundException

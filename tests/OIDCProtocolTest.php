@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +36,7 @@ use jwt\impl\UnsecuredJWT;
  * Class OIDCProtocolTest
  * http://openid.net/wordpress-content/uploads/2015/02/OpenID-Connect-Conformance-Profiles.pdf
  */
-class OIDCProtocolTest extends OpenStackIDBaseTest
+final class OIDCProtocolTest extends OpenStackIDBaseTest
 {
     /**
      * @var string
@@ -83,8 +82,7 @@ class OIDCProtocolTest extends OpenStackIDBaseTest
 
         $this->assertTrue(array_key_exists('error', $output));
         $this->assertTrue(!empty($output['error']));
-        $this->assertTrue($output['error'] === OAuth2Protocol::OAuth2Protocol_Error_Interaction_Required);
-
+        $this->assertTrue($output['error'] === OAuth2Protocol::OAuth2Protocol_Error_Login_Required);
     }
 
     public function testLoginWithTrailingSpace()

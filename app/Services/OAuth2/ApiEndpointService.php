@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use OAuth2\Models\IApiEndpoint;
 use OAuth2\Repositories\IApiEndpointRepository;
 use OAuth2\Repositories\IApiScopeRepository;
@@ -21,12 +20,11 @@ use OAuth2\Exceptions\InvalidApiEndpoint;
 use OAuth2\Exceptions\InvalidApiScope;
 use Utils\Db\ITransactionService;
 use Utils\Exceptions\EntityNotFoundException;
-
 /**
  * Class ApiEndpointService
  * @package Services\OAuth2
  */
-class ApiEndpointService implements IApiEndpointService {
+final class ApiEndpointService implements IApiEndpointService {
 
     /**
      * @var ITransactionService
@@ -270,6 +268,17 @@ class ApiEndpointService implements IApiEndpointService {
             $endpoint->active = $active;
             $this->repository->add($endpoint);
             return true;
+        });
+    }
+
+    /**
+     * @param int $id
+     * @return mixed
+     */
+    public function get($id)
+    {
+        return $this->tx_service->transaction(function () use($id){
+           return $this->repository->get($id);
         });
     }
 }

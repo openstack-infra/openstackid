@@ -11,13 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Utils\Services\UtilsServiceCatalog;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-
 /**
  * Class UtilsProvider
  * @package Services\Utils
@@ -41,7 +39,7 @@ final class UtilsProvider extends ServiceProvider {
         App::singleton(UtilsServiceCatalog::BannedIpService, 'Services\\Utils\\BannedIPService');
 
         // setting facade
-        $this->app['serverconfigurationservice'] = App::share(function ($app) {
+        App::singleton('serverconfigurationservice', function ($app) {
             return new ServerConfigurationService
             (
                 App::make(UtilsServiceCatalog::CacheService),
@@ -50,7 +48,7 @@ final class UtilsProvider extends ServiceProvider {
         });
 
         // setting facade
-        $this->app['externalurlservice'] = App::share(function ($app) {
+        App::singleton('externalurlservice', function ($app) {
             return new ExternalUrlService();
         });
 

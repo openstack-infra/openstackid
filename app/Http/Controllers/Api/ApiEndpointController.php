@@ -20,6 +20,7 @@ use OAuth2\Exceptions\InvalidApiEndpoint;
 use OAuth2\Exceptions\InvalidApiScope;
 use OAuth2\Repositories\IApiEndpointRepository;
 use OAuth2\Services\IApiEndpointService;
+use Utils\Exceptions\EntityNotFoundException;
 use Utils\Services\ILogService;
 
 /**
@@ -65,7 +66,12 @@ class ApiEndpointController extends AbstractRESTController implements ICRUDContr
             $data           = $api_endpoint->toArray();
             $data['scopes'] = $scopes->toArray();
             return $this->ok($data);
-        } catch (Exception $ex) {
+        }
+        catch (EntityNotFoundException $ex1) {
+            $this->log_service->warning($ex1);
+            return $this->error404($ex1);
+        }
+        catch (Exception $ex) {
             $this->log_service->error($ex);
             return $this->error500($ex);
         }

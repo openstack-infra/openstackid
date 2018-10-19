@@ -11,13 +11,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 **/
-
-
 use jwk\JSONWebKeyTypes;
 use jwk\JSONWebKeyPublicKeyUseValues;
 use Models\OAuth2\Client;
 use jwa\JSONWebSignatureAndEncryptionAlgorithms;
-
+use Tests\TestCase;
 /**
  * Class ClientPublicKeyApiTest
  */
