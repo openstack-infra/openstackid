@@ -28,13 +28,12 @@ use OAuth2\Responses\OAuth2WWWAuthenticateErrorResponse;
 use OAuth2\Services\ITokenService;
 use OAuth2\IResourceServerContext;
 use OAuth2\Repositories\IApiEndpointRepository;
-use OAuth2\Services\IClientService;
 use URL\Normalizer;
 use Illuminate\Support\Facades\Route;
 use Exception;
 use Utils\Services\ICheckPointService;
 use Utils\Services\ILogService;
-
+use libs\utils\RequestUtils;
 /**
  * Class OAuth2BearerAccessTokenRequestValidator
  * this class implements the logic to Accessing to Protected Resources
@@ -117,7 +116,7 @@ final class OAuth2BearerAccessTokenRequestValidator
         $realm  = $request->getHost();
 
         try {
-            $route_path  = Route::getCurrentRoute()->getPath();
+            $route_path  = RequestUtils::getCurrentRoutePath($request);
             if (strpos($route_path, '/') != 0)
                 $route_path = '/' . $route_path;
 

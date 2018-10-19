@@ -11,14 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
-
+use Tests\BrowserKitTestCase;
 /**
  * Class OpenStackIDBaseTest
  */
-abstract class OpenStackIDBaseTest extends TestCase {
+abstract class OpenStackIDBaseTest extends BrowserKitTestCase {
 
     protected function prepareForTests()
     {

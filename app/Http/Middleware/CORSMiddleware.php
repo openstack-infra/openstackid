@@ -1,5 +1,4 @@
 <?php namespace App\Http\Middleware;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Route;
-
+use libs\utils\RequestUtils;
 /**
  *
  * @package App\Http\Middleware\
@@ -141,7 +139,7 @@ final class CORSMiddleware
                     // correct route
                     $real_method = $request->headers->get('Access-Control-Request-Method');
 
-                    $route_path  = Route::getCurrentRoute()->getPath();
+                    $route_path  = RequestUtils::getCurrentRoutePath($request);
                     if (strpos($route_path, '/') != 0)
                         $route_path = '/' . $route_path;
 

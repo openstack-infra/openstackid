@@ -11,16 +11,14 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 **/
-
 use OAuth2\Models\IClient;
 use Auth\User;
 use Models\OAuth2\Client;
 use Illuminate\Support\Facades\Session;
-
 /**
  * Class ClientApiTest
  */
-class ClientApiTest extends TestCase {
+class ClientApiTest extends \Tests\BrowserKitTestCase {
 
     private $current_realm;
 
