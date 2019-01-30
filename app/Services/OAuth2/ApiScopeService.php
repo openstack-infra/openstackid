@@ -70,7 +70,7 @@ final class ApiScopeService implements IApiScopeService
     public function getFriendlyScopesByName(array $scopes_names)
     {
         return DB::table('oauth2_api_scope')->where('active', '=', true)->whereIn('name',
-            $scopes_names)->lists('short_description');
+            $scopes_names)->pluck('short_description')->all();
     }
 
     /**
