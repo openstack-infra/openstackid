@@ -26,15 +26,19 @@ final class ClientAuthContextValidatorFactoryProvider extends ServiceProvider
 
     public function boot()
     {
-        ClientAuthContextValidatorFactory::setTokenEndpointUrl
-        (
-            URL::action('OAuth2\OAuth2ProviderController@token')
-        );
+        // wait till app is fully booted so we have access to routes
+        $this->app->booted(function () {
+            ClientAuthContextValidatorFactory::setTokenEndpointUrl
+            (
+                URL::action('OAuth2\OAuth2ProviderController@token')
+            );
 
-        ClientAuthContextValidatorFactory::setJWKSetReader
-        (
-            App::make(\OAuth2\Services\IClientJWKSetReader::class)
-        );
+            ClientAuthContextValidatorFactory::setJWKSetReader
+            (
+                App::make(\OAuth2\Services\IClientJWKSetReader::class)
+            );
+        });
+
     }
     /**
      * Register the service provider.
