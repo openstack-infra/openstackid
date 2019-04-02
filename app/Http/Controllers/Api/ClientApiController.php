@@ -240,7 +240,6 @@ final class ClientApiController extends AbstractRESTController implements ICRUDC
                 'policy_uri'                      => 'sometimes|required|url',
                 'jwks_uri'                        => 'sometimes|required|url',
                 'default_max_age'                 => 'sometimes|required|integer',
-                'logout_use_iframe'               => 'sometimes|required|boolean',
                 'require_auth_time'               => 'sometimes|required|boolean',
                 'token_endpoint_auth_method'      => 'sometimes|required|token_endpoint_auth_method',
                 'token_endpoint_auth_signing_alg' => 'sometimes|required|signing_alg',

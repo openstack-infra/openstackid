@@ -654,7 +654,6 @@ final class OAuth2ProtocolTest extends OpenStackIDBaseTest
             $params = array(
                 'refresh_token' => $refresh_token,
                 'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_RefreshToken,
-                'grant_type' => OAuth2Protocol::OAuth2Protocol_GrantType_RefreshToken,
             );
 
             $response = $this->action("POST", "OAuth2\OAuth2ProviderController@token",

@@ -23,6 +23,7 @@ abstract class HttpResponse extends HttpMessage
      */
     public function __construct($http_code, $content_type)
     {
+        parent::__construct();
         $this->http_code    = $http_code;
         $this->content_type = $content_type;
     }
