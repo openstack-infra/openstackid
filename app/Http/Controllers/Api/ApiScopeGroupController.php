@@ -202,25 +202,24 @@ final class ApiScopeGroupController extends AbstractRESTController implements IC
 
             $values = Input::all();
 
-            $rules = array
-            (
-                'id'     => 'required|integer',
+            $rules = [
+               'id'     => 'required|integer',
                 'name'   => 'required|text|max:512',
                 'active' => 'required|boolean',
                 'scopes' => 'required',
                 'users'  => 'required|user_ids',
-            );
+            ];
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($values, $rules);
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
 
-                return $this->error400(array('error' => 'validation', 'messages' => $messages));
+                return $this->error400(['error' => 'validation', 'messages' => $messages]);
             }
 
-            $res = $this->service->update(intval($values['id']), $values);
+            $this->service->update(intval($values['id']), $values);
 
-            return $res ? $this->ok() : $this->error400(array('error' => 'operation failed'));
+            return $this->ok();
         }
         catch (InvalidApiScopeGroup $ex1)
         {
@@ -236,8 +235,8 @@ final class ApiScopeGroupController extends AbstractRESTController implements IC
     public function activate($id){
         try
         {
-            $res = $this->service->setStatus($id, true);
-            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
+            $this->service->setStatus($id, true);
+            return $this->ok();
         }
         catch (Exception $ex) {
             $this->log_service->error($ex);
@@ -248,8 +247,8 @@ final class ApiScopeGroupController extends AbstractRESTController implements IC
     public function deactivate($id){
         try
         {
-            $res = $this->service->setStatus($id, false);
-            return $res?$this->ok():$this->error400(array('error'=>'operation failed'));
+            $this->service->setStatus($id, false);
+            return $this->ok();
         }
         catch (Exception $ex) {
             $this->log_service->error($ex);

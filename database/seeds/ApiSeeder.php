@@ -20,10 +20,9 @@ class ApiSeeder extends Seeder {
         // users
         Api::create(
             array(
-                'name'            => 'users',
-                'logo'            =>  null,
-                'active'          =>  true,
-                'Description'     => 'User Info',
+                'name'               => 'users',
+                'active'             =>  true,
+                'Description'        => 'User Info',
                 'resource_server_id' => $resource_server->id,
                 'logo'               => asset('/assets/img/apis/server.png')
             )
