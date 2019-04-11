@@ -52,13 +52,6 @@
                         @endforeach
                     @endif
                 </div>
-                @if(Session::has('login_attempts') && Session::has('max_login_attempts_2_show_captcha') && Session::get('login_attempts') > Session::get('max_login_attempts_2_show_captcha'))
-                    {!! Recaptcha::render(array('id'=>'captcha','class'=>'input-block-level')) !!}
-                    {!! Form::hidden('login_attempts', Session::get('login_attempts')) !!}
-                @else
-                    {!! Form::hidden('login_attempts', '0') !!}
-                @endif
-
                 <div class="checkbox">
                     <label class="checkbox">
                         {!! Form::checkbox('remember', '1', false) !!}Remember me
@@ -83,6 +76,8 @@
                     <a title="verify account" target="_blank" href="{!! ExternalUrlService::getVerifyAccountUrl() !!}">Verify OpenStack ID</a>
                 </div>
             </div>
+            {!!  GoogleReCaptchaV3::renderField('login_id','login') !!}
+            {!! Form::hidden('login_attempts', Session::get('login_attempts')) !!}
             </fieldset>
             {!! Form::close() !!}
         </div>
@@ -91,5 +86,6 @@
     </div>
 @append
 @section('scripts')
+    {!!  GoogleReCaptchaV3::init() !!}
     {!! HTML::script('assets/js/login.js') !!}
 @append

@@ -25,7 +25,7 @@ class DisplayResponseUserAgentStrategy implements IDisplayResponseStrategy
      * @param array $data
      * @return SymfonyResponse
      */
-    public function getConsentResponse(array $data = array())
+    public function getConsentResponse(array $data = [])
     {
         return Response::view("oauth2.consent", $data, 200);
     }
@@ -34,7 +34,7 @@ class DisplayResponseUserAgentStrategy implements IDisplayResponseStrategy
      * @param array $data
      * @return SymfonyResponse
      */
-    public function getLoginResponse(array $data = array())
+    public function getLoginResponse(array $data = [])
     {
         return Response::view("login", $data, 200);
     }
@@ -43,14 +43,13 @@ class DisplayResponseUserAgentStrategy implements IDisplayResponseStrategy
      * @param array $data
      * @return SymfonyResponse
      */
-    public function getLoginErrorResponse(array $data = array())
+    public function getLoginErrorResponse(array $data = [])
     {
         $response =  Redirect::action('UserController@getLogin')
-            ->with('max_login_attempts_2_show_captcha', $data['max_login_attempts_2_show_captcha'])
             ->with('login_attempts', $data['login_attempts']);
 
         if(isset($data['username']))
-            $response= $response->with('username', $data['username']);
+            $response = $response->with('username', $data['username']);
         if(isset($data['error_message']))
             $response = $response->with('flash_notice', $data['error_message']);
         if(isset($data['validator']))

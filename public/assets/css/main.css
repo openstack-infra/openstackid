@@ -212,3 +212,8 @@ textarea {
 .alert{
     margin-top: 5px;
 }
+
+.grecaptcha-badge{
+    width: 100% !important;
+    margin-top: 10px;
+}

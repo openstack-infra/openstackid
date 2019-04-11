@@ -4,7 +4,7 @@
 
     * LAMP/LEMP environment
     * Redis
-    * PHP >= 5.3.7
+    * PHP >= 7.1.3
     * composer (https://getcomposer.org/)
 
 ## Install
@@ -13,7 +13,7 @@ run following commands on root folder
    * curl -s https://getcomposer.org/installer | php
    * php composer.phar install --prefer-dist
    * php composer.phar dump-autoload --optimize
-   * php artisan vendor:publish --provider="Greggilbert\Recaptcha\RecaptchaServiceProvider"
+   * php artisan vendor:publish --provider="TimeHunter\LaravelGoogleReCaptchaV3\Providers\GoogleReCaptchaV3ServiceProvider" --tag=googlerecaptchav3.config
    * php artisan migrate --env=YOUR_ENVIRONMENT
    * php artisan db:seed --env=YOUR_ENVIRONMENT
    * phpunit --bootstrap vendor/autoload.php

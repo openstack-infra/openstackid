@@ -151,8 +151,8 @@ return [
         OpenId\OpenIdServiceProvider::class,
         App\Providers\CustomAuthProvider::class,
         Collective\Html\HtmlServiceProvider::class,
-        \Providers\OAuth2\ClientAuthContextValidatorFactoryProvider::class,
-        Greggilbert\Recaptcha\RecaptchaServiceProvider::class,
+        Providers\OAuth2\ClientAuthContextValidatorFactoryProvider::class,
+        TimeHunter\LaravelGoogleReCaptchaV3\Providers\GoogleReCaptchaV3ServiceProvider::class,
     ],
 
     /*
@@ -200,7 +200,7 @@ return [
         'Form'      => Collective\Html\FormFacade::class,
         'HTML'      => Collective\Html\HtmlFacade::class,
         'Input'     => Illuminate\Support\Facades\Input::class,
-        'Recaptcha' => Greggilbert\Recaptcha\Facades\Recaptcha::class,
+        'GoogleReCaptchaV3'=> TimeHunter\LaravelGoogleReCaptchaV3\Facades\GoogleReCaptchaV3::class,
         'ServerConfigurationService' => \Services\Facades\ServerConfigurationService::class,
         'ExternalUrlService'=> \Services\Facades\ExternalUrlService::class,
     ],

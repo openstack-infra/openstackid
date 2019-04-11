@@ -27,8 +27,6 @@ use Illuminate\Support\Facades\View;
 use OAuth2\Repositories\IApiScopeRepository;
 use OAuth2\Repositories\IClientRepository;
 use OpenId\Services\IUserService;
-use OAuth2\Services\IApiScopeService;
-use OAuth2\Services\IClientService;
 use OAuth2\Services\IMementoOAuth2SerializerService;
 use OAuth2\Services\IResourceServerService;
 use OAuth2\Services\ISecurityContextService;
@@ -47,7 +45,7 @@ use Utils\IPHelper;
 use Utils\Services\IAuthService;
 use Utils\Services\IServerConfigurationService;
 use Utils\Services\IServerConfigurationService as IUtilsServerConfigurationService;
-
+use TimeHunter\LaravelGoogleReCaptchaV3\Validations\GoogleReCaptchaV3ValidationRule;
 /**
  * Class UserController
  * @package App\Http\Controllers
@@ -229,9 +227,8 @@ final class UserController extends OpenIdController
 
     public function postLogin()
     {
-        $max_login_attempts_2_show_captcha = $this->server_configuration_service->getConfigValue("MaxFailed.LoginAttempts.2ShowCaptcha");
-        $login_attempts                    = 0;
-        $username                          = '';
+        $login_attempts = 0;
+        $username       = '';
         try
         {
 
@@ -239,20 +236,19 @@ final class UserController extends OpenIdController
 
             if(isset($data['username']))
                 $data['username'] = trim($data['username']);
+
             if(isset($data['password']))
                 $data['password'] = trim($data['password']);
 
             $login_attempts = intval(Input::get('login_attempts'));
+
             // Build the validation constraint set.
-            $rules = array
-            (
-                'username' => 'required|email',
-                'password' => 'required',
-            );
-            if ($login_attempts >= $max_login_attempts_2_show_captcha)
-            {
-                $rules['g-recaptcha-response'] = 'required|recaptcha';
-            }
+            $rules = [
+                'username'              => 'required|email',
+                'password'              => 'required',
+                'g-recaptcha-response'  => [new GoogleReCaptchaV3ValidationRule('login')]
+            ];
+
             // Create a new validator instance.
             $validator = Validator::make($data, $rules);
 
@@ -278,24 +274,20 @@ final class UserController extends OpenIdController
 
                 return $this->login_strategy->errorLogin
                 (
-                    array
-                    (
-                        'max_login_attempts_2_show_captcha' => $max_login_attempts_2_show_captcha,
+                    [
                         'login_attempts'                    => $login_attempts,
                         'username'                          => $username,
                         'error_message'                     => "We are sorry, your username or password does not match an existing record."
-                    )
+                    ]
                 );
             }
             // validator errors
             return $this->login_strategy->errorLogin
             (
-                array
-                (
-                    'max_login_attempts_2_show_captcha' => $max_login_attempts_2_show_captcha,
+               [
                     'login_attempts'                    => $login_attempts,
                     'validator'                         => $validator
-                )
+                ]
             );
         }
         catch(UnverifiedEmailMemberException $ex1)
@@ -303,13 +295,11 @@ final class UserController extends OpenIdController
             Log::warning($ex1);
             return $this->login_strategy->errorLogin
             (
-                array
-                (
-                    'max_login_attempts_2_show_captcha' => $max_login_attempts_2_show_captcha,
+               [
                     'login_attempts'                    => $login_attempts,
                     'username'                          => $username,
                     'error_message'                     => $ex1->getMessage()
-                )
+               ]
             );
         }
         catch(AuthenticationException $ex2){

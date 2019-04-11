@@ -17,12 +17,11 @@ use Illuminate\Support\Facades\Log;
 use OpenId\Services\IUserService;
 use Utils\Services\ISecurityPolicyCounterMeasure;
 use Utils\Services\IServerConfigurationService;
-
 /**
  * Class LockUserCounterMeasure
  * @package Services\SecurityPolicies
  */
-class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
+final class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
 {
     /**
      * @var IServerConfigurationService
@@ -57,7 +56,7 @@ class LockUserCounterMeasure implements ISecurityPolicyCounterMeasure
      * @param array $params
      * @return $this
      */
-    public function trigger(array $params = array())
+    public function trigger(array $params = [])
     {
         try {
             if (isset($params["user_identifier"])) {
