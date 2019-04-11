@@ -14,10 +14,9 @@
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-use Monolog\Handler\NativeMailerHandler;
 use Illuminate\Support\Facades\Validator;
 use Validators\CustomValidator;
-
+use App\Http\Utils\Log\LaravelMailerHandler;
 /**
  * Class AppServiceProvider
  * @package App\Providers
@@ -43,9 +42,8 @@ class AppServiceProvider extends ServiceProvider
         $from = Config::get('log.from_email');
 
         if (!empty($to) && !empty($from)) {
-
-            $subject  = 'openstackid error';
-            $handler  = new NativeMailerHandler($to, $subject, $from);
+            $subject = Config::get('log.email_subject', 'openstackid-resource-server error');
+            $handler = new LaravelMailerHandler($to, $subject, $from);
             $handler->setLevel(Config::get('log.email_level', 'error'));
             $logger->pushHandler($handler);
         }

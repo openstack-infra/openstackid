@@ -153,6 +153,7 @@ return [
         Collective\Html\HtmlServiceProvider::class,
         \Providers\OAuth2\ClientAuthContextValidatorFactoryProvider::class,
         Greggilbert\Recaptcha\RecaptchaServiceProvider::class,
+        Sichikawa\LaravelSendgridDriver\SendgridTransportServiceProvider::class,
     ],
 
     /*
